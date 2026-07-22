@@ -1,7 +1,7 @@
 import request from '../utils/request'
 
 /**
- * 提交 HTTP 请求文本进行漏洞检测
+ * 提交 HTTP 请求文本进行攻击载荷识别
  */
 export function detectVulnerability(rawRequest) {
   return request({

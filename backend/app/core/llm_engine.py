@@ -1,5 +1,5 @@
 """
-LLM 调用引擎 — 异步调用 LLM API 做漏洞检测。
+LLM 调用引擎 — 异步调用 LLM API 做攻击载荷识别。
 
 支持 provider：
 - glm (智谱 GLM-4-Flash, 免费)
@@ -132,7 +132,7 @@ class LLMEngine:
 
     async def detect(self, messages: list[dict]) -> dict:
         """
-        调用 LLM 进行漏洞检测。
+        调用 LLM 进行攻击载荷识别。
         Returns: 包含 is_vulnerable, vulnerabilities 等字段的 dict
         """
         try:

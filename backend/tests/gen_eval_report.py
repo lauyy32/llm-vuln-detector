@@ -16,7 +16,7 @@ style.element.rPr.rFonts.set(docx.oxml.ns.qn("w:eastAsia"), "宋体")
 
 # 标题
 title = doc.add_heading("", level=0)
-run = title.add_run("LLM-VulnDetector 漏洞检测系统评测报告")
+run = title.add_run("LLM-VulnDetector 攻击载荷识别系统评测报告")
 run.font.size = Pt(22)
 run.font.color.rgb = RGBColor(0, 21, 41)
 title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -31,7 +31,7 @@ doc.add_paragraph("")
 # 一、实验目的
 doc.add_heading("一、实验目的", level=1)
 doc.add_paragraph(
-    "为了验证 LLM-VulnDetector 系统在 HTTP 漏洞检测任务上的实际效果，"
+    "为了验证 LLM-VulnDetector 系统在 HTTP 攻击载荷识别任务上的实际效果，"
     "我构建了一套覆盖 10 类常见 Web 漏洞的标准评测数据集，"
     "对系统进行了全量测试。本次评测的核心目标是量化回答以下问题："
 )
