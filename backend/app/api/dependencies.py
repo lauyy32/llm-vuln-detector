@@ -1,11 +1,12 @@
 """
 FastAPI 依赖注入 — 提供 LLMEngine 和 HistoryStore 的单例。
 """
+from typing import Optional
 from app.core.llm_engine import LLMEngine
 from app.utils.history_store import SQLiteHistoryStore
 
-_llm_engine: LLMEngine | None = None
-_history_store: SQLiteHistoryStore | None = None
+_llm_engine: Optional[LLMEngine] = None
+_history_store: Optional[SQLiteHistoryStore] = None
 
 
 def set_llm_engine(engine: LLMEngine):

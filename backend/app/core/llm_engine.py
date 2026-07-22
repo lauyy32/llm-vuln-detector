@@ -13,6 +13,7 @@ LLM 调用引擎 — 异步调用 LLM API 做漏洞检测。
 import json
 import logging
 import httpx
+from typing import Optional
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -51,7 +52,7 @@ class LLMEngine:
         self.timeout = config.get("timeout", 60)
         self.max_retries = config.get("max_retries", 3)
         self.temperature = config.get("temperature", 0.1)
-        self._client: httpx.AsyncClient | None = None
+        self._client: Optional[httpx.AsyncClient] = None
 
         if not self.api_key:
             raise LLMEngineError(f"未配置 {self.provider} 的 API Key")

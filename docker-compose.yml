@@ -18,5 +18,33 @@ services:
       - backend
     restart: unless-stopped
 
+  # ============================================================
+  #  DVWA — Web 漏洞靶场（用于端到端验证）
+  #  http://localhost:8080
+  #  默认登录: admin / password
+  # ============================================================
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  # ============================================================
+  #  ModSecurity + OWASP CRS — WAF 对比基线
+  #  http://localhost:8081 → 代理到 dvwa:80
+  #  被拦截的请求返回 403
+  # ============================================================
+  modsecurity:
+    image: owasp/modsecurity-crs:nginx
+    ports:
+      - "8081:8080"
+    environment:
+      BACKEND: "http://dvwa:80"
+      PARANOIA: "1"
+      PROXY_TIMEOUT: "60"
+    depends_on:
+      - dvwa
+    restart: unless-stopped
+
 volumes:
   backend-data:
