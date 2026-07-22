@@ -308,7 +308,7 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - [x] DVWA 三档难度（low/medium/high）+ ModSecurity 三级 PL
 - [x] CoT 分步推理 — 编码检测 + 混淆分析 + 深度上下文增强（v2.0）
 - [x] 三模式消融对比框架（cot / standard / no-context）
-- [x] 运行 206 条对抗样本 CoT 模式实测
+- [x] 运行 246 条对抗样本 CoT 模式实测
 - [x] 补充 40 条正常混淆样本到对抗数据集（支持误报率评测）
 - [x] 运行 246 条对抗样本完整评测（含正常样本，获取真实误报率）
 - [ ] 运行三模式对比评测（Standard / No-Context，量化 CoT 增益）
@@ -343,12 +343,12 @@ llm-vuln-detector/
 │   │   ├── evaluate.py            # v1.0 评测脚本（56条）
 │   │   ├── ablation.py            # 消融实验脚本
 │   │   ├── benchmark_dvwa.py      # DVWA 端到端 + ModSecurity 多维度对比
-│   │   ├── generate_adversarial.py# 对抗样本生成器（206条）
+│   │   ├── generate_adversarial.py# 对抗样本生成器 + 正常样本（246条）
 │   │   ├── gen_eval_report.py     # Word 评测报告生成
 │   │   ├── gen_ablation_report.py # Word 消融实验报告生成
 │   │   └── dataset/
 │   │       ├── test_cases.json    # 56 条标准评测数据集
-│   │       └── adversarial_samples.json  # 206 条对抗样本
+│   │       └── adversarial_samples.json  # 246 条对抗样本（206攻击+40正常）
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/

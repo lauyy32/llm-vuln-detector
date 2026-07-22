@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="LLM-VulnDetector",
     description="基于大语言模型的 HTTP 攻击载荷识别 API",
-    version="1.0.0",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
@@ -77,7 +77,7 @@ async def root():
     """根路径 — 返回 API 信息。"""
     return {
         "name": "LLM-VulnDetector",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "docs": "/docs",
         "health": "/health",
     }
