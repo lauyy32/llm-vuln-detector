@@ -25,8 +25,10 @@
 
 - **10 类攻击 payload 识别**：SQL注入、XSS、命令注入、路径穿越、SSRF、文件上传、XXE、SSTI、NoSQL注入、开放重定向
 - **上下文增强**：HTTP 请求结构化解析 + 13 类正则预扫描，将风险信号作为上下文提供给 LLM
-- **降误报设计**：few-shot 示例 + 自检机制（false_positive_check）+ 置信度量化
+- **DVWA 靶场端到端验证**：在真实 Web 漏洞靶场上自动化攻击 + 检测，覆盖 SQLi / Blind SQLi / XSS / CMDi / LFI
+- **ModSecurity CRS 横向对比**：与 OWASP ModSecurity CRS（工业级 WAF）双轨评测，对比检出率与误报率
 - **消融实验支持**：内置无上下文增强对照接口，可对比"有/无上下文增强"的效果差异
+- **降误报设计**：few-shot 示例 + 自检机制 + 置信度量化
 - **批量检测 + SQLite 持久化 + 统计面板**
 - **Docker 一键部署**
 
@@ -150,6 +152,8 @@ python tests/ablation.py   # 对比 有上下文增强 vs 无上下文增强
 
 所以这个 100% 只能说明"原型在自建数据集上能跑通"，**不代表真实场景下的检测能力**。
 
+> **补充验证**：项目已支持 DVWA 真实靶场端到端验证 + ModSecurity CRS 横向对比（见上方 "DVWA 靶场端到端验证"）。该评测在真实 Web 应用环境中运行，比 56 条手工数据集更具参考价值。
+
 ## 与我所正在研究的课题的关联
 
 | 课题要求 | 本项目对应 |
@@ -158,6 +162,8 @@ python tests/ablation.py   # 对比 有上下文增强 vs 无上下文增强
 | 智能（LLM）分析 | `llm_engine.py` + `prompt_templates.py` Prompt 工程 |
 | 消融实验 | `/api/detect-no-context` + `ablation.py` |
 | 量化评测 | 56 条数据集 + `evaluate.py`（宽松/严格两套指标） |
+| 端到端验证 | DVWA 靶场 + `benchmark_dvwa.py`（真实攻击场景） |
+| 横向对比 | ModSecurity OWASP CRS 双轨评测（工业级 WAF 基线） |
 | 属性图（CPG）创新点 | **尚未实现**，当前结构化上下文是理解 CPG 的第一步 |
 
 ## 后续计划
