@@ -175,7 +175,7 @@ python tests/evaluate_v2.py --max-samples 20 --modes cot
 | 数据集 | 数量 | 说明 |
 |---|---|---|
 | `dataset/test_cases.json` | 56 条 | 手工构造（41攻击 + 12正常 + 3边界） |
-| `dataset/adversarial_samples.json` | 206 条 | 编码/混淆/绕过变体（5大类 × 50+技术） |
+| `dataset/adversarial_samples.json` | 246 条 | 206条攻击（编码/混淆/绕过）+ 40条正常混淆样本 |
 
 ### DVWA 靶场端到端验证 + ModSecurity 对比
 
@@ -203,20 +203,30 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 
 ## 评测结果
 
-> **说明**：v1.0 在 56 条手工构造测试用例上达到 100% 准确率；v2.0 已完成 206 条对抗样本的 CoT 模式实测，结果如下。
+> **说明**：v1.0 在 56 条手工构造测试用例上达到 100% 准确率；v2.0 已完成 246 条对抗样本（206 攻击 + 40 正常）的 CoT 模式实测，结果如下。**⚠️ 首次评测仅含 206 条攻击样本（误报率无效）；数据集现已补充 40 条正常混淆样本，重新运行可测得真实误报率。**
 
-### v2.0 CoT 模式在 206 条对抗样本上的实测结果
+### v2.0 CoT 模式在 206 条对抗攻击样本上的实测结果
 
-测试时间：2026-07-22 | 数据集：`dataset/adversarial_samples.json` | 模式：`cot`
+测试时间：2026-07-22 | 数据集：`dataset/adversarial_samples.json`（当时仅含攻击样本） | 模式：`cot`
 
-| 指标 | 数值 |
-|---|---|
-| 总样本数 | 206 |
-| 检测率（类型正确） | 76.7% |
-| 严格检测率（识别为攻击） | 99.5% |
-| 漏报率 | 0.5% |
-| 误报率 | 0% |
-| API 错误 | 0 |
+**⚠️ 注意**：此轮评测数据集仅含攻击正例，因此误报率 = 0% 无统计意义。对抗数据集现已扩充至 246 条（含 40 条正常混淆样本），请重新运行评测获取真实误报率。
+
+| 指标 | 数值 | 说明 |
+|---|---|---|
+| 总样本数 | 206 | 全部为攻击样本 |
+| 检测率（类型正确） | 76.7% | 系统正确识别攻击类型 |
+| 严格检测率（识别为攻击） | 99.5% | 几乎全部被识别为攻击载荷 |
+| 漏报率 | 0.5% | 仅 1 条漏报（adv_waf_011） |
+| 误报率 | — | 此轮无正常样本，不可计算 |
+| API 错误 | 0 | — |
+
+### v2.0 CoT 模式在 246 条对抗样本（含正常样本）上的实测结果
+
+> **⬜ 待运行**：数据集已扩充至 246 条（206 攻击 + 40 正常混淆）。运行以下命令获取含真实误报率的完整结果：
+> ```bash
+> cd backend
+> python tests/evaluate_v2.py --dataset adversarial --modes cot
+> ```
 
 **按攻击类型拆分**：
 
@@ -254,10 +264,11 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - ✅ CoT 分步推理模式——编码检测 + 混淆分析 + 分步推理
 - ✅ Standard 模式——消融对比（量化 CoT 的增益）
 - ✅ 三模式评分框架——cot vs standard vs no-context
-- ✅ 206 条对抗样本数据集（编码/混淆/WAF绕过/协议走私）
-- ✅ 对抗样本 CoT 实测结果（206 条）
+- ✅ 246 条对抗样本数据集（206 攻击 + 40 正常混淆）
+- ✅ 对抗样本 CoT 实测结果（206 攻击样本）
 - ✅ DVWA 三档难度验证框架（代码已就绪，待运行）
 - ✅ ModSecurity CRS PL1/PL2/PL3 三级对比框架（代码已就绪，待运行）
+- ⬜ 246 条对抗样本完整评测（含正常样本，获取真实误报率）
 - ⬜ Standard / No-Context 消融实测结果
 - ⬜ DVWA + ModSecurity 实测结果
 
@@ -266,16 +277,16 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 运行 `python tests/evaluate_v2.py --dataset all --modes cot standard no-context` 后，结果将填入以下表格：
 
 ```
-┌─────────────────┬──────────┬──────────┬──────────┐
-│ 模式            │ 标准检测率│ 对抗检测率│ 退化幅度  │
-├─────────────────┼──────────┼──────────┼──────────┤
-│ CoT（增强+COT） │    ?%    │  76.7%   │   ?pp    │
-│ Standard（增强） │    ?%    │    ?%    │   ?pp    │
-│ No-Context（基线）│    ?%    │    ?%    │   ?pp    │
-└─────────────────┴──────────┴──────────┴──────────┘
+┌─────────────────┬──────────┬──────────┬──────────┬──────────┐
+│ 模式            │ 标准检测率│ 对抗检测率│ 退化幅度  │ 误报率   │
+├─────────────────┼──────────┼──────────┼──────────┼──────────┤
+│ CoT（增强+COT） │    ?%    │  76.7%   │   ?pp    │   ?%     │
+│ Standard（增强） │    ?%    │    ?%    │   ?pp    │   ?%     │
+│ No-Context（基线）│    ?%    │    ?%    │   ?pp    │   ?%     │
+└─────────────────┴──────────┴──────────┴──────────┴──────────┘
 ```
 
-注：`?%` 为尚未运行的模式/数据集。
+注：`?%` 为尚未运行的模式/数据集。76.7% 为仅含攻击样本的旧评测结果（无正常样本），建议使用 `--dataset all` 重新获取完整数据。
 
 ---
 
@@ -286,7 +297,7 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 | 上下文增强 | `context_builder.py` — 编码检测 + 混淆分析 + 22 类正则预扫描（v2.0 多维上下文） |
 | 智能（LLM）分析 | `llm_engine.py` + `prompt_templates.py` — CoT 分步推理 + Standard 消融 Prompt |
 | 消融实验 | `/api/detect` vs `/api/detect-standard` vs `/api/detect-no-context` 三模式对比 |
-| 量化评测 | 56 条标准 + 206 条对抗样本 + `evaluate_v2.py`（三模式对比框架） |
+| 量化评测 | 56 条标准 + 246 条对抗样本 + `evaluate_v2.py`（三模式对比框架） |
 | 端到端验证 | DVWA 靶场 + `benchmark_dvwa.py`（真实攻击场景，三档难度） |
 | 横向对比 | ModSecurity OWASP CRS 三档 PL 对比（工业级 WAF 基线） |
 | 属性图（CPG）创新点 | **尚未实现** — 当前 v2.0 的上下文增强是请求侧分析，CPG 是下一阶段核心创新方向 |
@@ -296,12 +307,14 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 ## 后续计划
 
 - [x] 引入 DVWA 靶场验证 + ModSecurity CRS 横向对比
-- [x] 增加对抗性测试（206 条编码/混淆/绕过变体）
+- [x] 增加对抗性测试（246 条：206 攻击 + 40 正常混淆）
 - [x] DVWA 三档难度（low/medium/high）+ ModSecurity 三级 PL
 - [x] CoT 分步推理 — 编码检测 + 混淆分析 + 深度上下文增强（v2.0）
 - [x] 三模式消融对比框架（cot / standard / no-context）
 - [x] 运行 206 条对抗样本 CoT 模式实测
-- [ ] 运行 206 条对抗样本三模式对比评测（Standard / No-Context）
+- [x] 补充 40 条正常混淆样本到对抗数据集（支持误报率评测）
+- [ ] 运行 246 条对抗样本完整评测（含正常样本，获取真实误报率）
+- [ ] 运行三模式对比评测（Standard / No-Context，量化 CoT 增益）
 - [ ] 运行 DVWA + ModSecurity 实测 + 披露对比结果
 - [ ] 扩大数据集至 500+ 真实/对抗混合样本
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
