@@ -103,28 +103,39 @@ python tests/evaluate.py --output report.json # 输出到文件
 ### DVWA 靶场端到端验证 + ModSecurity 对比
 
 ```bash
-# 1. 启动靶场和 WAF
-docker-compose up -d dvwa modsecurity
+# 1. 启动靶场和 WAF（3 档 Paranoia Level）
+docker-compose up -d dvwa modsecurity-pl1 modsecurity-pl2 modsecurity-pl3
 # 等待容器启动（约30秒）
 
 # 2. 启动 LLM-VulnDetector 后端
 docker-compose up -d backend
 # 或手动: uvicorn app.main:app --reload --port 8000
 
-# 3. 运行对比评测
+# 3. 运行多维度对比评测
 cd backend
-python tests/benchmark_dvwa.py               # 运行完整对比评测
-python tests/benchmark_dvwa.py --no-modsec    # 仅 LLM-VulnDetector（无 ModSecurity 时）
-python tests/benchmark_dvwa.py --output custom.json
+python tests/benchmark_dvwa.py                    # 完整: 3 难度 x 3 PL
+python tests/benchmark_dvwa.py --modsec-pls PL1   # 仅 PL1
+python tests/benchmark_dvwa.py --no-modsec         # 仅 LLM（无 ModSecurity）
 ```
 
-测试矩阵：**6 个漏洞场景 × 2 种请求（benign/attack）= 12 条测试用例**，双轨对比：
+测试矩阵：**DVWA low/medium/high（3 档）x 6 个场景 x 2 种请求 = 36 条 LLM 检测**，每条同时过 ModSecurity PL1/PL2/PL3（3 档），共 108 次 WAF 检测。
 
 | 对比维度 | LLM-VulnDetector | ModSecurity OWASP CRS |
 |---|---|---|
-| 检测方式 | 离线分析 raw HTTP | 在线 WAF 拦截 |
+| 检测方式 | 离线分析 raw HTTP | 在线 WAF 拦截（3 档 PL） |
 | 攻击场景 | SQLi / Blind SQLi / Reflected XSS / Stored XSS / CMDi / LFI |
-| 运行环境 | DVWA (low) + DeepSeek-Chat | ModSecurity + nginx 代理 (Paranoia 1) |
+| 难度梯度 | DVWA low → medium → high | Paranoia 1 → 2 → 3 |
+| 用例数 | 36 | 108（36 × 3 PL） |
+
+### 对抗样本测试
+
+```bash
+cd backend
+python tests/generate_adversarial.py    # 生成 206 条编码/混淆/绕过样本
+python tests/evaluate.py --dataset dataset/adversarial_samples.json  # 对抗样本评测
+```
+
+样本覆盖：URL编码/双编码、Unicode、HTML实体、大小写混淆、注释绕过、空白符变体、HTTP头注入、协议走私等。
 
 ### 消融实验
 
@@ -147,12 +158,12 @@ python tests/ablation.py   # 对比 有上下文增强 vs 无上下文增强
 
 1. **样本量略小**。56 条用例可能不足以证明泛化能力，个人认为真实场景的攻击变体远比这复杂。
 2. **我所采用的正例都是教科书式 payload**。"1' OR '1'='1"、"<script>alert(1)</script>"这类特征直接出现在正则规则和 few-shot 示例里，个人认为相当于"先告诉答案再考试"。
-3. **并没有盲测**。缺少编码绕过、WAF 绕过、真实流量负例等对抗性样本。
+3. **并没有盲测**。正在通过对抗样本数据集（206 条编码/混淆/绕过变体）补充对抗性测试。
 4. **检测的是请求，不是漏洞**。系统能判断"这条请求长得像 SQL 注入"，不能判断"目标系统真的存在 SQL 注入"。
 
 所以这个 100% 只能说明"原型在自建数据集上能跑通"，**不代表真实场景下的检测能力**。
 
-> **补充验证**：项目已支持 DVWA 真实靶场端到端验证 + ModSecurity CRS 横向对比（见上方 "DVWA 靶场端到端验证"）。该评测在真实 Web 应用环境中运行，比 56 条手工数据集更具参考价值。
+> **补充验证**：项目已支持 DVWA 真实靶场端到端验证（3 档难度）+ ModSecurity CRS 三级 Paranoia Level 横向对比（见上方 "DVWA 靶场端到端验证"）。另含 206 条对抗样本数据集（编码/混淆/绕过变体），用于鲁棒性测试。
 
 ## 与我所正在研究的课题的关联
 
@@ -169,7 +180,9 @@ python tests/ablation.py   # 对比 有上下文增强 vs 无上下文增强
 ## 后续计划
 
 - [x] 引入 DVWA 靶场验证 + ModSecurity CRS 横向对比
-- [ ] 增加对抗性测试（编码绕过、WAF 绕过等变体）
+- [x] 增加对抗性测试（206 条编码绕过、WAF 绕过等变体）
+- [x] DVWA 三档难度（low/medium/high）+ ModSecurity 三级 PL
+- [ ] 对抗样本评测结果补充到 README
 - [ ] 扩大数据集至 500+ 真实/对抗混合样本
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
 - [ ] 探索 CPG（Code Property Graph）级别的上下文增强
@@ -194,8 +207,9 @@ llm-vuln-detector/
 │   │   ├── test_*.py              # 单元测试（54个）
 │   │   ├── evaluate.py            # 评测脚本（56条数据集）
 │   │   ├── ablation.py            # 消融实验脚本
-│   │   ├── benchmark_dvwa.py      # DVWA 端到端 + ModSecurity 对比评测
+│   │   ├── benchmark_dvwa.py      # DVWA 端到端 + ModSecurity 对比评测（多难度）
 │   │   └── dataset/test_cases.json# 56条评测数据集
+│   │       adversarial_samples.json # 206条对抗样本数据集
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/

@@ -30,17 +30,43 @@ services:
     restart: unless-stopped
 
   # ============================================================
-  #  ModSecurity + OWASP CRS — WAF 对比基线
-  #  http://localhost:8081 → 代理到 dvwa:80
+  #  ModSecurity + OWASP CRS — WAF 对比基线（3 档 Paranoia Level）
+  #  PL1 (8081): 默认规则集，低误报
+  #  PL2 (8082): 更激进的规则，中等误报
+  #  PL3 (8083): 最激进，高检出但可能高误报
   #  被拦截的请求返回 403
   # ============================================================
-  modsecurity:
+  modsecurity-pl1:
     image: owasp/modsecurity-crs:nginx
     ports:
       - "8081:8080"
     environment:
       BACKEND: "http://dvwa:80"
       PARANOIA: "1"
+      PROXY_TIMEOUT: "60"
+    depends_on:
+      - dvwa
+    restart: unless-stopped
+
+  modsecurity-pl2:
+    image: owasp/modsecurity-crs:nginx
+    ports:
+      - "8082:8080"
+    environment:
+      BACKEND: "http://dvwa:80"
+      PARANOIA: "2"
+      PROXY_TIMEOUT: "60"
+    depends_on:
+      - dvwa
+    restart: unless-stopped
+
+  modsecurity-pl3:
+    image: owasp/modsecurity-crs:nginx
+    ports:
+      - "8083:8080"
+    environment:
+      BACKEND: "http://dvwa:80"
+      PARANOIA: "3"
       PROXY_TIMEOUT: "60"
     depends_on:
       - dvwa
