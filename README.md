@@ -203,7 +203,37 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 
 ## 评测结果
 
-> **说明**：以下为 v1.0 在 56 条手工构造测试用例上的基准结果。v2.0 CoT 增强版在三模式对比评测上的结果请运行 `evaluate_v2.py` 获取。
+> **说明**：v1.0 在 56 条手工构造测试用例上达到 100% 准确率；v2.0 已完成 206 条对抗样本的 CoT 模式实测，结果如下。
+
+### v2.0 CoT 模式在 206 条对抗样本上的实测结果
+
+测试时间：2026-07-22 | 数据集：`dataset/adversarial_samples.json` | 模式：`cot`
+
+| 指标 | 数值 |
+|---|---|
+| 总样本数 | 206 |
+| 检测率（类型正确） | 76.7% |
+| 严格检测率（识别为攻击） | 99.5% |
+| 漏报率 | 0.5% |
+| 误报率 | 0% |
+| API 错误 | 0 |
+
+**按攻击类型拆分**：
+
+| 类型 | 样本数 | 类型正确率 | 识别为攻击率 | 主要问题 |
+|---|---|---|---|---|
+| SQL注入 | 59 | 100.0% | 100.0% | — |
+| XSS | 67 | 100.0% | 100.0% | — |
+| 命令注入 | 29 | 100.0% | 100.0% | — |
+| 文件包含 | 19 | 15.8% | 100.0% | 多数被判为其他攻击类型 |
+| WAF绕过/综合 | 32 | 0.0% | 96.9% | 类型不匹配，被归为具体攻击类 |
+
+**结果解读**：
+- CoT 模式对传统攻击类型（SQLi / XSS / 命令注入）保持 **100% 类型正确率**，说明编码检测 + 混淆分析 + CoT 推理对常规绕过有效。
+- **严格检测率 99.5%** 意味着系统几乎识别出了所有攻击载荷，仅漏报 1 条（`adv_waf_011`，`OPTIONS / HTTP/1.1`）。
+- 主要短板在 **WAF绕过/综合** 与 **文件包含** 两类：系统倾向于把这些"综合绕过"样本识别为具体的 SQLi/XSS，导致类型判错。这反映了当前分类标签粒度和混淆样本定义上的问题，下一步可通过细化标签或增加综合类 few-shot 示例改进。
+
+### v1.0 基准结果（56 条手工用例）
 
 在 56 条手工构造的测试用例上（41 条攻击正例 + 12 条正常请求 + 3 条边界用例）：
 
@@ -215,8 +245,8 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 
 **在此必须说明的局限性**：
 
-1. **样本量小且为教科书式**。56 条正例都是教科书 payload（"1' OR '1'='1"、"<script>alert(1)</script>"），这些特征直接出现在正则规则和 few-shot 示例里，相当于"先告诉答案再考试"。
-2. **没有对抗性样本的实际结果**。206 条对抗样本数据集已生成，但尚未完整运行三模式对比评测。预期在对抗样本上检出率会**显著下降**，尤其是多层编码 + 混淆的组合场景。
+1. **样本量小且为教科书式**。56 条正例都是教科书 payload，这些特征直接出现在正则规则和 few-shot 示例里，相当于"先告诉答案再考试"。
+2. **对抗样本结果已部分披露**。206 条对抗样本 CoT 模式已实测；Standard / No-Context 消融对比建议补跑以量化 CoT 增益。
 3. **检测的是请求，不是漏洞**。系统能判断"这条请求长得像 SQL 注入"，不能判断"目标系统真的存在 SQL 注入"。
 4. **DVWA 评测尚未实际运行**。代码已支持三档难度 + 三级 ModSecurity PL，但因需要完整 Docker 环境，尚未获取实测数据。
 
@@ -225,24 +255,27 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - ✅ Standard 模式——消融对比（量化 CoT 的增益）
 - ✅ 三模式评分框架——cot vs standard vs no-context
 - ✅ 206 条对抗样本数据集（编码/混淆/WAF绕过/协议走私）
+- ✅ 对抗样本 CoT 实测结果（206 条）
 - ✅ DVWA 三档难度验证框架（代码已就绪，待运行）
 - ✅ ModSecurity CRS PL1/PL2/PL3 三级对比框架（代码已就绪，待运行）
-- ⬜ 对抗样本实测结果（待运行 `evaluate_v2.py`）
-- ⬜ DVWA + ModSecurity 实测结果（待运行 `benchmark_dvwa.py`）
+- ⬜ Standard / No-Context 消融实测结果
+- ⬜ DVWA + ModSecurity 实测结果
 
 ### 预期评测表格（运行后填入）
 
-运行 `python tests/evaluate_v2.py --dataset all` 后，结果将填入以下表格：
+运行 `python tests/evaluate_v2.py --dataset all --modes cot standard no-context` 后，结果将填入以下表格：
 
 ```
 ┌─────────────────┬──────────┬──────────┬──────────┐
 │ 模式            │ 标准检测率│ 对抗检测率│ 退化幅度  │
 ├─────────────────┼──────────┼──────────┼──────────┤
-│ CoT（增强+COT） │    ?%    │    ?%    │   ?pp    │
+│ CoT（增强+COT） │    ?%    │  76.7%   │   ?pp    │
 │ Standard（增强） │    ?%    │    ?%    │   ?pp    │
 │ No-Context（基线）│    ?%    │    ?%    │   ?pp    │
 └─────────────────┴──────────┴──────────┴──────────┘
 ```
+
+注：`?%` 为尚未运行的模式/数据集。
 
 ---
 
@@ -267,7 +300,8 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - [x] DVWA 三档难度（low/medium/high）+ ModSecurity 三级 PL
 - [x] CoT 分步推理 — 编码检测 + 混淆分析 + 深度上下文增强（v2.0）
 - [x] 三模式消融对比框架（cot / standard / no-context）
-- [ ] 运行 206 条对抗样本实测 + 披露三模式对比结果
+- [x] 运行 206 条对抗样本 CoT 模式实测
+- [ ] 运行 206 条对抗样本三模式对比评测（Standard / No-Context）
 - [ ] 运行 DVWA + ModSecurity 实测 + 披露对比结果
 - [ ] 扩大数据集至 500+ 真实/对抗混合样本
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
