@@ -2,6 +2,7 @@
 Pydantic 数据模型定义 — 前后端统一数据契约。
 """
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -95,7 +96,7 @@ class HistoryListResponse(BaseModel):
 class HistoryDetailResponse(BaseModel):
     """历史记录详情响应。"""
     success: bool
-    data: DetectResponse | None = None
+    data: Optional[DetectResponse] = None
 
 
 # ============================================================
@@ -117,7 +118,7 @@ class BatchDetectItem(BaseModel):
     index: int = Field(..., description="在批量请求中的序号")
     success: bool = Field(..., description="该条检测是否成功")
     error: str = Field("", description="失败原因（success=false 时）")
-    result: DetectResponse | None = Field(None, description="检测结果（success=true 时）")
+    result: Optional[DetectResponse] = Field(None, description="检测结果（success=true 时）")
 
 
 class BatchDetectResponse(BaseModel):

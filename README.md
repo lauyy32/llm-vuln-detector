@@ -93,10 +93,36 @@ python -m pytest tests/ -v
 
 ```bash
 cd backend
-python tests/evaluate.py                     # 全量评测
+python tests/evaluate.py                     # 全量评测（56条标准数据集）
 python tests/evaluate.py --category SQL注入   # 只评某一类
 python tests/evaluate.py --output report.json # 输出到文件
 ```
+
+### DVWA 靶场端到端验证 + ModSecurity 对比
+
+```bash
+# 1. 启动靶场和 WAF
+docker-compose up -d dvwa modsecurity
+# 等待容器启动（约30秒）
+
+# 2. 启动 LLM-VulnDetector 后端
+docker-compose up -d backend
+# 或手动: uvicorn app.main:app --reload --port 8000
+
+# 3. 运行对比评测
+cd backend
+python tests/benchmark_dvwa.py               # 运行完整对比评测
+python tests/benchmark_dvwa.py --no-modsec    # 仅 LLM-VulnDetector（无 ModSecurity 时）
+python tests/benchmark_dvwa.py --output custom.json
+```
+
+测试矩阵：**6 个漏洞场景 × 2 种请求（benign/attack）= 12 条测试用例**，双轨对比：
+
+| 对比维度 | LLM-VulnDetector | ModSecurity OWASP CRS |
+|---|---|---|
+| 检测方式 | 离线分析 raw HTTP | 在线 WAF 拦截 |
+| 攻击场景 | SQLi / Blind SQLi / Reflected XSS / Stored XSS / CMDi / LFI |
+| 运行环境 | DVWA (low) + DeepSeek-Chat | ModSecurity + nginx 代理 (Paranoia 1) |
 
 ### 消融实验
 
@@ -136,8 +162,9 @@ python tests/ablation.py   # 对比 有上下文增强 vs 无上下文增强
 
 ## 后续计划
 
-- [ ] 引入 DVWA 靶场样本，扩大数据集规模
+- [x] 引入 DVWA 靶场验证 + ModSecurity CRS 横向对比
 - [ ] 增加对抗性测试（编码绕过、WAF 绕过等变体）
+- [ ] 扩大数据集至 500+ 真实/对抗混合样本
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
 - [ ] 探索 CPG（Code Property Graph）级别的上下文增强
 - [ ] 接入服务端反馈（HTTP 响应状态/内容），从"payload 识别"走向"漏洞确认"
@@ -159,8 +186,9 @@ llm-vuln-detector/
 │   │   └── utils/history_store.py # SQLite 持久化
 │   ├── tests/
 │   │   ├── test_*.py              # 单元测试（54个）
-│   │   ├── evaluate.py            # 评测脚本
+│   │   ├── evaluate.py            # 评测脚本（56条数据集）
 │   │   ├── ablation.py            # 消融实验脚本
+│   │   ├── benchmark_dvwa.py      # DVWA 端到端 + ModSecurity 对比评测
 │   │   └── dataset/test_cases.json# 56条评测数据集
 │   ├── Dockerfile
 │   └── requirements.txt
