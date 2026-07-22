@@ -1,9 +1,14 @@
 """
-LLM 调用引擎 — 异步调用 LLM API 做攻击载荷识别。
+LLM 调用引擎 v2.0 — 异步调用 LLM API 做攻击载荷识别。
+
+支持模式：
+- cot: Chain-of-Thought 分步推理（默认，使用增强上下文 + CoT prompt）
+- standard: 标准检测（使用增强上下文 + 标准 prompt，消融对比）
+- no-context: 无上下文增强（消融基线）
 
 支持 provider：
-- glm (智谱 GLM-4-Flash, 免费)
-- deepseek (DeepSeek-Chat, 付费但便宜)
+- deepseek (DeepSeek-Chat)
+- glm (智谱 GLM-4-Flash)
 
 特性：
 - httpx 异步调用 + 连接池复用
@@ -12,6 +17,7 @@ LLM 调用引擎 — 异步调用 LLM API 做攻击载荷识别。
 """
 import json
 import logging
+import time
 import httpx
 from typing import Optional
 from tenacity import (
@@ -30,13 +36,13 @@ class LLMEngineError(Exception):
 
 
 class LLMEngine:
-    """LLM 调用引擎，支持智谱 GLM 和 DeepSeek。"""
+    """LLM 调用引擎 v2.0，支持 CoT 和标准模式。"""
 
     def __init__(self, config: dict):
         """
         Args:
             config: {
-                "provider": "glm" | "deepseek",
+                "provider": "deepseek" | "glm",
                 "api_key": "xxx",
                 "base_url": "...",
                 "model": "...",
@@ -53,6 +59,11 @@ class LLMEngine:
         self.max_retries = config.get("max_retries", 3)
         self.temperature = config.get("temperature", 0.1)
         self._client: Optional[httpx.AsyncClient] = None
+
+        # v2.0 — 统计信息
+        self.total_calls = 0
+        self.total_time_ms = 0
+        self.failed_calls = 0
 
         if not self.api_key:
             raise LLMEngineError(f"未配置 {self.provider} 的 API Key")
@@ -71,8 +82,8 @@ class LLMEngine:
         retry=retry_if_exception_type((httpx.TimeoutException, httpx.HTTPStatusError)),
         reraise=True,
     )
-    async def _call_api(self, messages: list[dict]) -> str:
-        """实际调用 LLM API，带重试。"""
+    async def _call_api(self, messages: list[dict]) -> tuple[str, float]:
+        """实际调用 LLM API，带重试。返回 (content, elapsed_ms)。"""
         client = await self._get_client()
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -82,27 +93,33 @@ class LLMEngine:
             "model": self.model,
             "messages": messages,
             "temperature": self.temperature,
-            "response_format": {"type": "json_object"},
         }
-        logger.info("调用 LLM: provider=%s, model=%s", self.provider, self.model)
+        # DeepSeek 支持 json_object，智谱不支持
+        if self.provider == "deepseek":
+            payload["response_format"] = {"type": "json_object"}
+
+        logger.info("调用 LLM: provider=%s, model=%s, mode=CoT", self.provider, self.model)
+        t0 = time.time()
         resp = await client.post(
             f"{self.base_url}/chat/completions",
             headers=headers,
             json=payload,
         )
+        elapsed = (time.time() - t0) * 1000
+
         if resp.status_code >= 500:
             raise httpx.HTTPStatusError(
-                f"LLM API 返回 {resp.status_code}: {resp.text}",
+                f"LLM API 返回 {resp.status_code}: {resp.text[:200]}",
                 request=resp.request,
                 response=resp,
             )
         if resp.status_code >= 400:
-            raise LLMEngineError(f"LLM API 请求失败 ({resp.status_code}): {resp.text}")
+            raise LLMEngineError(f"LLM API 请求失败 ({resp.status_code}): {resp.text[:200]}")
         resp.raise_for_status()
         data = resp.json()
         content = data["choices"][0]["message"]["content"]
-        logger.info("LLM 响应成功, 长度=%d", len(content))
-        return content
+        logger.info("LLM 响应成功, 长度=%d, 耗时=%dms", len(content), int(elapsed))
+        return content, elapsed
 
     def _parse_json_response(self, content: str) -> dict:
         """三级容错解析 LLM 返回的 JSON。"""
@@ -132,21 +149,44 @@ class LLMEngine:
 
     async def detect(self, messages: list[dict]) -> dict:
         """
-        调用 LLM 进行攻击载荷识别。
+        调用 LLM 进行攻击载荷识别（CoT 模式）。
         Returns: 包含 is_vulnerable, vulnerabilities 等字段的 dict
         """
         try:
-            raw_content = await self._call_api(messages)
+            raw_content, elapsed = await self._call_api(messages)
+            self.total_calls += 1
+            self.total_time_ms += elapsed
             result = self._parse_json_response(raw_content)
+            result["_meta"] = {
+                "mode": "cot",
+                "elapsed_ms": int(elapsed),
+                "provider": self.provider,
+                "model": self.model,
+            }
             return result
         except httpx.TimeoutException:
+            self.failed_calls += 1
             raise LLMEngineError(f"LLM API 调用超时（{self.timeout}s）")
         except httpx.HTTPStatusError as e:
+            self.failed_calls += 1
             raise LLMEngineError(f"LLM API HTTP 错误: {e}")
         except LLMEngineError:
+            self.failed_calls += 1
             raise
         except Exception as e:
+            self.failed_calls += 1
             raise LLMEngineError(f"LLM 调用异常: {e}")
+
+    def get_stats(self) -> dict:
+        """返回引擎统计信息。"""
+        return {
+            "total_calls": self.total_calls,
+            "failed_calls": self.failed_calls,
+            "total_time_ms": int(self.total_time_ms),
+            "avg_time_ms": int(self.total_time_ms / self.total_calls) if self.total_calls > 0 else 0,
+            "provider": self.provider,
+            "model": self.model,
+        }
 
     async def close(self):
         """关闭 httpx client。"""

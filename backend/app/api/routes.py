@@ -5,7 +5,8 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.llm_engine import LLMEngine, LLMEngineError
-from app.core.context_builder import parse_raw_request, build_detection_messages, build_detection_messages_no_context
+from app.core.context_builder import parse_raw_request, build_detection_messages, build_detection_messages_no_context, build_structured_context
+from app.core.prompt_templates import SYSTEM_PROMPT_STANDARD, USER_PROMPT_TEMPLATE
 from app.models.schemas import (
     DetectRequest,
     DetectResponse,
@@ -111,6 +112,71 @@ async def detect_no_context(
         detection_result = await llm_engine.detect(messages)
     except LLMEngineError as e:
         logger.error("LLM 识别失败(no-context): %s", e)
+        raise HTTPException(status_code=502, detail=f"LLM 识别失败: {e}")
+
+    vulns_raw = detection_result.get("vulnerabilities", [])
+    vulnerabilities = []
+    for v in vulns_raw:
+        try:
+            vulnerabilities.append(VulnerabilityItem(
+                type=v.get("type", "未知"),
+                severity=v.get("severity", "info"),
+                confidence=int(v.get("confidence", 0)),
+                location=v.get("location", ""),
+                payload=v.get("payload", ""),
+                description=v.get("description", ""),
+                remediation=v.get("remediation", ""),
+            ))
+        except Exception as e:
+            logger.warning("解析载荷项失败: %s, raw=%s", e, v)
+
+    risk_level = detection_result.get("risk_level", "info")
+    is_vulnerable = detection_result.get("is_vulnerable", len(vulnerabilities) > 0)
+
+    return DetectResponse(
+        success=True,
+        method=parsed.method,
+        path=parsed.path,
+        host=parsed.host,
+        is_vulnerable=is_vulnerable,
+        risk_level=risk_level,
+        vulnerabilities=vulnerabilities,
+        summary=detection_result.get("summary", ""),
+    )
+
+
+@router.post("/api/detect-standard", response_model=DetectResponse)
+async def detect_standard(
+    request: DetectRequest,
+    llm_engine: LLMEngine = Depends(get_llm_engine),
+):
+    """
+    消融实验对照接口 — 增强上下文 + 标准 Prompt（非 CoT）。
+    使用增强版上下文（含编码/混淆分析），但使用 v1.0 标准 System Prompt，对比 CoT 分步推理的效果差异。
+    """
+    try:
+        parsed = parse_raw_request(request.raw_request)
+        if not parsed.method:
+            raise ValueError("无法解析 HTTP 请求行，请检查格式")
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+    request_id = str(uuid.uuid4())[:8]
+    structured_ctx = build_structured_context(parsed, request_id)
+    user_content = USER_PROMPT_TEMPLATE.format(
+        request_id=request_id,
+        structured_context=structured_ctx,
+        raw_http=request.raw_request,
+    )
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT_STANDARD},
+        {"role": "user", "content": user_content},
+    ]
+
+    try:
+        detection_result = await llm_engine.detect(messages)
+    except LLMEngineError as e:
+        logger.error("LLM 识别失败(standard): %s", e)
         raise HTTPException(status_code=502, detail=f"LLM 识别失败: {e}")
 
     vulns_raw = detection_result.get("vulnerabilities", [])
