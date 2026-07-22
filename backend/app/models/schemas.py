@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field, field_validator
 # ============================================================
 
 class DetectRequest(BaseModel):
-    """漏洞检测请求。"""
+    """攻击载荷识别请求。"""
     raw_request: str = Field(
         ...,
         min_length=10,
@@ -31,7 +31,7 @@ class DetectRequest(BaseModel):
 
 class VulnerabilityItem(BaseModel):
     """单个漏洞详情。"""
-    type: str = Field(..., description="漏洞类型，如 SQL注入、XSS 等")
+    type: str = Field(..., description="攻击类型，如 SQL注入、XSS 等")
     severity: str = Field(
         ...,
         description="严重程度: high / medium / low / info",
@@ -48,12 +48,12 @@ class VulnerabilityItem(BaseModel):
 
 
 class DetectResponse(BaseModel):
-    """漏洞检测响应。"""
+    """攻击载荷识别响应。"""
     success: bool = Field(..., description="请求是否成功")
     method: str = Field("", description="HTTP 请求方法")
     path: str = Field("", description="HTTP 请求路径")
     host: str = Field("", description="目标 Host")
-    is_vulnerable: bool = Field(..., description="是否检测到漏洞")
+    is_vulnerable: bool = Field(..., description="是否检测到疑似攻击 payload（基于请求侧文本判断，不代表目标系统一定存在可利用漏洞）")
     risk_level: str = Field(
         "info",
         description="整体风险等级: high / medium / low / info",

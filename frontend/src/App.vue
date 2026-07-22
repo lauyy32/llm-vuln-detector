@@ -4,7 +4,7 @@
       <div class="header-left">
         <el-icon class="header-icon"><Monitor /></el-icon>
         <h1>LLM-VulnDetector</h1>
-        <span class="header-subtitle">基于大语言模型的上下文增强 HTTP 漏洞检测器</span>
+        <span class="header-subtitle">基于 LLM 的上下文增强 HTTP 攻击载荷识别原型</span>
       </div>
       <div class="header-right">
         <el-tag type="success" effect="plain" size="small">v2.0.0</el-tag>

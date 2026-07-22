@@ -2,6 +2,10 @@
 """
 评测脚本 — 使用标准数据集评估 LLM-VulnDetector 的检测效果。
 
+提供两套指标：
+  - 宽松二分类：只看 is_vulnerable 是否正确（不检查漏洞类型）
+  - 严格指标：正例必须 is_vulnerable=True 且漏洞类型匹配才算 TP
+
 指标：
   - 准确率 (Accuracy)
   - 精确率 (Precision)
@@ -9,6 +13,7 @@
   - F1-Score
   - 误报率 (FPR, False Positive Rate)
   - 漏报率 (FNR, False Negative Rate)
+  - 类型准确率 (Type Accuracy, 严格指标)
   - 各漏洞类型的检测率
   - 置信度分析
 
@@ -71,16 +76,21 @@ def evaluate_single(case: dict) -> dict:
         actual_types = list({v["type"] for v in actual_vulns})
         max_conf = max((v["confidence"] for v in actual_vulns), default=0)
 
-        # 判定
+        # 判定（宽松二分类：只看 is_vulnerable 是否正确）
         tp = expected_vuln and actual_vuln
         tn = (not expected_vuln) and (not actual_vuln)
         fp = (not expected_vuln) and actual_vuln
         fn = expected_vuln and (not actual_vuln)
 
-        # 类型匹配（仅对正例）
+        # 严格判定：正例必须 is_vulnerable=True 且漏洞类型匹配才算 strict_tp
+        # 类型不匹配的正例记为 strict_fn（检出了但类型错）
         type_match = None
         if expected_vuln and actual_vuln and expected_type:
             type_match = expected_type in actual_types
+
+        strict_tp = expected_vuln and actual_vuln and (type_match is True)
+        strict_fn = expected_vuln and (not actual_vuln or type_match is False)
+        # 负例的 strict_tn / strict_fp 与宽松一致（负例无类型匹配问题）
 
         # 置信度达标
         conf_ok = None
@@ -99,6 +109,7 @@ def evaluate_single(case: dict) -> dict:
             "expected_min_confidence": expected_min_conf,
             "confidence_ok": conf_ok,
             "tp": tp, "tn": tn, "fp": fp, "fn": fn,
+            "strict_tp": strict_tp, "strict_fn": strict_fn,
             "elapsed": elapsed,
             "error": None,
         }
@@ -112,10 +123,14 @@ def evaluate_single(case: dict) -> dict:
             "error": str(e),
             "elapsed": elapsed,
             "tp": False, "tn": False, "fp": False, "fn": False,
+            "strict_tp": False, "strict_fn": False,
+            "type_match": None,
+            "max_confidence": 0,
         }
 
 
 def compute_metrics(results: list[dict]) -> dict:
+    # --- 宽松二分类指标（只看 is_vulnerable 是否正确）---
     tp = sum(1 for r in results if r["tp"])
     tn = sum(1 for r in results if r["tn"])
     fp = sum(1 for r in results if r["fp"])
@@ -132,16 +147,39 @@ def compute_metrics(results: list[dict]) -> dict:
     fpr = fp / (fp + tn) if (fp + tn) else 0
     fnr = fn / (fn + tp) if (fn + tp) else 0
 
+    # --- 严格指标（正例必须 is_vulnerable=True 且类型匹配才算 TP）---
+    strict_tp = sum(1 for r in results if r.get("strict_tp"))
+    strict_fn = sum(1 for r in results if r.get("strict_fn"))
+    # 负例的 tn/fp 与宽松一致
+    strict_tn = tn
+    strict_fp = fp
+
+    strict_accuracy = (strict_tp + strict_tn) / actual_valid if actual_valid else 0
+    strict_precision = strict_tp / (strict_tp + strict_fp) if (strict_tp + strict_fp) else 0
+    strict_recall = strict_tp / (strict_tp + strict_fn) if (strict_tp + strict_fn) else 0
+    strict_f1 = (
+        2 * strict_precision * strict_recall / (strict_precision + strict_recall)
+        if (strict_precision + strict_recall) else 0
+    )
+
+    # 类型匹配率（在检出的正例中，类型正确的比例）
+    detected_pos = sum(1 for r in results if r["tp"])
+    type_correct = sum(1 for r in results if r.get("type_match") is True)
+    type_accuracy = type_correct / detected_pos if detected_pos else 0
+
     # 各类别统计
     cat_stats = {}
     for r in results:
         cat = r["category"]
         if cat not in cat_stats:
-            cat_stats[cat] = {"total": 0, "correct": 0, "tp": 0, "fn": 0, "tn": 0, "fp": 0}
+            cat_stats[cat] = {"total": 0, "correct": 0, "tp": 0, "fn": 0, "tn": 0, "fp": 0,
+                              "type_correct": 0}
         cat_stats[cat]["total"] += 1
         if r["tp"]:
             cat_stats[cat]["tp"] += 1
             cat_stats[cat]["correct"] += 1
+            if r.get("type_match") is True:
+                cat_stats[cat]["type_correct"] += 1
         elif r["tn"]:
             cat_stats[cat]["tn"] += 1
             cat_stats[cat]["correct"] += 1
@@ -152,8 +190,9 @@ def compute_metrics(results: list[dict]) -> dict:
 
     for cat, s in cat_stats.items():
         s["accuracy"] = round(s["correct"] / s["total"] * 100, 1) if s["total"] else 0
-        if cat != "正常请求" and cat != "边界用例":
+        if cat not in ("正常请求", "边界用例"):
             s["detection_rate"] = round(s["tp"] / s["total"] * 100, 1) if s["total"] else 0
+            s["type_accuracy"] = round(s["type_correct"] / s["tp"] * 100, 1) if s["tp"] else 0
 
     # 置信度统计
     conf_values = [r["max_confidence"] for r in results if r.get("max_confidence") and r["tp"]]
@@ -173,6 +212,13 @@ def compute_metrics(results: list[dict]) -> dict:
         "f1": round(f1 * 100, 1),
         "fpr": round(fpr * 100, 1),
         "fnr": round(fnr * 100, 1),
+        "strict_tp": strict_tp, "strict_tn": strict_tn,
+        "strict_fp": strict_fp, "strict_fn": strict_fn,
+        "strict_accuracy": round(strict_accuracy * 100, 1),
+        "strict_precision": round(strict_precision * 100, 1),
+        "strict_recall": round(strict_recall * 100, 1),
+        "strict_f1": round(strict_f1 * 100, 1),
+        "type_accuracy": round(type_accuracy * 100, 1),
         "avg_confidence": avg_conf,
         "avg_time_seconds": avg_time,
         "category_stats": cat_stats,
@@ -188,24 +234,35 @@ def print_report(metrics: dict, results: list[dict], mode: str = "full"):
     print(f"  检测失败:     {metrics['errors']}")
     print(f"  平均耗时:     {metrics['avg_time_seconds']}s / 条")
 
-    print(f"\n  --- 核心指标 ---")
+    print(f"\n  --- 宽松二分类指标（只看 is_vulnerable 是否正确）---")
     print(f"  准确率 Accuracy:  {metrics['accuracy']:>6.1f}%")
     print(f"  精确率 Precision: {metrics['precision']:>6.1f}%")
     print(f"  召回率 Recall:    {metrics['recall']:>6.1f}%")
     print(f"  F1-Score:         {metrics['f1']:>6.1f}%")
     print(f"  误报率 FPR:       {metrics['fpr']:>6.1f}%")
     print(f"  漏报率 FNR:       {metrics['fnr']:>6.1f}%")
-    print(f"  平均置信度:       {metrics['avg_confidence']:>6.1f}%")
 
-    print(f"\n  --- 混淆矩阵 ---")
+    print(f"\n  --- 严格指标（正例必须类型也匹配才算 TP）---")
+    print(f"  准确率 Accuracy:  {metrics['strict_accuracy']:>6.1f}%")
+    print(f"  精确率 Precision: {metrics['strict_precision']:>6.1f}%")
+    print(f"  召回率 Recall:    {metrics['strict_recall']:>6.1f}%")
+    print(f"  F1-Score:         {metrics['strict_f1']:>6.1f}%")
+    print(f"  类型准确率:       {metrics['type_accuracy']:>6.1f}%  (检出正例中类型正确的比例)")
+    print(f"  strict TP={metrics['strict_tp']}  strict FN={metrics['strict_fn']}  "
+          f"FP={metrics['strict_fp']}  TN={metrics['strict_tn']}")
+
+    print(f"\n  平均置信度:       {metrics['avg_confidence']:>6.1f}%")
+
+    print(f"\n  --- 混淆矩阵（宽松）---")
     print(f"  TP={metrics['tp']}  FP={metrics['fp']}  FN={metrics['fn']}  TN={metrics['tn']}")
 
     print(f"\n  --- 各类别统计 ---")
-    print(f"  {'类别':<12} {'总数':>4} {'正确':>4} {'准确率':>7} {'检出率':>7}")
-    print(f"  {'-'*12} {'-'*4} {'-'*4} {'-'*7} {'-'*7}")
+    print(f"  {'类别':<12} {'总数':>4} {'正确':>4} {'准确率':>7} {'检出率':>7} {'类型准确率':>10}")
+    print(f"  {'-'*12} {'-'*4} {'-'*4} {'-'*7} {'-'*7} {'-'*10}")
     for cat, s in sorted(metrics["category_stats"].items()):
-        det_rate = f"{s.get('detection_rate', '-')}%"
-        print(f"  {cat:<12} {s['total']:>4} {s['correct']:>4} {s['accuracy']:>6.1f}% {det_rate:>7}")
+        det_rate = f"{s.get('detection_rate', '-')}%" if s.get('detection_rate') is not None else "-"
+        type_acc = f"{s.get('type_accuracy', '-')}%" if s.get('type_accuracy') is not None else "-"
+        print(f"  {cat:<12} {s['total']:>4} {s['correct']:>4} {s['accuracy']:>6.1f}% {det_rate:>7} {type_acc:>10}")
 
     # 错误用例
     errors = [r for r in results if r["error"]]
@@ -231,7 +288,7 @@ def print_report(metrics: dict, results: list[dict], mode: str = "full"):
     # 类型匹配失败
     type_mismatch = [r for r in results if r.get("type_match") is False]
     if type_mismatch:
-        print(f"\n  --- 类型识别错误 ---")
+        print(f"\n  --- 类型识别错误 (检出了漏洞但类型不对) ---")
         for r in type_mismatch:
             print(f"  [{r['case_id']}] 期望={r['expected_type']}, 实际={r['actual_types']}")
 
