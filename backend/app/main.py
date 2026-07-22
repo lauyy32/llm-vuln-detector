@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="LLM-VulnDetector",
-    description="基于大语言模型的 Web 漏洞检测 API",
+    description="基于大语言模型的 HTTP 攻击载荷识别 API",
     version="1.0.0",
     lifespan=lifespan,
 )

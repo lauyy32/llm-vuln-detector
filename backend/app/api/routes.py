@@ -1,5 +1,5 @@
 """
-API 路由 — 漏洞检测 + 批量检测 + 历史记录 + 统计信息。
+API 路由 — 攻击载荷识别 + 批量识别 + 历史记录 + 统计信息。
 """
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -51,7 +51,7 @@ async def _do_detect(
                 remediation=v.get("remediation", ""),
             ))
         except Exception as e:
-            logger.warning("解析漏洞项失败: %s, raw=%s", e, v)
+            logger.warning("解析载荷项失败: %s, raw=%s", e, v)
 
     risk_level = detection_result.get("risk_level", "info")
     is_vulnerable = detection_result.get("is_vulnerable", len(vulnerabilities) > 0)
@@ -74,7 +74,7 @@ async def detect_vulnerability(
     llm_engine: LLMEngine = Depends(get_llm_engine),
     history_store=Depends(get_history_store),
 ):
-    """漏洞检测接口。接收原始 HTTP 请求文本，解析后调用 LLM 分析，返回漏洞检测结果。"""
+    """攻击载荷识别接口。接收原始 HTTP 请求文本，解析后调用 LLM 分析，返回疑似攻击载荷识别结果。"""
     try:
         response = await _do_detect(request.raw_request, llm_engine)
     except ValueError as e:
@@ -110,8 +110,8 @@ async def detect_no_context(
     try:
         detection_result = await llm_engine.detect(messages)
     except LLMEngineError as e:
-        logger.error("LLM 检测失败(no-context): %s", e)
-        raise HTTPException(status_code=502, detail=f"LLM 检测失败: {e}")
+        logger.error("LLM 识别失败(no-context): %s", e)
+        raise HTTPException(status_code=502, detail=f"LLM 识别失败: {e}")
 
     vulns_raw = detection_result.get("vulnerabilities", [])
     vulnerabilities = []
@@ -127,7 +127,7 @@ async def detect_no_context(
                 remediation=v.get("remediation", ""),
             ))
         except Exception as e:
-            logger.warning("解析漏洞项失败: %s, raw=%s", e, v)
+            logger.warning("解析载荷项失败: %s, raw=%s", e, v)
 
     risk_level = detection_result.get("risk_level", "info")
     is_vulnerable = detection_result.get("is_vulnerable", len(vulnerabilities) > 0)
@@ -150,7 +150,7 @@ async def batch_detect(
     llm_engine: LLMEngine = Depends(get_llm_engine),
     history_store=Depends(get_history_store),
 ):
-    """批量检测接口。最多50条。"""
+    """批量识别接口。最多50条。"""
     results = []
     total_count = len(request.requests)
     for idx, raw_req in enumerate(request.requests):
@@ -186,7 +186,7 @@ async def get_history(
     page_size: int = Query(20, ge=1, le=100),
     history_store=Depends(get_history_store),
 ):
-    """获取历史检测记录（分页）。"""
+    """获取历史识别记录（分页）。"""
     items, total = await history_store.list(page=page, page_size=page_size)
     return HistoryListResponse(
         success=True,
@@ -202,7 +202,7 @@ async def get_history_detail(
     record_id: str,
     history_store=Depends(get_history_store),
 ):
-    """获取单条历史检测详情。"""
+    """获取单条历史识别详情。"""
     record = await history_store.get(record_id)
     if record is None:
         raise HTTPException(status_code=404, detail="记录不存在")
