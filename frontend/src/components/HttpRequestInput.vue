@@ -21,7 +21,7 @@
           :disabled="!modelValue.trim()"
         >
           <el-icon v-if="!loading"><Search /></el-icon>
-          检测漏洞
+          分析请求
         </el-button>
       </div>
     </div>
