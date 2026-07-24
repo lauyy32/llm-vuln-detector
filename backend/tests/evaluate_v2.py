@@ -55,7 +55,17 @@ def load_dataset(path: Path) -> list[dict]:
 
 
 def build_http_request(sample: dict) -> str:
-    """根据样本生成 HTTP 请求文本。"""
+    """根据样本生成 HTTP 请求文本。
+
+    兼容两种数据集 schema:
+    - 对抗样本(adversarial): 提供 payload, 按类型拼装 HTTP 请求模板。
+    - 标准样本(test_cases): 直接提供完整 raw_http, 原样回传即可。
+    """
+    # 标准数据集已自带完整原始请求, 直接回传 (无需模板拼装)
+    raw = sample.get("raw_http", "")
+    if raw and raw.strip():
+        return raw
+
     payload = sample.get("payload", "")
     expected_type = sample.get("expected_type", "未知")
     category = sample.get("category", expected_type)
@@ -92,7 +102,8 @@ def build_http_request(sample: dict) -> str:
         template = templates.get(category, templates.get(expected_type,
             'POST /api HTTP/1.1\nHost: example.com\nContent-Type: application/x-www-form-urlencoded\n\ndata={payload}'))
 
-    return template.format(payload=payload)
+    # 用 replace 而非 str.format：避免 payload 含 { } 或模板内嵌字面量花括号（如 SSRF 的 {"url":"{payload}"}）触发 KeyError
+    return template.replace("{payload}", payload)
 
 
 def call_api(client: httpx.Client, raw_http: str, endpoint: str) -> dict:
@@ -143,15 +154,21 @@ async def call_api_async(client: httpx.AsyncClient, raw_http: str, endpoint: str
 
 
 def evaluate_sample(result: dict, sample: dict) -> dict:
-    """评估单个检测结果, 并记录混淆矩阵所需字段。"""
-    expected_type = sample.get("expected_type", "正常请求" if not sample.get("expected_vulnerable", True) else "未知")
-    expected_vulnerable = sample.get("expected_vulnerable", True)
+    """评估单个检测结果, 并记录混淆矩阵所需字段。
+
+    兼容 expected_vulnerable (对抗样本) 与 expected_is_vulnerable (标准样本) 两种字段名。
+    """
+    expected_vulnerable = sample.get("expected_vulnerable", sample.get("expected_is_vulnerable", True))
+    _raw_exp = sample.get("expected_type")
+    # 注意: 标准数据集良性样本的 expected_type 显式为 None, dict.get 不会回退默认值, 必须显式判空
+    expected_type = _raw_exp if _raw_exp else ("正常请求" if not expected_vulnerable else "未知")
+    display_payload = (sample.get("payload") or sample.get("raw_http", ""))[:120]
 
     r = {
         "sample_id": sample.get("id", "?"),
         "category": sample.get("category", ""),
         "subcategory": sample.get("subcategory", ""),
-        "payload": sample.get("payload", "")[:120],
+        "payload": display_payload,
         "difficulty": sample.get("difficulty", ""),
         "expected_type": expected_type,
         "expected_vulnerable": expected_vulnerable,
@@ -297,11 +314,11 @@ def compute_confusion_matrix(results: list[dict]) -> dict:
     for r in results:
         if r.get("error"):
             continue
-        exp = r.get("expected_type", "未知")
+        exp = r.get("expected_type") or "未知"
         det = r.get("best_detected_type", "未识别")
         matrix[exp][det] += 1
-    # 转为普通 dict
-    return {exp: dict(dets) for exp, dets in sorted(matrix.items())}
+    # 转为普通 dict (key 可能为 None, 排序时做防御)
+    return {exp: dict(dets) for exp, dets in sorted(matrix.items(), key=lambda kv: (kv[0] is None, kv[0]))}
 
 
 def by_category_breakdown(results: list[dict]) -> dict:
