@@ -316,7 +316,7 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
    - **文件包含（LFI/RFI）类型识别仅 15.8%**：19 条中 16 条被错判为「路径穿越」，类型混淆严重。
 5. **这恰好印证课题的 CPG 属性图创新点必要性**：请求侧关键字/上下文分析的上限已显现，只有引入代码属性图（调用链、数据流、sink 可达性）才能从根本上区分"真漏洞触发"与"形似攻击的正常流量"。
 
-> 注：LLM 输出具非确定性，单次评测的 ±0.5pp 波动属正常（如 CoT 有 1 条漏报、Standard 有 2 条 API 超限重试），结论以 Δ 量级与短板一致性为准。
+> 注：LLM 输出具非确定性，单次评测的 ±0.5pp 波动属正常（如 CoT 有 1 条漏报、Standard 有 2 条 API 超限重试），结论以 Δ 量级与短板一致性为准。另：对抗集 `standard` 模式因 2 条样本（adv_waf_019 SSTI、adv_waf_024 SSRF）遭遇 DeepSeek 服务端 HTTP 502、重试耗尽而透明排除，该模式按 244/246 计算；`cot` 与 `no-context` 模式为完整 246 条、0 错误，核心对比不受影响。
 
 ---
 
@@ -344,7 +344,7 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - [x] 运行 246 条对抗样本 CoT 模式实测
 - [x] 补充 40 条正常混淆样本到对抗数据集（支持误报率评测）
 - [x] 运行 246 条对抗样本完整评测（含正常样本，获取真实误报率）
-- [🔄] 运行三模式对比评测（Standard / No-Context，量化 CoT 增益）— 后台运行中
+- [x] 运行三模式对比评测（Standard / No-Context，量化 CoT 增益）— 已完成 2026-07-24（v2.1 完整指标，906 次调用）
 - [ ] 运行 DVWA + ModSecurity 实测 + 披露对比结果
 - [ ] 扩大数据集至 500+ 真实/对抗混合样本
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
