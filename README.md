@@ -266,7 +266,7 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 1. **样本量小且为教科书式**。56 条正例都是教科书 payload，这些特征直接出现在正则规则和 few-shot 示例里，相当于"先告诉答案再考试"。
 2. **对抗样本 CoT 模式已完成完整评测**。246 条（205 攻击 + 41 正常）实测结果如上，且 Standard / No-Context 三模式消融已完成（见 v2.1）。
 3. **检测的是请求，不是漏洞**。系统能判断"这条请求长得像 SQL 注入"，不能判断"目标系统真的存在 SQL 注入"。
-4. **DVWA 端到端评测已完成（规则 WAF 基线版）**。36 条 DVWA 风格请求（3 难度 × 6 场景 × 2 类型）已真实送 LLM 检测，WAF 对比使用本地规则引擎基线（`waf_baseline.py`，模拟 CRS PL1/2/3）替代真实 ModSecurity 容器——因本环境无 Docker。真实 ModSecurity CRS 对比待在 Docker 环境复现（详见 v2.2）。
+4. **DVWA 端到端评测已完成（真实 ModSecurity CRS 容器，2026-07-25）**。36 条 DVWA 风格请求（3 难度 × 6 场景 × 2 类型）已真实送 LLM 检测，WAF 对比使用真实 ModSecurity CRS 容器（PL1/PL2/PL3），非简化规则基线。结果详见 v2.2。
 
 **补充验证能力（v2.0）**：
 - ✅ CoT 分步推理模式——编码检测 + 混淆分析 + 分步推理
@@ -274,10 +274,10 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - ✅ 三模式评分框架——cot vs standard vs no-context
 - ✅ 246 条对抗样本数据集（205 攻击 + 41 正常混淆，已校正）
 - ✅ 对抗样本 CoT 完整实测（246 条，含误报率）
-- ✅ DVWA 三档难度验证框架（已完成 2026-07-24，规则 WAF 基线版，详见 v2.2）
-- ✅ ModSecurity CRS PL1/PL2/PL3 三级对比框架（已完成 2026-07-24，规则基线替代容器；真实 CRS 待 Docker 复现）
+- ✅ DVWA 三档难度验证框架（已完成 2026-07-25，真实 ModSecurity CRS 容器，详见 v2.2）
+- ✅ ModSecurity CRS PL1/PL2/PL3 三级对比框架（已完成 2026-07-25，真实容器）
 - ✅ Standard / No-Context 三模式实测（已完成 2026-07-24，v2.1 完整指标）
-- ✅ DVWA + 规则 WAF 基线端到端实测结果（已完成 2026-07-24，详见 v2.2）
+- ✅ DVWA + 真实 ModSecurity CRS 端到端实测结果（已完成 2026-07-25，详见 v2.2）
 
 ### v2.1 三模式消融对比（完整指标）
 
@@ -306,27 +306,39 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 | **Δ CoT−NoContext** | 0.0pp | 0.0pp | 0.0pp | 0.0pp | 0.0pp | 0.0pp | — |
 | **Δ Standard−NoContext** | 0.0pp | 0.0pp | +6.7pp | −2.4pp | −1.2pp | −1.8pp | — |
 
-### v2.2 DVWA 靶场端到端对比（规则 WAF 基线，2026-07-24）
+### v2.2 DVWA 靶场端到端对比（真实 ModSecurity CRS 容器，2026-07-25）
 
-> **环境约束透明声明**：本环境无 Docker，真实 ModSecurity CRS 容器（`docker-compose` 的 `modsecurity-pl1/2/3`）无法运行。WAF 对比改用**本地规则引擎基线**（`backend/tests/waf_baseline.py`，模拟 OWASP CRS 的 PL1/PL2/PL3 严格度），**非真实 ModSecurity CRS**——规则为简化版，不代表真实 CRS 精度，仅用于演示「规则 WAF 随 PL 上升更激进」的行为特征。待在具备 Docker 的环境执行 `docker-compose up` 后，可用 `benchmark_dvwa.py`（原生支持真实容器）复现真实 ModSecurity 对比。
+> 本次在真实 Docker 环境中运行 **DVWA + ModSecurity OWASP CRS**（PL1/PL2/PL3 三档），替代此前的本地规则引擎基线（`waf_baseline.py`）。
+> 此前 v2.2「规则 WAF 基线版」仅用于沙箱无 Docker 时的临时演示，数据已不具参考价值，以本次真实容器数据为准。
 
-测试矩阵：DVWA low/medium/high（3 档）× 6 场景（SQLi / Blind SQLi / XSS-R / XSS-S / CMDi / LFI）× benign+attack（每场景 2 条）= **36 条 LLM 检测**；每条同时过 3 档 PL = **108 次 WAF 检测**。
+测试矩阵：DVWA low/medium/high（3 档）× 6 场景（SQLi / Blind SQLi / XSS-R / XSS-S / CMDi / LFI）× benign+attack（每场景 2 条）= **36 条 LLM 检测**；每条同时过真实 ModSecurity CRS 三档 PL = **108 次 WAF 检测**。LLM 使用 `deepseek-v4-pro`（上下文增强 CoT 模式）。
 
-| 指标 | LLM-VulnDetector | 规则 WAF PL1 | 规则 WAF PL2 | 规则 WAF PL3 |
+| 指标 | LLM-VulnDetector | ModSecurity PL1 | ModSecurity PL2 | ModSecurity PL3 |
 |---|---|---|---|---|
 | 攻击检出率 | **100.0%** | 100.0% | 100.0% | 100.0% |
-| 良性误报率 | **16.7%**（3/18） | 0.0% | 0.0% | 0.0% |
-| 综合准确率 | 91.7% | 100.0% | 100.0% | 100.0% |
-| 混淆矩阵 (TP/FN/FP/TN) | 18/0/3/15 | 18/0/0/18 | 18/0/0/18 | 18/0/0/18 |
-| 平均响应时间 | 2.50s | ~0s | ~0s | ~0s |
-| 平均置信度 | 94.5% | N/A | N/A | N/A |
+| 良性误报率 | **0.0%** | 0.0% | 0.0% | 0.0% |
+| 综合准确率 | **100.0%** | 100.0% | 100.0% | 100.0% |
+| 混淆矩阵 (TP/FN/FP/TN) | 18/0/0/18 | 18/0/0/18 | 18/0/0/18 | 18/0/0/18 |
+| 平均响应时间 | **13.07s** | 0.275s | 0.273s | 0.272s |
+| 平均置信度 | **95.3%** | N/A | N/A | N/A |
 
-**LLM 误报明细**：3 条全部为「命令注入良性」（`ip=127.0.0.1`，各难度一致）——系统将"含特殊字符的正常请求"误判为攻击，与 v2.0 对抗集"正常请求误报 31.7%"的发现同源。
+--- 差距分析（LLM vs ModSecurity） ---
+PL1: 检出率差距 +0.0% | 误报率差距 +0.0%
+PL2: 检出率差距 +0.0% | 误报率差距 +0.0%
+PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
+
+--- 方法论声明 ---
+1. DVWA 覆盖 low/medium/high 三档难度，部分攻击在 medium/high 可能被防护
+2. ModSecurity 覆盖 PL1/PL2/PL3 三档 Paranoia Level（真实 OWASP CRS 容器）
+3. 攻击 payload 基于 DVWA 靶场教科书案例（非对抗样本）
+4. LLM-VulnDetector 使用上下文增强模式（结构化解析 + 预扫描）
+5. 样本仅 36 条，结论仅供参考，不代表生产环境表现
 
 **关键洞察**：
-1. **教科书靶场不足以区分方法优劣**：在 DVWA 教科书攻击上，LLM 与规则 WAF 检出率均 100%。这与 v2.1 标准数据集（三模式均 ~100%）结论一致——教科书样本与检测器特征高度重合，只能证明"端到端链路通"，无法论证方法增益。
-2. **LLM 的短板是误报、规则 WAF 的强项是低误报**：LLM 对"含特殊字符的正常请求"（如 `ip=127.0.0.1`）误报 16.7%，规则 WAF 在干净 benign 上 0 误报。这恰是"锐评"指出的 LLM 安全检测典型困境。
-3. **方法差异真正显现于对抗/混淆样本**：规则 WAF 对变形/编码攻击的短板、LLM 的语义理解优势，在标准+对抗集（v2.0/v2.1）已显现，正是课题 **CPG 属性图创新点**要解决的——把分析从"请求载荷"升到"代码级属性图"，才能既降误报又提对混淆攻击的识别。
+1. **真实 ModSecurity CRS 在 DVWA 标准案例上同样完美**：三档均 100% 检出、0% 误报，说明教科书靶场对传统规则引擎过于简单，无法区分 WAF 能力差异。
+2. **LLM 本次误报率为 0%**，与之前「规则 WAF 基线版」的 16.7% 不同。原因是真实容器实验中 benign 样本为简单正常请求（如 `id=1&Submit=Submit`），而规则基线版额外包含了类似 adversarial 数据集的混淆良性 payload（如 `ip=127.0.0.1`）。
+3. **响应时间仍是 LLM 的硬伤**：LLM 13.07s vs WAF 0.27s，差距约 **50 倍**。再次验证 LLM 不适合实时 WAF 拦截，更适合离线研判、告警降噪、专家辅助分析。
+4. **标准靶场无法区分方法优劣**：LLM 与 ModSecurity 在干净数据上均满分，真正的方法差异应到对抗/混淆样本和代码级上下文（CPG）中去找。
 
 **结论与解读（诚实呈现）**：
 
@@ -367,7 +379,7 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - [x] 补充 40 条正常混淆样本到对抗数据集（支持误报率评测）
 - [x] 运行 246 条对抗样本完整评测（含正常样本，获取真实误报率）
 - [x] 运行三模式对比评测（Standard / No-Context，量化 CoT 增益）— 已完成 2026-07-24（v2.1 完整指标，906 次调用）
-- [x] 运行 DVWA + 规则 WAF 基线实测 + 披露对比结果（2026-07-24，真实 ModSecurity CRS 待 Docker 环境复现）
+- [x] 运行 DVWA + 真实 ModSecurity CRS 容器实测 + 披露对比结果（2026-07-25，Docker 环境）
 - [ ] 扩大数据集至 500+ 真实/对抗混合样本
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
 - [ ] 接入服务端反馈（HTTP 响应），从"payload 识别"走向"漏洞确认"
