@@ -25,6 +25,13 @@ from typing import Optional
 
 import httpx
 
+# 轻量规则 WAF 基线（模拟 ModSecurity CRS 的 PL1/2/3 严格度，无需 Docker）
+try:
+    from waf_baseline import RuleBasedWAF
+except ImportError:  # 允许从 backend/ 根目录运行
+    sys.path.insert(0, str(Path(__file__).parent))
+    from waf_baseline import RuleBasedWAF
+
 # ---- 配置 ----
 
 API_URL = os.environ.get("VD_API_URL", "http://localhost:8000")
@@ -354,9 +361,11 @@ def send_via_modsec(modsec_url: str, path: str, method: str,
 # ================================================================
 
 def run_benchmark(dvwa_client: "DVWAClient",
-                  active_modsec_pls: list = None) -> list[SingleResult]:
+                  active_modsec_pls: list = None,
+                  waf_engine: "RuleBasedWAF" = None) -> list[SingleResult]:
     """
     遍历 3 档 DVWA 安全等级 + 3 档 ModSecurity PL 进行评测。
+    waf_engine 非空时，用本地规则 WAF 基线替代 ModSecurity 容器（--rule-waf 模式）。
     返回所有 SingleResult。
     """
     if active_modsec_pls is None:
@@ -419,10 +428,14 @@ def run_benchmark(dvwa_client: "DVWAClient",
 
             # ---- Step 2: ModSecurity (all active PL levels) ----
             for pl in active_modsec_pls:
-                ms_url = MODSEC_ENDPOINTS[pl]
                 start = time.time()
-                ms_result = send_via_modsec(ms_url, scen.page_path, method,
-                                            params, cookie_str=cookie_header)
+                if waf_engine is not None:
+                    # 本地规则 WAF 基线模式（无需 Docker / ModSecurity 容器）
+                    ms_result = waf_engine.check(raw_http, pl)
+                else:
+                    ms_url = MODSEC_ENDPOINTS[pl]
+                    ms_result = send_via_modsec(ms_url, scen.page_path, method,
+                                                params, cookie_str=cookie_header)
                 elapsed = round(time.time() - start, 2)
 
                 if pl == "PL1":
@@ -699,6 +712,8 @@ def main():
                        help="跳过 DVWA 初始化")
     parser.add_argument("--no-modsec", action="store_true",
                        help="跳过 ModSecurity CRS 对比")
+    parser.add_argument("--rule-waf", action="store_true",
+                       help="使用本地规则 WAF 基线（模拟 ModSecurity PL1/2/3），无需 Docker")
     parser.add_argument("--modsec-pls", type=str, default="PL1,PL2,PL3",
                        help="要测试的 ModSecurity PL 级别，逗号分隔（如: PL1,PL2）")
     args = parser.parse_args()
@@ -718,8 +733,12 @@ def main():
         print(f"  无法连接 {API_URL}，请先启动后端")
         sys.exit(1)
 
-    # ---- 检查 ModSecurity 容器 ----
-    if not args.no_modsec:
+    # ---- 检查 ModSecurity / 规则 WAF 基线 ----
+    waf_engine = None
+    if args.rule_waf:
+        waf_engine = RuleBasedWAF()
+        print(f"  使用本地规则 WAF 基线（模拟 ModSecurity {', '.join(active_pls)}，无需 Docker）")
+    elif not args.no_modsec:
         for pl in active_pls:
             ms_url = MODSEC_ENDPOINTS[pl]
             try:
@@ -748,7 +767,11 @@ def main():
     if not args.no_modsec:
         print(f"         x {len(active_pls)} ModSecurity PL = {len(DVWA_SECURITY_LEVELS) * len(SCENARIOS) * 2 * len(active_pls)} 次 WAF 检测\n")
 
-    results = run_benchmark(dvwa_client, active_pls if not args.no_modsec else [])
+    results = run_benchmark(
+        dvwa_client,
+        active_pls if (not args.no_modsec or waf_engine is not None) else [],
+        waf_engine,
+    )
     dvwa_client.close()
 
     # ---- 汇总 ----
@@ -786,7 +809,9 @@ def main():
         "subtitle": "LLM-VulnDetector (上下文增强) vs ModSecurity OWASP CRS (PL1/PL2/PL3)",
         "config": {
             "dvwa_url": DVWA_URL,
-            "modsec_endpoints": {pl: MODSEC_ENDPOINTS[pl] for pl in active_pls},
+            "waf_source": "rule_baseline_local_simulated_crs" if waf_engine
+                          else "modsecurity_container",
+            "modsec_endpoints": {pl: MODSEC_ENDPOINTS[pl] for pl in active_pls} if not waf_engine else {},
             "api_url": API_URL,
             "dvwa_security_levels": DVWA_SECURITY_LEVELS,
             "active_modsec_pls": active_pls,
