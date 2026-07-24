@@ -205,8 +205,12 @@ python tests/benchmark_dvwa.py --no-modsec         # 仅 LLM
 
 ```bash
 cd backend
-python tests/ablation.py   # 对比 有上下文增强 vs 无上下文增强（v1.0 模式）
-python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-context  # v2.0 三模式
+# v1.0 双模式消融（已归档，仅做快速验证）
+python tests/ablation.py   # 对比 有上下文增强 vs 无上下文增强
+
+# v2.1 三模式完整消融（复现论文/课题请用这个）
+python tests/evaluate_v2.py --dataset all --modes cot standard no-context
+python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-context
 ```
 
 ---
@@ -406,9 +410,9 @@ llm-vuln-detector/
 │   │   └── utils/history_store.py # SQLite 持久化
 │   ├── tests/
 │   │   ├── test_*.py              # 单元测试（54个）
-│   │   ├── evaluate_v2.py         # 综合评测 — 三模式 × 两数据集（v2.0 新增）
-│   │   ├── evaluate.py            # v1.0 评测脚本（56条）
-│   │   ├── ablation.py            # 消融实验脚本
+│   │   ├── evaluate_v2.py         # 综合评测 — 三模式 × 两数据集（v2.1 主评测）
+│   │   ├── evaluate.py            # v1.0 评测脚本（56条，已归档）
+│   │   ├── ablation.py            # v1.0 双模式消融（已归档，三模式请用 evaluate_v2.py）
 │   │   ├── benchmark_dvwa.py      # DVWA 端到端 + ModSecurity 多维度对比
 │   │   ├── generate_adversarial.py# 对抗样本生成器 + 正常样本（246条）
 │   │   ├── gen_eval_report.py     # Word 评测报告生成

@@ -1,8 +1,19 @@
 #!/usr/bin/env python
 """
-消融实验脚本 — 对比「有上下文增强」vs「无上下文增强」的检测效果差异。
+消融实验脚本 — v1.0 双模式遗留（已归档）。
 
-实验设计：
+对比「有上下文增强」vs「无上下文增强」的检测效果差异。
+
+⚠️ 注意：
+  - 本脚本只覆盖 /api/detect（有上下文增强）和 /api/detect-no-context（无上下文增强）
+    两个端点，是 v1.0 的简化双模式消融。
+  - 项目 v2.1 的三模式完整消融（CoT / Standard / No-Context）已在
+    backend/tests/evaluate_v2.py 中实现，包含 56 标准 + 246 对抗样本、
+    并发重试、完整指标与类型混淆矩阵。
+  - 如需复现论文/课题中的三模式结果，请使用 evaluate_v2.py：
+      python tests/evaluate_v2.py --dataset all --modes cot standard no-context
+
+实验设计（v1.0）：
   - 实验组: POST /api/detect (有结构化解析 + 正则预扫描 + 上下文注入)
   - 对照组: POST /api/detect-no-context (直接发送 raw HTTP，无预处理)
   - 两组使用相同的 LLM、相同的 system prompt、相同的数据集
@@ -14,7 +25,7 @@
   - 平均耗时
 
 用法:
-  python tests/ablation.py                      # 全量消融实验
+  python tests/ablation.py                      # 全量双模式消融（v1.0）
   python tests/ablation.py --limit 20           # 只跑前20条（快速验证）
 
 前提: 后端服务运行在 localhost:8000
