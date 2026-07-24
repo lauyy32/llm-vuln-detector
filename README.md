@@ -147,7 +147,10 @@ python -m pytest tests/ -v
 ```
 覆盖模块：context_builder、llm_engine、schemas、history_store（54 个测试用例）
 
-### 综合评测（v2.0 三模式对比）
+### 综合评测（v2.1 三模式消融 + 完整指标）
+
+> **研究问题**：上下文增强 + CoT 推理是否提升 LLM 攻击载荷识别效果？
+> 通过 CoT / Standard / No-Context 三模式在同一数据集上的指标差异（Δ）量化各自贡献。
 
 ```bash
 cd backend
@@ -156,18 +159,25 @@ cd backend
 # Dry-run（验证数据，不调 API）
 python tests/evaluate_v2.py --dry-run
 
-# 全量评测（262个样本 × 3个模式）
+# 全量三模式消融评测（302 样本 = 56 标准 + 246 对抗，× 3 模式）
 python tests/evaluate_v2.py --dataset all --modes cot standard no-context
 
-# 仅对抗样本
-python tests/evaluate_v2.py --dataset adversarial --modes cot
+# 仅对抗样本三模式
+python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-context
 
-# 快速测试（仅前20条）
-python tests/evaluate_v2.py --max-samples 20 --modes cot
+# 快速测试（仅前20条，三模式）
+python tests/evaluate_v2.py --max-samples 20 --modes cot standard no-context
 ```
 
+**评测特性（v2.1）**：
+- **异步并发**：`VD_CONCURRENCY`（默认 6）+ 信号量限流，批量评测从"串行数十分钟"降到数分钟
+- **重试退避**：超时 / 429 / 5xx 自动重试（指数退避，尊重 `Retry-After`）
+- **完整指标**：攻击级召回(Recall)、类型精确检出率、Precision / Recall / F1 / Accuracy、类型准确率
+- **类型级混淆矩阵**：`expected_type × detected_type`，定位"错判成什么"
+- **错误透明化**：逐条记录真实 API 错误原因（超时 / 限流 / 服务端错误），便于诊断
+
 **评测产出**：
-- `backend/tests/reports/evaluation_v2_report.json` — 综合对比报告
+- `backend/tests/reports/evaluation_v2_report.json` — 三模式消融对比报告
 - `backend/tests/reports/evaluation_v2_report_details.json` — 逐条详细结果
 
 ### 数据集
@@ -175,7 +185,7 @@ python tests/evaluate_v2.py --max-samples 20 --modes cot
 | 数据集 | 数量 | 说明 |
 |---|---|---|
 | `dataset/test_cases.json` | 56 条 | 手工构造（41攻击 + 12正常 + 3边界） |
-| `dataset/adversarial_samples.json` | 246 条 | 206条攻击（编码/混淆/绕过）+ 40条正常混淆样本 |
+| `dataset/adversarial_samples.json` | 246 条 | 205 条攻击（编码/混淆/绕过/WAF）+ 41 条正常混淆样本（含 1 条原 WAF 样本 `adv_waf_011` 纠正为良性） |
 
 ### DVWA 靶场端到端验证 + ModSecurity 对比
 
@@ -203,7 +213,7 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 
 ## 评测结果
 
-> **说明**：v1.0 在 56 条手工构造测试用例上达到 100% 准确率；v2.0 已完成 246 条对抗样本（206 攻击 + 40 正常混淆）的 CoT 模式实测，结果如下。
+> **说明**：v1.0 在 56 条手工构造测试用例上达到 100% 准确率；v2.0 已完成 246 条对抗样本（205 攻击 + 41 正常混淆）的 CoT 模式实测。v2.1 正在运行**三模式完整消融**（含 Precision/Recall/F1/Accuracy 与类型级混淆矩阵），结果见下方「v2.1 三模式消融对比」。
 
 ### v2.0 CoT 模式在 246 条对抗样本上的实测结果
 
@@ -266,24 +276,26 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - ✅ 对抗样本 CoT 完整实测（246 条，含误报率）
 - ✅ DVWA 三档难度验证框架（代码已就绪，待运行）
 - ✅ ModSecurity CRS PL1/PL2/PL3 三级对比框架（代码已就绪，待运行）
-- ⬜ Standard / No-Context 消融实测结果
+- 🔄 Standard / No-Context 消融实测（后台运行中，v2.1 完整指标）
 - ⬜ DVWA + ModSecurity 实测结果
 
-### 预期评测表格（运行后填入）
+### v2.1 三模式消融对比（完整指标）
 
-运行 `python tests/evaluate_v2.py --dataset all --modes cot standard no-context` 后，结果将填入以下表格：
+> 🚧 完整三模式消融评测（302 样本 × 3 模式）正在后台运行，完成后本表填入真实数字（含 CoT 复核）。
 
-```
-┌─────────────────┬──────────┬──────────┬──────────┬──────────┐
-│ 模式            │ 标准检测率│ 对抗检测率│ 退化幅度  │ 误报率   │
-├─────────────────┼──────────┼──────────┼──────────┼──────────┤
-│ CoT（增强+COT） │    ?%    │  76.6%   │   ?pp    │  42.5%   │
-│ Standard（增强） │    ?%    │    ?%    │   ?pp    │   ?%     │
-│ No-Context（基线）│    ?%    │    ?%    │   ?pp    │   ?%     │
-└─────────────────┴──────────┴──────────┴──────────┴──────────┘
-```
+**对抗样本数据集（246 条 = 205 攻击 + 41 正常）**：
 
-注：`?%` 为尚未运行的模式/数据集。
+| 模式 | 攻击级召回 | 类型精确检出率 | 误报率 | Precision | Recall | F1 | Accuracy |
+|---|---|---|---|---|---|---|---|
+| CoT（增强+CoT） | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
+| Standard（增强） | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
+| No-Context（基线） | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
+| **Δ CoT−Standard** | 🚧 | 🚧 | 🚧 | — | — | — | — |
+| **Δ CoT−NoContext** | 🚧 | 🚧 | 🚧 | — | — | — | — |
+
+**标准数据集（56 条）**：🚧 运行中
+
+> **量化方法**：Δ 表示 CoT 相对其他模式的指标差值（pp）。若 Δ_CoT−NoContext 在攻击级召回上显著为正，证明"上下文增强"有效；若 Δ_CoT−Standard 在类型精确检出率上为正，证明"CoT 分步推理"在类型判别上有额外增益。
 
 ---
 
@@ -311,7 +323,7 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 - [x] 运行 246 条对抗样本 CoT 模式实测
 - [x] 补充 40 条正常混淆样本到对抗数据集（支持误报率评测）
 - [x] 运行 246 条对抗样本完整评测（含正常样本，获取真实误报率）
-- [ ] 运行三模式对比评测（Standard / No-Context，量化 CoT 增益）
+- [🔄] 运行三模式对比评测（Standard / No-Context，量化 CoT 增益）— 后台运行中
 - [ ] 运行 DVWA + ModSecurity 实测 + 披露对比结果
 - [ ] 扩大数据集至 500+ 真实/对抗混合样本
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
