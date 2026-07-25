@@ -8,6 +8,18 @@
 
 ---
 
+## 为什么做这个项目（课题背景）
+
+我是网络空间安全学院（密码学院）的密码学方向研究生，导师教授。本项目的选题来自课题组与奇安信的校企合作课题——**「基于大语言模型的上下文增强智能漏洞检测技术研究」**。
+
+课题的核心问题是：**给 LLM 喂什么样的上下文，能让它更准确地判断一条 HTTP 请求是否真的携带攻击载荷，而不是被"看起来像攻击"的正常流量误导？**
+
+这个命题在真实场景里非常具体：WAF、IDS 每天面对海量请求，其中既有真实攻击，也有大量包含 SQL 关键字、Base64、编码 HTML 的正常业务流量。规则引擎靠特征匹配，误报和漏报的代价都很高；LLM 有语义理解潜力，但"直接把 raw 请求丢给模型"效果并不稳定。课题想验证的是——在原始请求之外，还能构造哪些结构化上下文（编码还原、混淆分析、代码属性图等），来系统性地提升 LLM 的判断质量。
+
+**LLM-VulnDetector 是这个课题的最小可行原型（MVP）**：目标不是做一个能直接上生产的 WAF，而是把"上下文增强能否提升 LLM 检测效果"这个假设，用可复现的实验数据讲清楚。当前版本聚焦请求侧上下文（编码检测 + 混淆分析 + CoT 推理），并已通过三模式消融、真实攻击数据集、鲁棒性测试和工业级 WAF（ModSecurity CRS）横向对比，诚实呈现了哪些增强有效、哪些无效。下一阶段会引入代码属性图（CPG）级别的上下文——这也是课题真正的创新落点。
+
+> 如果你是这个领域的同行或导师，README 里的「评测结果」章节会直接告诉你：标准数据集区分不出方法差异，对抗/真实数据集上请求侧上下文增强没有稳定增益，而 CoT 的价值只在对比标准 Prompt 时显现。这些结论不漂亮，但都是真实跑出来的。
+
 ## 这个项目能做什么 / 不能做什么
 
 **能做的**：判断一条 HTTP 请求的参数值里，是否出现某类攻击的典型 payload 特征（SQL 注入、XSS、命令注入等 10 类），并给出类型、置信度和成因分析。**v2.0 增加了编码检测与混淆分析**，能透视 URL 编码/Unicode/双重编码等绕过手法。
@@ -360,7 +372,7 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 
 ### v2.3 真实世界数据集 + LLM 鲁棒性测试（2026-07-25）
 
-> 直接回应「测试集模板化、自己出题自己考」的质疑：本实验使用来自 SecLists / PayloadsAllTheThings 社区公认公开攻击集的真实 payload，并针对 LLM 检测器本身做三类对抗鲁棒性测试（prompt injection / 语义保持扰动 / 最小编辑）。
+> 直接回应「测试集模板化、自己出题自己考」的质疑：本实验使用的 payload 取自 SecLists / PayloadsAllTheThings 社区公认公开攻击集（以**内嵌种子**形式打包进 `fetch_real_world_dataset.py`，标注 `source` 字段，非本项目合成）；若本机有 SecLists 仓库，可通过 `--seclists-dir` 参数直接读取原文件扩展到数百条。同时针对 LLM 检测器本身做三类对抗鲁棒性测试（prompt injection / 语义保持扰动 / 最小编辑）。
 
 #### A. 真实世界数据集三模式对比
 
@@ -421,7 +433,7 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 | 上下文增强 | `context_builder.py` — 编码检测 + 混淆分析 + 22 类正则预扫描（v2.0 多维上下文） |
 | 智能（LLM）分析 | `llm_engine.py` + `prompt_templates.py` — CoT 分步推理 + Standard 消融 Prompt |
 | 消融实验 | `/api/detect` vs `/api/detect-standard` vs `/api/detect-no-context` 三模式对比 |
-| 量化评测 | 56 条标准 + 246 条对抗样本 + `evaluate_v2.py`（三模式对比框架） |
+| 量化评测 | 56 条标准 + 246 条对抗样本 + 67 条真实世界样本 + `evaluate_v2.py`（三模式对比框架，含三数据集） |
 | 端到端验证 | DVWA 靶场 + `benchmark_dvwa.py`（真实攻击场景，三档难度） |
 | 横向对比 | ModSecurity OWASP CRS 三档 PL 对比（工业级 WAF 基线） |
 | 属性图（CPG）创新点 | **尚未实现** — 当前 v2.0 的上下文增强是请求侧分析，CPG 是下一阶段核心创新方向 |
@@ -468,19 +480,19 @@ llm-vuln-detector/
 │   │   └── utils/history_store.py # SQLite 持久化
 │   ├── tests/
 │   │   ├── test_*.py              # 单元测试（54个）
-│   │   ├── evaluate_v2.py         # 综合评测 — 三模式 × 两数据集（v2.1 主评测）
+│   │   ├── evaluate_v2.py         # 综合评测 — 三模式 × 三数据集（标准/对抗/真实世界，v2.1 主评测）
 │   │   ├── evaluate.py            # v1.0 评测脚本（56条，已归档）
 │   │   ├── ablation.py            # v1.0 双模式消融（已归档，三模式请用 evaluate_v2.py）
 │   │   ├── benchmark_dvwa.py      # DVWA 端到端 + ModSecurity 多维度对比
 │   │   ├── benchmark_robustness.py# 针对 LLM 检测器的鲁棒性测试（prompt injection / 语义扰动 / 最小编辑）
-│   │   ├── fetch_real_world_dataset.py # 从 SecLists/PayloadsAllTheThings 拉取真实攻击样本
+│   │   ├── fetch_real_world_dataset.py # 使用来自 SecLists/PayloadsAllTheThings 的内嵌种子样本（支持 --seclists-dir 从本机仓库扩展到数百条）
 │   │   ├── generate_adversarial.py# 对抗样本生成器 + 正常样本（246条）
 │   │   ├── gen_eval_report.py     # Word 评测报告生成
 │   │   ├── gen_ablation_report.py # Word 消融实验报告生成
 │   │   └── dataset/
 │   │       ├── test_cases.json    # 56 条标准评测数据集
-│   │       ├── adversarial_samples.json  # 246 条对抗样本（206攻击+40正常）
-│   │       └── real_world_samples.json   # 67 条真实世界样本（55攻击+12正常，来自 SecLists/PayloadsAllTheThings）
+│   │       ├── adversarial_samples.json  # 246 条对抗样本（205攻击+41正常，手工构造绕过/混淆变体）
+│   │       └── real_world_samples.json   # 67 条真实世界样本（55攻击+12正常，来自 SecLists/PayloadsAllTheThings 的内嵌种子，支持 --seclists-dir 扩展）
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/

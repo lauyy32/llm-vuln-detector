@@ -166,7 +166,7 @@ class TestContextBuilder:
         assert messages[0]["role"] == "system"
         assert messages[1]["role"] == "user"
         assert "test-002" in messages[1]["content"]
-        assert "结构化上下文" in messages[1]["content"]
+        assert "多维上下文" in messages[1]["content"]
 
     def test_build_detection_messages_no_context(self):
         raw = "GET /search?q=test HTTP/1.1\nHost: example.com"

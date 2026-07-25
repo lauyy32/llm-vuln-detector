@@ -1,11 +1,17 @@
 """
 API 路由 — 攻击载荷识别 + 批量识别 + 历史记录 + 统计信息。
 """
+import asyncio
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.llm_engine import LLMEngine, LLMEngineError
-from app.core.context_builder import parse_raw_request, build_detection_messages, build_detection_messages_no_context, build_structured_context
+from app.core.context_builder import (
+    parse_raw_request,
+    build_detection_messages,
+    build_detection_messages_no_context,
+    build_structured_context,
+)
 from app.core.prompt_templates import SYSTEM_PROMPT_STANDARD, USER_PROMPT_TEMPLATE
 from app.models.schemas import (
     DetectRequest,
@@ -24,25 +30,24 @@ import uuid
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+# 批量检测默认并发上限（与 evaluate_v2.py 一致）
+BATCH_CONCURRENCY = 6
 
-async def _do_detect(
-    raw_request: str,
-    llm_engine: LLMEngine,
-) -> DetectResponse:
-    """内部：执行单次检测，返回 DetectResponse。"""
+
+def _parse_request_or_422(raw_request: str):
+    """解析 HTTP 请求文本，无法解析时转 422。"""
     parsed = parse_raw_request(raw_request)
     if not parsed.method:
-        raise ValueError("无法解析 HTTP 请求行，请检查格式")
+        raise HTTPException(status_code=422, detail="无法解析 HTTP 请求行，请检查格式")
+    return parsed
 
-    request_id = str(uuid.uuid4())[:8]
-    messages = build_detection_messages(parsed, request_id)
-    detection_result = await llm_engine.detect(messages)
 
-    vulns_raw = detection_result.get("vulnerabilities", [])
-    vulnerabilities = []
+def _to_vulnerability_items(vulns_raw: list) -> list[VulnerabilityItem]:
+    """将 LLM 返回的 vulnerabilities 原始列表转换为 VulnerabilityItem。"""
+    items: list[VulnerabilityItem] = []
     for v in vulns_raw:
         try:
-            vulnerabilities.append(VulnerabilityItem(
+            items.append(VulnerabilityItem(
                 type=v.get("type", "未知"),
                 severity=v.get("severity", "info"),
                 confidence=int(v.get("confidence", 0)),
@@ -53,10 +58,16 @@ async def _do_detect(
             ))
         except Exception as e:
             logger.warning("解析载荷项失败: %s, raw=%s", e, v)
+    return items
 
+
+def _build_response(parsed, detection_result: dict) -> DetectResponse:
+    """由解析结果与 LLM 检测结果构造 DetectResponse。"""
+    vulnerabilities = _to_vulnerability_items(detection_result.get("vulnerabilities", []))
     risk_level = detection_result.get("risk_level", "info")
-    is_vulnerable = detection_result.get("is_vulnerable", len(vulnerabilities) > 0)
-
+    is_vulnerable = detection_result.get(
+        "is_vulnerable", len(vulnerabilities) > 0
+    )
     return DetectResponse(
         success=True,
         method=parsed.method,
@@ -69,6 +80,15 @@ async def _do_detect(
     )
 
 
+async def _do_detect(raw_request: str, llm_engine: LLMEngine) -> DetectResponse:
+    """内部：执行单次检测，返回 DetectResponse。"""
+    parsed = _parse_request_or_422(raw_request)
+    request_id = str(uuid.uuid4())[:8]
+    messages = build_detection_messages(parsed, request_id)
+    detection_result = await llm_engine.detect(messages)
+    return _build_response(parsed, detection_result)
+
+
 @router.post("/api/detect", response_model=DetectResponse)
 async def detect_vulnerability(
     request: DetectRequest,
@@ -78,8 +98,6 @@ async def detect_vulnerability(
     """攻击载荷识别接口。接收原始 HTTP 请求文本，解析后调用 LLM 分析，返回疑似攻击载荷识别结果。"""
     try:
         response = await _do_detect(request.raw_request, llm_engine)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
     except LLMEngineError as e:
         logger.error("LLM 检测失败: %s", e)
         raise HTTPException(status_code=502, detail=f"LLM 检测失败: {e}")
@@ -98,13 +116,7 @@ async def detect_no_context(
     直接发送原始 HTTP 请求给 LLM，不做结构化解析和预扫描。
     不保存历史记录。
     """
-    try:
-        parsed = parse_raw_request(request.raw_request)
-        if not parsed.method:
-            raise ValueError("无法解析 HTTP 请求行，请检查格式")
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
-
+    parsed = _parse_request_or_422(request.raw_request)
     request_id = str(uuid.uuid4())[:8]
     messages = build_detection_messages_no_context(request.raw_request, request_id)
 
@@ -114,35 +126,7 @@ async def detect_no_context(
         logger.error("LLM 识别失败(no-context): %s", e)
         raise HTTPException(status_code=502, detail=f"LLM 识别失败: {e}")
 
-    vulns_raw = detection_result.get("vulnerabilities", [])
-    vulnerabilities = []
-    for v in vulns_raw:
-        try:
-            vulnerabilities.append(VulnerabilityItem(
-                type=v.get("type", "未知"),
-                severity=v.get("severity", "info"),
-                confidence=int(v.get("confidence", 0)),
-                location=v.get("location", ""),
-                payload=v.get("payload", ""),
-                description=v.get("description", ""),
-                remediation=v.get("remediation", ""),
-            ))
-        except Exception as e:
-            logger.warning("解析载荷项失败: %s, raw=%s", e, v)
-
-    risk_level = detection_result.get("risk_level", "info")
-    is_vulnerable = detection_result.get("is_vulnerable", len(vulnerabilities) > 0)
-
-    return DetectResponse(
-        success=True,
-        method=parsed.method,
-        path=parsed.path,
-        host=parsed.host,
-        is_vulnerable=is_vulnerable,
-        risk_level=risk_level,
-        vulnerabilities=vulnerabilities,
-        summary=detection_result.get("summary", ""),
-    )
+    return _build_response(parsed, detection_result)
 
 
 @router.post("/api/detect-standard", response_model=DetectResponse)
@@ -154,13 +138,7 @@ async def detect_standard(
     消融实验对照接口 — 增强上下文 + 标准 Prompt（非 CoT）。
     使用增强版上下文（含编码/混淆分析），但使用 v1.0 标准 System Prompt，对比 CoT 分步推理的效果差异。
     """
-    try:
-        parsed = parse_raw_request(request.raw_request)
-        if not parsed.method:
-            raise ValueError("无法解析 HTTP 请求行，请检查格式")
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
-
+    parsed = _parse_request_or_422(request.raw_request)
     request_id = str(uuid.uuid4())[:8]
     structured_ctx = build_structured_context(parsed, request_id)
     user_content = USER_PROMPT_TEMPLATE.format(
@@ -179,35 +157,7 @@ async def detect_standard(
         logger.error("LLM 识别失败(standard): %s", e)
         raise HTTPException(status_code=502, detail=f"LLM 识别失败: {e}")
 
-    vulns_raw = detection_result.get("vulnerabilities", [])
-    vulnerabilities = []
-    for v in vulns_raw:
-        try:
-            vulnerabilities.append(VulnerabilityItem(
-                type=v.get("type", "未知"),
-                severity=v.get("severity", "info"),
-                confidence=int(v.get("confidence", 0)),
-                location=v.get("location", ""),
-                payload=v.get("payload", ""),
-                description=v.get("description", ""),
-                remediation=v.get("remediation", ""),
-            ))
-        except Exception as e:
-            logger.warning("解析载荷项失败: %s, raw=%s", e, v)
-
-    risk_level = detection_result.get("risk_level", "info")
-    is_vulnerable = detection_result.get("is_vulnerable", len(vulnerabilities) > 0)
-
-    return DetectResponse(
-        success=True,
-        method=parsed.method,
-        path=parsed.path,
-        host=parsed.host,
-        is_vulnerable=is_vulnerable,
-        risk_level=risk_level,
-        vulnerabilities=vulnerabilities,
-        summary=detection_result.get("summary", ""),
-    )
+    return _build_response(parsed, detection_result)
 
 
 @router.post("/api/batch-detect", response_model=BatchDetectResponse)
@@ -216,33 +166,31 @@ async def batch_detect(
     llm_engine: LLMEngine = Depends(get_llm_engine),
     history_store=Depends(get_history_store),
 ):
-    """批量识别接口。最多50条。"""
-    results = []
-    total_count = len(request.requests)
-    for idx, raw_req in enumerate(request.requests):
-        try:
-            response = await _do_detect(raw_req, llm_engine)
-            await history_store.save(response)
-            results.append(BatchDetectItem(
-                index=idx, success=True, result=response
-            ))
-        except ValueError as e:
-            results.append(BatchDetectItem(
-                index=idx, success=False, error=str(e)
-            ))
-        except LLMEngineError as e:
-            results.append(BatchDetectItem(
-                index=idx, success=False, error=f"LLM 错误: {e}"
-            ))
-        except Exception as e:
-            results.append(BatchDetectItem(
-                index=idx, success=False, error=f"未知错误: {e}"
-            ))
+    """批量识别接口。最多50条，并发检测（默认并发 6，信号量限流）。"""
+    semaphore = asyncio.Semaphore(BATCH_CONCURRENCY)
 
+    async def _one(idx: int, raw_req: str) -> BatchDetectItem:
+        async with semaphore:
+            try:
+                response = await _do_detect(raw_req, llm_engine)
+                await history_store.save(response)
+                return BatchDetectItem(index=idx, success=True, result=response)
+            except HTTPException as e:
+                return BatchDetectItem(index=idx, success=False, error=str(e.detail))
+            except ValueError as e:
+                return BatchDetectItem(index=idx, success=False, error=str(e))
+            except LLMEngineError as e:
+                return BatchDetectItem(index=idx, success=False, error=f"LLM 错误: {e}")
+            except Exception as e:  # noqa: BLE001
+                return BatchDetectItem(index=idx, success=False, error=f"未知错误: {e}")
+
+    results = await asyncio.gather(
+        *(_one(idx, raw_req) for idx, raw_req in enumerate(request.requests))
+    )
     return BatchDetectResponse(
         success=True,
-        total=total_count,
-        results=results,
+        total=len(request.requests),
+        results=list(results),
     )
 
 

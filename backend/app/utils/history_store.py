@@ -1,14 +1,13 @@
 """
-历史记录存储 — SQLite 持久化实现。
+历史记录存储 — SQLite 持久化实现（异步化）。
 
-接口与 InMemoryHistoryStore 保持一致：
-- save(response) -> record_id
-- list(page, page_size) -> (items, total)
-- get(record_id) -> dict | None
-- stats() -> dict  (新增：统计信息)
-- clear() -> int   (新增：清空所有记录)
+所有阻塞的 sqlite3 操作通过 asyncio.to_thread 卸载到线程池，
+避免在 FastAPI 异步事件循环中阻塞。公开接口（save/list/get/stats/clear）
+保持与旧版一致，调用方无需改动。
 """
+import asyncio
 import json
+import os
 import sqlite3
 import uuid
 import logging
@@ -23,17 +22,20 @@ class SQLiteHistoryStore:
 
     def __init__(self, db_path: str = "data/vulndetector.db"):
         self.db_path = db_path
-        self._init_db()
+        # 初始化建表一次性开销，在启动阶段同步执行（微秒级）
+        self._init_db_sync()
         logger.info("SQLiteHistoryStore 初始化完成: %s", db_path)
 
+    # ------------------------------------------------------------------
+    # 同步底层实现（均在线程池中执行，连接随用随建、用完即关）
+    # ------------------------------------------------------------------
     def _get_conn(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
 
-    def _init_db(self):
+    def _init_db_sync(self):
         """自动建表（如不存在）。"""
-        import os
         db_dir = os.path.dirname(self.db_path)
         if db_dir:
             os.makedirs(db_dir, exist_ok=True)
@@ -66,7 +68,7 @@ class SQLiteHistoryStore:
         conn.commit()
         conn.close()
 
-    async def save(self, response) -> str:
+    def _save_sync(self, response) -> str:
         """保存一条检测记录，返回 record_id。"""
         record_id = str(uuid.uuid4())[:8]
         vuln_types = list({v.type for v in response.vulnerabilities})
@@ -102,7 +104,7 @@ class SQLiteHistoryStore:
         logger.info("保存检测记录: id=%s, vulnerable=%s", record_id, response.is_vulnerable)
         return record_id
 
-    async def list(self, page: int = 1, page_size: int = 20):
+    def _list_sync(self, page: int = 1, page_size: int = 20):
         """分页查询历史记录列表（摘要信息）。"""
         offset = (page - 1) * page_size
         conn = self._get_conn()
@@ -132,7 +134,7 @@ class SQLiteHistoryStore:
             })
         return items, total
 
-    async def get(self, record_id: str) -> Optional[dict]:
+    def _get_sync(self, record_id: str) -> Optional[dict]:
         """获取单条记录的完整响应。"""
         conn = self._get_conn()
         row = conn.execute(
@@ -144,7 +146,7 @@ class SQLiteHistoryStore:
             return None
         return json.loads(row["full_response"])
 
-    async def stats(self) -> dict:
+    def _stats_sync(self) -> dict:
         """统计信息：总数、检出率、各类型分布、各风险等级分布。"""
         conn = self._get_conn()
         total = conn.execute("SELECT COUNT(*) FROM detection_records").fetchone()[0]
@@ -180,7 +182,7 @@ class SQLiteHistoryStore:
             "risk_distribution": risk_dist,
         }
 
-    async def clear(self) -> int:
+    def _clear_sync(self) -> int:
         """清空所有记录，返回删除条数。"""
         conn = self._get_conn()
         count = conn.execute("SELECT COUNT(*) FROM detection_records").fetchone()[0]
@@ -189,3 +191,26 @@ class SQLiteHistoryStore:
         conn.close()
         logger.info("清空历史记录: %d 条", count)
         return count
+
+    # ------------------------------------------------------------------
+    # 异步公开接口（阻塞操作卸载到线程池）
+    # ------------------------------------------------------------------
+    async def save(self, response) -> str:
+        """保存一条检测记录，返回 record_id。"""
+        return await asyncio.to_thread(self._save_sync, response)
+
+    async def list(self, page: int = 1, page_size: int = 20):
+        """分页查询历史记录列表（摘要信息）。"""
+        return await asyncio.to_thread(self._list_sync, page, page_size)
+
+    async def get(self, record_id: str) -> Optional[dict]:
+        """获取单条记录的完整响应。"""
+        return await asyncio.to_thread(self._get_sync, record_id)
+
+    async def stats(self) -> dict:
+        """统计信息：总数、检出率、各类型分布、各风险等级分布。"""
+        return await asyncio.to_thread(self._stats_sync)
+
+    async def clear(self) -> int:
+        """清空所有记录，返回删除条数。"""
+        return await asyncio.to_thread(self._clear_sync)
