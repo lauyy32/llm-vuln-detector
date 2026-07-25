@@ -7,7 +7,7 @@
         <span class="header-subtitle">基于 LLM 的上下文增强 HTTP 攻击载荷识别原型</span>
       </div>
       <div class="header-right">
-        <el-tag type="success" effect="plain" size="small">v2.0.0</el-tag>
+        <el-tag type="success" effect="plain" size="small">v2.4.0</el-tag>
       </div>
     </el-header>
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 ============================================================================
-  综合评测脚本 v2.1 — 三模式消融对比 + 完整指标 + 类型级混淆矩阵
+  综合评测脚本 v2.3 — 三模式消融对比（标准/对抗/真实世界三数据集）+ 完整指标 + 类型级混淆矩阵
 
   测试维度 (消融实验):
     - CoT 模式 (默认, /api/detect)        — 增强上下文 + CoT 分步推理
@@ -13,7 +13,7 @@
 
   测试数据集:
     - 56 条标准测试用例 (dataset/test_cases.json)
-    - 246 条对抗样本 (dataset/adversarial_samples.json) = 206 攻击 + 40 正常
+    - 246 条对抗样本 (dataset/adversarial_samples.json) = 205 攻击 + 41 正常
 
   完整指标 (每个 mode × dataset):
     - 检出率 / 严格检出率 / 漏报率 / 误报率
@@ -456,7 +456,7 @@ def generate_comparison_report(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="LLM-VulnDetector v2.1 综合消融评测")
+    parser = argparse.ArgumentParser(description="LLM-VulnDetector v2.3 综合消融评测（三数据集）")
     parser.add_argument("--dataset", choices=["standard", "adversarial", "real-world", "all"],
                         default="all", help="测试数据集 (default: all)")
     parser.add_argument("--modes", nargs="+",
