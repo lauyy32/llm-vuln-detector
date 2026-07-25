@@ -439,7 +439,9 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 
 `gen_semantic_perturb_variants` 同步新增 SQL/XSS 的 URL 编码变体；报告新增 `by_attack_type` 维度，可按攻击类型拆分翻转率。
 
-> ⚠️ **数据说明**：上方 v2.3 的「409 变体 / 2.0% 翻转率」由**升级前的 3 变体生成器**产出。升级后变体数量与分布已改变，**该数字不能直接代表新生成器**；需用 `python tests/benchmark_robustness.py --dataset real-world --endpoint /api/detect` 重跑后，以新结果替换本段落。
+**效率优化（同次提交）**：原 `run_robustness` 为嵌套 for 循环串行 `await`，409 变体约 1.5 小时、升级后 825+ 变体将达 ~3 小时。已改为**两阶段并发**：阶段1 所有样本原始判定并发（信号量限流，默认 8，可用 `--concurrency` 调），阶段2 仅对「原始判为攻击」的样本并发跑变体，保留「漏报样本跳过变体」省调用逻辑。预计 825+ 变体真实重跑从 ~3 小时降至 **约 20–40 分钟**（取决于 DeepSeek 限流与单请求延迟）。
+
+> ⚠️ **数据说明**：上方 v2.3 的「409 变体 / 2.0% 翻转率」由**升级前的 3 变体生成器**产出。升级后变体数量与分布已改变（约 825+ 变体），**该数字不能直接代表新生成器**；需用 `python tests/benchmark_robustness.py --dataset real-world --endpoint /api/detect --concurrency 8` 重跑后，以新结果替换本段落。
 
 ---
 
@@ -502,7 +504,7 @@ llm-vuln-detector/
 │   │   ├── evaluate.py            # v1.0 评测脚本（56条，已归档）
 │   │   ├── ablation.py            # v1.0 双模式消融（已归档，三模式请用 evaluate_v2.py）
 │   │   ├── benchmark_dvwa.py      # DVWA 端到端 + ModSecurity 多维度对比
-│   │   ├── benchmark_robustness.py# 针对 LLM 检测器的鲁棒性测试（v2.4：prompt injection 升级为 10 变体 / 语义扰动 / 最小编辑）
+│   │   ├── benchmark_robustness.py# 针对 LLM 检测器的鲁棒性测试（v2.4：10 变体 prompt injection / 语义扰动 / 最小编辑；两阶段并发，--concurrency 可调）
 │   │   ├── fetch_real_world_dataset.py # 使用来自 SecLists/PayloadsAllTheThings 的内嵌种子样本（支持 --seclists-dir 从本机仓库扩展到数百条）
 │   │   ├── generate_adversarial.py# 对抗样本生成器 + 正常样本（246条）
 │   │   ├── gen_eval_report.py     # Word 评测报告生成

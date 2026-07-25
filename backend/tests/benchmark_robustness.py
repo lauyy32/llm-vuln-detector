@@ -27,6 +27,8 @@ v2.4 升级（回应"prompt injection 变体太基础"的质疑）：
 
   # 本机真实评测（需后端在 8000 运行，会调 API）
   python tests/benchmark_robustness.py --dataset real-world --endpoint /api/detect
+  # 调高/调低并发（受 DeepSeek 限流约束）：
+  python tests/benchmark_robustness.py --dataset real-world --concurrency 12
 """
 from __future__ import annotations
 
@@ -224,50 +226,68 @@ def make_mock_call(variant_tag: str):
     return _mock
 
 
-async def run_robustness(samples: list[dict], endpoint: str, use_mock: bool):
-    """对每个攻击样本生成三类变体，调 LLM，统计翻转。"""
+async def run_robustness(samples: list[dict], endpoint: str, use_mock: bool, concurrency: int = 8):
+    """对每个攻击样本生成三类变体，并发调 LLM，统计翻转。
+
+    v2.4 效率优化（回应"跑两小时太慢"的质疑）——两阶段并发：
+      阶段1：所有样本的原始判定并发执行（信号量限流，默认 8）
+      阶段2：仅对「原始判为攻击」的样本，生成全部变体并并发调用
+    相比旧版「逐样本串行 + 变体内串行」（O(N×V) 次顺序等待），
+    改为两阶段并发后耗时降至约 O(ceil(N×V / 并发数))。
+    保留原 skip 语义：原始就漏报的样本不浪费调用去测变体。
+    """
+    sem = asyncio.Semaphore(concurrency)
+
+    async def _call_orig(sample: dict) -> dict:
+        async with sem:
+            if use_mock:
+                return {"is_vulnerable": True,
+                        "vulnerabilities": [{"type": sample.get("category", "mock")}],
+                        "risk_level": "high"}
+            return await call_api_async(_client, build_http_request(sample), endpoint)
+
+    async def _call_var(variant_http: str, variant_tag: str) -> dict:
+        async with sem:
+            if use_mock:
+                return make_mock_call(variant_tag)(variant_http, endpoint)
+            return await call_api_async(_client, variant_http, endpoint)
+
+    # 阶段1：原始判定并发
+    valid = [s for s in samples if s.get("category") in ATTACK_TYPES]
+    orig_results = await asyncio.gather(*[_call_orig(s) for s in valid])
+    attack_samples = [s for s, res in zip(valid, orig_results) if is_attack(res) is True]
+
+    # 阶段2：变体并发（仅攻击样本）
+    var_meta: list[tuple[dict, str, str, str]] = []
+    var_tasks = []
+    for s in attack_samples:
+        category = s.get("category", "?")
+        for gen_name, gen_fn in VARIANT_GENERATORS.items():
+            for variant_http, variant_tag in gen_fn(s):
+                var_meta.append((s, category, gen_name, variant_tag))
+                var_tasks.append(_call_var(variant_http, variant_tag))
+    var_results = await asyncio.gather(*var_tasks) if var_tasks else []
+
     records = []
     per_cat = defaultdict(lambda: {"n": 0, "flip": 0})
     per_attack = defaultdict(lambda: {"n": 0, "flip": 0})
-
-    for sample in samples:
-        category = sample.get("category", "?")
-        if category not in ATTACK_TYPES:
-            continue
-        orig_http = build_http_request(sample)
-
-        # 原始判定
-        if use_mock:
-            orig_res = {"is_vulnerable": True, "vulnerabilities": [{"type": category}], "risk_level": "high"}
-        else:
-            orig_res = await call_api_async(_client, orig_http, endpoint)
-        orig_attack = is_attack(orig_res)
-        if orig_attack is not True:
-            # 原始样本本身没判为攻击（可能是模型漏报），跳过翻转统计但记录
-            continue
-
-        for gen_name, gen_fn in VARIANT_GENERATORS.items():
-            for variant_http, variant_tag in gen_fn(sample):
-                if use_mock:
-                    var_res = make_mock_call(variant_tag)(variant_http, endpoint)
-                else:
-                    var_res = await call_api_async(_client, variant_http, endpoint)
-                var_attack = is_attack(var_res)
-                flipped = (var_attack is False)  # 攻击被判成安全 = 最危险翻转
-                per_cat[category]["n"] += 1
-                per_attack[gen_name]["n"] += 1
-                if flipped:
-                    per_cat[category]["flip"] += 1
-                    per_attack[gen_name]["flip"] += 1
-                records.append({
-                    "sample_id": sample.get("id"),
-                    "category": category,
-                    "attack_type": gen_name,
-                    "variant_tag": variant_tag,
-                    "orig_is_attack": True,
-                    "variant_is_attack": var_attack,
-                    "flipped": flipped,
-                })
+    for (s, category, gen_name, variant_tag), var_res in zip(var_meta, var_results):
+        var_attack = is_attack(var_res)
+        flipped = (var_attack is False)  # 攻击被判成安全 = 最危险翻转
+        per_cat[category]["n"] += 1
+        per_attack[gen_name]["n"] += 1
+        if flipped:
+            per_cat[category]["flip"] += 1
+            per_attack[gen_name]["flip"] += 1
+        records.append({
+            "sample_id": s.get("id"),
+            "category": category,
+            "attack_type": gen_name,
+            "variant_tag": variant_tag,
+            "orig_is_attack": True,
+            "variant_is_attack": var_attack,
+            "flipped": flipped,
+        })
 
     return records, per_cat, per_attack
 
@@ -280,6 +300,9 @@ async def main_async():
     ap.add_argument("--dataset", choices=["adversarial", "real-world"], default="real-world")
     ap.add_argument("--endpoint", default="/api/detect", help="检测端点 (cot=默认)")
     ap.add_argument("--max-samples", type=int, default=None)
+    ap.add_argument("--concurrency", type=int,
+                    default=int(os.environ.get("VD_ROBUSTNESS_CONCURRENCY", "8")),
+                    help="并发调用上限（默认 8，受 DeepSeek 限流约束，可调小）")
     ap.add_argument("--dry-run", action="store_true", help="mock 判定，不调 API")
     args = ap.parse_args()
 
@@ -307,7 +330,8 @@ async def main_async():
         import httpx
         _client = httpx.AsyncClient(timeout=float(os.environ.get("VD_REQUEST_TIMEOUT", "90")))
 
-    records, per_cat, per_attack = await run_robustness(samples, args.endpoint, args.dry_run)
+    records, per_cat, per_attack = await run_robustness(
+        samples, args.endpoint, args.dry_run, args.concurrency)
 
     if _client:
         await _client.aclose()
