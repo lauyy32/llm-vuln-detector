@@ -457,7 +457,7 @@ def generate_comparison_report(
 
 def main():
     parser = argparse.ArgumentParser(description="LLM-VulnDetector v2.1 综合消融评测")
-    parser.add_argument("--dataset", choices=["standard", "adversarial", "all"],
+    parser.add_argument("--dataset", choices=["standard", "adversarial", "real-world", "all"],
                         default="all", help="测试数据集 (default: all)")
     parser.add_argument("--modes", nargs="+",
                         default=["cot", "standard", "no-context"],
@@ -484,6 +484,11 @@ def main():
         if adv_path.exists():
             datasets["adversarial"] = load_dataset(adv_path)
             print(f"[数据] 对抗样本: {len(datasets['adversarial'])} 条")
+    if args.dataset in ("real-world", "all"):
+        rw_path = DATASET_DIR / "real_world_samples.json"
+        if rw_path.exists():
+            datasets["real-world"] = load_dataset(rw_path)
+            print(f"[数据] 真实攻击样本: {len(datasets['real-world'])} 条")
 
     if not datasets:
         print("[错误] 未找到任何数据集文件")
