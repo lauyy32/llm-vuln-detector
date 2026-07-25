@@ -7,7 +7,7 @@ LLM 调用引擎 v2.0 — 异步调用 LLM API 做攻击载荷识别。
 - no-context: 无上下文增强（消融基线）
 
 支持 provider：
-- deepseek (DeepSeek-Chat)
+- deepseek (DeepSeek-V4-Pro)
 - glm (智谱 GLM-4-Flash)
 
 特性：

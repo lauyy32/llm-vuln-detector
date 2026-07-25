@@ -80,7 +80,7 @@ for ri, row_data in enumerate(design_data):
 
 doc.add_paragraph("")
 doc.add_paragraph("数据集：56 条测试用例（41 条漏洞正例 + 12 条正常请求 + 3 条边界用例），覆盖 10 类 Web 漏洞。")
-doc.add_paragraph("LLM 模型：DeepSeek-Chat。")
+doc.add_paragraph("LLM 模型：DeepSeek-V4-Pro。")
 
 # 三、实验结果
 doc.add_heading("三、实验结果", level=1)

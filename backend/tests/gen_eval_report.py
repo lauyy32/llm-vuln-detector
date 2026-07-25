@@ -43,7 +43,7 @@ doc.add_paragraph("系统的响应速度能否满足实际使用需求？（平�
 # 二、实验环境
 doc.add_heading("二、实验环境与设置", level=1)
 doc.add_paragraph("后端框架：Python FastAPI + httpx 异步 HTTP 客户端", style="List Bullet")
-doc.add_paragraph("大语言模型：DeepSeek-Chat（DeepSeek API）", style="List Bullet")
+doc.add_paragraph("大语言模型：DeepSeek-V4-Pro（DeepSeek API）", style="List Bullet")
 doc.add_paragraph("前端框架：Vue 3 + Element Plus", style="List Bullet")
 doc.add_paragraph("检测流程：HTTP 请求解析 -> 正则预扫描 -> 上下文结构化构造 -> LLM 分析 -> JSON 结果输出", style="List Bullet")
 doc.add_paragraph("Prompt 策略：系统提示 + few-shot 示例 + CoT 推理 + 降误报自检机制", style="List Bullet")

@@ -35,7 +35,7 @@ class Settings(BaseSettings):
         },
         "deepseek": {
             "base_url": "https://api.deepseek.com",
-            "model": "deepseek-chat",
+            "model": "deepseek-v4-pro",
         },
     }
 

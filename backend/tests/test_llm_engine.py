@@ -88,7 +88,7 @@ class TestLLMEngineInit:
             "provider": "deepseek",
             "api_key": "sk-test",
             "base_url": "http://fake",
-            "model": "deepseek-chat",
+            "model": "deepseek-v4-pro",
             "timeout": 30,
             "max_retries": 2,
             "temperature": 0.2,

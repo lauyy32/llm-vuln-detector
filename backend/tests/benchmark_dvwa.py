@@ -595,7 +595,7 @@ def print_report(metrics: dict, results: list[SingleResult], active_pls: list):
     print(f"    请求类型:      benign + attack（每场景 2 条）")
     print(f"    总用例数:      {ov['total_cases']} ({ov['attack_cases']} attacks + {ov['benign_cases']} benign)")
     print(f"    ModSecurity:   {', '.join(active_pls)}（3 档 Paranoia Level）")
-    print(f"    LLM 模型:      DeepSeek-Chat（上下文增强）")
+    print(f"    LLM 模型:      DeepSeek-V4-Pro（上下文增强）")
     print(f"    检测失败:      {ov['errors']}")
 
     # ---- 按 DVWA 难度拆分 ----
