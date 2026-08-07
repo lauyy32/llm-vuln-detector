@@ -49,7 +49,7 @@ cd codeql-queries && git sparse-checkout set python shared misc
 3. **路径翻译**：`codeql.exe` 是原生 Windows 程序，MSYS 风格的 `/c/Users/...` 会被翻译成
    `C:\c\Users\...`。一律传 `C:/Users/...`。
 
-## Defender 阻塞 taint 查询（本机实测 2026-08-07）
+## Defender 阻塞 taint 查询（本机实测 2026-08-07，已修复）
 
 **现象**：`ast` / `cfg` / `dfg` 三个轻量查询在**全新 DB** 上稳定通过（27 / 31 / 9 边）；
 但 `taint`（数据流）在 `query run` 阶段报：
@@ -68,7 +68,7 @@ A fatal error occurred: Severe disk cache trouble (corruption or out of space)
 实时扫描在写入瞬间持锁，CodeQL 拿不到写权限 → 崩溃。这与 DB 是否在仓库内无关，是
 **实时扫描对 `cpg_db` 目录的锁定**。
 
-**修复（需管理员权限，本自动化环境无，故由用户手动执行一次）**：
+**修复（已验证）**：
 
 ```powershell
 # 以管理员身份运行 PowerShell
@@ -81,16 +81,17 @@ Add-MpPreference -ExclusionPath "C:/Users/lenovo/cpg_db"
 python pipeline.py --rebuild --force
 ```
 
-`taint` 应能正常出 `taint.csv`。`pipeline.py` 已对 `AccessDenied` / `Cant write tuple pool`
-/ `Severe disk cache trouble` 做了检测，失败时打印上述提示而非静默挂死。
+实测 `taint` 查询在 1.9s 内完成，正常输出 `taint.csv`（1 row）。
+`pipeline.py` 已对 `AccessDenied` / `Cant write tuple pool` / `Severe disk cache trouble`
+做了检测，失败时打印上述提示而非静默挂死。
 
 ** poisoned 缓存陷阱**：被 kill 的 `codeql.exe`（以及它拉起的 java 子进程）会**遗留锁定的
 缓存文件**，导致后续查询在旧 DB 上反复 `AccessDenied`。先用
 `taskkill /F /T /PID <pid>` 把整棵树（含 java）清掉，再 `--rebuild`（或确认 DB 已被覆盖）。
 `pipeline.py` 的看门狗超时即用 `taskkill /F /T` 杀整棵树，避免孤儿 java 持锁。
 
-**结论 / 当前可用性**：CPG 最小管线的**核心三步（AST+CFG+DFG → 文本切片）已在本机端到端验证可用**；
-`taint` 仅是环境阻塞（Defender），非工具或查询缺陷，加排除项后即通。
+**结论 / 当前可用性**：CPG 最小管线的**四步（AST+CFG+DFG+taint → 文本切片）已在本机端到端验证可用**。
+`taint` 之前被 Windows Defender 实时扫描阻塞，加 DB 目录排除项后已跑通。
 
 
 ## 性能：`--ram` 不是可选项
@@ -120,7 +121,7 @@ CodeQL 在最大堆 < 约 2 GB 时会打印
 | `ast.ql` | 父→子 AST 边 | 默认**不**进切片：源码文本对 LLM 而言已编码了 AST，重复塞进去只烧 token。是否真的无增益，本身是一个可做的消融。 |
 | `cfg.ql` | 控制流后继边（带 true/false 分支标签） | 行级聚合，丢弃同行的表达式求值顺序边 |
 | `dfg.ql` | SSA def-use + phi 边 | **刻意不用** `TaintTracking::localTaintStep`（见上面性能一节）。这也是 CPG 教科书定义的 DFG。 |
-| `taint.ql` | source → sink 污点路径 | 这是"请求侧检测器永远看不到"的那条信息，是本课题立论的核心证据。**当前在本机被 Windows Defender 锁缓存阻塞（见上节），需加 DB 目录排除项后才能跑通；`ast/cfg/dfg` 不受影响。** |
+| `taint.ql` | source → sink 污点路径 | 这是"请求侧检测器永远看不到"的那条信息，是本课题立论的核心证据。本机需把 DB 目录加入 Windows Defender 排除项才能跑通（见上节）。 |
 
 `taint.ql` 当前用的是基于方法名的启发式 Config（`get` → `execute`），
 因为独立代码片段没有框架建模。正式语料会换成上游 `py/sql-injection` 等按 CWE 的配置。
