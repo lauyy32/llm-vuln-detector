@@ -1,0 +1,58 @@
+# CPG SLICE — mcp_server.py::_resolve_path
+
+## SOURCE
+L129 | def _resolve_path(directory: str, candidate: str) -> tuple[str, str | None]:
+L130 |     """Return absolute path and relative display path rooted at directory."""
+L131 |     candidate_path = Path(candidate)
+L132 |     abs_path = (
+L133 |         str(candidate_path)
+L134 |         if candidate_path.is_absolute()
+L135 |         else str(Path(directory) / candidate)
+L136 |     )
+L137 |     try:
+L138 |         rel_path = os.path.relpath(abs_path, directory)
+L139 |     except ValueError:
+L140 |         rel_path = None
+L141 |     if rel_path and rel_path.startswith(".."):
+L142 |         rel_path = None
+L143 |     return abs_path, rel_path
+
+## CONTROL FLOW
+[entry]  -->  L129
+L129  -->  L130
+L130  -->  L131
+L131  -->  L134
+L132  -->  L137
+L133  -->  L132
+L134  --false-->  L135
+L134  --true-->  L133
+L135  -->  L133
+L137  -->  L138
+L138  -->  L139
+L138  -->  L141
+L139  -->  L140
+L140  -->  L141
+L141  --false-->  L143
+L141  --true-->  L141
+L141  --true-->  L142
+L142  -->  L143
+L143  -->  [exit]
+
+## DATA FLOW (SSA def-use, phi = branch merge)
+[candidate] L129 candidate  --def-use-->  L131 candidate
+[candidate] L129 candidate  --def-use-->  L135 candidate
+[directory] L129 directory  --def-use-->  L135 directory
+[directory] L129 directory  --def-use-->  L138 directory
+[candidate_path] L131 candidate_path  --def-use-->  L133 candidate_path
+[candidate_path] L131 candidate_path  --def-use-->  L134 candidate_path
+[abs_path] L132 abs_path  --def-use-->  L138 abs_path
+[abs_path] L132 abs_path  --def-use-->  L143 abs_path
+[rel_path] L138 rel_path  --def-use-->  L141 rel_path
+[rel_path] L138 rel_path  --phi-->  L143 phi(rel_path)
+[rel_path] L140 rel_path  --def-use-->  L141 rel_path
+[rel_path] L140 rel_path  --phi-->  L143 phi(rel_path)
+[rel_path] L142 rel_path  --phi-->  L143 phi(rel_path)
+[rel_path] L143 phi(rel_path)  --def-use-->  L143 phi(rel_path)
+
+## TAINT VERDICT
+(no untrusted input reaches a modelled sink)
