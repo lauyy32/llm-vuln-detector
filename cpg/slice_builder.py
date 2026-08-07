@@ -152,16 +152,45 @@ def build_taint_section(rows: list[dict[str, str]], source_path: Path) -> list[s
     ]
 
 
-def function_line_range(ast_rows: list[dict[str, str]], func: str) -> tuple[int, int]:
-    lines = [
-        int(v)
-        for r in ast_rows
-        if r["func"] == func
-        for v in (r["parentLine"], r["childLine"])
-    ]
+def function_line_range(
+    ast_rows: list[dict[str, str]], func: str, anchor_line: int | None = None
+) -> tuple[int, int]:
+    """Return (first, last) source line of ``func``.
+
+    When a name is overloaded (e.g. an ``@abc.abstractmethod`` stub plus several
+    concrete implementations), the naive min/max would merge every definition
+    into one huge span. With ``anchor_line`` we instead cluster the definition's
+    lines by continuity (gap <= 2) and pick the cluster that contains the
+    anchor, so each overload is sliced independently.
+    """
+    lines = sorted(
+        set(
+            int(v)
+            for r in ast_rows
+            if r["func"] == func
+            for v in (r["parentLine"], r["childLine"])
+        )
+    )
     if not lines:
         raise SystemExit(f"function {func!r} not found in ast.csv")
-    return min(lines), max(lines)
+    if anchor_line is None:
+        return lines[0], lines[-1]
+    # cluster by continuity
+    clusters: list[list[int]] = []
+    cur = [lines[0]]
+    for ln in lines[1:]:
+        if ln - cur[-1] <= 2:
+            cur.append(ln)
+        else:
+            clusters.append(cur)
+            cur = [ln]
+    clusters.append(cur)
+    for cl in clusters:
+        if cl[0] <= anchor_line <= cl[-1]:
+            return cl[0], cl[-1]
+    # anchor not on an AST line: nearest cluster by distance to its midpoint
+    best = min(clusters, key=lambda c: abs(((c[0] + c[-1]) // 2) - anchor_line))
+    return best[0], best[-1]
 
 
 def build_ast_section(rows: list[dict[str, str]], func: str) -> list[str]:
@@ -186,7 +215,12 @@ def build_ast_section(rows: list[dict[str, str]], func: str) -> list[str]:
 
 
 def build_slice(
-    out_dir: Path, source: Path, func: str, node_level: bool, include_ast: bool = False
+    out_dir: Path,
+    source: Path,
+    func: str,
+    node_level: bool,
+    include_ast: bool = False,
+    anchor_line: int | None = None,
 ) -> str:
     ast_rows = read_rows(out_dir / "ast.csv")
     cfg_rows = read_rows(out_dir / "cfg.csv")
@@ -195,7 +229,7 @@ def build_slice(
     taint_path = out_dir / "taint.csv"
     taint_rows = read_rows(taint_path) if taint_path.exists() else []
 
-    first, last = function_line_range(ast_rows, func)
+    first, last = function_line_range(ast_rows, func, anchor_line)
     # The def line sits one above the first statement we can see in the AST.
     first = max(1, first - 1)
 
@@ -244,10 +278,22 @@ def main() -> None:
         action="store_true",
         help="append the AST edge list (off by default, see build_slice docstring)",
     )
+    ap.add_argument(
+        "--line",
+        type=int,
+        default=None,
+        help="anchor line to disambiguate an overloaded function (e.g. an "
+        "abstractmethod stub vs its concrete implementations)",
+    )
     args = ap.parse_args()
 
     text = build_slice(
-        args.out_dir, args.source, args.function, args.node_level, args.include_ast
+        args.out_dir,
+        args.source,
+        args.function,
+        args.node_level,
+        args.include_ast,
+        args.line,
     )
     dest = args.out_dir / f"slice_{args.function}.txt"
     dest.write_text(text, encoding="utf-8")

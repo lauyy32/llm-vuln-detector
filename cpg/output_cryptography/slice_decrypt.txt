@@ -1,0 +1,50 @@
+# CPG SLICE — fernet.py::decrypt
+
+## SOURCE
+L84 |     def decrypt(self, token: bytes | str, ttl: int | None = None) -> bytes:
+L85 |         timestamp, data = Fernet._get_unverified_token_data(token)
+L86 |         if ttl is None:
+L87 |             time_info = None
+L88 |         else:
+L89 |             time_info = (ttl, int(time.time()))
+L90 |         return self._decrypt_data(data, timestamp, time_info)
+
+## CONTROL FLOW
+[entry]  -->  L20
+[entry]  -->  L84
+[entry]  -->  L200
+L20  -->  L21
+L21  -->  [exit]
+L84  -->  L85
+L85  -->  L86
+L86  --false-->  L89
+L86  --true-->  L87
+L87  -->  L90
+L89  -->  L90
+L90  -->  [exit]
+L200  -->  L201
+L201  -->  L202
+L201  -->  L206
+L202  -->  L203
+L203  -->  [exit]
+L203  -->  L204
+L204  -->  L205
+L205  -->  L201
+
+## DATA FLOW (SSA def-use, phi = branch merge)
+[self] L84 self  --def-use-->  L90 self
+[token] L84 token  --def-use-->  L85 token
+[ttl] L84 ttl  --def-use-->  L86 ttl
+[ttl] L84 ttl  --def-use-->  L89 ttl
+[data] L85 data  --def-use-->  L90 data
+[timestamp] L85 timestamp  --def-use-->  L90 timestamp
+[time_info] L87 time_info  --phi-->  L90 phi(time_info)
+[time_info] L89 time_info  --phi-->  L90 phi(time_info)
+[time_info] L90 phi(time_info)  --def-use-->  L90 phi(time_info)
+[msg] L200 msg  --def-use-->  L203 msg
+[self] L200 self  --def-use-->  L201 self
+[ttl] L200 ttl  --def-use-->  L203 ttl
+[f] L201 f  --def-use-->  L203 f
+
+## TAINT VERDICT
+(no untrusted input reaches a modelled sink)

@@ -1,0 +1,218 @@
+# CPG SLICE — http_parser.py::parse_message
+
+## SOURCE
+L650 |         # request line
+L651 |         line = lines[0].decode("utf-8", "surrogateescape")
+L652 |         try:
+L653 |             method, path, version = line.split(" ", maxsplit=2)
+L654 |         except ValueError:
+L655 |             raise BadHttpMethod(line) from None
+
+## CONTROL FLOW
+[entry]  -->  L309
+[entry]  -->  L649
+[entry]  -->  L765
+L309  -->  [exit]
+L649  -->  L651
+L651  -->  L652
+L652  -->  L653
+L653  -->  L654
+L653  -->  L658
+L654  -->  L655
+L658  --false-->  L660
+L658  --true-->  L659
+L660  -->  L663
+L663  -->  L664
+L664  --false-->  L666
+L664  --true-->  L665
+L666  -->  L668
+L668  --false-->  L672
+L668  --true-->  L671
+L671  -->  L709
+L672  --false-->  L688
+L672  --true-->  L675
+L675  -->  L676
+L676  -->  L682
+L682  -->  L683
+L682  -->  L709
+L683  -->  L684
+L684  -->  L685
+L685  -->  L686
+L686  -->  L682
+L688  --false-->  L694
+L688  --true-->  L688
+L688  --true-->  L690
+L690  -->  L709
+L694  -->  L695
+L695  --false-->  L709
+L695  --true-->  L697
+L697  -->  L698
+L698  -->  L697
+L703  -->  L704
+L704  -->  L705
+L705  -->  L706
+L706  -->  L707
+L707  -->  L708
+L708  -->  L711
+L709  -->  L703
+L711  --false-->  L714
+L711  --true-->  L711
+L711  --true-->  L712
+L714  --false-->  L720
+L714  --true-->  L715
+L715  --false-->  L718
+L715  --true-->  L716
+L716  -->  L720
+L718  -->  L720
+L720  -->  [exit]
+L720  -->  L721
+L721  -->  L722
+L722  -->  L723
+L723  -->  L724
+L724  -->  L725
+L725  -->  L726
+L726  -->  L727
+L727  -->  L728
+L728  -->  L729
+L729  -->  L730
+L730  -->  L720
+L765  -->  L766
+L766  -->  L767
+L767  -->  L768
+L768  -->  L769
+L768  -->  L772
+L769  -->  L770
+L772  -->  L773
+L773  -->  L774
+L773  -->  L779
+L774  -->  L775
+L775  -->  L776
+L776  -->  L779
+L779  -->  L780
+L780  --false-->  L782
+L780  --true-->  L781
+L782  -->  L785
+L785  --false-->  L785
+L785  --false-->  L787
+L785  --true-->  L786
+L787  -->  L797
+L791  -->  L792
+L792  -->  L793
+L793  -->  L794
+L794  -->  L795
+L795  -->  L796
+L796  -->  L799
+L797  -->  L791
+L799  --false-->  L811
+L799  --true-->  L800
+L800  --false-->  L803
+L800  --true-->  L801
+L801  -->  L811
+L803  --false-->  L803
+L803  --false-->  L805
+L803  --true-->  L804
+L804  -->  L811
+L805  --false-->  L805
+L805  --false-->  L809
+L805  --true-->  L806
+L806  -->  L811
+L809  -->  L811
+L811  -->  [exit]
+L811  -->  L812
+L812  -->  L813
+L813  -->  L814
+L814  -->  L815
+L815  -->  L816
+L816  -->  L817
+L817  -->  L818
+L818  -->  L819
+L819  -->  L820
+L820  -->  L811
+
+## DATA FLOW (SSA def-use, phi = branch merge)
+[lines] L649 lines  --def-use-->  L651 lines
+[lines] L649 lines  --def-use-->  L709 lines
+[self] L649 self  --def-use-->  L709 self
+[line] L651 line  --def-use-->  L653 line
+[line] L651 line  --def-use-->  L655 line
+[line] L651 line  --def-use-->  L665 line
+[method] L653 method  --def-use-->  L658 method
+[method] L653 method  --def-use-->  L659 method
+[method] L653 method  --def-use-->  L660 method
+[path] L653 path  --def-use-->  L671 path
+[path] L653 path  --def-use-->  L672 path
+[path] L653 path  --def-use-->  L675 path
+[path] L653 path  --def-use-->  L688 path
+[path] L653 path  --def-use-->  L690 path
+[path] L653 path  --def-use-->  L694 path
+[path] L653 path  --def-use-->  L698 path
+[path] L653 path  --def-use-->  L722 path
+[version] L653 version  --def-use-->  L663 version
+[method] L660 method  --def-use-->  L668 method
+[method] L660 method  --def-use-->  L688 method
+[method] L660 method  --def-use-->  L721 method
+[match] L663 match  --def-use-->  L664 match
+[match] L663 match  --def-use-->  L666 match
+[version_o] L666 version_o  --def-use-->  L711 version_o
+[version_o] L666 version_o  --def-use-->  L715 version_o
+[version_o] L666 version_o  --def-use-->  L723 version_o
+[url] L671 url  --phi-->  L709 phi(url)
+[path_part] L675 path_part  --def-use-->  L676 path_part
+[url_fragment] L675 url_fragment  --def-use-->  L685 url_fragment
+[path_part] L676 path_part  --def-use-->  L683 path_part
+[qs_part] L676 qs_part  --def-use-->  L684 qs_part
+[url] L682 url  --phi-->  L709 phi(url)
+[url] L690 url  --phi-->  L709 phi(url)
+[url] L694 url  --def-use-->  L695 url
+[url] L694 url  --phi-->  L709 phi(url)
+[headers] L703 headers  --def-use-->  L711 headers
+[headers] L703 headers  --def-use-->  L724 headers
+[raw_headers] L704 raw_headers  --def-use-->  L725 raw_headers
+[close] L705 close  --def-use-->  L714 close
+[close] L705 close  --phi-->  L720 phi(close)
+[compression] L706 compression  --def-use-->  L727 compression
+[upgrade] L707 upgrade  --def-use-->  L728 upgrade
+[chunked] L708 chunked  --def-use-->  L729 chunked
+[url] L709 phi(url)  --def-use-->  L730 url
+[close] L716 close  --phi-->  L720 phi(close)
+[close] L718 close  --phi-->  L720 phi(close)
+[close] L720 phi(close)  --def-use-->  L726 close
+[lines] L765 lines  --def-use-->  L766 lines
+[lines] L765 lines  --def-use-->  L797 lines
+[self] L765 self  --def-use-->  L797 self
+[line] L766 line  --def-use-->  L768 line
+[line] L766 line  --def-use-->  L770 line
+[line] L766 line  --def-use-->  L781 line
+[line] L766 line  --def-use-->  L786 line
+[status] L768 status  --def-use-->  L773 status
+[status] L768 status  --def-use-->  L775 status
+[version] L768 version  --def-use-->  L779 version
+[reason] L773 reason  --phi-->  L779 phi(reason)
+[status] L773 status  --phi-->  L779 phi(status)
+[status] L775 status  --phi-->  L779 phi(status)
+[reason] L776 reason  --phi-->  L779 phi(reason)
+[match] L779 match  --def-use-->  L780 match
+[match] L779 match  --def-use-->  L782 match
+[reason] L779 phi(reason)  --def-use-->  L814 reason
+[status] L779 phi(status)  --def-use-->  L785 status
+[status] L779 phi(status)  --def-use-->  L787 status
+[version_o] L782 version_o  --def-use-->  L800 version_o
+[version_o] L782 version_o  --def-use-->  L812 version_o
+[status_i] L787 status_i  --def-use-->  L803 status_i
+[status_i] L787 status_i  --def-use-->  L813 status_i
+[headers] L791 headers  --def-use-->  L805 headers
+[headers] L791 headers  --def-use-->  L815 headers
+[raw_headers] L792 raw_headers  --def-use-->  L816 raw_headers
+[close] L793 close  --def-use-->  L799 close
+[close] L793 close  --phi-->  L811 phi(close)
+[compression] L794 compression  --def-use-->  L818 compression
+[upgrade] L795 upgrade  --def-use-->  L819 upgrade
+[chunked] L796 chunked  --def-use-->  L820 chunked
+[close] L801 close  --phi-->  L811 phi(close)
+[close] L804 close  --phi-->  L811 phi(close)
+[close] L806 close  --phi-->  L811 phi(close)
+[close] L809 close  --phi-->  L811 phi(close)
+[close] L811 phi(close)  --def-use-->  L817 close
+
+## TAINT VERDICT
+(no untrusted input reaches a modelled sink)

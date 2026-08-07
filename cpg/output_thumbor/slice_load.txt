@@ -1,0 +1,463 @@
+# CPG SLICE — file_loader.py::load
+
+## SOURCE
+L13 | from urllib.parse import unquote
+L14 | 
+L15 | from thumbor.loaders import LoaderResult
+L16 | 
+L17 | 
+L18 | async def load(context, path):
+L19 |     file_path = join(
+L20 |         context.config.FILE_LOADER_ROOT_PATH.rstrip("/"), path.lstrip("/")
+L21 |     )
+L22 |     file_path = abspath(file_path)
+L23 |     inside_root_path = file_path.startswith(
+L24 |         abspath(context.config.FILE_LOADER_ROOT_PATH)
+L25 |     )
+L26 | 
+L27 |     result = LoaderResult()
+L28 | 
+L29 |     if not inside_root_path:
+L30 |         result.error = LoaderResult.ERROR_NOT_FOUND
+L31 |         result.successful = False
+L32 |         return result
+L33 | 
+L34 |     # keep backwards compatibility, try the actual path first
+L35 |     # if not found, unquote it and try again
+L36 |     if not exists(file_path):
+L37 |         file_path = unquote(file_path)
+L38 | 
+L39 |     if exists(file_path) and isfile(file_path):
+L40 |         with open(file_path, "rb") as source_file:
+L41 |             stats = fstat(source_file.fileno())
+L42 | 
+L43 |             result.successful = True
+L44 |             result.buffer = source_file.read()
+L45 | 
+L46 |             result.metadata.update(
+L47 |                 size=stats.st_size,
+L48 |                 updated_at=datetime.utcfromtimestamp(stats.st_mtime),
+L49 |             )
+L50 |     else:
+L51 |         result.error = LoaderResult.ERROR_NOT_FOUND
+L52 |         result.successful = False
+L53 | 
+L54 |     return result
+
+## CONTROL FLOW
+[entry]  -->  L13
+[entry]  -->  L18
+[entry]  -->  L23
+[entry]  -->  L24
+[entry]  -->  L34
+[entry]  -->  L87
+[entry]  -->  L130
+[entry]  -->  L186
+L13  -->  L14
+L13  -->  L15
+L14  -->  L15
+L15  --false-->  L21
+L15  -->  L17
+L15  --true-->  L16
+L16  -->  L17
+L17  --false-->  L22
+L17  -->  L16
+L17  --true-->  L18
+L18  -->  [exit]
+L18  -->  L19
+L19  -->  L20
+L19  -->  L22
+L20  -->  L19
+L21  -->  [exit]
+L22  --false-->  L31
+L22  -->  L23
+L22  --true-->  L23
+L23  -->  L24
+L23  -->  L27
+L24  -->  L23
+L24  -->  L25
+L24  -->  L27
+L25  -->  L24
+L25  -->  [exit]
+L25  -->  L26
+L26  -->  L27
+L27  -->  L28
+L27  -->  L29
+L28  -->  L25
+L28  -->  L29
+L28  -->  L32
+L29  --false-->  L36
+L29  -->  [exit]
+L29  -->  L28
+L29  --true-->  L30
+L30  -->  L31
+L31  -->  [exit]
+L31  -->  L32
+L32  -->  [exit]
+L32  -->  L34
+L34  --false-->  L42
+L34  -->  L35
+L34  --true-->  L35
+L35  -->  [exit]
+L35  -->  L36
+L36  --false-->  L39
+L36  -->  L37
+L36  --true-->  L37
+L37  -->  L38
+L37  -->  L39
+L38  -->  [exit]
+L38  -->  L39
+L39  --false-->  L51
+L39  -->  L40
+L39  --true-->  L39
+L39  --true-->  L40
+L40  -->  L35
+L40  -->  L41
+L41  -->  L43
+L42  --false-->  L45
+L42  --true-->  L43
+L43  -->  L44
+L43  -->  L45
+L44  -->  L46
+L45  --false-->  L57
+L45  --true-->  L46
+L46  -->  L47
+L46  -->  L54
+L47  -->  L48
+L47  -->  L49
+L48  -->  L46
+L49  -->  L50
+L50  -->  L52
+L51  -->  L52
+L52  -->  L53
+L52  -->  L54
+L52  -->  L60
+L53  -->  L54
+L54  -->  [exit]
+L54  -->  L52
+L57  -->  L58
+L58  -->  L60
+L60  -->  [exit]
+L87  -->  L88
+L88  -->  L89
+L89  -->  L90
+L90  -->  L91
+L91  -->  L92
+L92  -->  [exit]
+L130  -->  L131
+L131  -->  L132
+L132  -->  L133
+L133  -->  L134
+L134  -->  L137
+L136  -->  L140
+L137  --false-->  L136
+L137  --true-->  L138
+L138  -->  L136
+L140  --false-->  L140
+L140  --false-->  L146
+L140  --true-->  L142
+L141  -->  L144
+L142  -->  L141
+L144  -->  L149
+L146  -->  L147
+L147  -->  L149
+L149  -->  L150
+L149  -->  L153
+L150  -->  L151
+L151  -->  L149
+L153  -->  L155
+L155  -->  L156
+L156  -->  L157
+L157  --false-->  L160
+L157  --true-->  L158
+L158  -->  L174
+L160  --false-->  L165
+L160  --true-->  L161
+L161  --false-->  L165
+L161  --true-->  L162
+L162  -->  L163
+L162  -->  L165
+L163  -->  L162
+L165  --false-->  L174
+L165  --true-->  L168
+L166  -->  L167
+L166  -->  L174
+L167  -->  L169
+L168  -->  L166
+L169  --false-->  L166
+L169  --true-->  L171
+L170  -->  L166
+L171  -->  L170
+L174  --false-->  L177
+L174  --true-->  L174
+L174  --true-->  L175
+L175  -->  L177
+L177  -->  L178
+L178  -->  L179
+L178  -->  L197
+L179  -->  L180
+L180  -->  L181
+L181  -->  L182
+L182  -->  L183
+L183  -->  L184
+L184  -->  L185
+L185  -->  L186
+L186  -->  L187
+L187  -->  L188
+L187  -->  L189
+L188  -->  L189
+L189  --false-->  L193
+L189  -->  L190
+L189  --true-->  L190
+L190  -->  L191
+L191  -->  L192
+L191  -->  L193
+L192  -->  L193
+L193  --false-->  L196
+L193  -->  L194
+L193  --true-->  L194
+L194  -->  L178
+L194  -->  L196
+L196  -->  L197
+L197  --false-->  L200
+L197  -->  L198
+L197  --true-->  L198
+L198  -->  [exit]
+L198  -->  L199
+L199  -->  L200
+L199  -->  L204
+L199  -->  L209
+L200  -->  L201
+L201  --false-->  L206
+L201  -->  L202
+L201  -->  L203
+L201  -->  L209
+L201  --true-->  L202
+L202  -->  L201
+L202  -->  L203
+L202  -->  L206
+L203  -->  L204
+L204  -->  L205
+L204  -->  L206
+L205  -->  L206
+L205  -->  L209
+L206  --false-->  L216
+L206  -->  L205
+L206  -->  L207
+L206  --true-->  L206
+L206  --true-->  L209
+L207  -->  L206
+L209  -->  [exit]
+L209  -->  L210
+L210  --false-->  L218
+L210  -->  L211
+L210  --true-->  L211
+L211  -->  L212
+L212  -->  L213
+L212  -->  L214
+L213  -->  L209
+L213  -->  L212
+L214  -->  L218
+L216  -->  L218
+L218  --false-->  L220
+L218  --true-->  L219
+L219  -->  L220
+L220  --false-->  [exit]
+L220  --true-->  L221
+L221  -->  [exit]
+
+## DATA FLOW (SSA def-use, phi = branch merge)
+[context] L13 context  --def-use-->  L14 context
+[context] L13 context  --def-use-->  L15 context
+[context] L13 context  --def-use-->  L21 context
+[context] L13 context  --def-use-->  L22 context
+[context] L13 context  --def-use-->  L31 context
+[path] L13 path  --def-use-->  L15 path
+[path] L13 path  --def-use-->  L21 path
+[path] L13 path  --def-use-->  L22 path
+[path] L13 path  --def-use-->  L27 path
+[path] L13 path  --def-use-->  L31 path
+[loader] L14 loader  --def-use-->  L15 loader
+[loader] L14 loader  --def-use-->  L21 loader
+[result] L15 result  --def-use-->  L17 result
+[result] L15 result  --def-use-->  L18 result
+[context] L18 context  --def-use-->  L20 context
+[context] L18 context  --def-use-->  L24 context
+[path] L18 path  --def-use-->  L20 path
+[file_path] L19 file_path  --def-use-->  L22 file_path
+[file_path] L22 file_path  --def-use-->  L23 file_path
+[file_path] L22 file_path  --def-use-->  L36 file_path
+[file_path] L22 file_path  --def-use-->  L37 file_path
+[file_path] L22 file_path  --phi-->  L39 phi(file_path)
+[callback] L23 callback  --def-use-->  L37 callback
+[callback] L23 callback  --def-use-->  L60 callback
+[context] L23 context  --def-use-->  L25 context
+[context] L23 context  --def-use-->  L29 context
+[inside_root_path] L23 inside_root_path  --def-use-->  L29 inside_root_path
+[path] L23 path  --def-use-->  L25 path
+[result] L23 result  --def-use-->  L24 result
+[result] L23 result  --def-use-->  L25 result
+[result] L23 result  --def-use-->  L26 result
+[result] L23 result  --def-use-->  L27 result
+[result] L23 result  --def-use-->  L29 result
+[context] L24 context  --def-use-->  L26 context
+[file_path] L24 file_path  --def-use-->  L27 file_path
+[url] L24 url  --def-use-->  L27 url
+[file_path] L27 file_path  --def-use-->  L28 file_path
+[file_path] L27 file_path  --def-use-->  L42 file_path
+[file_path] L27 file_path  --def-use-->  L43 file_path
+[file_path] L27 file_path  --phi-->  L45 phi(file_path)
+[result] L27 result  --def-use-->  L30 result
+[result] L27 result  --def-use-->  L31 result
+[result] L27 result  --def-use-->  L32 result
+[result] L27 result  --def-use-->  L43 result
+[result] L27 result  --def-use-->  L44 result
+[result] L27 result  --def-use-->  L46 result
+[result] L27 result  --def-use-->  L51 result
+[result] L27 result  --def-use-->  L52 result
+[result] L27 result  --def-use-->  L54 result
+[inside_root_path] L28 inside_root_path  --def-use-->  L34 inside_root_path
+[result] L32 result  --def-use-->  L35 result
+[result] L32 result  --def-use-->  L36 result
+[result] L32 result  --def-use-->  L37 result
+[result] L32 result  --def-use-->  L49 result
+[result] L32 result  --def-use-->  L50 result
+[result] L32 result  --def-use-->  L52 result
+[result] L32 result  --def-use-->  L57 result
+[result] L32 result  --def-use-->  L58 result
+[result] L32 result  --def-use-->  L60 result
+[context] L34 context  --def-use-->  L36 context
+[url] L34 url  --def-use-->  L37 url
+[file_path] L37 file_path  --phi-->  L39 phi(file_path)
+[file_path] L39 phi(file_path)  --def-use-->  L39 phi(file_path)
+[file_path] L39 phi(file_path)  --def-use-->  L40 file_path
+[source_file] L40 source_file  --def-use-->  L41 source_file
+[source_file] L40 source_file  --def-use-->  L44 source_file
+[stats] L41 stats  --def-use-->  L47 stats
+[stats] L41 stats  --def-use-->  L48 stats
+[file_path] L43 file_path  --phi-->  L45 phi(file_path)
+[file_path] L45 phi(file_path)  --def-use-->  L45 phi(file_path)
+[file_path] L45 phi(file_path)  --def-use-->  L46 file_path
+[f] L46 f  --def-use-->  L47 f
+[f] L46 f  --def-use-->  L50 f
+[stats] L47 stats  --def-use-->  L53 stats
+[stats] L47 stats  --def-use-->  L54 stats
+[buffer] L87 buffer  --def-use-->  L89 buffer
+[extension] L87 extension  --def-use-->  L88 extension
+[self] L87 self  --def-use-->  L88 self
+[self] L87 self  --def-use-->  L89 self
+[self] L87 self  --def-use-->  L90 self
+[self] L87 self  --def-use-->  L91 self
+[self] L87 self  --def-use-->  L92 self
+[context] L130 context  --def-use-->  L137 context
+[context] L130 context  --def-use-->  L138 context
+[context] L130 context  --def-use-->  L140 context
+[context] L130 context  --def-use-->  L144 context
+[context] L130 context  --def-use-->  L151 context
+[context] L130 context  --def-use-->  L157 context
+[context] L130 context  --def-use-->  L158 context
+[context] L130 context  --def-use-->  L160 context
+[context] L130 context  --def-use-->  L161 context
+[context] L130 context  --def-use-->  L162 context
+[context] L130 context  --def-use-->  L165 context
+[context] L130 context  --def-use-->  L168 context
+[context] L130 context  --def-use-->  L169 context
+[context] L130 context  --def-use-->  L171 context
+[context] L130 context  --def-use-->  L175 context
+[context] L130 context  --def-use-->  L181 context
+[context] L130 context  --def-use-->  L182 context
+[context] L130 context  --def-use-->  L183 context
+[context] L130 context  --def-use-->  L184 context
+[context] L130 context  --def-use-->  L186 context
+[context] L130 context  --def-use-->  L187 context
+[context] L130 context  --def-use-->  L188 context
+[context] L130 context  --def-use-->  L189 context
+[context] L130 context  --def-use-->  L190 context
+[context] L130 context  --def-use-->  L191 context
+[context] L130 context  --def-use-->  L192 context
+[context] L130 context  --def-use-->  L193 context
+[context] L130 context  --def-use-->  L212 context
+[url] L131 url  --def-use-->  L177 url
+[normalize_url_func] L132 normalize_url_func  --def-use-->  L177 normalize_url_func
+[return_contents_fn] L133 return_contents_fn  --def-use-->  L209 return_contents_fn
+[encode_fn] L134 encode_fn  --def-use-->  L186 encode_fn
+[encode_fn] L134 encode_fn  --def-use-->  L188 encode_fn
+[encode_fn] L134 encode_fn  --def-use-->  L189 encode_fn
+[encode_fn] L134 encode_fn  --def-use-->  L190 encode_fn
+[encode_fn] L134 encode_fn  --def-use-->  L191 encode_fn
+[encode_fn] L134 encode_fn  --def-use-->  L192 encode_fn
+[using_proxy] L136 using_proxy  --def-use-->  L140 using_proxy
+[http_client_implementation] L141 http_client_implementation  --phi-->  L149 phi(http_client_implementation)
+[prepare_curl_callback] L144 prepare_curl_callback  --phi-->  L149 phi(prepare_curl_callback)
+[http_client_implementation] L146 http_client_implementation  --phi-->  L149 phi(http_client_implementation)
+[prepare_curl_callback] L147 prepare_curl_callback  --phi-->  L149 phi(prepare_curl_callback)
+[http_client_implementation] L149 phi(http_client_implementation)  --def-use-->  L150 http_client_implementation
+[prepare_curl_callback] L149 phi(prepare_curl_callback)  --def-use-->  L194 prepare_curl_callback
+[client] L153 client  --def-use-->  L199 client
+[user_agent] L155 user_agent  --phi-->  L165 phi(user_agent)
+[user_agent] L155 user_agent  --phi-->  L174 phi(user_agent)
+[headers] L156 headers  --def-use-->  L170 headers
+[headers] L156 headers  --phi-->  L174 phi(headers)
+[headers] L158 headers  --phi-->  L174 phi(headers)
+[user_agent] L162 user_agent  --phi-->  L165 phi(user_agent)
+[user_agent] L165 phi(user_agent)  --phi-->  L174 phi(user_agent)
+[header_key] L167 header_key  --def-use-->  L169 header_key
+[header_key] L167 header_key  --def-use-->  L170 header_key
+[header_key] L167 header_key  --def-use-->  L171 header_key
+[headers] L174 phi(headers)  --def-use-->  L174 phi(headers)
+[headers] L174 phi(headers)  --def-use-->  L180 headers
+[user_agent] L174 phi(user_agent)  --def-use-->  L174 phi(user_agent)
+[user_agent] L174 phi(user_agent)  --phi-->  L177 phi(user_agent)
+[user_agent] L175 user_agent  --phi-->  L177 phi(user_agent)
+[user_agent] L177 phi(user_agent)  --def-use-->  L185 user_agent
+[url] L177 url  --def-use-->  L179 url
+[url] L177 url  --def-use-->  L211 url
+[req] L178 req  --def-use-->  L199 req
+[req] L178 req  --def-use-->  L202 req
+[req] L178 req  --def-use-->  L206 req
+[buffer] L186 buffer  --def-use-->  L190 buffer
+[buffer] L186 buffer  --def-use-->  L194 buffer
+[buffer] L186 buffer  --phi-->  L196 phi(buffer)
+[extension] L186 extension  --def-use-->  L187 extension
+[extension] L186 extension  --def-use-->  L189 extension
+[self] L186 self  --def-use-->  L187 self
+[self] L186 self  --def-use-->  L190 self
+[self] L186 self  --def-use-->  L191 self
+[self] L186 self  --def-use-->  L193 self
+[self] L186 self  --def-use-->  L194 self
+[self] L186 self  --def-use-->  L196 self
+[self] L186 self  --def-use-->  L201 self
+[self] L186 self  --def-use-->  L202 self
+[self] L186 self  --def-use-->  L206 self
+[self] L186 self  --def-use-->  L209 self
+[self] L186 self  --def-use-->  L211 self
+[self] L186 self  --def-use-->  L213 self
+[self] L186 self  --def-use-->  L214 self
+[self] L186 self  --def-use-->  L216 self
+[self] L186 self  --def-use-->  L218 self
+[self] L186 self  --def-use-->  L219 self
+[self] L186 self  --def-use-->  L220 self
+[self] L186 self  --def-use-->  L221 self
+[mime] L190 mime  --def-use-->  L191 mime
+[buffer] L194 buffer  --phi-->  L196 phi(buffer)
+[image_or_frames] L196 image_or_frames  --def-use-->  L197 image_or_frames
+[image_or_frames] L196 image_or_frames  --def-use-->  L207 image_or_frames
+[image_or_frames] L196 image_or_frames  --def-use-->  L209 image_or_frames
+[image_or_frames] L196 image_or_frames  --def-use-->  L210 image_or_frames
+[image_or_frames] L196 image_or_frames  --def-use-->  L212 image_or_frames
+[image_or_frames] L196 image_or_frames  --def-use-->  L216 image_or_frames
+[buffer] L196 phi(buffer)  --def-use-->  L196 phi(buffer)
+[start] L197 start  --def-use-->  L202 start
+[start] L197 start  --def-use-->  L206 start
+[start] L197 start  --def-use-->  L213 start
+[response] L199 response  --phi-->  L209 phi(response)
+[err] L200 err  --def-use-->  L202 err
+[response] L201 response  --phi-->  L209 phi(response)
+[error] L203 error  --def-use-->  L204 error
+[err] L204 err  --def-use-->  L206 err
+[response] L205 response  --phi-->  L209 phi(response)
+[response] L209 phi(response)  --def-use-->  L210 response
+[frame] L212 frame  --def-use-->  L213 frame
+
+## TAINT VERDICT
+(no untrusted input reaches a modelled sink)
