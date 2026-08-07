@@ -1,0 +1,5 @@
+name: lauyy32/cpg-queries
+version: 0.0.1
+library: false
+dependencies:
+  codeql/python-all: "*"

@@ -1,0 +1,11 @@
+# Downloaded CodeQL bundle (large, re-downloadable from github.com)
+codeql-bundle.tar.gz
+# Extracted CodeQL (CLI + extractors + dbscheme, ~1GB)
+codeql/
+# CodeQL query libraries (sparse-cloned from github/codeql, re-cloneable)
+codeql-queries/
+# Generated CodeQL databases
+db/
+# Binary query results (keep human-readable .txt slices)
+*.bqrs
+*.csv

@@ -1,0 +1,45 @@
+# CPG SLICE — cve_sqli_demo.py::get_user_profile
+
+## SOURCE
+L18 |     # SOURCE: 攻击者可控的 HTTP 请求输入
+L19 |     user_id = request.args.get("id")
+L20 | 
+L21 |     if admin_mode:
+L22 |         # 分支 -> 用于验证 CFG
+L23 |         query = "SELECT name, email FROM users"
+L24 |     else:
+L25 |         # 污点传播：user_id（source）流入 query（接近 sink）
+L26 |         query = "SELECT name, email FROM users WHERE id = " + user_id
+L27 | 
+L28 |     cursor = db.cursor()
+L29 |     # SINK: 若 admin_mode 为 False，则发生 SQL 注入
+L30 |     cursor.execute(query)
+L31 |     return cursor.fetchall()
+
+## CONTROL FLOW
+[entry]  -->  L17
+L17  -->  L19
+L19  -->  L21
+L21  --false-->  L26
+L21  --true-->  L23
+L23  -->  L28
+L26  -->  L28
+L28  -->  L30
+L30  -->  L31
+L31  -->  [exit]
+
+## DATA FLOW (SSA def-use, phi = branch merge)
+[admin_mode] L17 admin_mode  --def-use-->  L21 admin_mode
+[db] L17 db  --def-use-->  L28 db
+[request] L17 request  --def-use-->  L19 request
+[user_id] L19 user_id  --def-use-->  L26 user_id
+[query] L23 query  --phi-->  L28 phi(query)
+[query] L26 query  --phi-->  L28 phi(query)
+[cursor] L28 cursor  --def-use-->  L30 cursor
+[cursor] L28 cursor  --def-use-->  L31 cursor
+[query] L28 phi(query)  --def-use-->  L30 query
+
+## TAINT VERDICT
+UNTRUSTED  L19: user_id = request.args.get("id")
+           ==> reaches sink at L30: cursor.execute(query)
+           (flow: Attribute() -> query)
