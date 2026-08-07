@@ -1,0 +1,205 @@
+# Copyright 2026 Flyto2. Licensed under Apache-2.0. See LICENSE.
+
+"""
+HTTP Request Modules
+
+Generic HTTP GET and POST request modules.
+"""
+
+from typing import Any
+
+import aiohttp
+
+from ....base import BaseModule
+from ....registry import register_module
+from ....schema import compose, presets
+
+
+@register_module(
+    module_id='core.api.http_get',
+    version='1.0.0',
+    category='api',
+    subcategory='api',
+    tags=['api', 'http', 'request', 'get', 'ssrf_protected'],
+    label='HTTP GET Request',
+    label_key='modules.api.http_get.label',
+    description='Send HTTP GET request to any URL',
+    description_key='modules.api.http_get.description',
+    icon='Globe',
+    color='#3B82F6',
+    input_types=['string'],
+    output_types=['json', 'text', 'api_response'],
+    can_connect_to=['data.*', 'notify.*', 'file.*', 'flow.*'],
+    can_receive_from=['start', 'flow.*'],
+
+    # Schema-driven params
+    params_schema=compose(
+        presets.URL(required=True, placeholder='https://api.example.com/data'),
+        presets.HEADERS(),
+        presets.QUERY_PARAMS(key='params'),
+        presets.TIMEOUT_S(default=30),
+        presets.VERIFY_SSL(default=True),
+    ),
+    output_schema={
+        'status_code': {'type': 'number', 'description': 'HTTP status code',
+                'description_key': 'modules.core.api.http_get.output.status_code.description'},
+        'headers': {'type': 'object', 'description': 'HTTP headers',
+                'description_key': 'modules.core.api.http_get.output.headers.description'},
+        'body': {'type': 'string', 'description': 'Response body content',
+                'description_key': 'modules.core.api.http_get.output.body.description'},
+        'json': {'type': 'object', 'optional': True, 'description': 'Parsed JSON response data',
+                'description_key': 'modules.core.api.http_get.output.json.description'}
+    },
+    examples=[{
+        'title': 'Fetch API data',
+        'params': {
+            'url': 'https://api.github.com/users/octocat'
+        }
+    }],
+    author='Flyto Team',
+    license='MIT',
+    timeout_ms=60000,
+)
+class HTTPGetModule(BaseModule):
+    """Send HTTP GET request"""
+
+    module_name = "HTTP GET Request"
+    module_description = "Send HTTP GET request to any URL"
+
+    def validate_params(self) -> None:
+        if 'url' not in self.params:
+            raise ValueError("Missing required parameter: url")
+
+    async def execute(self) -> Any:
+        url = self.params.get('url')
+        headers = self.params.get('headers', {})
+        params = self.params.get('params', {})
+        timeout = self.params.get('timeout', 30)
+        verify_ssl = self.params.get('verify_ssl', True)
+
+        if not url:
+            raise ValueError("URL is required")
+
+        ssl_param = None if verify_ssl else False
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url,
+                headers=headers,
+                params=params,
+                timeout=aiohttp.ClientTimeout(total=timeout),
+                ssl=ssl_param,
+            ) as response:
+                status_code = response.status
+                response_headers = dict(response.headers)
+                body = await response.text()
+
+                result = {
+                    'status_code': status_code,
+                    'headers': response_headers,
+                    'body': body
+                }
+
+                if 'application/json' in response_headers.get('Content-Type', ''):
+                    try:
+                        result['json'] = await response.json()
+                    except Exception:
+                        pass
+
+                return result
+
+
+@register_module(
+    module_id='core.api.http_post',
+    version='1.0.0',
+    category='api',
+    subcategory='api',
+    tags=['api', 'http', 'request', 'post', 'ssrf_protected'],
+    label='HTTP POST Request',
+    label_key='modules.api.http_post.label',
+    description='Send HTTP POST request to any URL',
+    description_key='modules.api.http_post.description',
+    icon='Send',
+    color='#3B82F6',
+    input_types=['json', 'text', 'any'],
+    output_types=['json', 'text', 'api_response'],
+    can_receive_from=['data.*'],
+    can_connect_to=['data.*', 'notify.*', 'file.*'],
+
+    # Schema-driven params
+    params_schema=compose(
+        presets.URL(required=True, placeholder='https://api.example.com/data'),
+        presets.HEADERS(),
+        presets.TEXT(key='body', label='Body', label_key='schema.field.body', multiline=True),
+        presets.REQUEST_BODY(key='json'),
+        presets.TIMEOUT_S(default=30),
+        presets.VERIFY_SSL(default=True),
+    ),
+    output_schema={
+        'status_code': {'type': 'number', 'description': 'HTTP status code'},
+        'headers': {'type': 'object', 'description': 'HTTP headers'},
+        'body': {'type': 'string', 'description': 'Response body content'},
+        'json': {'type': 'object', 'optional': True, 'description': 'Parsed JSON response data'}
+    },
+    examples=[{
+        'title': 'Post JSON data',
+        'params': {
+            'url': 'https://api.example.com/users',
+            'json': {'name': 'John', 'email': 'john@example.com'}
+        }
+    }],
+    author='Flyto Team',
+    license='MIT',
+    timeout_ms=60000,
+)
+class HTTPPostModule(BaseModule):
+    """Send HTTP POST request"""
+
+    module_name = "HTTP POST Request"
+    module_description = "Send HTTP POST request to any URL"
+
+    def validate_params(self) -> None:
+        if 'url' not in self.params:
+            raise ValueError("Missing required parameter: url")
+
+    async def execute(self) -> Any:
+        url = self.params.get('url')
+        headers = self.params.get('headers', {})
+        body = self.params.get('body')
+        json_data = self.params.get('json')
+        timeout = self.params.get('timeout', 30)
+        verify_ssl = self.params.get('verify_ssl', True)
+
+        if not url:
+            raise ValueError("URL is required")
+
+        ssl_param = None if verify_ssl else False
+        kwargs = {
+            'headers': headers,
+            'timeout': aiohttp.ClientTimeout(total=timeout),
+            'ssl': ssl_param,
+        }
+
+        if json_data:
+            kwargs['json'] = json_data
+        elif body:
+            kwargs['data'] = body
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, **kwargs) as response:
+                status_code = response.status
+                response_headers = dict(response.headers)
+                response_body = await response.text()
+
+                result = {
+                    'status_code': status_code,
+                    'headers': response_headers,
+                    'body': response_body
+                }
+
+                if 'application/json' in response_headers.get('Content-Type', ''):
+                    try:
+                        result['json'] = await response.json()
+                    except Exception:
+                        pass
+
+                return result

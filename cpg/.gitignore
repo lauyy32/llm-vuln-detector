@@ -9,3 +9,7 @@ db/
 # Binary query results (keep human-readable .txt slices)
 *.bqrs
 *.csv
+# Raw git clones of corpus source repos (large, re-cloneable)
+corpus_raw/
+# Cached advisory API pulls
+raw_advisories.json

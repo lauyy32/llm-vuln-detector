@@ -191,7 +191,9 @@ def build_slice(
     ast_rows = read_rows(out_dir / "ast.csv")
     cfg_rows = read_rows(out_dir / "cfg.csv")
     dfg_rows = read_rows(out_dir / "dfg.csv")
-    taint_rows = read_rows(out_dir / "taint.csv")
+    # taint.csv 可能缺失（真实大数据上 taint 查询慢/无结果时跳过）；优雅降级。
+    taint_path = out_dir / "taint.csv"
+    taint_rows = read_rows(taint_path) if taint_path.exists() else []
 
     first, last = function_line_range(ast_rows, func)
     # The def line sits one above the first statement we can see in the AST.

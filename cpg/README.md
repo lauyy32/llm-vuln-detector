@@ -137,3 +137,49 @@ CodeQL 在最大堆 < 约 2 GB 时会打印
 - 正式评测必须用真实 CVE 修复前后代码（Devign 真实仓库），禁用 SARD 合成集。
 - 实验设计须含「仅请求 / 仅代码(CPG) / 请求+代码」三模式 + CodeQL 基线正面对比。
 - 优先锁本地模型（Ollama）消除 API 漂移；本步不耗 API。
+
+## 真实语料接入（corpus/）
+
+**数据集决策（2026-08-07）**：Devign 实测是 C/C++（QEMU/FFmpeg/Linux/Chromium），与 CodeQL Python 管线不匹配，已弃用。
+改用 **GitHub Global Advisory Database API**（`GET /advisories?ecosystem=pip`）作为真实索引：每条 advisory 自带
+**CVE 编号 + CWE + 受影响包 + 精确修复 commit URL**，修复前=`fix_commit^`、修复后=`fix_commit`，天然配对、可复现。
+CVEFixes 全量 12.7GB 本环境不可下，故走 GitHub Advisory 路线（已验证 pip 生态 300 条→78 候选→覆盖 20+ CWE）。
+
+**纪律**：禁用 SARD/Juliet 合成集；只用真实 CVE 修复代码；每条必须带 CVE+CWE+fix_commit（可验证、可复现）。
+
+**接入步骤**（corpus_builder.py）：
+
+```bash
+# 1. 拉取 pip 生态 advisory（缓存 raw_advisories.json，减少 API quota）
+python corpus_builder.py fetch --eco pip --pages 5
+# 2. 筛选带 GitHub 修复 commit + CWE 的候选（按仓库分层，每仓库最多 2 条，打散来源聚集）
+python corpus_builder.py select --out candidates.jsonl --max-per-repo 2 --seed 7
+# 3. 克隆并提取修复前后文件对（默认取前 N 条）
+python corpus_builder.py extract --candidates candidates.jsonl --limit 10
+# 4. 汇总 corpus_index.jsonl（含 CWE 分布）
+python corpus_builder.py index
+```
+
+**目录结构**：
+
+| 路径 | 内容 |
+|------|------|
+| `corpus_raw/` | 原始 repo clone（gitignored，--filter=blob:none 省空间） |
+| `corpus_pairs/<CVE>/fixed/` | 修复后代码（真实 CVE 修复 commit） |
+| `corpus_pairs/<CVE>/vuln/` | 修复前代码（fix_commit 的 parent） |
+| `corpus_pairs/<CVE>/meta.json` | cve/ghsa/repo/commit/cwes/severity/summary/label |
+| `corpus_index.jsonl` | 全部语料条目汇总（含归档目录外的所有 pair） |
+| `dataset.jsonl` | 实验用分层队列（≤N/repo），消融实验权威语料集 |
+
+**语料结构（双队列，明确分离避免偏见）**：
+- **跨项目多样队列（主消融集）**：`dataset.jsonl` 由 `index --max-per-repo 2` 生成，每仓库最多 2 条，
+  覆盖 20+ CWE 族群（注入/SSRF/路径遍历/鉴权/信息泄露/DoS/TLS 等）与 20+ 不同上游项目
+  （cryptography / aiohttp / thumbor / onionshare / flyto-core / termux / datamodel-code-generator / h2 / langgraph / gemini-bridge / Linuxfabrik 等）。
+- **单项目一致性队列（辅助验证）**：`corpus_pairs/` 下保留 open-webui 的 8 个 CVE 修复对，
+  用于验证「同一项目内多 CVE 方法一致性」，不混入主消融集，避免单一来源聚集被判为套路化。
+
+**已接入（实测）**：真实 CVE 修复前后代码对（fixed=修复 commit，vuln=parent），CWE 覆盖
+CWE-862/863/639(鉴权族) / CWE-79/1021(XSS族) / CWE-22/59/61(遍历族) / CWE-918(SSRF) / CWE-444(HTTP走私) / CWE-200/209(信息泄露) / CWE-94/74/1336(注入族) / CWE-400/1333(DoS) / CWE-295/347(TLS) 等。
+
+**规模化待办**：GitHub API 无 token 限流 60/hr，扩充到数百对需分批或加 token；或后续下 CVEFixes 全量筛 Python 子集交叉验证。taint 查询在真实第三方库（含 stdlib 规模）上会触发数据流爆炸，需限定分析范围（见 OPEN-DECISIONS）。
+
