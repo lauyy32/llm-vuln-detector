@@ -130,6 +130,92 @@ def _is_defender_block(stderr: str) -> bool:
     )
 
 
+# CWE -> query basename. Each reuses CodeQL's *upstream* per-CWE flow module
+# (semmle.python.security.dataflow.*), so the taint evidence maps to the real
+# CWE instead of the old get->execute heuristic. Phase 1 covers the injection
+# family (022/089/078/094); other CWEs need their upstream flow module or a
+# structural query — see OPEN-DECISIONS.md (taint CWE coverage).
+CWE_TAINT_QUERIES = (
+    ("CWE-022", "taint"),     # queries/taint.ql      -> PathInjectionFlow
+    ("CWE-089", "cwe-089"),   # SqlInjectionFlow
+    ("CWE-078", "cwe-078"),   # CommandInjectionFlow
+    ("CWE-094", "cwe-094"),   # CodeInjectionFlow
+)
+
+
+def _run_cwe_taint(
+    exe: Path, db: Path, out_dir: Path, env: dict[str, str], ram: int, threads: int, force: bool
+) -> str:
+    """Run each per-CWE upstream taint query and aggregate rows into taint.csv.
+
+    The aggregated CSV keeps a leading ``cwe`` column so slice_builder can group
+    the evidence by weakness class. Idempotent: a present taint.csv is reused
+    unless ``--force``.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    search_path = win_path(HERE / "codeql-queries")
+    aggregate = out_dir / "taint.csv"
+    if (not force) and _csv_has_rows(aggregate):
+        print("[cache] taint.csv present, skipping (use --force to re-run)")
+        return "cached"
+    header: str | None = None
+    rows: list[str] = []
+    failed = False
+    for cwe, qbase in CWE_TAINT_QUERIES:
+        ql = HERE / "queries" / f"{qbase}.ql"
+        bqrs = out_dir / f"{qbase}.bqrs"
+        rc = run(
+            [
+                str(exe),
+                "query",
+                "run",
+                win_path(ql),
+                f"--database={win_path(db)}",
+                f"--search-path={search_path}",
+                f"--output={win_path(bqrs)}",
+                f"--ram={ram}",
+                f"--threads={threads}",
+            ],
+            env,
+            QUERY_TIMEOUT["taint"],
+        )
+        if rc != 0:
+            failed = True
+            continue
+        tmp_csv = out_dir / f"{qbase}.csv"
+        rc = run(
+            [
+                str(exe),
+                "bqrs",
+                "decode",
+                "--format=csv",
+                f"--output={win_path(tmp_csv)}",
+                win_path(bqrs),
+            ],
+            env,
+            60,
+        )
+        if rc != 0:
+            failed = True
+            continue
+        lines = tmp_csv.read_text(encoding="utf-8").splitlines()
+        if not lines:
+            continue
+        if header is None:
+            header = lines[0]
+        rows.extend(lines[1:])
+    if header is None:
+        header = "cwe,sourceLine,sourceNode,sinkLine,sinkNode"
+    if not rows:
+        # header-only so slice_builder degrades gracefully (no modelled sink hit)
+        aggregate.write_text(header + "\n", encoding="utf-8")
+        print("[ok] taint: 0 rows (no untrusted input reaches a modelled sink)")
+        return "failed" if failed else "ok"
+    aggregate.write_text(header + "\n" + "\n".join(rows) + "\n", encoding="utf-8")
+    print(f"[ok] taint: {len(rows)} rows -> {aggregate}")
+    return "failed" if failed else "ok"
+
+
 def build_database(exe: Path, src: Path, db: Path, env: dict[str, str], rebuild: bool) -> None:
     if db.exists() and not rebuild:
         print(f"[skip] database already exists at {db} (use --rebuild to recreate)")
@@ -171,6 +257,10 @@ def run_queries(
         if skip_taint and name == "taint":
             print(f"[skip] taint omitted (--skip-taint)")
             status[name] = "skipped"
+            continue
+        if name == "taint":
+            # Aggregate per-CWE upstream taint queries into taint.csv.
+            status[name] = _run_cwe_taint(exe, db, out_dir, env, ram, threads, force)
             continue
         csv_out = out_dir / f"{name}.csv"
         if (not force) and _csv_has_rows(csv_out):

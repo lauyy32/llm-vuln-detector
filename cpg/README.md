@@ -121,10 +121,12 @@ CodeQL 在最大堆 < 约 2 GB 时会打印
 | `ast.ql` | 父→子 AST 边 | 默认**不**进切片：源码文本对 LLM 而言已编码了 AST，重复塞进去只烧 token。是否真的无增益，本身是一个可做的消融。 |
 | `cfg.ql` | 控制流后继边（带 true/false 分支标签） | 行级聚合，丢弃同行的表达式求值顺序边 |
 | `dfg.ql` | SSA def-use + phi 边 | **刻意不用** `TaintTracking::localTaintStep`（见上面性能一节）。这也是 CPG 教科书定义的 DFG。 |
-| `taint.ql` | source → sink 污点路径 | 这是"请求侧检测器永远看不到"的那条信息，是本课题立论的核心证据。本机需把 DB 目录加入 Windows Defender 排除项才能跑通（见上节）。 |
+| `taint.ql` + `cwe-089/078/094.ql` | source → sink 污点路径（按 CWE） | 这是"请求侧检测器永远看不到"的那条信息，是本课题立论的核心证据。已**换上游按-CWE 查询**：每个文件 import `semmle.python.security.dataflow.*` 的对应 flow（PathInjectionFlow / SqlInjectionFlow / CommandInjectionFlow / CodeInjectionFlow），pipeline 聚合成带 `cwe` 列的 `taint.csv`，slice_builder 按 CWE 分组渲染。本机需把 DB 目录加入 Windows Defender 排除项才能跑通（见上节）。 |
 
-`taint.ql` 当前用的是基于方法名的启发式 Config（`get` → `execute`），
-因为独立代码片段没有框架建模。正式语料会换成上游 `py/sql-injection` 等按 CWE 的配置。
+`taint` 阶段覆盖注入族（CWE-022/089/078/094），复用 CodeQL 官方检测逻辑而非启发式。
+**限制（也是本课题立论的支点）**：静态 taint 依赖框架建模的 source，对非框架化源码
+（如 thumbor `load(context, path)` 经自封装 context 传入）同样命中 0 行——这正是 LLM 上下文
+增强要补的盲区。SSRF/XSS/鉴权/走私/TLS/DoS 等其余 CWE 待补对应上游 flow 或结构查询（见 OPEN-DECISIONS）。
 
 ## 已知的规模化问题（写在前面，避免后面撞墙）
 

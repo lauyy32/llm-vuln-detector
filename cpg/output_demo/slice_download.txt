@@ -1,0 +1,26 @@
+# CPG SLICE — flask_path_traversal.py::download
+
+## SOURCE
+L19 | def download():
+L20 |     filename = request.args.get("file")  # RemoteFlowSource
+L21 |     path = os.path.join(BASE_DIR, filename)  # tainted path
+L22 |     with open(path, "rb") as fh:  # FileSystemAccess sink (CWE-022)
+L23 |         return fh.read()
+
+## CONTROL FLOW
+[entry]  -->  L20
+L20  -->  L21
+L21  -->  L22
+L22  -->  L23
+L23  -->  [exit]
+
+## DATA FLOW (SSA def-use, phi = branch merge)
+[filename] L20 filename  --def-use-->  L21 filename
+[path] L21 path  --def-use-->  L22 path
+[fh] L22 fh  --def-use-->  L23 fh
+
+## TAINT VERDICT
+### CWE-022  (1 path(s))
+UNTRUSTED  L11: from flask import Flask, request
+           ==> reaches sink at L22: with open(path, "rb") as fh:  # FileSystemAccess sink (CWE-022)
+           (flow: ImportMember -> path)

@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import csv
 from collections import OrderedDict
+from itertools import groupby
 from pathlib import Path
 
 CSV_ENCODING = "utf-8"
@@ -132,24 +133,38 @@ def build_taint_section(rows: list[dict[str, str]], source_path: Path) -> list[s
     The line of real source is both shorter and more informative, so quote that
     and keep the node label only as a disambiguator.
     """
-    src_lines = source_path.read_text(encoding="utf-8").splitlines()
+    src_lines = source_path.read_text(encoding=CSV_ENCODING).splitlines()
 
     def quote(line: int) -> str:
         return src_lines[line - 1].strip() if 1 <= line <= len(src_lines) else "?"
 
-    edges = dedupe(
-        [
-            (int(r["sourceLine"]), r["sourceNode"], int(r["sinkLine"]), r["sinkNode"])
-            for r in rows
-        ]
-    )
-    edges.sort()
-    return [
-        f"UNTRUSTED  L{a}: {quote(a)}\n"
-        f"           ==> reaches sink at L{b}: {quote(b)}\n"
-        f"           (flow: {clean_node(at)} -> {clean_node(bt)})"
-        for a, at, b, bt in edges
-    ]
+    norm: list[tuple] = []
+    for r in rows:
+        cwe = (r.get("cwe") or "").strip()
+        try:
+            a, b = int(r["sourceLine"]), int(r["sinkLine"])
+        except (KeyError, ValueError):
+            continue
+        norm.append((cwe, a, r.get("sourceNode", ""), b, r.get("sinkNode", "")))
+    norm = dedupe(norm)
+    norm.sort()
+
+    if not norm:
+        return ["(no untrusted input reaches a modelled sink)"]
+
+    out: list[str] = []
+    for cwe, grp in groupby(norm, key=lambda x: x[0]):
+        grp = list(grp)
+        if cwe:
+            out.append(f"### {cwe}  ({len(grp)} path(s))")
+        for _cwe, a, at, b, bt in grp:
+            out.append(
+                f"UNTRUSTED  L{a}: {quote(a)}\n"
+                f"           ==> reaches sink at L{b}: {quote(b)}\n"
+                f"           (flow: {clean_node(at)} -> {clean_node(bt)})"
+            )
+        out.append("")
+    return out[:-1]  # drop trailing blank
 
 
 def function_line_range(
