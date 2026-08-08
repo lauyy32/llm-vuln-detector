@@ -121,12 +121,12 @@ CodeQL 在最大堆 < 约 2 GB 时会打印
 | `ast.ql` | 父→子 AST 边 | 默认**不**进切片：源码文本对 LLM 而言已编码了 AST，重复塞进去只烧 token。是否真的无增益，本身是一个可做的消融。 |
 | `cfg.ql` | 控制流后继边（带 true/false 分支标签） | 行级聚合，丢弃同行的表达式求值顺序边 |
 | `dfg.ql` | SSA def-use + phi 边 | **刻意不用** `TaintTracking::localTaintStep`（见上面性能一节）。这也是 CPG 教科书定义的 DFG。 |
-| `taint.ql` + `cwe-089/078/094.ql` | source → sink 污点路径（按 CWE） | 这是"请求侧检测器永远看不到"的那条信息，是本课题立论的核心证据。已**换上游按-CWE 查询**：每个文件 import `semmle.python.security.dataflow.*` 的对应 flow（PathInjectionFlow / SqlInjectionFlow / CommandInjectionFlow / CodeInjectionFlow），pipeline 聚合成带 `cwe` 列的 `taint.csv`，slice_builder 按 CWE 分组渲染。本机需把 DB 目录加入 Windows Defender 排除项才能跑通（见上节）。 |
+| `taint.ql` + `cwe-089/078/094/918/079.ql` | source → sink 污点路径（按 CWE） | 这是"请求侧检测器永远看不到"的那条信息，是本课题立论的核心证据。已**换上游按-CWE 查询**：每个文件 import `semmle.python.security.dataflow.*` 的对应 flow（PathInjectionFlow / SqlInjectionFlow / CommandInjectionFlow / CodeInjectionFlow / FullServerSideRequestForgeryFlow / ReflectedXssFlow），pipeline 聚合成带 `cwe`(+`file`) 列的 `taint.csv`，slice_builder 按 CWE 分组、并按 `file` 列把 TAINT VERDICT 限定到当前切片所属源文件（避免跨文件串味）。本机需把 DB 目录加入 Windows Defender 排除项才能跑通（见上节）。 |
 
-`taint` 阶段覆盖注入族（CWE-022/089/078/094），复用 CodeQL 官方检测逻辑而非启发式。
+`taint` 阶段覆盖注入族（CWE-022/089/078/094）+ SSRF(918) + 反射XSS(079)，复用 CodeQL 官方检测逻辑而非启发式。SSRF 用 `FullServerSideRequestForgeryFlow`（要求 URL 完全受控），XSS 用 `ReflectedXssFlow`；二者均已用 Flask 正控制冒烟测试验证命中（flask_ssrf→CWE-918、flask_xss→CWE-079）。
 **限制（也是本课题立论的支点）**：静态 taint 依赖框架建模的 source，对非框架化源码
 （如 thumbor `load(context, path)` 经自封装 context 传入）同样命中 0 行——这正是 LLM 上下文
-增强要补的盲区。SSRF/XSS/鉴权/走私/TLS/DoS 等其余 CWE 待补对应上游 flow 或结构查询（见 OPEN-DECISIONS）。
+增强要补的盲区。鉴权(862·863)/HTTP走私(444)/TLS(295·347)/DoS(400)/信息泄露(200)/IDOR(639)/链接跟随(59)/输入校验(20) 等其余 CWE 多为结构型/非纯数据流查询，待补对应上游 Security/CWE-* 结构查询或自定义 `ConfigSig`（见 OPEN-DECISIONS）。
 
 ## 已知的规模化问题（写在前面，避免后面撞墙）
 

@@ -1,0 +1,28 @@
+# CPG SLICE — flask_ssrf.py::fetch
+
+## SOURCE
+L20 | def fetch():
+L21 |     url = request.args.get("url")  # RemoteFlowSource, fully controls the URL
+L22 |     resp = requests.get(url)       # Http::Client::Request sink (CWE-918)
+L23 |     return resp.text
+
+## CONTROL FLOW
+[entry]  -->  L21
+L21  -->  L22
+L22  -->  L23
+L23  -->  [exit]
+
+## DATA FLOW (SSA def-use, phi = branch merge)
+[url] L21 url  --def-use-->  L22 url
+[resp] L22 resp  --def-use-->  L23 resp
+
+## TAINT VERDICT
+### CWE-079  (1 path(s))
+UNTRUSTED  L13: from flask import Flask, request
+           ==> reaches sink at L23: return resp.text
+           (flow: ImportMember -> Attribute)
+
+### CWE-918  (1 path(s))
+UNTRUSTED  L13: from flask import Flask, request
+           ==> reaches sink at L22: resp = requests.get(url)       # Http::Client::Request sink (CWE-918)
+           (flow: ImportMember -> url)

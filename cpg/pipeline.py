@@ -132,14 +132,20 @@ def _is_defender_block(stderr: str) -> bool:
 
 # CWE -> query basename. Each reuses CodeQL's *upstream* per-CWE flow module
 # (semmle.python.security.dataflow.*), so the taint evidence maps to the real
-# CWE instead of the old get->execute heuristic. Phase 1 covers the injection
-# family (022/089/078/094); other CWEs need their upstream flow module or a
-# structural query — see OPEN-DECISIONS.md (taint CWE coverage).
+# CWE instead of the old get->execute heuristic. The injection family
+# (022/089/078/094) plus SSRF(918) and reflected XSS(079) are covered by
+# upstream *flow* modules. The rest of the dataset's CWEs (authz 862/863,
+# smuggling 444, TLS 295, DoS 400, info-exposure 200, IDOR 639, link-following
+# 59, input-validation 20) are structural / non-pure-dataflow and need upstream
+# Security/CWE-* structural queries or a custom ConfigSig — see OPEN-DECISIONS.md
+# (taint CWE coverage).
 CWE_TAINT_QUERIES = (
     ("CWE-022", "taint"),     # queries/taint.ql      -> PathInjectionFlow
     ("CWE-089", "cwe-089"),   # SqlInjectionFlow
     ("CWE-078", "cwe-078"),   # CommandInjectionFlow
     ("CWE-094", "cwe-094"),   # CodeInjectionFlow
+    ("CWE-918", "cwe-918"),   # FullServerSideRequestForgeryFlow
+    ("CWE-079", "cwe-079"),   # ReflectedXssFlow
 )
 
 

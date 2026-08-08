@@ -132,8 +132,14 @@ def build_taint_section(rows: list[dict[str, str]], source_path: Path) -> list[s
 
     The line of real source is both shorter and more informative, so quote that
     and keep the node label only as a disambiguator.
+
+    The aggregated ``taint.csv`` carries taint rows from *every* file in the
+    database, but a slice only concerns one source file. Scope the rows to the
+    current file via the ``file`` column (source's file basename). Rows without
+    a ``file`` column (legacy taint.csv) are kept whole for backward compat.
     """
     src_lines = source_path.read_text(encoding=CSV_ENCODING).splitlines()
+    target_file = source_path.name
 
     def quote(line: int) -> str:
         return src_lines[line - 1].strip() if 1 <= line <= len(src_lines) else "?"
@@ -144,6 +150,10 @@ def build_taint_section(rows: list[dict[str, str]], source_path: Path) -> list[s
         try:
             a, b = int(r["sourceLine"]), int(r["sinkLine"])
         except (KeyError, ValueError):
+            continue
+        row_file = (r.get("file") or "").strip()
+        # Scope to the sliced file; absent `file` column => legacy, keep it.
+        if row_file and row_file != target_file:
             continue
         norm.append((cwe, a, r.get("sourceNode", ""), b, r.get("sinkNode", "")))
     norm = dedupe(norm)

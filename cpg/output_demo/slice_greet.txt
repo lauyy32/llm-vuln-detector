@@ -1,0 +1,20 @@
+# CPG SLICE — flask_xss.py::greet
+
+## SOURCE
+L16 | def greet():
+L17 |     name = request.args.get("name")  # RemoteFlowSource
+L18 |     return "Hello, " + name          # HttpResponse sink (CWE-079)
+
+## CONTROL FLOW
+[entry]  -->  L17
+L17  -->  L18
+L18  -->  [exit]
+
+## DATA FLOW (SSA def-use, phi = branch merge)
+[name] L17 name  --def-use-->  L18 name
+
+## TAINT VERDICT
+### CWE-079  (1 path(s))
+UNTRUSTED  L10: from flask import Flask, request
+           ==> reaches sink at L18: return "Hello, " + name          # HttpResponse sink (CWE-079)
+           (flow: ImportMember -> BinaryExpr)
