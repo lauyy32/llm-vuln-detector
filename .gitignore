@@ -46,3 +46,6 @@ backend/tests/reports/
 
 # WorkBuddy workspace files
 .workbuddy/
+
+# Ablation temp artifacts (SARIF, per-sample DB scratch, validation scripts)
+cpg/ablation/.work/

@@ -45,7 +45,7 @@ DEFAULT_JAVA_HOME = r"C:/Program Files/Java/jdk-21.0.1"
 DEFAULT_DB = Path("C:/Users/lenovo/cpg_db/sample_db")
 QUERIES = ("ast", "cfg", "dfg", "taint")
 # Dataflow query is by far the heaviest; give it more headroom by default.
-QUERY_TIMEOUT = {"ast": 120, "cfg": 120, "dfg": 180, "taint": 300}
+QUERY_TIMEOUT = {"ast": 120, "cfg": 120, "dfg": 180, "taint": 1200}
 
 
 def win_path(p: Path) -> str:
