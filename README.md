@@ -4,6 +4,8 @@
 
 输入一条原始 HTTP 请求 → 多维上下文解析（编码检测 + 混淆分析 + 正则预扫描）→ LLM CoT 分步推理 → 输出该请求是否疑似包含某类攻击 payload。
 
+> 本仓库包含两条研究线：其一是上述请求侧 MVP（v2.x，已完成消融评测）；其二是 `cpg/` 代码级上下文子系统（ADR-001 确定的研究主线，将源码属性图作为 LLM 与静态分析的上下文）。两者共同服务于课题"上下文增强智能漏洞检测"。
+
 **Author**: [lauyy32](https://github.com/lauyy32)
 
 ---
@@ -27,12 +29,9 @@
 **不能做的**：
 - 看不到服务端源码，无法判断参数是否真的被拼进 SQL / shell —— **不能确认漏洞可利用**
 - 不能替代 SQLMap、Burp Active Scan 等需要服务端反馈的工具
-- 不是 SAST/DAST，不做代码扫描，不做流量代理
-- v2.0 的上下文增强仍是请求侧分析，未引入 CPG/AST 等代码级分析
+- 请求侧 MVP 本身不做代码扫描、不做流量代理；源码级 SAST 与 CPG 上下文由 `cpg/` 子系统基于 CodeQL 承担
 
 **所以本质上**：这是一个"疑似攻击请求分类器"，"is_vulnerable=true"的真实含义是"该请求携带了某类攻击的典型 payload"，而不是"目标系统存在该漏洞"。
-
-这个项目是我的研究生课题"基于大语言模型的上下文增强智能漏洞检测技术研究"的**最小可行原型**，用来验证"上下文增强能否提升 LLM 对攻击请求的识别效果"这个想法。
 
 ---
 
@@ -286,15 +285,15 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 4. **DVWA 端到端评测已完成（真实 ModSecurity CRS 容器，2026-07-25）**。36 条 DVWA 风格请求（3 难度 × 6 场景 × 2 类型）已真实送 LLM 检测，WAF 对比使用真实 ModSecurity CRS 容器（PL1/PL2/PL3），非简化规则基线。结果详见 v2.2。
 
 **补充验证能力（v2.0）**：
-- ✅ CoT 分步推理模式——编码检测 + 混淆分析 + 分步推理
-- ✅ Standard 模式——消融对比（量化 CoT 的增益）
-- ✅ 三模式评分框架——cot vs standard vs no-context
-- ✅ 246 条对抗样本数据集（205 攻击 + 41 正常混淆，已校正）
-- ✅ 对抗样本 CoT 完整实测（246 条，含误报率）
-- ✅ DVWA 三档难度验证框架（已完成 2026-07-25，真实 ModSecurity CRS 容器，详见 v2.2）
-- ✅ ModSecurity CRS PL1/PL2/PL3 三级对比框架（已完成 2026-07-25，真实容器）
-- ✅ Standard / No-Context 三模式实测（已完成 2026-07-24，v2.1 完整指标）
-- ✅ DVWA + 真实 ModSecurity CRS 端到端实测结果（已完成 2026-07-25，详见 v2.2）
+- CoT 分步推理模式——编码检测 + 混淆分析 + 分步推理
+- Standard 模式——消融对比（量化 CoT 的增益）
+- 三模式评分框架——cot vs standard vs no-context
+- 246 条对抗样本数据集（205 攻击 + 41 正常混淆，已校正）
+- 对抗样本 CoT 完整实测（246 条，含误报率）
+- DVWA 三档难度验证框架（已完成 2026-07-25，真实 ModSecurity CRS 容器，详见 v2.2）
+- ModSecurity CRS PL1/PL2/PL3 三级对比框架（已完成 2026-07-25，真实容器）
+- Standard / No-Context 三模式实测（已完成 2026-07-24，v2.1 完整指标）
+- DVWA + 真实 ModSecurity CRS 端到端实测结果（已完成 2026-07-25，详见 v2.2）
 
 ### v2.1 三模式消融对比（完整指标）
 
@@ -445,6 +444,24 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 
 ---
 
+## 代码级上下文子系统（CPG / Code Property Graph）
+
+自 ADR-001 起，本仓库的研究主线由"请求侧 payload 分类"收敛为"代码级上下文增强的漏洞检测"。请求侧分析已在 v2.x 消融实验中证明无稳定增益（见上方评测结果），其根本上限在于无法观测服务端代码是否真正将输入拼入危险 sink。CPG 子系统即针对该上限，将源码的结构化上下文提供给 LLM 与静态分析器。
+
+技术实现（位于 `cpg/`）：
+
+- **代码属性图提取**：基于 CodeQL 2.26.2 原生 CLI，对目标仓库构建数据库并抽取 AST / CFG / DFG 三类图，由 `slice_builder.py` 聚合成可读的文本切片（验证样本：27/31/9 条边）。
+- **污点分析（taint）**：复用 CodeQL 上游按 CWE 分类的数据流查询，当前覆盖注入族（CWE-022/089/078/094）、SSRF（CWE-918）与反射型 XSS（CWE-079）；多文件数据库下按源文件限定污点结论，避免跨文件串味。
+- **三模式消融框架**（`cpg/ablation/`）：提供 `POST /api/v1/detect{mode: request|code|both}` 端点，配合可插拔 Scorer（CodeQLBaseline / StructuralHeuristic / LocalLLM 占位）。`request` 模式仅持 PoC / 公告、无源码，作为 abstain 上限基线；`code` 仅喂 CPG 切片；`both` 叠加二者。框架已在 4 个 vuln 正例的 demo 上跑通：StructuralHeuristic 与 CodeQLBaseline 在 code / both 模式下 F1 = 1.000（4/4）。
+- **真实语料**：从 GitHub Advisory API（pip 生态）分层抽样得到 `dataset.jsonl`（16 条跨 11 仓库，每仓库 ≤ 2 条，覆盖 11 个 CWE 族群），规避单来源聚集。
+
+已知局限（OPEN-DECISIONS）：
+
+- 真实 `dataset.jsonl` 全量消融仍待执行——当前为逐样本建库，需先做语料库级单数据库以消除重复开销。
+- `LocalLLMScorer` 仍为占位，尚未接入本地模型（Ollama），故消融尚未含真实 LLM 信号。
+- 鉴权 / 请求走私 / TLS / DoS / 信息泄露 / IDOR 等结构型 CWE 暂缺上游数据流查询，需补结构查询或配置指纹。
+- `request` 模式在本数据集上恒为 abstain（语料不含请求字段），其"天花板"需在后续从公告派生 PoC 才能评估。
+
 ## 与课题的关联
 
 | 课题要求 | 本项目对应 |
@@ -455,7 +472,7 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 | 量化评测 | 56 条标准 + 246 条对抗样本 + 67 条真实世界样本 + `evaluate_v2.py`（三模式对比框架，含三数据集） |
 | 端到端验证 | DVWA 靶场 + `benchmark_dvwa.py`（真实攻击场景，三档难度） |
 | 横向对比 | ModSecurity OWASP CRS 三档 PL 对比（工业级 WAF 基线） |
-| 属性图（CPG）创新点 | **尚未实现** — 当前 v2.0 的上下文增强是请求侧分析，CPG 是下一阶段核心创新方向 |
+| 属性图（CPG）创新点 | **已实现（研究主线）** — `cpg/` 子系统：CodeQL 管线（AST/CFG/DFG/taint）+ 三模式上下文消融框架（request/code/both），详见下方章节 |
 
 ---
 
@@ -477,7 +494,10 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 - [ ] 扩大数据集至 500+ 真实/对抗混合样本（`--seclists-dir` 生成本地免费，评测需 API）
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
 - [ ] 接入服务端反馈（HTTP 响应），从"payload 识别"走向"漏洞确认"
-- [ ] **探索 CPG（Code Property Graph）级别上下文增强** — 将 AST/CFG/PDG 信息作为 LLM 上下文
+- [x] **CPG 代码级上下文子系统（研究主线，ADR-001）** — `cpg/`：CodeQL 管线（AST/CFG/DFG/taint，覆盖注入族 + SSRF + XSS）+ 切片构造 + 三模式消融框架（request/code/both）+ 真实语料分层抽样（dataset.jsonl，16 条 / 11 仓库）
+- [ ] 真实 `dataset.jsonl` 全量三模式消融（需先做语料库级单数据库，消除逐样本建库开销）
+- [ ] 接入本地模型（Ollama）填充 `LocalLLMScorer`，锁定可复现实验（多 seed）
+- [ ] 扩展结构型 CWE 覆盖（鉴权 / 走私 / TLS / DoS / 信息泄露 / IDOR 等），补上游结构查询或配置指纹
 
 ---
 
@@ -485,7 +505,7 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 
 ```
 llm-vuln-detector/
-├── backend/
+├── backend/                       # 请求侧 MVP（v2.x）：FastAPI + LLM CoT 分类器
 │   ├── app/
 │   │   ├── main.py                # FastAPI 入口（v2.0）
 │   │   ├── config.py              # 配置管理
@@ -504,26 +524,43 @@ llm-vuln-detector/
 │   │   ├── evaluate.py            # v1.0 评测脚本（56条，已归档）
 │   │   ├── ablation.py            # v1.0 双模式消融（已归档，三模式请用 evaluate_v2.py）
 │   │   ├── benchmark_dvwa.py      # DVWA 端到端 + ModSecurity 多维度对比
-│   │   ├── benchmark_robustness.py# 针对 LLM 检测器的鲁棒性测试（v2.4：10 变体 prompt injection / 语义扰动 / 最小编辑；两阶段并发，--concurrency 可调）
-│   │   ├── fetch_real_world_dataset.py # 使用来自 SecLists/PayloadsAllTheThings 的内嵌种子样本（支持 --seclists-dir 从本机仓库扩展到数百条）
+│   │   ├── benchmark_robustness.py# 针对 LLM 检测器的鲁棒性测试（v2.4）
+│   │   ├── fetch_real_world_dataset.py # 真实世界样本获取（支持 --seclists-dir 扩展）
 │   │   ├── generate_adversarial.py# 对抗样本生成器 + 正常样本（246条）
 │   │   ├── gen_eval_report.py     # Word 评测报告生成
 │   │   ├── gen_ablation_report.py # Word 消融实验报告生成
 │   │   └── dataset/
 │   │       ├── test_cases.json    # 56 条标准评测数据集
-│   │       ├── adversarial_samples.json  # 246 条对抗样本（205攻击+41正常，手工构造绕过/混淆变体）
-│   │       └── real_world_samples.json   # 67 条真实世界样本（55攻击+12正常，来自 SecLists/PayloadsAllTheThings 的内嵌种子，支持 --seclists-dir 扩展）
+│   │       ├── adversarial_samples.json  # 246 条对抗样本
+│   │       └── real_world_samples.json   # 67 条真实世界样本
 │   ├── Dockerfile
 │   └── requirements.txt
-├── frontend/
+├── cpg/                           # 代码级上下文子系统（ADR-001 研究主线）
+│   ├── pipeline.py                # CodeQL 数据库构建 + AST/CFG/DFG/taint 查询管线
+│   ├── slice_builder.py           # 图 → 文本切片构造
+│   ├── queries/                   # 自定义 / 按 CWE 拆分的 taint 查询
+│   ├── samples/                   # 正控制样本（CWE-022/079/089/918 等）
+│   ├── ablation/                  # 三模式消融框架（request/code/both）
+│   │   ├── api.py                 # FastAPI POST /api/v1/detect{mode}
+│   │   ├── scorers.py             # Scorer 抽象 + 基线/启发式/LLM stub
+│   │   ├── codeql_baseline.py     # CodeQL 官方套件 SARIF 解析适配器
+│   │   ├── cpg_eval.py            # 单样本 CPG 提取
+│   │   ├── context_build.py       # 按 mode 构造 DetectionContext
+│   │   ├── run_ablation.py        # 消融 harness
+│   │   └── summary.md             # demo 消融结果汇总
+│   └── dataset.jsonl              # 真实 CVE 语料（16 条 / 11 仓库）
+├── frontend/                      # Vue 3 前端
 │   ├── src/
-│   │   ├── App.vue                # 主页面（3个Tab）
-│   │   └── components/            # 5个组件
+│   │   ├── App.vue
+│   │   └── components/
 │   ├── Dockerfile
 │   └── nginx.conf
 ├── docker-compose.yml
 ├── .env.example
-└── README.md
+├── README.md
+└── docs/                          # 设计文档与决策记录
+    ├── PRD-ablation-3mode.md
+    └── decisions/ADR-001.md
 ```
 
 ---
@@ -534,6 +571,4 @@ MIT
 
 ---
 
-<p align="center">
-  Made with curiosity by <a href="https://github.com/lauyy32">lauyy32</a>
-</p>
+<p align="center">Author: <a href="https://github.com/lauyy32">lauyy32</a></p>

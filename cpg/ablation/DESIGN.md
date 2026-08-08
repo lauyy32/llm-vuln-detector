@@ -1,6 +1,6 @@
 # 设计方向：三模式检测结果展示（极简科研工具）
 
-> 作者：颜好看（UI/UX 设计师，MVP 开发专家团）
+> 作者：lauyy32
 > 文档类型：极简结果展示设计方向（科研工具，非消费级产品）
 > 对标：CodeQL「Show paths」source→sink 数据流编号 + Semgrep 代码切片行高亮 + severity/confidence 徽章（科研工具通行信息密度范式，直接复用）
 

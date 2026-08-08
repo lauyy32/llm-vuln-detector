@@ -2,8 +2,8 @@
 
 > 生成日期：2026-08-08
 > 基于：PRD-ablation-3mode.md (v1) + ARCHITECTURE.md (v1) + DESIGN.md (v1)
-> 状态：已确认（用户确认三文档 + request 模式决策）
-> 项目总监：大湾区靓仔 | PM：许清楚 | 架构师：高见远 | 设计师：颜好看
+> 状态：已确认（三文档一致，request 模式 abstain 决策已固化）
+> 作者：lauyy32
 
 ---
 
