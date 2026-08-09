@@ -7,8 +7,9 @@ DetectionContext，跑 StructuralHeuristicScorer + CodeQLBaselineScorer，收集
 
 数据来源
 --------
-* 默认（真实）：``cpg/dataset.jsonl``，每行展开 vuln/fixed 两样本；逐样本建 DB +
-  跑 taint + 复用该 DB 跑 baseline（慢，受 Defender/超时影响）。
+* 默认（真实）：``cpg/dataset.jsonl``，所有样本源码聚合到**一个** CodeQL 数据库
+  （``corpus_db``），建库一次 + 6 次 taint 查询 + 1 次官方 analyze；按样本路径前缀
+  区分实例，避免跨样本串味。
 * ``--demo``：复用已建好的 ``sample_db`` 与 ``output_demo/taint.csv``，对 ``cpg/samples``
   4 个 demo 文件跑同样的聚合逻辑，验证链路（不重建 DB）。
 
@@ -47,9 +48,12 @@ from cpg.ablation.config import (  # noqa: E402
     TAINT_COVERED_CWES, WORK_DIR, normalize_cwe,
 )
 from cpg.ablation.context_build import build_context  # noqa: E402
-from cpg.ablation.cpg_eval import extract_taint  # noqa: E402
+from cpg.ablation.cpg_eval import build_cpg_slices_text, extract_taint  # noqa: E402
+from cpg.ablation.corpus_db import build_corpus_db  # noqa: E402
+from cpg.ablation.codeql_baseline import run_codeql_baseline_corpus  # noqa: E402
 from cpg.ablation.scorers import (  # noqa: E402
-    CodeQLBaselineScorer, DetectionContext, StructuralHeuristicScorer,
+    CodeQLBaselineScorer, DetectionContext, LocalLLMScorer,
+    StructuralHeuristicScorer, Verdict,
 )
 
 POSITIVE = "vulnerable"
@@ -79,6 +83,20 @@ def _read_taint_csv_for_file(csv_path: Path, basename: str) -> list[dict]:
     return out
 
 
+def _taint_row_in_prefix(row: dict, prefix: str) -> bool:
+    """语料库级单数据库下，按样本路径前缀（如 ``CVE-2026-50558_vuln``）隔离 taint 行。
+
+    ``abs_path`` 为真实源码在 ``corpus_src/<cve>_<version>/`` 下的绝对路径；前缀段
+    直接挂在 ``corpus_src`` 之下，故以 ``/<prefix>/`` 子串匹配即可避免同名文件串味。
+    """
+    if not prefix:
+        return False
+    p = (row.get("abs_path") or "").replace("\\", "/")
+    if not p:
+        return False
+    return f"/{prefix}/" in p
+
+
 def load_demo_samples() -> list[dict]:
     samples: list[dict] = []
     for f in sorted(SAMPLES_DIR.glob("*.py")):
@@ -98,6 +116,19 @@ def load_demo_samples() -> list[dict]:
             "reuse_taint_csv": DEMO_TAINT_CSV,
         })
     return samples
+
+
+def _load_dataset_rows(limit: int | None) -> list[dict]:
+    """读取 dataset.jsonl 原始行（供语料库级单数据库构建）。"""
+    rows: list[dict] = []
+    with DATASET_JSONL.open(encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    if limit is not None:
+        rows = rows[:limit]
+    return rows
 
 
 def load_dataset_samples(limit: int | None) -> list[dict]:
@@ -199,13 +230,58 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=None, help="只跑前 N 条 dataset 样本（仅真实模式）")
     ap.add_argument("--demo", action="store_true", help="复用 sample_db + taint.csv 跑 cpg/samples（验证聚合）")
     ap.add_argument("--skip-baseline", action="store_true", help="跳过 CodeQL 基线（仅跑结构化启发式，提速）")
+    ap.add_argument("--with-local-llm", action="store_true",
+                    help="纳入 LocalLLMScorer（需本机 Ollama + 模型已拉取；不可达时自动 abstain）")
     ap.add_argument("--out-dir", type=Path, default=ABLATION_DIR)
     args = ap.parse_args()
 
-    samples = load_demo_samples() if args.demo else load_dataset_samples(args.limit)
+    corpus: dict | None = None
+    if args.demo:
+        samples = load_demo_samples()
+    else:
+        # 真实模式：语料库级单数据库（建库一次 + 6 次 taint 查询 + 1 次 analyze）
+        rows = _load_dataset_rows(args.limit)
+        try:
+            _db, _staged, _taint, _sarif = build_corpus_db(rows, skip_baseline=args.skip_baseline)
+        except RuntimeError as exc:
+            print(f"[fatal] corpus database build failed: {exc}")
+            return 1
+        corpus = {"db": _db, "staged": _staged, "taint": _taint, "sarif": _sarif}
+        samples = [
+            {
+                "sample_id": st["cve"],
+                "cwes": [st["cwe"]] if st["cwe"] else [],
+                "cwe": st["cwe"],
+                "summary": st.get("summary"),
+                "version": st["version"],
+                "truth": st["truth"],
+                "prefix": st["prefix"],
+                # 真实源码已落在 corpus_src；此处置空字符串仅用于触发 cpg_slices 构建，
+                # 评分由注入的 taint_rows 决定，不依赖源码文本。
+                "code_text": "",
+            }
+            for st in _staged
+        ]
     if not samples:
         print("[warn] no samples loaded; check dataset / demo files")
         return 1
+
+    # 本地 LLM 评分器（可选）：仅当 --with-local-llm 且本机 Ollama 实际可达时纳入；
+    # 否则不计入，避免一列全 abstain 干扰指标。
+    local_llm = LocalLLMScorer()
+    local_llm_enabled = bool(args.with_local_llm) and local_llm.reachable()
+    if args.with_local_llm and not local_llm_enabled:
+        print("[warn] --with-local-llm set but Ollama unreachable; LocalLLMScorer disabled")
+    active_scorers = list(SCORERS) + (["LocalLLMScorer"] if local_llm_enabled else [])
+
+    # 基线可用性：demo 逐样本走 CodeQLBaselineScorer（自带 db）；真实模式依赖 corpus SARIF，
+    # 缺失（analyze 失败）时整轮跳过基线评分，避免崩溃。
+    baseline_available = not args.skip_baseline and (
+        args.demo or bool(corpus and corpus.get("sarif"))
+    )
+    if not baseline_available and not args.skip_baseline:
+        print("[warn] CodeQL baseline unavailable (corpus SARIF missing); "
+              "skipping CodeQLBaselineScorer for this run")
 
     print(f"[info] loaded {len(samples)} sample-version(s); demo={args.demo}; "
           f"skip_baseline={args.skip_baseline}")
@@ -219,54 +295,51 @@ def main() -> int:
         group = "taint" if cwe in TAINT_COVERED_CWES else "logic"
         sid = s["sample_id"]
 
-        # 准备该样本的 taint 证据与 DB（demo 复用，真实建库）
         if s.get("reuse_db"):
+            # demo：复用 sample_db + output_demo/taint.csv
             db_path = Path(s["reuse_db"])
             sample_file = Path(s["source_file"])
             taint_rows = _read_taint_csv_for_file(Path(s["reuse_taint_csv"]), sample_file.name)
             wd = None
+            baseline_key = (str(db_path), str(sample_file), cwe)
         else:
-            wd = WORK_DIR / "samples" / f"{sid}_{s['version']}"
-            try:
-                taint_rows = extract_taint(s["code_text"], cwe, wd)
-            except RuntimeError as exc:
-                errors.append(f"{sid}/{s['version']}: extract_taint failed: {exc}")
-                # 建库失败：code/both 无法分析，记 error；request 仍 abstain
-                for mode in MODES:
-                    ctx = DetectionContext(request_info=None,
-                                            advisory_meta={"cve_id": sid, "cwe": cwe, "summary": s["summary"]},
-                                            code_text=None, cpg_slices=None)
-                    sh = StructuralHeuristicScorer()
-                    v_sh = sh.score(ctx) if mode == "request" else _error_verdict(cwe)
-                    records.append((sid, s["version"], mode, "StructuralHeuristicScorer",
-                                    v_sh.label, s["truth"], v_sh.cwe, cwe, group))
-                    if not args.skip_baseline:
-                        records.append((sid, s["version"], mode, "CodeQLBaselineScorer",
-                                        "error", s["truth"], None, cwe, group))
-                continue
-            db_path = wd / "db"
-            sample_file = wd / "src" / "sample.py"
+            # 真实：语料库级单数据库，按样本前缀过滤 taint 行；baseline 按前缀过滤 SARIF
+            prefix = s.get("prefix")
+            taint_rows = [r for r in corpus["taint"] if _taint_row_in_prefix(r, prefix)]
+            wd = None
+            db_path = corpus["db"]
+            sample_file = None
+            baseline_key = (str(db_path), prefix, cwe)
 
         # 三模式
         for mode in MODES:
             ctx = build_context(mode, s, workdir=wd, taint_rows=taint_rows)
-            # 结构化启发式
+            # 结构化启发式（吃注入的 taint_rows；request 模式 cpg_slices=None → 显式 abstain）
             v_sh = StructuralHeuristicScorer(taint_rows=taint_rows).score(ctx)
             records.append((sid, s["version"], mode, "StructuralHeuristicScorer",
                             v_sh.label, s["truth"], v_sh.cwe, cwe, group))
-            # CodeQL 基线（按 db/sample/cwe 记忆化，三模式共用）
-            if args.skip_baseline:
+            # CodeQL 官方基线：demo 逐样本跑 analyze；真实按前缀过滤已建好的 corpus SARIF；
+            # 不可用（skip_baseline 或缺 SARIF）时跳过，不崩溃。
+            if not baseline_available:
                 continue
-            key = (str(db_path), str(sample_file), cwe)
-            if key not in baseline_cache:
-                bl = CodeQLBaselineScorer(db_path=db_path, sample_file=sample_file)
-                baseline_cache[key] = bl.score(ctx)
-            v_bl = baseline_cache[key]
+            if baseline_key not in baseline_cache:
+                if s.get("reuse_db"):
+                    bl = CodeQLBaselineScorer(db_path=db_path, sample_file=sample_file)
+                    baseline_cache[baseline_key] = bl.score(ctx)
+                else:
+                    baseline_cache[baseline_key] = run_codeql_baseline_corpus(
+                        corpus["sarif"], prefix, cwe)
+            v_bl = baseline_cache[baseline_key]
             records.append((sid, s["version"], mode, "CodeQLBaselineScorer",
                             v_bl.label, s["truth"], v_bl.cwe, cwe, group))
+            # 本地 LLM（可选；Ollama 不可达时自动 abstain）
+            if local_llm_enabled:
+                v_llm = local_llm.score(ctx)
+                records.append((sid, s["version"], mode, "LocalLLMScorer",
+                                v_llm.label, s["truth"], v_llm.cwe, cwe, group))
 
     _write_results(args.out_dir / "results.csv", records)
-    summary = _build_summary(records, errors, args, len(samples))
+    summary = _build_summary(records, errors, args, len(samples), active_scorers)
     (args.out_dir / "summary.md").write_text(summary, encoding="utf-8")
     print("\n=== ablation summary ===")
     print(summary)
@@ -291,7 +364,12 @@ def _write_results(path: Path, records: list[tuple]) -> None:
             w.writerow(r)
 
 
-def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int) -> str:
+def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int,
+                    scorers: list[str] | None = None) -> str:
+    # 活跃 scorer 列表：传入 active_scorers 优先；否则默认随 skip_baseline 决定。
+    # skip_baseline 时剔除 CodeQLBaselineScorer（无对应记录）。
+    base = scorers if scorers is not None else SCORERS
+    sc_list = base if not args.skip_baseline else [s for s in base if s != "CodeQLBaselineScorer"]
     # 过滤 error 行用于指标，但保留计数
     def rec_filter(scorer=None, mode=None, group=None, truth_in=None):
         out = []
@@ -314,11 +392,11 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     lines.append(f"- 数据来源: {'demo (cpg/samples + sample_db)' if args.demo else 'dataset.jsonl (真实 CVE)'}")
     lines.append(f"- 样本版本数: {n_samples}  (vuln=正例 / fixed=负例)")
     lines.append(f"- 跳过基线: {args.skip_baseline}")
-    lines.append(f"- CodeQL: 2.26.2  python-code-scanning 套件")
+    lines.append(f"- CodeQL: 2.26.2  python Security/CWE 定向查询（覆盖数据集 CWE-022/918/020/295）")
     if args.demo:
         lines.append("")
         lines.append("> 注：demo 模式仅含 4 个 vuln 正例（无 fixed 负例），用于验证聚合链路；"
-                     "真实 dataset.jsonl 全量需逐样本建 DB，已用 demo 验证聚合逻辑。")
+                     "真实 dataset.jsonl 全量已通过语料库级单数据库（建库一次 + 6 次 taint 查询 + 1 次 analyze）完成。")
     if errors:
         lines.append("")
         lines.append(f"## 建库/抽取失败（{len(errors)}）")
@@ -331,7 +409,7 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     lines.append("")
     headers = ["scorer", "mode", "P", "R", "F1", "support", "TP", "FP", "TN", "FN"]
     rows = []
-    for sc in SCORERS if not args.skip_baseline else SCORERS[:1]:
+    for sc in sc_list:
         for m in MODES:
             recs = rec_filter(scorer=sc, mode=m)
             met = compute_metrics(recs)
@@ -347,7 +425,7 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     headers = ["group", "scorer", "mode", "P", "R", "F1", "support"]
     rows = []
     for g in ("taint", "logic"):
-        for sc in SCORERS if not args.skip_baseline else SCORERS[:1]:
+        for sc in sc_list:
             for m in MODES:
                 recs = rec_filter(scorer=sc, mode=m, group=g)
                 if not recs:
@@ -379,7 +457,7 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     # 混淆矩阵（全局，两个 scorer）
     lines.append("## 混淆矩阵（全局，行=预测 / 列=真值）")
     lines.append("")
-    for sc in SCORERS if not args.skip_baseline else SCORERS[:1]:
+    for sc in sc_list:
         recs = rec_filter(scorer=sc)
         met = compute_metrics(recs)
         lines.append(f"### {sc}")

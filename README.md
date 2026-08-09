@@ -455,11 +455,11 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 - **三模式消融框架**（`cpg/ablation/`）：提供 `POST /api/v1/detect{mode: request|code|both}` 端点，配合可插拔 Scorer（CodeQLBaseline / StructuralHeuristic / LocalLLM 占位）。`request` 模式仅持 PoC / 公告、无源码，作为 abstain 上限基线；`code` 仅喂 CPG 切片；`both` 叠加二者。框架已在 4 个 vuln 正例的 demo 上跑通：StructuralHeuristic 与 CodeQLBaseline 在 code / both 模式下 F1 = 1.000（4/4）。
 - **真实语料**：从 GitHub Advisory API（pip 生态）分层抽样得到 `dataset.jsonl`（16 条跨 11 仓库，每仓库 ≤ 2 条，覆盖 11 个 CWE 族群），规避单来源聚集。
 
-已知局限（OPEN-DECISIONS）：
+已知局限与实测边界（OPEN-DECISIONS）：
 
-- 真实 `dataset.jsonl` 全量消融仍待执行——当前为逐样本建库，需先做语料库级单数据库以消除重复开销。
-- `LocalLLMScorer` 仍为占位，尚未接入本地模型（Ollama），故消融尚未含真实 LLM 信号。
-- 鉴权 / 请求走私 / TLS / DoS / 信息泄露 / IDOR 等结构型 CWE 暂缺上游数据流查询，需补结构查询或配置指纹。
+- **真实 `dataset.jsonl` 全量三模式消融已完成**（语料库级单数据库 `corpus_db.py`：建库一次 + 6 次自定义 taint 查询 + 1 次官方定向 analyze，按 `<cve>_<version>/` 前缀隔离样本；产物 `cpg/ablation/results.csv` + `summary.md`）。实证结论：标准静态分析（`StructuralHeuristicScorer` 自定义 taint + `CodeQLBaselineScorer` 官方 CWE-022/918/020/295 查询）在本题多样真实 CVE 上召回极低——自定义 taint 全零命中（真实仓库多为非框架化源码），官方基线全局 F1=0.111（R=0.062，仅 taint 组命中 1 真阳 + 1 误报）。这恰说明 LLM+CPG 语义层针对的正是此盲区，而非工程缺陷。
+- `LocalLLMScorer` 的 Ollama HTTP 接口已实现（纯标准库，无第三方依赖；Ollama 不可达时自动 abstain），但因本机未安装 Ollama（受"不下载不明软件"约束），消融尚未含真实 LLM 信号——接入属环境就绪后的下一步。
+- 鉴权(862/863) / 请求走私(444) / TLS(295·347) / DoS(400) / 信息泄露(200) / IDOR(639) / 链接跟随(59) / 输入校验(20) 等结构型 CWE：经核查，其中 020/295 已有官方查询并已纳入基线，其余在 CodeQL Python 安全套件中确无成熟查询，静态基线天然失效，需上游结构查询或自定义配置指纹（ConfigSig）补充。
 - `request` 模式在本数据集上恒为 abstain（语料不含请求字段），其"天花板"需在后续从公告派生 PoC 才能评估。
 
 ## 与课题的关联
@@ -495,7 +495,7 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
 - [ ] 接入服务端反馈（HTTP 响应），从"payload 识别"走向"漏洞确认"
 - [x] **CPG 代码级上下文子系统（研究主线，ADR-001）** — `cpg/`：CodeQL 管线（AST/CFG/DFG/taint，覆盖注入族 + SSRF + XSS）+ 切片构造 + 三模式消融框架（request/code/both）+ 真实语料分层抽样（dataset.jsonl，16 条 / 11 仓库）
-- [ ] 真实 `dataset.jsonl` 全量三模式消融（需先做语料库级单数据库，消除逐样本建库开销）
+- [x] 真实 `dataset.jsonl` 全量三模式消融（语料库级单数据库 `corpus_db.py`，已产出 results.csv + summary.md）
 - [ ] 接入本地模型（Ollama）填充 `LocalLLMScorer`，锁定可复现实验（多 seed）
 - [ ] 扩展结构型 CWE 覆盖（鉴权 / 走私 / TLS / DoS / 信息泄露 / IDOR 等），补上游结构查询或配置指纹
 

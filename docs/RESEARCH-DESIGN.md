@@ -44,3 +44,23 @@
 - 掉回"标准集 100%"陷阱 → 强制真实 CVE 数据，禁用 SARD。
 - LLM+CPG 未优于 CodeQL → 两种结果都能写，重点在可解释性/零规则维护的增量论证。
 - 工具/环境卡壳 → 先 CodeQL（Docker 镜像成熟），Joern 作备选。
+
+## 7. 执行状态（截至 2026-08-08）
+
+§5 路线图中前四项已落地：
+
+1. **最小 CPG 管线** — 原生 CodeQL 2.26.2 CLI 已端到端跑通 AST/CFG/DFG/taint 四查询，切片文本化正确（见 `cpg/README.md`）。
+2. **三模式端点** — `cpg/ablation/` 已实现 `POST /api/v1/detect{mode: request|code|both}` + 可插拔 Scorer（StructuralHeuristic / CodeQLBaseline / LocalLLM）。
+3. **真实 CVE 数据集** — `cpg/dataset.jsonl`：GitHub Advisory API 分层抽样 16 条 / 跨 11 仓库 / ≤2 条每仓库 / 11 个 CWE 族群；修复前后代码对齐全。
+4. **三模式 + CodeQL 基线消融** — 语料库级单数据库（`corpus_db.py`，建库一次 + 6 次自定义 taint 查询 + 1 次官方定向 analyze，按 `<cve>_<version>/` 前缀隔离样本），全量 dataset.jsonl（32 样本版本）已端到端跑通并产出 `results.csv` + `summary.md`。基线覆盖数据集所有"有官方查询可映射"的 CWE（022/918/020/295 共 10 个官方查询）；其余逻辑型 CWE（059/200/400/444/639/862/863）在 CodeQL Python 套件中无成熟查询，静态基线天然失效。
+
+第 5 项（锁本地模型）进行中：
+
+- `LocalLLMScorer` 的 Ollama HTTP 接口已实现（纯标准库，无第三方依赖；Ollama 不可达时自动 abstain，不中断消融）。
+- 受"不为本机安装不明软件"约束，本机尚未安装 Ollama，`--with-local-llm` 自动降级为不纳入；模型接入属环境就绪后的下一步。
+
+**关键边界（消融已揭示，均为实证而非推测）**：
+
+- 数据集 11 个 CWE 中仅 CWE-022、CWE-918 属污点可建模类，但**自定义窄 taint 查询在真实语料上实测零命中**（真实漏洞仓库多为非框架化源码，静态数据流盲目）；官方 CodeQL（CWE-022/918）亦仅在 16 个 vuln 版本中命中 1 个（召回 6.25%）+ 1 个误报。
+- 其余 9 类（CWE-020/059/200/295/400/444/639/862/863）为逻辑/语义型，CodeQL Python 套件对其多数无成熟查询，静态基线恒 benign。
+- 综上，标准静态分析（含自定义 taint 与官方定向查询）在本多样真实 CVE 上近乎失效——这正是 LLM+CPG 语义层要补的盲区，也是本课题"上下文增强有效边界"的核心论证对象，而非工程缺陷。三模式消融中 request/code/both 的区分度将主要来自 `LocalLLMScorer`（待接 Ollama）。

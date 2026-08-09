@@ -192,3 +192,82 @@ def run_codeql_baseline(
         label="benign", confidence=1.0, cwe=target,
         evidence=[{"reason": f"official python-code-scanning did not flag {target} in {sample_file.name}"}],
     )
+
+
+def run_codeql_baseline_corpus(
+    sarif_path: str | Path,
+    sample_prefix: str,
+    cwe: str | None,
+) -> Verdict:
+    """语料库级单数据库场景：从已跑好的 corpus SARIF 中，按 ``sample_prefix``
+    （如 ``CVE-2026-50558_vuln``）过滤匹配目标 CWE 的结果，判 vulnerable。
+
+    单数据库下多个样本的 SARIF 结果共存，必须按样本路径前缀隔离，否则同名文件
+    （``__init__.py`` / ``conf.py`` / ``test_*.py``）会跨样本串味。artifactLocation
+    的 uri 相对 source-root，形如 ``<cve>_<version>/<relpath>``，故以前缀 + '/' 匹配。
+    """
+    sarif_path = Path(sarif_path)
+    target = config.normalize_cwe(cwe)
+    if not sarif_path.exists():
+        return Verdict(
+            label="abstain", confidence=0.0, cwe=target,
+            evidence=[{"reason": "corpus SARIF not found", "sarif": str(sarif_path)}],
+        )
+    try:
+        data = json.loads(sarif_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return Verdict(
+            label="abstain", confidence=0.0, cwe=target,
+            evidence=[{"reason": f"SARIF unreadable: {exc}", "sarif": str(sarif_path)}],
+        )
+
+    rule_tags: dict[str, set[str]] = {}
+    for run in data.get("runs", []) or []:
+        rule_tags.update(_build_rule_tags(run))
+
+    if target is None:
+        return Verdict(
+            label="abstain", confidence=0.0, cwe=target,
+            evidence=[{"reason": "no target CWE supplied to corpus baseline"}],
+        )
+
+    prefix_norm = sample_prefix.replace("\\", "/")
+    evidence: list[dict] = []
+    for run in data.get("runs", []) or []:
+        for res in run.get("results", []) or []:
+            if not _result_cwe_match(res, rule_tags, target):
+                continue
+            hit = False
+            for loc in res.get("locations", []) or []:
+                uri = (
+                    loc.get("physicalLocation", {})
+                    .get("artifactLocation", {})
+                    .get("uri")
+                )
+                if uri and uri.replace("\\", "/").startswith(prefix_norm + "/"):
+                    hit = True
+                    break
+            if not hit:
+                continue
+            rid = res.get("ruleId")
+            evidence.append(
+                {
+                    "type": "codeql-baseline",
+                    "cwe": target,
+                    "ruleId": rid,
+                    "uri": (
+                        (res.get("locations", []) or [{}])[0]
+                        .get("physicalLocation", {})
+                        .get("artifactLocation", {})
+                        .get("uri")
+                    ),
+                }
+            )
+
+    if evidence:
+        return Verdict(label="vulnerable", confidence=1.0, cwe=target, evidence=evidence)
+
+    return Verdict(
+        label="benign", confidence=1.0, cwe=target,
+        evidence=[{"reason": f"official suite did not flag {target} under {sample_prefix}"}],
+    )

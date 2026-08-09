@@ -12,6 +12,10 @@
 
 from __future__ import annotations
 
+import json
+import re
+import urllib.error
+import urllib.request
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -161,16 +165,160 @@ class CodeQLBaselineScorer(Scorer):
 # 本地 LLM 评分器（预留 stub）
 # ---------------------------------------------------------------------------
 class LocalLLMScorer(Scorer):
-    """预留：消费 context 文本调 Ollama Qwen2.5-Coder；本期不实现。"""
+    """本地 LLM 评分器：消费 context 文本调本地 Ollama（默认 ``qwen2.5-coder``）。
+
+    仅通过标准 HTTP 接口（``localhost:11434``）与本地模型通信，不依赖任何云端 API，
+    以消除 API 漂移（ADR-001）。Ollama 未安装或目标模型未拉取时，``score()`` 不抛异常，
+    而是返回 abstain verdict（reason 注明不可达），由消融 harness 计入 abstain 天花板。
+
+    请求侧（request-only）模式无代码 / 无 CPG 上下文，本地 LLM 同样无法判别可利用性，
+    直接 abstain（与 StructuralHeuristic 的 request 天花板保持一致）。
+
+    纯标准库实现（urllib），不引入任何第三方依赖，满足「不下载不明来源软件」约束。
+    """
 
     name = "LocalLLMScorer"
+    DEFAULT_BASE = "http://localhost:11434"
 
-    def __init__(self, model: str = "qwen2.5-coder"):
+    def __init__(self, model: str = "qwen2.5-coder:7b", base_url: str = DEFAULT_BASE,
+                 timeout: float = 120.0):
         self.model = model
+        self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
+        self._reachable: bool | None = None  # 懒检测缓存
+
+    # ---- 可用性探测 ----
+    def reachable(self) -> bool:
+        if self._reachable is None:
+            self._reachable = self._probe()
+        return self._reachable
+
+    def _probe(self) -> bool:
+        """探测 Ollama 服务在线且目标模型已拉取（不触发生成）。"""
+        try:
+            req = urllib.request.Request(f"{self.base_url}/api/tags", method="GET")
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            models = [m.get("name") for m in data.get("models", [])]
+            return any(
+                self.model == mn
+                or self.model.startswith(mn + ":")
+                or mn.startswith(self.model)
+                for mn in models
+            )
+        except Exception:
+            return False
+
+    # ---- prompt 构造 ----
+    SYSTEM = (
+        "你是一名资深代码安全审计助手。给定漏洞公告元数据与代码级上下文（CPG 污点切片），"
+        "判断目标代码是否可被利用（vulnerable）、无可证伪利用路径（benign）或信息不足"
+        "（abstain）。只输出严格 JSON，不要任何解释性文字。"
+    )
+
+    def _build_prompt(self, ctx: DetectionContext) -> str:
+        meta = ctx.advisory_meta or {}
+        cwe = meta.get("cwe")
+        summary = meta.get("summary") or ""
+        cve = meta.get("cve_id") or "unknown"
+        parts = [
+            "# 审计任务",
+            f"- CVE: {cve}",
+            f"- 目标 CWE: {cwe or '未指定'}",
+            f"- 公告摘要: {summary}",
+        ]
+        if ctx.request_info:
+            req_txt = json.dumps(ctx.request_info, ensure_ascii=False)
+            parts.append(f"\n# 请求侧触发信息\n{req_txt[:2000]}")
+        if ctx.code_text:
+            parts.append(f"\n# 目标代码（节选）\n```\n{ctx.code_text[:6000]}\n```")
+        if ctx.cpg_slices:
+            parts.append(f"\n# 代码级上下文（CPG 污点切片）\n{ctx.cpg_slices[:4000]}")
+        parts.append(
+            "\n# 输出要求\n严格输出如下 JSON，不要任何额外文字：\n"
+            '{"verdict":"vulnerable|benign|abstain","cwe":"CWE-xxx 或 null",'
+            '"confidence":0.0到1.0的数字,"rationale":"一句话依据"}'
+        )
+        return "\n".join(parts)
+
+    # ---- 调用 ----
+    def _generate(self, prompt: str) -> str:
+        payload = json.dumps(
+            {
+                "model": self.model,
+                "prompt": prompt,
+                "system": self.SYSTEM,
+                "stream": False,
+                "options": {"temperature": 0},
+            }
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"{self.base_url}/api/generate",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data.get("response", "")
+
+    @staticmethod
+    def _extract_json(text: str) -> dict | None:
+        text = text.strip()
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            try:
+                return json.loads(m.group(0))
+            except json.JSONDecodeError:
+                return None
+        return None
 
     def score(self, ctx: DetectionContext) -> Verdict:
-        raise NotImplementedError(
-            "LocalLLMScorer is a stub for the ablation skeleton; wire Ollama Qwen2.5-Coder later."
+        target = config.normalize_cwe((ctx.advisory_meta or {}).get("cwe"))
+        # request-only：无代码 / 无 CPG 上下文 → 本地 LLM 同样无法判别可利用性
+        if ctx.cpg_slices is None and not ctx.code_text:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{"reason": "no code/CPG context in request-only mode"}],
+            )
+        if not self.reachable():
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{
+                    "reason": f"Ollama unreachable at {self.base_url} "
+                              f"(model {self.model} not loaded); LocalLLMScorer disabled",
+                }],
+            )
+        try:
+            raw = self._generate(self._build_prompt(ctx))
+        except Exception as exc:  # 网络 / 超时 / 生成前错误
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{"reason": f"LocalLLM call failed: {exc}"}],
+            )
+        obj = self._extract_json(raw)
+        if not obj:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{"reason": "LocalLLM returned non-JSON", "raw": raw[:500]}],
+            )
+        label = str(obj.get("verdict", "abstain")).lower()
+        if label not in ("vulnerable", "benign", "abstain"):
+            label = "abstain"
+        cwe_out = config.normalize_cwe(obj.get("cwe")) if obj.get("cwe") else target
+        try:
+            conf = float(obj.get("confidence", 0.0))
+        except (TypeError, ValueError):
+            conf = 0.0
+        conf = max(0.0, min(1.0, conf))
+        return Verdict(
+            label=label, confidence=conf, cwe=cwe_out,
+            evidence=[{"type": "local-llm", "model": self.model,
+                       "rationale": obj.get("rationale", "")}],
         )
 
 

@@ -21,4 +21,5 @@ select "CWE-918" as cwe,
   source.getLocation().getStartLine() as sourceLine,
   source.toString() as sourceNode,
   sink.getLocation().getStartLine() as sinkLine,
-  sink.toString() as sinkNode
+  sink.toString() as sinkNode,
+  source.getLocation().getFile().getAbsolutePath() as abs_path

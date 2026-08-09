@@ -9,6 +9,8 @@ db/
 # Binary query results (keep human-readable .txt slices)
 *.bqrs
 *.csv
+# 但保留消融实验的最终产物（核心可复现证据，需入库）
+!ablation/results.csv
 # Raw git clones of corpus source repos (large, re-cloneable)
 corpus_raw/
 # Cached advisory API pulls
