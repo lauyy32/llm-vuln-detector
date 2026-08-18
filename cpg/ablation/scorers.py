@@ -1,4 +1,4 @@
-"""Scorer 抽象与三个具体评分器（SPEC §6）。
+"""Scorer 抽象与四个具体评分器（SPEC §6）。
 
 - ``DetectionContext``：一个样本在某个 mode 下的上下文（request_info / advisory_meta /
   code_text / cpg_slices）。
@@ -456,10 +456,73 @@ class ConfigSigScorer(Scorer):
         )
 
 
+class CPGEvidenceScorer(Scorer):
+    """消费 CPG 污点切片文本（build_cpg_slices_text 渲染产物），做确定性判定。
+
+    与 StructuralHeuristicScorer（吃注入的 taint_rows 结构化数据）不同，本评分器
+    **直接解析 cpg_slices 文本**，模拟「规则/LLM 读取 CPG 切片」的最小形态：CPG
+    切片文本本身即可作为独立判定输入，无需额外结构化注入。
+
+    - request 模式（ctx.cpg_slices 为 None）→ abstain；
+    - 切片声明「no untrusted input reaches a modelled sink」→ benign（CPG 已证明无 source→sink 连通）；
+    - 切片含「reaches sink at L」污点流 → vulnerable（confidence=0.8）；
+    - 切片非空但无结构化流信息（异常）→ abstain。
+
+    无 LLM、无下载、无外部依赖。其意义在于为 LocalLLMScorer 提供「同吃 cpg_slices
+    文本、但确定性解析」的对照基线，使③（LLM+CPG）的语义增量可被干净量化。
+    """
+
+    name = "CPGEvidenceScorer"
+
+    _NO_FLOW_RE = re.compile(r"no untrusted input reaches a modelled sink", re.I)
+    _FLOW_RE = re.compile(r"reaches sink at L\d+", re.I)
+    _CWE_HEAD_RE = re.compile(r"^###\s+(CWE-\d+)", re.M)
+
+    @staticmethod
+    def _parse_flow_cwes(slices: str) -> list[str]:
+        """按 `### CWE-XXX` 分段，返回含污点流的 CWE 列表。"""
+        flows: list[str] = []
+        parts = CPGEvidenceScorer._CWE_HEAD_RE.split(slices)
+        # parts: ['', 'CWE-022', 'body...', 'CWE-918', 'body...', ...]
+        for i in range(1, len(parts), 2):
+            cwe = parts[i]
+            body = parts[i + 1] if i + 1 < len(parts) else ""
+            if CPGEvidenceScorer._FLOW_RE.search(body):
+                flows.append(cwe)
+        return flows
+
+    def score(self, ctx: DetectionContext) -> Verdict:
+        if ctx.cpg_slices is None:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=None,
+                evidence=[{"reason": "no CPG slice in request mode; ceiling for request-only detection"}],
+            )
+        slices = ctx.cpg_slices
+        target = config.normalize_cwe((ctx.advisory_meta or {}).get("cwe"))
+        if self._NO_FLOW_RE.search(slices):
+            return Verdict(
+                label="benign", confidence=0.6, cwe=target,
+                evidence=[{"type": "cpg-evidence", "reason": "CPG taint slice: no source->sink flow"}],
+            )
+        flow_cwes = self._parse_flow_cwes(slices)
+        if flow_cwes:
+            ev_cwe = config.normalize_cwe(flow_cwes[0]) or target
+            return Verdict(
+                label="vulnerable", confidence=0.8, cwe=ev_cwe,
+                evidence=[{"type": "cpg-evidence", "cwe": flow_cwes[0], "flows": len(flow_cwes)}],
+            )
+        # 切片非空但无结构化流信息（异常，如渲染格式变更）
+        return Verdict(
+            label="abstain", confidence=0.0, cwe=target,
+            evidence=[{"reason": "CPG slice present but no flow info; format anomaly"}],
+        )
+
+
 # 名称 -> 类 注册表（harness / api 用）
 SCORER_REGISTRY: dict[str, type[Scorer]] = {
     "StructuralHeuristicScorer": StructuralHeuristicScorer,
     "CodeQLBaselineScorer": CodeQLBaselineScorer,
     "ConfigSigScorer": ConfigSigScorer,
+    "CPGEvidenceScorer": CPGEvidenceScorer,
     "LocalLLMScorer": LocalLLMScorer,
 }

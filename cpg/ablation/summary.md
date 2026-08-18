@@ -1,11 +1,12 @@
 # 三模式上下文消融实验 - 结果汇总
 
-- 生成时间: 2026-08-18 12:12 UTC
+- 生成时间: 2026-08-18 14:31 UTC
 - 数据来源: dataset.jsonl (真实 CVE)
 - 样本版本数: 32  (vuln=正例 / fixed=负例)
 - 跳过基线: False
 - CodeQL: 2.26.2  python Security/CWE 定向查询（覆盖数据集 CWE-022/918/020/295）
 - ConfigSig: 结构型/配置签名基线（CWE-295/059/200 精确签名；020/400/444/639/862/863 显式 abstain）
+- CPGEvidence: 直接解析 CPG 污点切片文本做确定性判定（为 LocalLLMScorer 提供同吃切片文本的对照基线）
 
 ## 全局指标（正类=vulnerable；abstain 计为未判 vulnerable → 正例召回 0）
 
@@ -20,6 +21,9 @@
 | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
+| CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
+| CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
+| CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 
 ## 分组指标（可污点类 vs 逻辑类）
 
@@ -34,6 +38,9 @@
 | taint | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 8 |
 | taint | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 8 |
 | taint | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 8 |
+| taint | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 8 |
+| taint | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 8 |
+| taint | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 8 |
 | logic | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 24 |
 | logic | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 24 |
 | logic | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 24 |
@@ -43,8 +50,11 @@
 | logic | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 24 |
 | logic | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 24 |
 | logic | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 24 |
+| logic | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 24 |
+| logic | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 24 |
+| logic | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 24 |
 
-## 每 CWE 指标（StructuralHeuristic / ConfigSig）
+## 每 CWE 指标（StructuralHeuristic / ConfigSig / CPGEvidence）
 
 | cwe | scorer | mode | P | R | F1 | support |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -114,6 +124,39 @@
 | CWE-918 | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-918 | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-918 | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-020 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-020 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-020 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-022 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 6 |
+| CWE-022 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 6 |
+| CWE-022 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 6 |
+| CWE-059 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-059 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-059 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-200 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-200 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-200 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-295 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-295 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-295 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-400 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-400 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-400 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-444 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-444 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-444 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-639 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-639 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-639 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-862 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-862 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-862 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-863 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-863 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-863 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-918 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-918 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-918 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 
 ## 混淆矩阵（全局，行=预测 / 列=真值）
 
@@ -139,4 +182,12 @@
 | vulnerable | 0 | 0 | 0 | 0 |
 | benign | 16 | 16 | 0 | 0 |
 | abstain | 32 | 32 | 0 | 0 |
+| error | 0 | 0 | 0 | 0 |
+
+### CPGEvidenceScorer
+| predicted \ truth | vulnerable | benign | abstain | error |
+| --- | --- | --- | --- | --- |
+| vulnerable | 0 | 0 | 0 | 0 |
+| benign | 32 | 32 | 0 | 0 |
+| abstain | 16 | 16 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
