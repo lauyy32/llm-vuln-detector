@@ -4,10 +4,13 @@
   code_text / cpg_slices）。
 - ``Verdict``：判定结果（label / confidence / cwe / evidence）。
 - ``Scorer``：统一接口 ``score(ctx) -> Verdict``。
-- ``CodeQLBaselineScorer``：跑官方 ``python-code-scanning`` 套件得纯静态 baseline，不依赖 mode。
+- ``CodeQLBaselineScorer``：跑官方 python Security/CWE 定向查询得纯静态 baseline，不依赖 mode。
 - ``StructuralHeuristicScorer``：吃 cpg_slices 与 taint 行，按「目标 CWE 是否存 source→sink
   流」判 vulnerable，无 LLM；request 模式（无 cpg_slices）→ 显式 abstain（SPEC §8）。
-- ``LocalLLMScorer``：预留 stub，``score()`` 抛 ``NotImplementedError``。
+- ``ConfigSigScorer``：结构型/配置签名基线，按目标 CWE 在源码中匹配不安全配置签名
+  （如 CWE-295 证书校验关闭、CWE-59 符号链接跟随、CWE-200 调试暴露）；对基于缺失的
+  CWE（020/400/444/639/862/863）显式 abstain。纯正则/AST 扫描，无 LLM、无 CodeQL。
+- ``LocalLLMScorer``：本地 Ollama HTTP 接口（urllib），模型不可达时自动 abstain。
 """
 
 from __future__ import annotations
@@ -322,9 +325,141 @@ class LocalLLMScorer(Scorer):
         )
 
 
+# ---------------------------------------------------------------------------
+# 结构型 / 配置签名基线评分器（ConfigSig）
+# ---------------------------------------------------------------------------
+class ConfigSigScorer(Scorer):
+    """结构型/配置签名基线：在源码中按目标 CWE 匹配「不安全配置/结构签名」。
+
+    定位：与 CodeQLBaseline（官方污点/套件）、StructuralHeuristic（自建 taint）并列的
+    **第三类静态基线**，专门覆盖 CodeQL Python 套件无成熟查询的逻辑型 CWE
+    （如 CWE-295 证书校验、CWE-59 符号链接跟随、CWE-200 调试信息暴露）。
+    纯正则/AST 扫描源码，无 LLM、无第三方依赖、不触发 CodeQL 建库，秒级。
+
+    设计纪律（OPEN-DECISIONS #8）：
+    - 仅对「**存在可检测正签名**」的 CWE（295/59/200）给出 vulnerable/benign 判定；
+    - 对「**基于缺失（absence-based）**」或「**框架/循环级、无精确签名**」的 CWE
+      （020/400/444/639/862/863）显式 abstain——签名法无法证明「某处缺少某个检查」，
+      也易对通用模式（如 ``while True``）产生误报；这类恰好是 LLM+CPG 语义层要补的盲区，
+      不以假阳性冒充覆盖。
+    - request 模式（ctx.cpg_slices 为 None）无代码上下文，显式 abstain（与
+      StructuralHeuristic 的 request 天花板保持一致）。
+
+    信号来源：优先 ``source_root``（真实模式 staged 源码目录）；否则回退 ctx.code_text。
+    """
+
+    name = "ConfigSigScorer"
+
+    # 基于缺失 / 无精确签名：签名法无法覆盖，显式 abstain
+    ABSTAIN_CWES = {"CWE-020", "CWE-400", "CWE-444", "CWE-639", "CWE-862", "CWE-863"}
+
+    # 各 CWE 的「不安全配置/结构签名」正则（行级匹配，file:line:snippet 作为证据）
+    SIGNATURES: dict[str, list[re.Pattern[str]]] = {
+        "CWE-295": [
+            re.compile(r"verify\s*=\s*False", re.I),
+            re.compile(r"check_hostname\s*=\s*False", re.I),
+            re.compile(r"CERT_NONE"),
+            re.compile(r"ssl\.CERT_NONE"),
+        ],
+        "CWE-59": [
+            re.compile(r"os\.symlink\s*\("),
+            re.compile(r"followlinks\s*=\s*True", re.I),
+        ],
+        "CWE-200": [
+            re.compile(r"debug\s*=\s*True", re.I),
+            re.compile(r"app\.debug"),
+            re.compile(r"werkzeug\.debug", re.I),
+            re.compile(r"traceback\.print_exc"),
+        ],
+    }
+
+    def __init__(self, source_root: str | Path | None = None):
+        self.source_root = Path(source_root) if source_root else None
+
+    # ---- 源码收集 ----
+    def _collect_sources(self, ctx: DetectionContext) -> list[tuple[str, str]]:
+        """返回 [(file_label, text), ...]。优先 source_root 目录，否则回退 code_text。"""
+        out: list[tuple[str, str]] = []
+        if self.source_root and self.source_root.exists():
+            for p in sorted(self.source_root.rglob("*.py")):
+                try:
+                    out.append((str(p), p.read_text(encoding="utf-8", errors="ignore")))
+                except Exception:
+                    continue
+        if not out:
+            ct = ctx.code_text
+            if ct and ct.strip():
+                out.append(("<code_text>", ct))
+        return out
+
+    # ---- CWE-295 通配符 DNS 专项（实战形态：SAN/host 中允许 ``*``）----
+    @staticmethod
+    def _wildcard_in_cert_context(line: str) -> bool:
+        low = line.lower()
+        if not any(k in low for k in
+                   ("host", "san", "dns", "cert", "verify", "common_name", "cn")):
+            return False
+        return ("*" in line) or ("fnmatch" in low) or ("wildcard" in low)
+
+    def _match(self, cwe: str, sources: list[tuple[str, str]]) -> list[dict]:
+        pats = self.SIGNATURES.get(cwe, [])
+        hits: list[dict] = []
+        for fname, text in sources:
+            for i, line in enumerate(text.splitlines(), 1):
+                matched = any(p.search(line) for p in pats)
+                if not matched and cwe == "CWE-295" and self._wildcard_in_cert_context(line):
+                    matched = True
+                if matched:
+                    hits.append({"file": fname, "line": i, "snippet": line.strip()[:160]})
+        return hits
+
+    def score(self, ctx: DetectionContext) -> Verdict:
+        # request 模式：无代码上下文
+        if ctx.cpg_slices is None:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=None,
+                evidence=[{"reason": "no code context in request mode; ConfigSig is code-based"}],
+            )
+        target = config.normalize_cwe((ctx.advisory_meta or {}).get("cwe"))
+        if target is None:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=None,
+                evidence=[{"reason": "no target CWE; cannot orient signature check"}],
+            )
+        # 基于缺失 / 无精确签名的 CWE：签名法无法覆盖
+        if target in self.ABSTAIN_CWES:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{
+                    "reason": f"{target} is absence-based / no precise source signature; "
+                              f"out of ConfigSig scope (motivates LLM+CPG semantic layer)",
+                }],
+            )
+        sources = self._collect_sources(ctx)
+        if not sources:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{"reason": "no source available for ConfigSig scan"}],
+            )
+        hits = self._match(target, sources)
+        if hits:
+            return Verdict(
+                label="vulnerable", confidence=0.8, cwe=target,
+                evidence=[{
+                    "type": "config-sig", "cwe": target,
+                    "file": h["file"], "line": h["line"], "snippet": h["snippet"],
+                } for h in hits[:5]],
+            )
+        return Verdict(
+            label="benign", confidence=0.6, cwe=target,
+            evidence=[{"reason": f"no config signature for {target} in source"}],
+        )
+
+
 # 名称 -> 类 注册表（harness / api 用）
 SCORER_REGISTRY: dict[str, type[Scorer]] = {
     "StructuralHeuristicScorer": StructuralHeuristicScorer,
     "CodeQLBaselineScorer": CodeQLBaselineScorer,
+    "ConfigSigScorer": ConfigSigScorer,
     "LocalLLMScorer": LocalLLMScorer,
 }

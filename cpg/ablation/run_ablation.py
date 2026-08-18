@@ -1,7 +1,7 @@
 """消融 harness（SPEC §7 / ARCHITECTURE §4）。
 
 遍历样本，对每样本展开 vuln(正例)/fixed(负例) 两版本，构造 request/code/both 三模式
-DetectionContext，跑 StructuralHeuristicScorer + CodeQLBaselineScorer，收集
+DetectionContext，跑 StructuralHeuristicScorer + CodeQLBaselineScorer + ConfigSigScorer，收集
 ``(sample_id, version, mode, scorer, predicted, truth)``，聚合并落
 ``results.csv`` + ``summary.md``。
 
@@ -49,16 +49,16 @@ from cpg.ablation.config import (  # noqa: E402
 )
 from cpg.ablation.context_build import build_context  # noqa: E402
 from cpg.ablation.cpg_eval import build_cpg_slices_text, extract_taint  # noqa: E402
-from cpg.ablation.corpus_db import build_corpus_db  # noqa: E402
+from cpg.ablation.corpus_db import build_corpus_db, CORPUS_SRC  # noqa: E402
 from cpg.ablation.codeql_baseline import run_codeql_baseline_corpus  # noqa: E402
 from cpg.ablation.scorers import (  # noqa: E402
-    CodeQLBaselineScorer, DetectionContext, LocalLLMScorer,
+    CodeQLBaselineScorer, ConfigSigScorer, DetectionContext, LocalLLMScorer,
     StructuralHeuristicScorer, Verdict,
 )
 
 POSITIVE = "vulnerable"
 MODES = ("request", "code", "both")
-SCORERS = ("StructuralHeuristicScorer", "CodeQLBaselineScorer")
+SCORERS = ("StructuralHeuristicScorer", "CodeQLBaselineScorer", "ConfigSigScorer")
 
 # demo 文件名 -> 目标 CWE（与 output_demo/taint.csv 中的 file 列一致）
 DEMO_FNAME_CWE = {
@@ -332,6 +332,12 @@ def main() -> int:
             v_bl = baseline_cache[baseline_key]
             records.append((sid, s["version"], mode, "CodeQLBaselineScorer",
                             v_bl.label, s["truth"], v_bl.cwe, cwe, group))
+            # 结构型/配置签名基线（ConfigSig）：吃真实源码目录（真实）或 code_text（demo），
+            # 按目标 CWE 匹配不安全配置签名；request 模式 / 基于缺失的 CWE 显式 abstain。
+            cfg_src = CORPUS_SRC / s["prefix"] if (not s.get("reuse_db") and s.get("prefix")) else None
+            v_cfg = ConfigSigScorer(source_root=cfg_src).score(ctx)
+            records.append((sid, s["version"], mode, "ConfigSigScorer",
+                            v_cfg.label, s["truth"], v_cfg.cwe, cwe, group))
             # 本地 LLM（可选；Ollama 不可达时自动 abstain）
             if local_llm_enabled:
                 v_llm = local_llm.score(ctx)
@@ -393,6 +399,7 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     lines.append(f"- 样本版本数: {n_samples}  (vuln=正例 / fixed=负例)")
     lines.append(f"- 跳过基线: {args.skip_baseline}")
     lines.append(f"- CodeQL: 2.26.2  python Security/CWE 定向查询（覆盖数据集 CWE-022/918/020/295）")
+    lines.append(f"- ConfigSig: 结构型/配置签名基线（CWE-295/059/200 精确签名；020/400/444/639/862/863 显式 abstain）")
     if args.demo:
         lines.append("")
         lines.append("> 注：demo 模式仅含 4 个 vuln 正例（无 fixed 负例），用于验证聚合链路；"
@@ -436,21 +443,22 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     lines.append(md_table(headers, rows))
     lines.append("")
 
-    # 每 CWE（仅 StructuralHeuristic，核心消融单元）
-    lines.append("## 每 CWE 指标（StructuralHeuristicScorer）")
+    # 每 CWE（核心消融单元：结构化启发式 + 配置签名基线）
+    lines.append("## 每 CWE 指标（StructuralHeuristic / ConfigSig）")
     lines.append("")
     cwes_seen = sorted({ct for *_x, ct, _g in records})
-    headers = ["cwe", "mode", "P", "R", "F1", "support"]
+    headers = ["cwe", "scorer", "mode", "P", "R", "F1", "support"]
     rows = []
-    for cw in cwes_seen:
-        for m in MODES:
-            sub = [(p, t) for (sid, ver, mm, sc, p, t, cp, ct, g) in records
-                   if sc == "StructuralHeuristicScorer" and mm == m and ct == cw]
-            if not sub:
-                continue
-            met = compute_metrics(sub)
-            rows.append([cw, m, f"{met['precision']:.3f}", f"{met['recall']:.3f}",
-                         f"{met['f1']:.3f}", met["support"]])
+    for sc in ("StructuralHeuristicScorer", "ConfigSigScorer"):
+        for cw in cwes_seen:
+            for m in MODES:
+                sub = [(p, t) for (sid, ver, mm, scc, p, t, cp, ct, g) in records
+                       if scc == sc and mm == m and ct == cw]
+                if not sub:
+                    continue
+                met = compute_metrics(sub)
+                rows.append([cw, sc, m, f"{met['precision']:.3f}", f"{met['recall']:.3f}",
+                             f"{met['f1']:.3f}", met["support"]])
     lines.append(md_table(headers, rows))
     lines.append("")
 
