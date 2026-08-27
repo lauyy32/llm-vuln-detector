@@ -56,12 +56,17 @@ def run(cmd, **kw):
 
 
 def fetch_advisories(eco: str, pages: int):
-    """拉取某生态的 GitHub advisory，缓存到本地。无 token 限流 60/hr，pages*100<=6000。"""
+    """拉取某生态的 GitHub advisory，缓存到本地。无 token 限流 60/hr，pages*100<=6000。
+
+    GITHUB_TOKEN 环境变量可用时注入认证头（5000/hr 配额）。
+    """
     all_advs = []
+    token = os.environ.get("GITHUB_TOKEN", "")
+    auth = ["-H", f"Authorization: Bearer {token}"] if token else []
     for page in range(1, pages + 1):
         url = f"{API_BASE}?ecosystem={eco}&per_page=100&page={page}&sort=published"
         r = run(["curl", "-sS", "-m", "30", "-H", f"Accept: {API_ACCEPT}",
-                 "-H", f"X-GitHub-Api-Version: {API_VERSION}", url])
+                 "-H", f"X-GitHub-Api-Version: {API_VERSION}", *auth, url])
         if r.returncode != 0:
             print(f"[warn] curl failed page {page}: {r.stderr[:200]}")
             break
@@ -210,11 +215,15 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
         return []
     files = [f for f in show.stdout.splitlines()
              if f.endswith(".py") and ("test" not in f.lower() or "tests" not in f.lower())]
-    # 优先取改动文件；退化取全部 py
+    # 优先取改动文件；修复 diff 不含 .py 变更（如跨语言修复在 Rust/C）时跳过——
+    # 此时 vuln/fixed 的 Python 侧完全相同，truth 标签无意义，属污染样本。
     diff = run(["git", "diff", "--name-only", f"{fix_commit}^", fix_commit],
                cwd=str(repo_dir))
     changed = [f for f in diff.stdout.splitlines() if f.endswith(".py")] if diff.returncode == 0 else []
-    targets = changed or files[:20]
+    if not changed:
+        print(f"    [skip] fix diff has no .py changes (cross-language fix), skip")
+        return []
+    targets = changed[:20]
     extracted = []
     for f in targets:
         fixed_path = pair_dir / "fixed" / f

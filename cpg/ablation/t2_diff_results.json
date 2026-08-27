@@ -1,0 +1,114 @@
+[
+  {
+    "sample": "CVE-2026-50558",
+    "base_pred": "vulnerable",
+    "diff_verdict": "benign",
+    "diff_chars": 2555,
+    "rationale": "The patch adds a `safe_tar_extractall` function that checks if the extracted file paths are within the designated destin",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-53502",
+    "base_pred": "vulnerable",
+    "diff_verdict": "benign",
+    "diff_chars": 4750,
+    "rationale": "The patch correctly decodes the URL before performing the security check, preventing path traversal attacks.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-53505",
+    "base_pred": "benign",
+    "diff_verdict": "benign",
+    "diff_chars": 2235,
+    "rationale": "The patch adds input validation to ensure that the value is between 0 and 1.0, effectively preventing unbounded post-tra",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-54706",
+    "base_pred": "vulnerable",
+    "diff_verdict": "benign",
+    "diff_chars": 7669,
+    "rationale": "The patch adds a `_is_path_contained` method to verify that paths are within selected roots, effectively preventing syml",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-54707",
+    "base_pred": "vulnerable",
+    "diff_verdict": "benign",
+    "diff_chars": 7379,
+    "rationale": "The patch adds a check to reject file uploads when disabled, preventing the vulnerability.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-54785",
+    "base_pred": "abstain",
+    "diff_verdict": "benign",
+    "diff_chars": 6374,
+    "rationale": "The patch adds a check to skip files that resolve outside the working directory, effectively preventing arbitrary local ",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-59881",
+    "base_pred": "benign",
+    "diff_verdict": "vulnerable",
+    "diff_chars": 1966,
+    "rationale": "The fix does not address the vulnerability by not negotiating permessage-deflate compression.",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-67424",
+    "base_pred": "vulnerable",
+    "diff_verdict": "benign",
+    "diff_chars": 3209,
+    "rationale": "The patch adds an SSRF guard to validate outbound URLs, effectively preventing SSRF attacks.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-67435",
+    "base_pred": "vulnerable",
+    "diff_verdict": "benign",
+    "diff_chars": 3389,
+    "rationale": "The patch adds a function `_install_safe_redirect_stripping` that wraps the `_redirect_headers` method of the `httpx.Cli",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-69243",
+    "base_pred": "benign",
+    "diff_verdict": "benign",
+    "diff_chars": 7621,
+    "rationale": "The patch adds a flag `_pending_upgrade` to defer any requested upgrade until the complete request has been read, ensuri",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-70487",
+    "base_pred": "benign",
+    "diff_verdict": "benign",
+    "diff_chars": 2118,
+    "rationale": "补丁通过引入 `_set_direct_model` 函数并调用它来设置 `request.state.direct` 和 `request.state.model`，并确保 `knowledge_items` 通过 `get_access",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-70488",
+    "base_pred": "abstain",
+    "diff_verdict": "benign",
+    "diff_chars": 1078,
+    "rationale": "补丁对漏洞点施加了有效防护，通过检查文件和目录是否属于当前知识库来防止未授权删除。",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-71433",
+    "base_pred": "abstain",
+    "diff_verdict": "benign",
+    "diff_chars": 8190,
+    "rationale": "The patch adds namespace validation and escaping, effectively preventing namespace prefix matching from crossing segment",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-71554",
+    "base_pred": "benign",
+    "diff_verdict": "benign",
+    "diff_chars": 585,
+    "rationale": "补丁在处理 Host 头时添加了有效防护，确保了只有一个 Host 头存在。",
+    "improved": false
+  }
+]

@@ -15,6 +15,15 @@ import semmle.python.dataflow.new.DataFlow
 import semmle.python.security.dataflow.PathInjectionCustomizations
 import semmle.python.security.dataflow.PathInjectionQuery
 
+/** 辅助目录（文档/测试/CI 脚本）——工具脚本的合法文件操作不是漏洞，排除误标。 */
+private predicate isAuxFile(DataFlow::Node n) {
+  exists(string p |
+    p = n.getLocation().getFile().getAbsolutePath() and
+    (p.matches("%/docs/%") or p.matches("%/tests/%") or p.matches("%/test/%") or
+     p.matches("%/.github/%") or p.matches("%/examples/%") or p.matches("%/scripts/%"))
+  )
+}
+
 /** A parameter named like a filesystem path, as a taint source. */
 class CpgPathSource extends PathInjection::Source {
   CpgPathSource() {
@@ -23,7 +32,11 @@ class CpgPathSource extends PathInjection::Source {
       (pn.getParameter().getName() = "path" or
        pn.getParameter().getName() = "filepath" or
        pn.getParameter().getName() = "filename" or
-       pn.getParameter().getName() = "file_path")
+       pn.getParameter().getName() = "file_path" or
+       pn.getParameter().getName() = "candidate" or
+       pn.getParameter().getName() = "directory" or
+       pn.getParameter().getName() = "abs_path") and
+      not isAuxFile(pn)
     )
   }
 }
