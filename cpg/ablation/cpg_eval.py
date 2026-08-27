@@ -154,9 +154,26 @@ def extract_taint(code_text: str, cwe: str | None, out_dir: str | Path) -> list[
     return rows
 
 
+def _read_src_lines(r: dict, fallback_text: str) -> list[str] | None:
+    """按 taint 行的 abs_path 读源码行；无路径或读取失败时回退到 code_text 拆行。
+
+    语料库模式下 code_text 可能是多文件节选拼接，行号只对该 taint 行所属文件有效，
+    故优先按 abs_path 直接读文件，避免拼接错位导致切片文本渲染出错误代码行。
+    """
+    ap = r.get("abs_path")
+    if ap:
+        try:
+            txt = Path(ap).read_text(encoding="utf-8", errors="replace")
+            return txt.splitlines()
+        except OSError:
+            pass
+    if fallback_text:
+        return fallback_text.splitlines()
+    return None
+
+
 def build_cpg_slices_text(taint_rows: list[dict], code_text: str) -> str:
-    """把结构化 taint 行渲染成可读 CPG 切片文本（供未来 LLM / 调试；非判定依据）。"""
-    lines = code_text.splitlines()
+    """把结构化 taint 行渲染成可读 CPG 切片文本（供 LLM 上下文；非判定依据）。"""
     if not taint_rows:
         return "(no untrusted input reaches a modelled sink)\n"
     out: list[str] = ["# CPG TAINT SLICE", ""]
@@ -167,8 +184,12 @@ def build_cpg_slices_text(taint_rows: list[dict], code_text: str) -> str:
             b = int(r.get("sinkLine") or 0)
         except (TypeError, ValueError):
             a = b = 0
-        src_line = lines[a - 1].strip() if 1 <= a <= len(lines) else "?"
-        sink_line = lines[b - 1].strip() if 1 <= b <= len(lines) else "?"
+        lines = _read_src_lines(r, code_text)
+        if lines is None:
+            src_line = sink_line = "?"
+        else:
+            src_line = lines[a - 1].strip() if 1 <= a <= len(lines) else "?"
+            sink_line = lines[b - 1].strip() if 1 <= b <= len(lines) else "?"
         out.append(f"### {cwe}")
         out.append(f"UNTRUSTED  L{a}: {src_line}")
         out.append(f"           ==> reaches sink at L{b}: {sink_line}")

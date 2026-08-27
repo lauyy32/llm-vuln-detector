@@ -63,5 +63,8 @@
 ## 4. 当前进度
 
 - Ollama + `qwen2.5-coder:7b` 就绪，LocalLLMScorer 集成验证可用（demo F1=1.0）。
-- A-1/A-2 均已完成：corpus 级真实污点版全量消融已跑通，LocalLLMScorer F1 由 0.000（空污点）提升至 **0.483**（真实污点），证实"上下文增强"假设；但 LLM 与确定性 CPGEvidence（F1=0.516）持平略低，"LLM 优于静态"未成立，贡献点重构为互补性。B 系列待推进。
-- 本地提交 `077b04a`（未推送，待新 PAT）。
+- A-1/A-2 均已完成：corpus 级真实污点版全量消融已跑通，LocalLLMScorer F1 由 0.000（空污点）提升至 **0.483**（真实污点），证实"上下文增强"假设；但 LLM 与确定性 CPGEvidence（F1=0.516）持平略低，"LLM 优于静态"未成立，贡献点重构为互补性。
+- A-1 实证（查漏补缺）：`taint.ql`(CWE-022)=115 行、`cwe-918.ql`(CWE-918)=10 行真实污点流，fresh re-run 可复现。已提交 `b72f15f`（本地，未推送，待新 PAT）。
+- **B-0.5（深坑修复，已完成）**：真实样本 `code_text` 曾被硬编码空串（LLM 看不到源码）→ 修复为 `_load_sample_code` 注入真实源码（taint 锚点块优先、≤6000 字符）+ `build_cpg_slices_text` 按 abs_path 读行。同时发现并治理 2 个污染样本（69248/69249，Rust 修复、Python 侧 diff=0），harness 新增 `--exclude-cves`。
+- **干净版消融（28 样本）**：LocalLLMScorer F1=**0.462**、CPGEvidence F1=0.480——LLM 与确定性解析器基本打平（差 0.018），仍未证明独有优势。
+- **B-2 实证素材已找到**：CVE-2026-53505（thumbor CWE-400）——无 taint 证据，CPGEvidence 判 benign（错），LLM 语义推理判 vulnerable（对），rationale 实证。这是"确定性解析器必然失败、LLM 语义成功"的天然样本；LLM 另有 4 个独错（3 个诚实 abstain）。B-2 下一步：按 53505 模式扩展逻辑型无流样本对照，坐实 LLM 独特价值。

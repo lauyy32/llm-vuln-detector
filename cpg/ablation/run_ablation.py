@@ -97,6 +97,91 @@ def _taint_row_in_prefix(row: dict, prefix: str) -> bool:
     return f"/{prefix}/" in p
 
 
+def _load_sample_code(prefix: str, taint_rows: list[dict], max_chars: int = 6000) -> str:
+    """从 ``corpus_src/<prefix>/`` 读取真实源码节选，作为 code_text 注入 LLM 上下文。
+
+    语料库模式下样本源码落在 ``corpus_src/<cve>_<version>/``；此前 harness 把真实样本
+    的 ``code_text`` 置空串，导致 LLM 在真实 CVE 上看不到任何源码，仅靠 taint 占位文本
+    与公告摘要盲判。此函数按「taint 锚点优先 + 窗口截断」选取对判定最有价值的节选：
+
+    * taint 命中的文件：把每个 source/sink 行号展开为锚点区间（sink±60 / source±40），
+      合并重叠区间后**按命中行数降序**输出——保证 sink 附近（含安全包装、守卫等判定
+      关键上下文）优先进入文本，而非简单取大窗口开头（大窗口会因 6000 字符截断
+      丢掉 sink 之后的安全 wrapper 定义，导致 LLM 误判）；
+    * 其余 ``.py`` 文件：取头部前 100 行（通常含入口 / import / 配置上下文）；
+    * 总量受 ``max_chars`` 约束（与 LocalLLMScorer 的 ``code_text[:6000]`` 对齐），
+      文件/区间间以 ``# ===== FILE: <basename> (L<lo>-L<hi>) =====`` 分隔标注。
+
+    切片文本的行号经 ``cpg_eval._read_src_lines`` 按 abs_path 独立读取，不受节选影响。
+    """
+    root = CORPUS_SRC / prefix
+    if not root.is_dir():
+        return ""
+    hit_paths: dict[str, list[tuple[int, int]]] = {}
+    root_str = str(root).replace("\\", "/") + "/"
+    for r in taint_rows:
+        ap = (r.get("abs_path") or "").replace("\\", "/")
+        if ap.startswith(root_str):
+            try:
+                a = int(r.get("sourceLine") or 0)
+                b = int(r.get("sinkLine") or 0)
+            except (TypeError, ValueError):
+                a = b = 0
+            hit_paths.setdefault(ap, []).append((a, b))
+    py_files = sorted(
+        (p for p in root.rglob("*.py") if p.is_file()),
+        key=lambda p: (p.resolve().as_posix() not in hit_paths, p.stat().st_size),
+    )
+    # 候选块：(优先级, 起始行, 结束行, 文件, 行列表)。命中文件块 prio=0 且按命中
+    # 行数降序，非命中文件块 prio=1。
+    blocks: list[tuple[int, int, int, Path, list[str]]] = []
+    for p in py_files:
+        try:
+            lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+        except OSError:
+            continue
+        if not lines:
+            continue
+        ap = p.resolve().as_posix()
+        ab = [x for x in hit_paths.get(ap, []) if x[0] and x[1]]
+        if ab:
+            spans: list[tuple[int, int]] = []
+            for a, b in ab:
+                spans.append((max(1, b - 60), min(len(lines), b + 60)))
+                spans.append((max(1, a - 30), min(len(lines), a + 60)))
+            spans.sort()
+            merged: list[list[int]] = []
+            for lo, hi in spans:
+                if merged and lo <= merged[-1][1] + 20:
+                    merged[-1][1] = max(merged[-1][1], hi)
+                else:
+                    merged.append([lo, hi])
+            # 命中行数（区间内 source/sink 锚点计数）降序 → 判定关键上下文优先
+            scored = []
+            for lo, hi in merged:
+                n_hit = sum(1 for (a, b) in ab
+                            if (lo <= a <= hi) or (lo <= b <= hi))
+                scored.append((n_hit, lo, hi))
+            scored.sort(key=lambda x: (-x[0], x[1]))
+            for n_hit, lo, hi in scored:
+                blocks.append((0, lo, hi, p, lines))
+        else:
+            blocks.append((1, 1, min(100, len(lines)), p, lines))
+    blocks.sort(key=lambda b: (b[0], b[1]))
+    parts: list[str] = []
+    used = 0
+    for _prio, lo, hi, p, lines in blocks:
+        text = f"# ===== FILE: {p.name} (L{lo}-L{hi}) =====\n" + "\n".join(lines[lo - 1:hi])
+        if used + len(text) > max_chars:
+            remain = max_chars - used
+            if remain > 200:
+                parts.append(text[:remain] + "\n# (truncated)")
+            break
+        parts.append(text)
+        used += len(text) + 1
+    return "\n".join(parts)
+
+
 def load_demo_samples() -> list[dict]:
     samples: list[dict] = []
     for f in sorted(SAMPLES_DIR.glob("*.py")):
@@ -228,6 +313,8 @@ def md_table(headers: list[str], rows: list[list]) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--limit", type=int, default=None, help="只跑前 N 条 dataset 样本（仅真实模式）")
+    ap.add_argument("--exclude-cves", type=str, default="",
+                    help="逗号分隔的 CVE 列表，从真实模式中剔除（如跨语言修复样本，Python 侧不可判定）")
     ap.add_argument("--demo", action="store_true", help="复用 sample_db + taint.csv 跑 cpg/samples（验证聚合）")
     ap.add_argument("--skip-baseline", action="store_true", help="跳过 CodeQL 基线（仅跑结构化启发式，提速）")
     ap.add_argument("--with-local-llm", action="store_true",
@@ -241,6 +328,11 @@ def main() -> int:
     else:
         # 真实模式：语料库级单数据库（建库一次 + 6 次 taint 查询 + 1 次 analyze）
         rows = _load_dataset_rows(args.limit)
+        if args.exclude_cves:
+            excluded = {c.strip() for c in args.exclude_cves.split(",") if c.strip()}
+            kept = [r for r in rows if (r.get("cve_id") or "") not in excluded]
+            print(f"[info] --exclude-cves: 剔除 {len(rows) - len(kept)} 条（{sorted(excluded)}），保留 {len(kept)} 条")
+            rows = kept
         try:
             _db, _staged, _taint, _sarif = build_corpus_db(rows, skip_baseline=args.skip_baseline)
         except RuntimeError as exc:
@@ -306,6 +398,10 @@ def main() -> int:
             # 真实：语料库级单数据库，按样本前缀过滤 taint 行；baseline 按前缀过滤 SARIF
             prefix = s.get("prefix")
             taint_rows = [r for r in corpus["taint"] if _taint_row_in_prefix(r, prefix)]
+            # B-0.5：注入真实源码节选（此前 code_text 恒为空串，LLM 在真实样本上看不到源码；
+            # 三模式共享同一 code_text，只构造一次）
+            if not s.get("code_text"):
+                s["code_text"] = _load_sample_code(prefix, taint_rows)
             wd = None
             db_path = corpus["db"]
             sample_file = None
