@@ -67,4 +67,6 @@
 - A-1 实证（查漏补缺）：`taint.ql`(CWE-022)=115 行、`cwe-918.ql`(CWE-918)=10 行真实污点流，fresh re-run 可复现。已提交 `b72f15f`（本地，未推送，待新 PAT）。
 - **B-0.5（深坑修复，已完成）**：真实样本 `code_text` 曾被硬编码空串（LLM 看不到源码）→ 修复为 `_load_sample_code` 注入真实源码（taint 锚点块优先、≤6000 字符）+ `build_cpg_slices_text` 按 abs_path 读行。同时发现并治理 2 个污染样本（69248/69249，Rust 修复、Python 侧 diff=0），harness 新增 `--exclude-cves`。
 - **干净版消融（28 样本）**：LocalLLMScorer F1=**0.462**、CPGEvidence F1=0.480——LLM 与确定性解析器基本打平（差 0.018），仍未证明独有优势。
-- **B-2 实证素材已找到**：CVE-2026-53505（thumbor CWE-400）——无 taint 证据，CPGEvidence 判 benign（错），LLM 语义推理判 vulnerable（对），rationale 实证。这是"确定性解析器必然失败、LLM 语义成功"的天然样本；LLM 另有 4 个独错（3 个诚实 abstain）。B-2 下一步：按 53505 模式扩展逻辑型无流样本对照，坐实 LLM 独特价值。
+- **B-2 实证素材已找到**：CVE-2026-53505（thumbor CWE-400）——无 taint 证据，CPGEvidence 判 benign（错），LLM 语义推理判 vulnerable（对），rationale 实证。这是"确定性解析器必然失败、LLM 语义成功"的天然样本；LLM 另有 4 个独错（3 个诚实 abstain）。
+- **A 系列迭代（已完成）**：新增 `tarslip.ql`（复用官方 TarSlipFlow），覆盖 CWE-022 的 tar 提取子类（PathInjection 只认 open 类 sink，extractall/extract 此前失明）；corpus DB 实测命中 50558 的 2 行真实流（vuln 无守卫 extractall / fixed safe wrapper 内 guarded extractall）。同时修复 `_load_sample_code` 锚点排序 bug（sink 密集区间被 6000 字符截断挤出，安全包装定义丢失）。
+- **含 TarSlip 证据干净消融（28 样本）**：**LocalLLMScorer F1=0.500（P=0.500 R=0.500），首次追平反超 CPGEvidence（F1=0.480）**；taint 子集三者并列 0.600；**logic 子集 LLM 0.444 首次反超 CPGEvidence 0.400**。改善来自 67435_vuln（abstain→vulnerable，带摘要稳定可复现）。注：样本量小（1-2 样本差异），需多 seed 验证；7B 在复杂语义（TarSlip 安全包装识别）上仍失败，14B 因 17GB RAM 受限列为 future work。

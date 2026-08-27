@@ -48,6 +48,7 @@ DEFAULT_JAVA_HOME = r"C:/Program Files/Java/jdk-21.0.1"
 # ---------------------------------------------------------------------------
 CWE_TAINT_QUERIES = (
     ("CWE-022", "taint"),     # queries/taint.ql       -> PathInjectionFlow
+    ("CWE-022", "tarslip"),   # queries/tarslip.ql     -> TarSlipFlow（extractall/extract 提取）
     ("CWE-089", "cwe-089"),   # SqlInjectionFlow
     ("CWE-078", "cwe-078"),   # CommandInjectionFlow
     ("CWE-094", "cwe-094"),   # CodeInjectionFlow

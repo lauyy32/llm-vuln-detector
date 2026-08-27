@@ -167,7 +167,10 @@ def _load_sample_code(prefix: str, taint_rows: list[dict], max_chars: int = 6000
                 blocks.append((0, lo, hi, p, lines))
         else:
             blocks.append((1, 1, min(100, len(lines)), p, lines))
-    blocks.sort(key=lambda b: (b[0], b[1]))
+    # 稳定排序（key 仅 prio）：命中文件块（prio=0）整体优先于非命中文件（prio=1）；
+    # 同文件多块保持构造时的命中数降序（不能用起始行二次排序，会把 sink 密集区间
+    # 挤到 6000 字符截断之外，导致安全包装定义丢失）。
+    blocks.sort(key=lambda b: b[0])
     parts: list[str] = []
     used = 0
     for _prio, lo, hi, p, lines in blocks:
