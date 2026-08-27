@@ -268,7 +268,7 @@ def main() -> int:
 
     # 本地 LLM 评分器（可选）：仅当 --with-local-llm 且本机 Ollama 实际可达时纳入；
     # 否则不计入，避免一列全 abstain 干扰指标。
-    local_llm = LocalLLMScorer()
+    local_llm = LocalLLMScorer(timeout=600)
     local_llm_enabled = bool(args.with_local_llm) and local_llm.reachable()
     if args.with_local_llm and not local_llm_enabled:
         print("[warn] --with-local-llm set but Ollama unreachable; LocalLLMScorer disabled")

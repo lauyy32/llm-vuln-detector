@@ -1,6 +1,6 @@
 # 三模式上下文消融实验 - 结果汇总
 
-- 生成时间: 2026-08-27 10:07 UTC
+- 生成时间: 2026-08-18 14:31 UTC
 - 数据来源: dataset.jsonl (真实 CVE)
 - 样本版本数: 32  (vuln=正例 / fixed=负例)
 - 跳过基线: False
@@ -24,9 +24,6 @@
 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
-| LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
-| LocalLLMScorer | code | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
-| LocalLLMScorer | both | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 
 ## 分组指标（可污点类 vs 逻辑类）
 
@@ -44,9 +41,6 @@
 | taint | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 8 |
 | taint | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 8 |
 | taint | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 8 |
-| taint | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 8 |
-| taint | LocalLLMScorer | code | 0.000 | 0.000 | 0.000 | 8 |
-| taint | LocalLLMScorer | both | 0.000 | 0.000 | 0.000 | 8 |
 | logic | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 24 |
 | logic | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 24 |
 | logic | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 24 |
@@ -59,9 +53,6 @@
 | logic | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 24 |
 | logic | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 24 |
 | logic | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 24 |
-| logic | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 24 |
-| logic | LocalLLMScorer | code | 0.000 | 0.000 | 0.000 | 24 |
-| logic | LocalLLMScorer | both | 0.000 | 0.000 | 0.000 | 24 |
 
 ## 每 CWE 指标（StructuralHeuristic / ConfigSig / CPGEvidence）
 
@@ -194,14 +185,6 @@
 | error | 0 | 0 | 0 | 0 |
 
 ### CPGEvidenceScorer
-| predicted \ truth | vulnerable | benign | abstain | error |
-| --- | --- | --- | --- | --- |
-| vulnerable | 0 | 0 | 0 | 0 |
-| benign | 32 | 32 | 0 | 0 |
-| abstain | 16 | 16 | 0 | 0 |
-| error | 0 | 0 | 0 | 0 |
-
-### LocalLLMScorer
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
 | vulnerable | 0 | 0 | 0 | 0 |
