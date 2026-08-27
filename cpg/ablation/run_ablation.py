@@ -318,6 +318,10 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=None, help="只跑前 N 条 dataset 样本（仅真实模式）")
     ap.add_argument("--exclude-cves", type=str, default="",
                     help="逗号分隔的 CVE 列表，从真实模式中剔除（如跨语言修复样本，Python 侧不可判定）")
+    ap.add_argument("--no-taint", action="store_true",
+                    help="禁用 CPG taint 注入（cpg_slices=None、taint_rows=[]），隔离「源码」与「CPG 证据」的增益")
+    ap.add_argument("--no-code", action="store_true",
+                    help="禁用源码注入（code_text 置空，仅保留摘要 + taint），隔离「源码」增益")
     ap.add_argument("--demo", action="store_true", help="复用 sample_db + taint.csv 跑 cpg/samples（验证聚合）")
     ap.add_argument("--skip-baseline", action="store_true", help="跳过 CodeQL 基线（仅跑结构化启发式，提速）")
     ap.add_argument("--with-local-llm", action="store_true",
@@ -402,8 +406,8 @@ def main() -> int:
             prefix = s.get("prefix")
             taint_rows = [r for r in corpus["taint"] if _taint_row_in_prefix(r, prefix)]
             # B-0.5：注入真实源码节选（此前 code_text 恒为空串，LLM 在真实样本上看不到源码；
-            # 三模式共享同一 code_text，只构造一次）
-            if not s.get("code_text"):
+            # 三模式共享同一 code_text，只构造一次）。--no-code 时保持空串，隔离源码增益。
+            if not s.get("code_text") and not args.no_code:
                 s["code_text"] = _load_sample_code(prefix, taint_rows)
             wd = None
             db_path = corpus["db"]
@@ -412,9 +416,15 @@ def main() -> int:
 
         # 三模式
         for mode in MODES:
-            ctx = build_context(mode, s, workdir=wd, taint_rows=taint_rows)
+            # --no-taint：隔离 CPG 增益。taint_rows 置空 + cpg_slices 显式 None，
+            # 使 LLM / 确定性 scorer 均不消费 CPG 污点证据（仅源码 + 摘要）。
+            effective_taint = [] if args.no_taint else taint_rows
+            ctx_kwargs = {"workdir": wd, "taint_rows": effective_taint}
+            if args.no_taint:
+                ctx_kwargs["cpg_slices"] = None
+            ctx = build_context(mode, s, **ctx_kwargs)
             # 结构化启发式（吃注入的 taint_rows；request 模式 cpg_slices=None → 显式 abstain）
-            v_sh = StructuralHeuristicScorer(taint_rows=taint_rows).score(ctx)
+            v_sh = StructuralHeuristicScorer(taint_rows=effective_taint).score(ctx)
             records.append((sid, s["version"], mode, "StructuralHeuristicScorer",
                             v_sh.label, s["truth"], v_sh.cwe, cwe, group))
             # CodeQL 官方基线：demo 逐样本跑 analyze；真实按前缀过滤已建好的 corpus SARIF；

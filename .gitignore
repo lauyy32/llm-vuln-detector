@@ -49,3 +49,6 @@ backend/tests/reports/
 
 # Ablation temp artifacts (SARIF, per-sample DB scratch, validation scripts)
 cpg/ablation/.work/
+
+# 多 seed 消融产物（可本地重建）
+cpg/ablation/seeds/
