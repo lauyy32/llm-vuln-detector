@@ -1,6 +1,6 @@
 # 三模式上下文消融实验 - 结果汇总
 
-- 生成时间: 2026-08-27 13:19 UTC
+- 生成时间: 2026-08-27 10:07 UTC
 - 数据来源: dataset.jsonl (真实 CVE)
 - 样本版本数: 32  (vuln=正例 / fixed=负例)
 - 跳过基线: False
@@ -13,8 +13,8 @@
 | scorer | mode | P | R | F1 | support | TP | FP | TN | FN |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
-| StructuralHeuristicScorer | code | 0.500 | 0.188 | 0.273 | 32 | 3 | 3 | 13 | 13 |
-| StructuralHeuristicScorer | both | 0.500 | 0.188 | 0.273 | 32 | 3 | 3 | 13 | 13 |
+| StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
+| StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 | CodeQLBaselineScorer | request | 0.500 | 0.062 | 0.111 | 32 | 1 | 1 | 15 | 15 |
 | CodeQLBaselineScorer | code | 0.500 | 0.062 | 0.111 | 32 | 1 | 1 | 15 | 15 |
 | CodeQLBaselineScorer | both | 0.500 | 0.062 | 0.111 | 32 | 1 | 1 | 15 | 15 |
@@ -22,19 +22,19 @@
 | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
-| CPGEvidenceScorer | code | 0.533 | 0.500 | 0.516 | 32 | 8 | 7 | 9 | 8 |
-| CPGEvidenceScorer | both | 0.533 | 0.500 | 0.516 | 32 | 8 | 7 | 9 | 8 |
+| CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
+| CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
-| LocalLLMScorer | code | 0.538 | 0.438 | 0.483 | 32 | 7 | 6 | 10 | 9 |
-| LocalLLMScorer | both | 0.538 | 0.438 | 0.483 | 32 | 7 | 6 | 10 | 9 |
+| LocalLLMScorer | code | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
+| LocalLLMScorer | both | 0.000 | 0.000 | 0.000 | 32 | 0 | 0 | 16 | 16 |
 
 ## 分组指标（可污点类 vs 逻辑类）
 
 | group | scorer | mode | P | R | F1 | support |
 | --- | --- | --- | --- | --- | --- | --- |
 | taint | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 8 |
-| taint | StructuralHeuristicScorer | code | 0.500 | 0.750 | 0.600 | 8 |
-| taint | StructuralHeuristicScorer | both | 0.500 | 0.750 | 0.600 | 8 |
+| taint | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 8 |
+| taint | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 8 |
 | taint | CodeQLBaselineScorer | request | 0.500 | 0.250 | 0.333 | 8 |
 | taint | CodeQLBaselineScorer | code | 0.500 | 0.250 | 0.333 | 8 |
 | taint | CodeQLBaselineScorer | both | 0.500 | 0.250 | 0.333 | 8 |
@@ -42,11 +42,11 @@
 | taint | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 8 |
 | taint | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 8 |
 | taint | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 8 |
-| taint | CPGEvidenceScorer | code | 0.500 | 0.750 | 0.600 | 8 |
-| taint | CPGEvidenceScorer | both | 0.500 | 0.750 | 0.600 | 8 |
+| taint | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 8 |
+| taint | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 8 |
 | taint | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 8 |
-| taint | LocalLLMScorer | code | 0.500 | 0.750 | 0.600 | 8 |
-| taint | LocalLLMScorer | both | 0.500 | 0.750 | 0.600 | 8 |
+| taint | LocalLLMScorer | code | 0.000 | 0.000 | 0.000 | 8 |
+| taint | LocalLLMScorer | both | 0.000 | 0.000 | 0.000 | 8 |
 | logic | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 24 |
 | logic | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 24 |
 | logic | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 24 |
@@ -57,11 +57,11 @@
 | logic | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 24 |
 | logic | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 24 |
 | logic | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 24 |
-| logic | CPGEvidenceScorer | code | 0.556 | 0.417 | 0.476 | 24 |
-| logic | CPGEvidenceScorer | both | 0.556 | 0.417 | 0.476 | 24 |
+| logic | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 24 |
+| logic | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 24 |
 | logic | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 24 |
-| logic | LocalLLMScorer | code | 0.571 | 0.333 | 0.421 | 24 |
-| logic | LocalLLMScorer | both | 0.571 | 0.333 | 0.421 | 24 |
+| logic | LocalLLMScorer | code | 0.000 | 0.000 | 0.000 | 24 |
+| logic | LocalLLMScorer | both | 0.000 | 0.000 | 0.000 | 24 |
 
 ## 每 CWE 指标（StructuralHeuristic / ConfigSig / CPGEvidence）
 
@@ -71,8 +71,8 @@
 | CWE-020 | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-020 | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-022 | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 6 |
-| CWE-022 | StructuralHeuristicScorer | code | 0.500 | 0.667 | 0.571 | 6 |
-| CWE-022 | StructuralHeuristicScorer | both | 0.500 | 0.667 | 0.571 | 6 |
+| CWE-022 | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 6 |
+| CWE-022 | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 6 |
 | CWE-059 | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-059 | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-059 | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 2 |
@@ -98,8 +98,8 @@
 | CWE-863 | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-863 | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-918 | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-918 | StructuralHeuristicScorer | code | 0.500 | 1.000 | 0.667 | 2 |
-| CWE-918 | StructuralHeuristicScorer | both | 0.500 | 1.000 | 0.667 | 2 |
+| CWE-918 | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-918 | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-020 | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-020 | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-020 | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 2 |
@@ -137,20 +137,20 @@
 | CWE-020 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-020 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-022 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 6 |
-| CWE-022 | CPGEvidenceScorer | code | 0.500 | 0.667 | 0.571 | 6 |
-| CWE-022 | CPGEvidenceScorer | both | 0.500 | 0.667 | 0.571 | 6 |
+| CWE-022 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 6 |
+| CWE-022 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 6 |
 | CWE-059 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-059 | CPGEvidenceScorer | code | 0.500 | 1.000 | 0.667 | 2 |
-| CWE-059 | CPGEvidenceScorer | both | 0.500 | 1.000 | 0.667 | 2 |
+| CWE-059 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-059 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-200 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 4 |
-| CWE-200 | CPGEvidenceScorer | code | 1.000 | 0.500 | 0.667 | 4 |
-| CWE-200 | CPGEvidenceScorer | both | 1.000 | 0.500 | 0.667 | 4 |
+| CWE-200 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-200 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-295 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-295 | CPGEvidenceScorer | code | 0.500 | 1.000 | 0.667 | 2 |
-| CWE-295 | CPGEvidenceScorer | both | 0.500 | 1.000 | 0.667 | 2 |
+| CWE-295 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-295 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-400 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 4 |
-| CWE-400 | CPGEvidenceScorer | code | 0.500 | 0.500 | 0.500 | 4 |
-| CWE-400 | CPGEvidenceScorer | both | 0.500 | 0.500 | 0.500 | 4 |
+| CWE-400 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 4 |
+| CWE-400 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 4 |
@@ -161,19 +161,19 @@
 | CWE-862 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-862 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-863 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-863 | CPGEvidenceScorer | code | 0.500 | 1.000 | 0.667 | 2 |
-| CWE-863 | CPGEvidenceScorer | both | 0.500 | 1.000 | 0.667 | 2 |
+| CWE-863 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-863 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-918 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-918 | CPGEvidenceScorer | code | 0.500 | 1.000 | 0.667 | 2 |
-| CWE-918 | CPGEvidenceScorer | both | 0.500 | 1.000 | 0.667 | 2 |
+| CWE-918 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
+| CWE-918 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 
 ## 混淆矩阵（全局，行=预测 / 列=真值）
 
 ### StructuralHeuristicScorer
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
-| vulnerable | 6 | 6 | 0 | 0 |
-| benign | 26 | 26 | 0 | 0 |
+| vulnerable | 0 | 0 | 0 | 0 |
+| benign | 32 | 32 | 0 | 0 |
 | abstain | 16 | 16 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
 
@@ -196,15 +196,15 @@
 ### CPGEvidenceScorer
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
-| vulnerable | 16 | 14 | 0 | 0 |
-| benign | 16 | 18 | 0 | 0 |
+| vulnerable | 0 | 0 | 0 | 0 |
+| benign | 32 | 32 | 0 | 0 |
 | abstain | 16 | 16 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
 
 ### LocalLLMScorer
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
-| vulnerable | 14 | 12 | 0 | 0 |
-| benign | 16 | 18 | 0 | 0 |
-| abstain | 18 | 18 | 0 | 0 |
+| vulnerable | 0 | 0 | 0 | 0 |
+| benign | 32 | 32 | 0 | 0 |
+| abstain | 16 | 16 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
