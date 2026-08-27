@@ -1,6 +1,6 @@
 # 三模式上下文消融实验 - 结果汇总
 
-- 生成时间: 2026-08-27 14:53 UTC
+- 生成时间: 2026-08-27 14:42 UTC
 - 数据来源: dataset.jsonl (真实 CVE)
 - 样本版本数: 28  (vuln=正例 / fixed=负例)
 - 跳过基线: False
@@ -25,8 +25,8 @@
 | CPGEvidenceScorer | code | 0.545 | 0.429 | 0.480 | 28 | 6 | 5 | 9 | 8 |
 | CPGEvidenceScorer | both | 0.545 | 0.429 | 0.480 | 28 | 6 | 5 | 9 | 8 |
 | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 28 | 0 | 0 | 14 | 14 |
-| LocalLLMScorer | code | 0.538 | 0.500 | 0.519 | 28 | 7 | 6 | 8 | 7 |
-| LocalLLMScorer | both | 0.538 | 0.500 | 0.519 | 28 | 7 | 6 | 8 | 7 |
+| LocalLLMScorer | code | 0.500 | 0.500 | 0.500 | 28 | 7 | 7 | 7 | 7 |
+| LocalLLMScorer | both | 0.500 | 0.500 | 0.500 | 28 | 7 | 7 | 7 | 7 |
 
 ## 分组指标（可污点类 vs 逻辑类）
 
@@ -60,8 +60,8 @@
 | logic | CPGEvidenceScorer | code | 0.600 | 0.300 | 0.400 | 20 |
 | logic | CPGEvidenceScorer | both | 0.600 | 0.300 | 0.400 | 20 |
 | logic | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 20 |
-| logic | LocalLLMScorer | code | 0.571 | 0.400 | 0.471 | 20 |
-| logic | LocalLLMScorer | both | 0.571 | 0.400 | 0.471 | 20 |
+| logic | LocalLLMScorer | code | 0.500 | 0.400 | 0.444 | 20 |
+| logic | LocalLLMScorer | both | 0.500 | 0.400 | 0.444 | 20 |
 
 ## 每 CWE 指标（StructuralHeuristic / ConfigSig / CPGEvidence）
 
@@ -195,7 +195,7 @@
 ### LocalLLMScorer
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
-| vulnerable | 14 | 12 | 0 | 0 |
-| benign | 6 | 9 | 0 | 0 |
-| abstain | 22 | 21 | 0 | 0 |
+| vulnerable | 14 | 14 | 0 | 0 |
+| benign | 10 | 10 | 0 | 0 |
+| abstain | 18 | 18 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
