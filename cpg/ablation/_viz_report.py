@@ -3,7 +3,7 @@ import csv
 import json
 from pathlib import Path
 
-ROOT = Path("C:/Users/lenovo/WorkBuddy/2026-07-21-16-16-43/llm-vuln-detector")
+ROOT = Path(__file__).resolve().parent.parent.parent
 
 # ---------- 数据聚合 ----------
 # 1) 36 版本主消融（A 设置，code 模式）

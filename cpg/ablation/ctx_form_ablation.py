@@ -11,7 +11,7 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path("C:/Users/lenovo/WorkBuddy/2026-07-21-16-16-43/llm-vuln-detector")
+ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
 from cpg.ablation.run_ablation import _load_dataset_rows, _load_sample_code

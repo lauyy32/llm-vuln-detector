@@ -333,6 +333,8 @@ def main() -> int:
     ap.add_argument("--with-local-llm", action="store_true",
                     help="纳入 LocalLLMScorer（需本机 Ollama + 模型已拉取；不可达时自动 abstain）")
     ap.add_argument("--llm-model", type=str, default=None, help="本地 LLM 模型名（默认 qwen2.5-coder:7b，模型规模消融用）")
+    ap.add_argument("--seed", type=int, default=None,
+                    help="Ollama 采样 seed（temperature=0 下结果确定，此参数显式声明以满足可复现审计）")
     ap.add_argument("--out-dir", type=Path, default=ABLATION_DIR)
     args = ap.parse_args()
 
@@ -388,7 +390,8 @@ def main() -> int:
     # raw_log：每次 LLM 调用的完整 prompt+响应落盘 JSONL（可复现性审计，P0-3）。
     local_llm = LocalLLMScorer(model=getattr(args, "llm_model", None) or "qwen2.5-coder:7b",
                                timeout=600,
-                               raw_log=args.out_dir / "raw_llm_responses.jsonl")
+                               raw_log=args.out_dir / "raw_llm_responses.jsonl",
+                               seed=args.seed)
     local_llm_enabled = bool(args.with_local_llm) and local_llm.reachable()
     if args.with_local_llm and not local_llm_enabled:
         print("[warn] --with-local-llm set but Ollama unreachable; LocalLLMScorer disabled")

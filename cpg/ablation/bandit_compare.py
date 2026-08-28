@@ -6,9 +6,16 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path("C:/Users/lenovo/WorkBuddy/2026-07-21-16-16-43/llm-vuln-detector")
-BANDIT = "C:/Users/lenovo/.workbuddy/binaries/python/envs/default/Scripts/bandit.exe"
-SRC = Path("C:/Users/lenovo/cpg_db/corpus_src")
+# 仓库根引导：脚本直跑时 sys.path[0]=cpg/ablation，须先把仓库根加入才能 `import cpg.ablation.config`
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from cpg.ablation import config
+
+ROOT = config.REPO_ROOT
+BANDIT = str(config.BANDIT_EXE)
+SRC = config.CORPUS_SRC
 
 # 排除污染样本与提取不完整样本
 EXCLUDE = {"CVE-2026-69248", "CVE-2026-69249", "CVE-2026-55419"}

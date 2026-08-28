@@ -42,13 +42,14 @@ def _rmtree_manual(path) -> None:
             os.remove(entry.path)
     os.rmdir(p)
 
-# 语料库级临时产物统一落在已加入 Windows Defender 排除项的 ``C:/Users/lenovo/cpg_db``
-# 之下，规避 CodeQL TRAP 缓存被 Defender 锁死（此前 sample_db 已验证该目录可跑通建库
+# 语料库级临时产物统一落在已加入 Windows Defender 排除项的 DATA_ROOT
+# （默认 ``C:/Users/lenovo/cpg_db``，可用环境变量 CPG_DATA_ROOT 覆盖）之下，
+# 规避 CodeQL TRAP 缓存被 Defender 锁死（此前 sample_db 已验证该目录可跑通建库
 # + taint 查询 + analyze）。产物均为可重建中间文件，不进入版本库。
 CORPUS_PAIRS = config.CPG_DIR / "corpus_pairs"
-CORPUS_SRC = Path("C:/Users/lenovo/cpg_db/corpus_src")
-CORPUS_DB = Path("C:/Users/lenovo/cpg_db/corpus_db")
-CORPUS_SARIF = Path("C:/Users/lenovo/cpg_db/corpus_baseline.sarif")
+CORPUS_SRC = config.CORPUS_SRC
+CORPUS_DB = config.CORPUS_DB
+CORPUS_SARIF = config.CORPUS_SARIF
 
 # 大库（真实仓库多文件）建库 / analyze 给足墙钟余量
 DB_TIMEOUT = 900

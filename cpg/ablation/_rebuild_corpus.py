@@ -1,7 +1,8 @@
 """T3：重建 corpus DB（含新样本）+ 重跑 taint + analyze。"""
 import sys
+from pathlib import Path
 
-sys.path.insert(0, "C:/Users/lenovo/WorkBuddy/2026-07-21-16-16-43/llm-vuln-detector")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from cpg.ablation.corpus_db import build_corpus_db
 from cpg.ablation.run_ablation import _load_dataset_rows

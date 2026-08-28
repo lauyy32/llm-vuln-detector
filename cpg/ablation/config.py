@@ -27,14 +27,33 @@ CODEQL_EXE = CPG_DIR / "codeql" / ("codeql.exe" if os.name == "nt" else "codeql"
 CODEQL_QUERIES_DIR = CPG_DIR / "codeql-queries"   # 自定义 cpg 查询（含 qlpack.yml）
 QUERIES_DIR = CPG_DIR / "queries"                 # taint.ql / cwe-XXX.ql
 
+# 外部数据根（DB / 语料源 / SARIF）——单点配置，避免跨脚本硬编码。
+# 默认落在已加入 Windows Defender 排除项的短路径；可用环境变量 CPG_DATA_ROOT 覆盖。
+_DATA_ROOT_DEFAULT = Path(os.environ.get("CPG_DATA_ROOT", "C:/Users/lenovo/cpg_db"))
+DATA_ROOT = _DATA_ROOT_DEFAULT if _DATA_ROOT_DEFAULT.is_absolute() else _DATA_ROOT_DEFAULT
+
 # 已建好的复用资源（Dry-run A 直接复用，不重建）
-DEMO_DB = Path("C:/Users/lenovo/cpg_db/sample_db")
+DEMO_DB = DATA_ROOT / "sample_db"
 DEMO_TAINT_CSV = CPG_DIR / "output_demo" / "taint.csv"
 SAMPLES_DIR = CPG_DIR / "samples"
 DATASET_JSONL = CPG_DIR / "dataset.jsonl"
 RESULTS_CSV = ABLATION_DIR / "results.csv"
 SUMMARY_MD = ABLATION_DIR / "summary.md"
 WORK_DIR = ABLATION_DIR / ".work"          # 真实样本临时 DB / taint 产物
+
+# 语料库级产物（corpus_db.py 引用；单点定义，脚本间共享）
+CORPUS_SRC = DATA_ROOT / "corpus_src"
+CORPUS_DB = DATA_ROOT / "corpus_db"
+CORPUS_SARIF = DATA_ROOT / "corpus_baseline.sarif"
+
+# Bandit 可执行文件（P1 工具对比用；环境变量 BANDIT_EXE 可覆盖）
+BANDIT_EXE = Path(os.environ.get(
+    "BANDIT_EXE",
+    "C:/Users/lenovo/.workbuddy/binaries/python/envs/default/Scripts/bandit.exe",
+))
+
+# Ollama 服务地址（LocalLLMScorer 默认值同源）
+OLLAMA_BASE = os.environ.get("OLLAMA_BASE", "http://localhost:11434")
 
 # ---------------------------------------------------------------------------
 # Java / CodeQL 运行环境

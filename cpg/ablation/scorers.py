@@ -181,14 +181,16 @@ class LocalLLMScorer(Scorer):
     """
 
     name = "LocalLLMScorer"
-    DEFAULT_BASE = "http://localhost:11434"
+    DEFAULT_BASE = config.OLLAMA_BASE  # 与 config.OLLAMA_BASE 同源（可环境变量覆盖）
 
     def __init__(self, model: str = "qwen2.5-coder:7b", base_url: str = DEFAULT_BASE,
-                 timeout: float = 120.0, raw_log: str | Path | None = None):
+                 timeout: float = 120.0, raw_log: str | Path | None = None,
+                 seed: int | None = None):
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.raw_log = Path(raw_log) if raw_log else None  # LLM 原始响应落盘（可复现性）
+        self.seed = seed  # Ollama 采样 seed（temperature=0 时仍显式声明，满足可复现审计）
         self._reachable: bool | None = None  # 懒检测缓存
 
     # ---- 可用性探测 ----
@@ -251,13 +253,16 @@ class LocalLLMScorer(Scorer):
 
     # ---- 调用 ----
     def _generate(self, prompt: str) -> str:
+        options: dict = {"temperature": 0}
+        if self.seed is not None:
+            options["seed"] = self.seed
         payload = json.dumps(
             {
                 "model": self.model,
                 "prompt": prompt,
                 "system": self.SYSTEM,
                 "stream": False,
-                "options": {"temperature": 0},
+                "options": options,
             }
         ).encode("utf-8")
         req = urllib.request.Request(
@@ -300,6 +305,8 @@ class LocalLLMScorer(Scorer):
                 "mode": "request" if (ctx.cpg_slices is None and not ctx.code_text) else
                         ("both" if ctx.request_info else "code"),
                 "model": self.model,
+                "seed": self.seed,
+                "temperature": 0,
                 "prompt": prompt,
                 "raw_response": raw,
             }
