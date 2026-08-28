@@ -1,8 +1,8 @@
 # 三模式上下文消融实验 - 结果汇总
 
-- 生成时间: 2026-08-28 04:05 UTC
+- 生成时间: 2026-08-28 04:20 UTC
 - 数据来源: dataset.jsonl (真实 CVE)
-- 样本版本数: 38  (vuln=正例 / fixed=负例)
+- 样本版本数: 36  (vuln=正例 / fixed=负例)
 - 跳过基线: False
 - CodeQL: 2.26.2  python Security/CWE 定向查询（覆盖数据集 CWE-022/918/020/295）
 - ConfigSig: 结构型/配置签名基线（CWE-295/059/200 精确签名；020/400/444/639/862/863 显式 abstain）
@@ -12,21 +12,21 @@
 
 | scorer | mode | P | R | F1 | support | TP | FP | TN | FN |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 38 | 0 | 0 | 19 | 19 |
-| StructuralHeuristicScorer | code | 0.500 | 0.211 | 0.296 | 38 | 4 | 4 | 15 | 15 |
-| StructuralHeuristicScorer | both | 0.500 | 0.211 | 0.296 | 38 | 4 | 4 | 15 | 15 |
-| CodeQLBaselineScorer | request | 0.500 | 0.053 | 0.095 | 38 | 1 | 1 | 18 | 18 |
-| CodeQLBaselineScorer | code | 0.500 | 0.053 | 0.095 | 38 | 1 | 1 | 18 | 18 |
-| CodeQLBaselineScorer | both | 0.500 | 0.053 | 0.095 | 38 | 1 | 1 | 18 | 18 |
-| ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 38 | 0 | 0 | 19 | 19 |
-| ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 38 | 0 | 0 | 19 | 19 |
-| ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 38 | 0 | 0 | 19 | 19 |
-| CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 38 | 0 | 0 | 19 | 19 |
-| CPGEvidenceScorer | code | 0.500 | 0.368 | 0.424 | 38 | 7 | 7 | 12 | 12 |
-| CPGEvidenceScorer | both | 0.500 | 0.368 | 0.424 | 38 | 7 | 7 | 12 | 12 |
-| LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 38 | 0 | 0 | 19 | 19 |
-| LocalLLMScorer | code | 0.471 | 0.421 | 0.444 | 38 | 8 | 9 | 10 | 11 |
-| LocalLLMScorer | both | 0.471 | 0.421 | 0.444 | 38 | 8 | 9 | 10 | 11 |
+| StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 36 | 0 | 0 | 18 | 18 |
+| StructuralHeuristicScorer | code | 0.500 | 0.222 | 0.308 | 36 | 4 | 4 | 14 | 14 |
+| StructuralHeuristicScorer | both | 0.500 | 0.222 | 0.308 | 36 | 4 | 4 | 14 | 14 |
+| CodeQLBaselineScorer | request | 0.500 | 0.056 | 0.100 | 36 | 1 | 1 | 17 | 17 |
+| CodeQLBaselineScorer | code | 0.500 | 0.056 | 0.100 | 36 | 1 | 1 | 17 | 17 |
+| CodeQLBaselineScorer | both | 0.500 | 0.056 | 0.100 | 36 | 1 | 1 | 17 | 17 |
+| ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 36 | 0 | 0 | 18 | 18 |
+| ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 36 | 0 | 0 | 18 | 18 |
+| ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 36 | 0 | 0 | 18 | 18 |
+| CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 36 | 0 | 0 | 18 | 18 |
+| CPGEvidenceScorer | code | 0.538 | 0.389 | 0.452 | 36 | 7 | 6 | 12 | 11 |
+| CPGEvidenceScorer | both | 0.538 | 0.389 | 0.452 | 36 | 7 | 6 | 12 | 11 |
+| LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 36 | 0 | 0 | 18 | 18 |
+| LocalLLMScorer | code | 0.500 | 0.444 | 0.471 | 36 | 8 | 8 | 10 | 10 |
+| LocalLLMScorer | both | 0.500 | 0.444 | 0.471 | 36 | 8 | 8 | 10 | 10 |
 
 ## 分组指标（可污点类 vs 逻辑类）
 
@@ -47,21 +47,21 @@
 | taint | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 8 |
 | taint | LocalLLMScorer | code | 0.500 | 1.000 | 0.667 | 8 |
 | taint | LocalLLMScorer | both | 0.500 | 1.000 | 0.667 | 8 |
-| logic | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 30 |
-| logic | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 30 |
-| logic | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 30 |
-| logic | CodeQLBaselineScorer | request | 0.000 | 0.000 | 0.000 | 30 |
-| logic | CodeQLBaselineScorer | code | 0.000 | 0.000 | 0.000 | 30 |
-| logic | CodeQLBaselineScorer | both | 0.000 | 0.000 | 0.000 | 30 |
-| logic | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 30 |
-| logic | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 30 |
-| logic | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 30 |
-| logic | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 30 |
-| logic | CPGEvidenceScorer | code | 0.500 | 0.200 | 0.286 | 30 |
-| logic | CPGEvidenceScorer | both | 0.500 | 0.200 | 0.286 | 30 |
-| logic | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 30 |
-| logic | LocalLLMScorer | code | 0.444 | 0.267 | 0.333 | 30 |
-| logic | LocalLLMScorer | both | 0.444 | 0.267 | 0.333 | 30 |
+| logic | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 28 |
+| logic | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 28 |
+| logic | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 28 |
+| logic | CodeQLBaselineScorer | request | 0.000 | 0.000 | 0.000 | 28 |
+| logic | CodeQLBaselineScorer | code | 0.000 | 0.000 | 0.000 | 28 |
+| logic | CodeQLBaselineScorer | both | 0.000 | 0.000 | 0.000 | 28 |
+| logic | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 28 |
+| logic | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 28 |
+| logic | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 28 |
+| logic | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 28 |
+| logic | CPGEvidenceScorer | code | 0.600 | 0.214 | 0.316 | 28 |
+| logic | CPGEvidenceScorer | both | 0.600 | 0.214 | 0.316 | 28 |
+| logic | LocalLLMScorer | request | 0.000 | 0.000 | 0.000 | 28 |
+| logic | LocalLLMScorer | code | 0.500 | 0.286 | 0.364 | 28 |
+| logic | LocalLLMScorer | both | 0.500 | 0.286 | 0.364 | 28 |
 
 ## 每 CWE 指标（StructuralHeuristic / ConfigSig / CPGEvidence）
 
@@ -88,9 +88,6 @@
 | CWE-400 | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-400 | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-400 | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 4 |
-| CWE-434 | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-434 | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-434 | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-444 | StructuralHeuristicScorer | request | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | StructuralHeuristicScorer | code | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | StructuralHeuristicScorer | both | 0.000 | 0.000 | 0.000 | 4 |
@@ -127,9 +124,6 @@
 | CWE-400 | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-400 | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-400 | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 4 |
-| CWE-434 | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-434 | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-434 | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-444 | ConfigSigScorer | request | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | ConfigSigScorer | code | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | ConfigSigScorer | both | 0.000 | 0.000 | 0.000 | 4 |
@@ -166,9 +160,6 @@
 | CWE-400 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-400 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-400 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 4 |
-| CWE-434 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-434 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 2 |
-| CWE-434 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 2 |
 | CWE-444 | CPGEvidenceScorer | request | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | CPGEvidenceScorer | code | 0.000 | 0.000 | 0.000 | 4 |
 | CWE-444 | CPGEvidenceScorer | both | 0.000 | 0.000 | 0.000 | 4 |
@@ -191,15 +182,15 @@
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
 | vulnerable | 8 | 8 | 0 | 0 |
-| benign | 30 | 30 | 0 | 0 |
-| abstain | 19 | 19 | 0 | 0 |
+| benign | 28 | 28 | 0 | 0 |
+| abstain | 18 | 18 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
 
 ### CodeQLBaselineScorer
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
 | vulnerable | 3 | 3 | 0 | 0 |
-| benign | 54 | 54 | 0 | 0 |
+| benign | 51 | 51 | 0 | 0 |
 | abstain | 0 | 0 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
 
@@ -207,22 +198,22 @@
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
 | vulnerable | 0 | 0 | 0 | 0 |
-| benign | 22 | 22 | 0 | 0 |
-| abstain | 35 | 35 | 0 | 0 |
+| benign | 20 | 20 | 0 | 0 |
+| abstain | 34 | 34 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
 
 ### CPGEvidenceScorer
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
-| vulnerable | 14 | 14 | 0 | 0 |
-| benign | 24 | 24 | 0 | 0 |
-| abstain | 19 | 19 | 0 | 0 |
+| vulnerable | 14 | 12 | 0 | 0 |
+| benign | 22 | 24 | 0 | 0 |
+| abstain | 18 | 18 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
 
 ### LocalLLMScorer
 | predicted \ truth | vulnerable | benign | abstain | error |
 | --- | --- | --- | --- | --- |
-| vulnerable | 16 | 18 | 0 | 0 |
+| vulnerable | 16 | 16 | 0 | 0 |
 | benign | 12 | 12 | 0 | 0 |
-| abstain | 29 | 27 | 0 | 0 |
+| abstain | 26 | 26 | 0 | 0 |
 | error | 0 | 0 | 0 | 0 |
