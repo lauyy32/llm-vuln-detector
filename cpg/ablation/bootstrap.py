@@ -57,6 +57,8 @@ def main():
     print(f"CVE 数: {len(cves)}（版本数: {sum(len(v) for v in by_cve.values())}）")
 
     # 计算各 scorer 的原始全量 F1（非重采样）
+    # 口径与 run_ablation.compute_metrics 一致：正例（vulnerable）未判为
+    # vulnerable（含 benign 与 abstain）均计 FN——abstain 视为未检出。
     orig_f1 = {}
     for s in SCORERS:
         tp = fp = fn = 0
@@ -69,7 +71,7 @@ def main():
                         tp += 1
                     else:
                         fp += 1
-                elif pred == "benign" and truth == "vulnerable":
+                elif truth == "vulnerable":
                     fn += 1
         orig_f1[s] = f1_from_counts(tp, fp, fn)
 
@@ -88,7 +90,7 @@ def main():
                             tp += 1
                         else:
                             fp += 1
-                    elif pred == "benign" and truth == "vulnerable":
+                    elif truth == "vulnerable":
                         fn += 1
             boot[s].append(f1_from_counts(tp, fp, fn))
 

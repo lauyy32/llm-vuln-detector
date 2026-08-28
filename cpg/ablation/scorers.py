@@ -184,10 +184,11 @@ class LocalLLMScorer(Scorer):
     DEFAULT_BASE = "http://localhost:11434"
 
     def __init__(self, model: str = "qwen2.5-coder:7b", base_url: str = DEFAULT_BASE,
-                 timeout: float = 120.0):
+                 timeout: float = 120.0, raw_log: str | Path | None = None):
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self.raw_log = Path(raw_log) if raw_log else None  # LLM 原始响应落盘（可复现性）
         self._reachable: bool | None = None  # 懒检测缓存
 
     # ---- 可用性探测 ----
@@ -214,11 +215,11 @@ class LocalLLMScorer(Scorer):
 
     # ---- prompt 构造 ----
     SYSTEM = (
-        "你是一名资深代码安全审计助手。给定漏洞公告元数据、目标源码节选与代码级上下文（CPG 污点切片），"
+        "你是一名资深代码安全审计助手。给定目标 CWE 类型、目标源码节选与代码级上下文（CPG 污点切片），"
         "判断目标代码是否可被利用（vulnerable）、无可证伪利用路径（benign）或信息不足（abstain）。"
         "重要判断原则：污点切片只覆盖数据流型漏洞（路径穿越/SSRF/注入）；切片为空或标注 no flow 不代表目标"
         "安全——鉴权缺失、请求走私、符号链接跟随、信息泄露、输入校验缺失等逻辑型漏洞不产生数据流。"
-        "请以公告摘要为线索、结合源码语义核查摘要所述功能点是否缺失必要的安全控制（如越权检查、边界校验、"
+        "请结合源码语义核查目标 CWE 对应的功能点是否缺失必要的安全控制（如越权检查、边界校验、"
         "协议约束）。只输出严格 JSON，不要任何解释性文字。"
     )
 
@@ -231,8 +232,9 @@ class LocalLLMScorer(Scorer):
             "# 审计任务",
             f"- CVE: {cve}",
             f"- 目标 CWE: {cwe or '未指定'}",
-            f"- 公告摘要: {summary}",
         ]
+        if summary:
+            parts.append(f"- 公告摘要: {summary}")
         if ctx.request_info:
             req_txt = json.dumps(ctx.request_info, ensure_ascii=False)
             parts.append(f"\n# 请求侧触发信息\n{req_txt[:2000]}")
@@ -283,6 +285,29 @@ class LocalLLMScorer(Scorer):
                 return None
         return None
 
+    def _log_raw(self, ctx: DetectionContext, prompt: str, raw: str) -> None:
+        """把每次 LLM 调用的完整输入/输出落盘为 JSONL（可复现性审计）。
+
+        ``ctx.advisory_meta`` 可能含 ``cve_id``；以该字段关联样本。写入失败静默忽略
+        （日志文件不可写不阻断消融流程）。
+        """
+        if self.raw_log is None:
+            return
+        try:
+            self.raw_log.parent.mkdir(parents=True, exist_ok=True)
+            rec = {
+                "cve_id": (ctx.advisory_meta or {}).get("cve_id"),
+                "mode": "request" if (ctx.cpg_slices is None and not ctx.code_text) else
+                        ("both" if ctx.request_info else "code"),
+                "model": self.model,
+                "prompt": prompt,
+                "raw_response": raw,
+            }
+            with self.raw_log.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+        except Exception:
+            pass
+
     def score(self, ctx: DetectionContext) -> Verdict:
         target = config.normalize_cwe((ctx.advisory_meta or {}).get("cwe"))
         # request-only：无代码 / 无 CPG 上下文 → 本地 LLM 同样无法判别可利用性
@@ -300,12 +325,14 @@ class LocalLLMScorer(Scorer):
                 }],
             )
         try:
-            raw = self._generate(self._build_prompt(ctx))
+            prompt = self._build_prompt(ctx)
+            raw = self._generate(prompt)
         except Exception as exc:  # 网络 / 超时 / 生成前错误
             return Verdict(
                 label="abstain", confidence=0.0, cwe=target,
                 evidence=[{"reason": f"LocalLLM call failed: {exc}"}],
             )
+        self._log_raw(ctx, prompt, raw)
         obj = self._extract_json(raw)
         if not obj:
             return Verdict(

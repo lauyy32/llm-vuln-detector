@@ -82,7 +82,8 @@ class Scorer(ABC):
 - CodeQL 基线=官方套件 SARIF；`taint.csv` 仅喂 StructuralHeuristic，二者分流。
 
 ## 8. 边界与决策（锁定）
-- **request 模式**：本期**显式 abstain**（verdict=`abstain`，confidence=0）；消融计为「未判 vulnerable」→ 对 vuln 样本召回记 0。真实比较在 **code vs both** 与 **CodeQL 基线**三路。这诚实呈现「无码检测天花板≈0」。
+- **request 模式**：本期**显式 abstain**（verdict=`abstain`，confidence=0）；消融计为「未判 vulnerable」→ 对 vuln 样本召回记 0。这诚实呈现「无码检测天花板≈0」。
+- **协议修正（2026-08-28）**：语料不含请求字段时 `request` 恒 abstain、`both` 与 `code` 等价（request_info 恒 None），二者不构成独立消融维度。主消融默认 `--modes code`；`request`/`both` 需显式指定且结果如实标注。主结果默认不注入公告摘要（标签泄漏修复）；CWE 为任务定向不属泄漏。
 - 小样本：配 leave-one-out（后续）与效应量，不过度宣称。
 - 版本固化：CodeQL 锁 2.26.2 并记录。
 

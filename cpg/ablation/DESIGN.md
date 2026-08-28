@@ -7,7 +7,7 @@
 ## 1. 信息层级（结果页）
 - **主视觉·顶部**：判定徽章（`vulnerable` 红 / `benign` 绿）+ `confidence` 环 + `CWE` + `mode` 标签
 - **核心·中部**：代码切片（`JetBrains Mono` 等宽），`source` 行红描边、`sink` 行红填充，taint 路径 `1→2→3` 串联
-- **次要·底部**：三模式对照（request/code/both 并排 verdict+confidence）或 dataset 基线 P/R/F1 小字
+- **次要·底部**：mode 对照（request/code/both 并排 verdict+confidence，语料无请求字段时 request 恒 abstain、both=code，如实展示）或 dataset 基线 P/R/F1 小字
 
 ## 2. 设计 Token（锁定）
 - **双主题**：浅 `#F8FAFC` / 深 `#0D1117`，冷灰蓝中性；强调色单冷蓝 `#2563EB`，每屏 ≤2 处

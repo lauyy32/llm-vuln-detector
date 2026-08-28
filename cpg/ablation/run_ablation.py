@@ -321,9 +321,13 @@ def main() -> int:
     ap.add_argument("--no-taint", action="store_true",
                     help="禁用 CPG taint 注入（cpg_slices=None、taint_rows=[]），隔离「源码」与「CPG 证据」的增益")
     ap.add_argument("--no-code", action="store_true",
-                    help="禁用源码注入（code_text 置空，仅保留摘要 + taint），隔离「源码」增益")
-    ap.add_argument("--no-summary", action="store_true",
-                    help="禁用公告摘要注入（隔离摘要泄漏嫌疑，检验 CPG 增益是否依赖摘要）")
+                    help="禁用源码注入（code_text 置空，仅保留 taint），隔离「源码」增益")
+    ap.add_argument("--with-summary", action="store_true",
+                    help="注入公告摘要（默认不注入——摘要描述漏洞位置/成因，构成标签泄漏，主结果保持无摘要；"
+                         "此开关仅用于摘要隔离对照实验）")
+    ap.add_argument("--modes", type=str, default="code",
+                    help="逗号分隔的检测模式列表（默认 code；request/both 需显式指定——"
+                         "语料不含请求字段时 request 恒 abstain、both 退化为 code）")
     ap.add_argument("--demo", action="store_true", help="复用 sample_db + taint.csv 跑 cpg/samples（验证聚合）")
     ap.add_argument("--skip-baseline", action="store_true", help="跳过 CodeQL 基线（仅跑结构化启发式，提速）")
     ap.add_argument("--with-local-llm", action="store_true",
@@ -332,12 +336,23 @@ def main() -> int:
     ap.add_argument("--out-dir", type=Path, default=ABLATION_DIR)
     args = ap.parse_args()
 
+    # 请求模式白名单：request/both 依赖语料中的请求字段，语料不含时 both 与 code 无异
+    modes = tuple(m.strip().lower() for m in args.modes.split(",") if m.strip())
+    if any(m not in ("request", "code", "both") for m in modes):
+        print(f"[fatal] invalid --modes {args.modes!r}; expected subset of request,code,both")
+        return 1
+    # 语料级单数据库构建前先加载 rows 以判断是否有请求字段
+    rows = _load_dataset_rows(args.limit)
+    has_request_field = any(bool(r.get("request")) for r in rows)
+    if not has_request_field and any(m in ("request", "both") for m in modes):
+        print("[warn] dataset 不含 request 字段：request 模式将恒 abstain；both 模式退化为 code "
+              "（request_info=None）。如需请求侧证据，请先在 dataset 中补充请求字段。")
+
     corpus: dict | None = None
     if args.demo:
         samples = load_demo_samples()
     else:
         # 真实模式：语料库级单数据库（建库一次 + 6 次 taint 查询 + 1 次 analyze）
-        rows = _load_dataset_rows(args.limit)
         if args.exclude_cves:
             excluded = {c.strip() for c in args.exclude_cves.split(",") if c.strip()}
             kept = [r for r in rows if (r.get("cve_id") or "") not in excluded]
@@ -354,7 +369,7 @@ def main() -> int:
                 "sample_id": st["cve"],
                 "cwes": [st["cwe"]] if st["cwe"] else [],
                 "cwe": st["cwe"],
-                "summary": "" if args.no_summary else st.get("summary"),
+                "summary": "" if not args.with_summary else st.get("summary"),
                 "version": st["version"],
                 "truth": st["truth"],
                 "prefix": st["prefix"],
@@ -370,8 +385,10 @@ def main() -> int:
 
     # 本地 LLM 评分器（可选）：仅当 --with-local-llm 且本机 Ollama 实际可达时纳入；
     # 否则不计入，避免一列全 abstain 干扰指标。--llm-model 可指定模型（如 14b 规模消融）。
+    # raw_log：每次 LLM 调用的完整 prompt+响应落盘 JSONL（可复现性审计，P0-3）。
     local_llm = LocalLLMScorer(model=getattr(args, "llm_model", None) or "qwen2.5-coder:7b",
-                               timeout=600)
+                               timeout=600,
+                               raw_log=args.out_dir / "raw_llm_responses.jsonl")
     local_llm_enabled = bool(args.with_local_llm) and local_llm.reachable()
     if args.with_local_llm and not local_llm_enabled:
         print("[warn] --with-local-llm set but Ollama unreachable; LocalLLMScorer disabled")
@@ -418,8 +435,8 @@ def main() -> int:
             sample_file = None
             baseline_key = (str(db_path), prefix, cwe)
 
-        # 三模式
-        for mode in MODES:
+        # 按 --modes 指定模式（默认 code）
+        for mode in modes:
             # --no-taint：隔离 CPG 增益。taint_rows 置空 + cpg_slices 显式 None，
             # 使 LLM / 确定性 scorer 均不消费 CPG 污点证据（仅源码 + 摘要）。
             effective_taint = [] if args.no_taint else taint_rows
@@ -432,19 +449,18 @@ def main() -> int:
             records.append((sid, s["version"], mode, "StructuralHeuristicScorer",
                             v_sh.label, s["truth"], v_sh.cwe, cwe, group))
             # CodeQL 官方基线：demo 逐样本跑 analyze；真实按前缀过滤已建好的 corpus SARIF；
-            # 不可用（skip_baseline 或缺 SARIF）时跳过，不崩溃。
-            if not baseline_available:
-                continue
-            if baseline_key not in baseline_cache:
-                if s.get("reuse_db"):
-                    bl = CodeQLBaselineScorer(db_path=db_path, sample_file=sample_file)
-                    baseline_cache[baseline_key] = bl.score(ctx)
-                else:
-                    baseline_cache[baseline_key] = run_codeql_baseline_corpus(
-                        corpus["sarif"], prefix, cwe)
-            v_bl = baseline_cache[baseline_key]
-            records.append((sid, s["version"], mode, "CodeQLBaselineScorer",
-                            v_bl.label, s["truth"], v_bl.cwe, cwe, group))
+            # 不可用（skip_baseline 或缺 SARIF）时仅跳过 CodeQL 基线，其余 scorer 不受影响。
+            if baseline_available:
+                if baseline_key not in baseline_cache:
+                    if s.get("reuse_db"):
+                        bl = CodeQLBaselineScorer(db_path=db_path, sample_file=sample_file)
+                        baseline_cache[baseline_key] = bl.score(ctx)
+                    else:
+                        baseline_cache[baseline_key] = run_codeql_baseline_corpus(
+                            corpus["sarif"], prefix, cwe)
+                v_bl = baseline_cache[baseline_key]
+                records.append((sid, s["version"], mode, "CodeQLBaselineScorer",
+                                v_bl.label, s["truth"], v_bl.cwe, cwe, group))
             # 结构型/配置签名基线（ConfigSig）：吃真实源码目录（真实）或 code_text（demo），
             # 按目标 CWE 匹配不安全配置签名；request 模式 / 基于缺失的 CWE 显式 abstain。
             cfg_src = CORPUS_SRC / s["prefix"] if (not s.get("reuse_db") and s.get("prefix")) else None
@@ -463,7 +479,7 @@ def main() -> int:
                                 v_llm.label, s["truth"], v_llm.cwe, cwe, group))
 
     _write_results(args.out_dir / "results.csv", records)
-    summary = _build_summary(records, errors, args, len(samples), active_scorers)
+    summary = _build_summary(records, errors, args, len(samples), active_scorers, modes=modes)
     (args.out_dir / "summary.md").write_text(summary, encoding="utf-8")
     print("\n=== ablation summary ===")
     print(summary)
@@ -489,7 +505,7 @@ def _write_results(path: Path, records: list[tuple]) -> None:
 
 
 def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int,
-                    scorers: list[str] | None = None) -> str:
+                    scorers: list[str] | None = None, modes: tuple[str, ...] = ("code",)) -> str:
     # 活跃 scorer 列表：传入 active_scorers 优先；否则默认随 skip_baseline 决定。
     # skip_baseline 时剔除 CodeQLBaselineScorer（无对应记录）。
     base = scorers if scorers is not None else SCORERS
@@ -510,15 +526,21 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
         return out
 
     lines = []
-    lines.append("# 三模式上下文消融实验 - 结果汇总")
+    lines.append("# 上下文消融实验 - 结果汇总")
     lines.append("")
     lines.append(f"- 生成时间: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     lines.append(f"- 数据来源: {'demo (cpg/samples + sample_db)' if args.demo else 'dataset.jsonl (真实 CVE)'}")
     lines.append(f"- 样本版本数: {n_samples}  (vuln=正例 / fixed=负例)")
+    lines.append(f"- 模式: {', '.join(modes)}")
+    lines.append(f"- 公告摘要注入: {args.with_summary}（主结果默认关闭，避免标签泄漏）")
     lines.append(f"- 跳过基线: {args.skip_baseline}")
     lines.append(f"- CodeQL: 2.26.2  python Security/CWE 定向查询（覆盖数据集 CWE-022/918/020/295）")
     lines.append(f"- ConfigSig: 结构型/配置签名基线（CWE-295/059/200 精确签名；020/400/444/639/862/863 显式 abstain）")
     lines.append(f"- CPGEvidence: 直接解析 CPG 污点切片文本做确定性判定（为 LocalLLMScorer 提供同吃切片文本的对照基线）")
+    if "request" in modes or "both" in modes:
+        lines.append("")
+        lines.append("> 注：语料不含请求字段时，request 模式按设计恒 abstain（无码检测天花板），"
+                     "both 模式 request_info 为 None、与 code 模式等价。")
     if args.demo:
         lines.append("")
         lines.append("> 注：demo 模式仅含 4 个 vuln 正例（无 fixed 负例），用于验证聚合链路；"
@@ -536,7 +558,7 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     headers = ["scorer", "mode", "P", "R", "F1", "support", "TP", "FP", "TN", "FN"]
     rows = []
     for sc in sc_list:
-        for m in MODES:
+        for m in modes:
             recs = rec_filter(scorer=sc, mode=m)
             met = compute_metrics(recs)
             rows.append([sc, m, f"{met['precision']:.3f}", f"{met['recall']:.3f}",
@@ -552,7 +574,7 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     rows = []
     for g in ("taint", "logic"):
         for sc in sc_list:
-            for m in MODES:
+            for m in modes:
                 recs = rec_filter(scorer=sc, mode=m, group=g)
                 if not recs:
                     continue
@@ -570,7 +592,7 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
     rows = []
     for sc in ("StructuralHeuristicScorer", "ConfigSigScorer", "CPGEvidenceScorer"):
         for cw in cwes_seen:
-            for m in MODES:
+            for m in modes:
                 sub = [(p, t) for (sid, ver, mm, scc, p, t, cp, ct, g) in records
                        if scc == sc and mm == m and ct == cw]
                 if not sub:

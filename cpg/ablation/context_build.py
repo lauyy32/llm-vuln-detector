@@ -5,8 +5,12 @@
 - ``code``：填 code_text，并调 extract_taint 得 cpg_slices（taint 文本）。
 - ``both``：二者皆填（request_info 仅在 dataset 含请求数据时非空）。
 
+协议修正（2026-08-28）：语料不含请求字段时，request 恒 abstain、both 退化为
+code（request_info=None）。主消融默认 ``--modes code``；request/both 仅作天花板
+对照点显式启用，不再宣称三模式为三个独立消融维度。
+
 ``build_context(mode, sample, ...)`` 保持核心签名；额外关键字参数（workdir / taint_rows /
-cpg_slices）供 harness 注入预计算产物，避免重复建库。``sample`` 兼容两种数据集形状：
+cpg_slices / include_summary）供 harness 注入预计算产物，避免重复建库。``sample`` 兼容两种数据集形状：
 
 * 实际 ``dataset.jsonl``：``cves``(list) / ``cwe`` / ``files`` / ``summary`` / ``cve_id``
 * 文档约定形状：``vuln_code`` / ``fixed_code`` / ``sample_id`` / ``cwe``
@@ -48,15 +52,25 @@ def build_context(
     workdir: str | Path | None = None,
     taint_rows: list[dict] | None = None,
     cpg_slices: str | None = None,
+    include_summary: bool = False,
 ) -> DetectionContext:
+    """构造 DetectionContext。
+
+    ``include_summary``（默认 False）：是否把公告摘要写入 advisory_meta。摘要描述漏洞
+    的具体位置与成因，直接注入 LLM prompt 构成标签泄漏（DeepSeek 评审确认）；CWE 为
+    任务定向（CodeQL/结构启发式等基线共用同一目标 CWE），不属泄漏。主结果默认
+    不含摘要，仅隔离实验（--with-summary）显式开启。
+    """
     mode = (mode or "").lower()
     if mode not in VALID_MODES:
         raise ValueError(f"invalid mode {mode!r}; expected one of {VALID_MODES}")
 
     sid = _sample_id(sample)
     cwe = _primary_cwe(sample)
-    summary = sample.get("summary")
-    advisory_meta = {"cve_id": sid, "cwe": cwe, "summary": summary}
+    summary = sample.get("summary") if include_summary else None
+    advisory_meta = {"cve_id": sid, "cwe": cwe}
+    if summary:
+        advisory_meta["summary"] = summary
 
     if mode == "request":
         # 无代码可分析 → cpg_slices 为 None → Scorer 显式 abstain

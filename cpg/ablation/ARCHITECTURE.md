@@ -18,7 +18,12 @@
  "mode":"code","scorer":"StructuralHeuristicScorer",
  "evidence":[{"type":"taint","cwe":"CWE-22","sourceLine":19,"sinkLine":30,"file":"penelope.py"}]}
 ```
-mode 组装 `DetectionContext`：request 仅填 `request_info`/`advisory_meta`，`code_text` 与 `cpg_slices` 空；code 填 `code_text` 并据 pipeline 产物生成 `cpg_slices`；both 二者皆填。request 模式 MVP 下无 CPG，仅作「无码检测天花板」对照点（预留 LLM）。
+mode 组装 `DetectionContext`：request 仅填 `request_info`/`advisory_meta`，`code_text` 与 `cpg_slices` 空；code 填 `code_text` 并据 pipeline 产物生成 `cpg_slices`；both 二者皆填。
+
+**协议修正（2026-08-28，回应 DeepSeek 评审）**：本数据集语料**不含请求字段**（`sample.get("request")` 恒 None）——
+- `request` 模式按设计恒 abstain（无码检测天花板对照点，非缺陷）；
+- `both` 模式的 `request_info` 恒为 None，与 `code` 模式**完全等价**，不构成独立消融维度；
+- 因此主消融默认只跑 `code` 模式（`--modes code`），request/both 需显式指定且结果如实标注。请求侧检测能力需在语料补充真实请求字段（或从公告派生 PoC）后方可评估。
 
 ## 2. Scorer 接口（以 StructuralHeuristic 为例，示例非指定）
 ```python
