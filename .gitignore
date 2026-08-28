@@ -52,3 +52,6 @@ cpg/ablation/.work/
 
 # 多 seed 消融产物（可本地重建）
 cpg/ablation/seeds/
+
+# 采集中间产物（可重建）
+cpg/candidates_t*.jsonl
