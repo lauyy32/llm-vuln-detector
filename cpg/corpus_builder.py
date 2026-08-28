@@ -52,7 +52,11 @@ API_VERSION = "2022-11-28"
 
 
 def run(cmd, **kw):
-    return subprocess.run(cmd, capture_output=True, text=True, **kw)
+    """subprocess.run 包装：超时返回 returncode=124（调用处按非零处理跳过）。"""
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, **kw)
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess(cmd, 124, stdout="", stderr="[timeout]")
 
 
 def fetch_advisories(eco: str, pages: int):
@@ -199,18 +203,18 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
         clone = run([
             "git", "clone", "--filter=blob:none", "--no-checkout",
             f"https://github.com/{repo_slug}.git", str(repo_dir)
-        ], cwd=str(ROOT))
+        ], cwd=str(ROOT), timeout=300)
         if clone.returncode != 0:
             print(f"    [fail] clone {repo_slug}: {clone.stderr[:160]}")
             return []
     # 确保 fix_commit 可达
     fetch = run(["git", "fetch", "--depth", "2", "origin", fix_commit],
-                cwd=str(repo_dir))
+                cwd=str(repo_dir), timeout=180)
     if fetch.returncode != 0:
         print(f"    [fail] fetch {fix_commit[:8]} in {repo_slug}: {fetch.stderr[:160]}")
         return []
     # 提取修复后文件列表（从 fix_commit 的 tree）
-    show = run(["git", "ls-tree", "-r", "--name-only", fix_commit], cwd=str(repo_dir))
+    show = run(["git", "ls-tree", "-r", "--name-only", fix_commit], cwd=str(repo_dir), timeout=60)
     if show.returncode != 0:
         return []
     files = [f for f in show.stdout.splitlines()
@@ -218,7 +222,7 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
     # 优先取改动文件；修复 diff 不含 .py 变更（如跨语言修复在 Rust/C）时跳过——
     # 此时 vuln/fixed 的 Python 侧完全相同，truth 标签无意义，属污染样本。
     diff = run(["git", "diff", "--name-only", f"{fix_commit}^", fix_commit],
-               cwd=str(repo_dir))
+               cwd=str(repo_dir), timeout=60)
     changed = [f for f in diff.stdout.splitlines() if f.endswith(".py")] if diff.returncode == 0 else []
     if not changed:
         print(f"    [skip] fix diff has no .py changes (cross-language fix), skip")
@@ -230,13 +234,13 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
         vuln_path = pair_dir / "vuln" / f
         for commit, dst in ((fix_commit, fixed_path), (f"{fix_commit}^", vuln_path)):
             dst.parent.mkdir(parents=True, exist_ok=True)
-            cp = run(["git", "checkout", commit, "--", f], cwd=str(repo_dir))
+            cp = run(["git", "checkout", commit, "--", f], cwd=str(repo_dir), timeout=90)
             if cp.returncode == 0:
                 # 把 checkout 出的文件移到目标位置
                 src = repo_dir / f
                 if src.exists():
                     dst.write_bytes(src.read_bytes())
-                    run(["git", "checkout", "HEAD", "--", f], cwd=str(repo_dir))  # 复位
+                    run(["git", "checkout", "HEAD", "--", f], cwd=str(repo_dir), timeout=60)  # 复位
                     extracted.append(str(dst.relative_to(ROOT)))
     return extracted
 
