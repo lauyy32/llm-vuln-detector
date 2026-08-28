@@ -1,0 +1,146 @@
+[
+  {
+    "sample": "CVE-2026-50558",
+    "base_pred": "vulnerable",
+    "patch_verdict": "benign",
+    "diff_chars": 2555,
+    "rationale": "The patch adds a `safe_tar_extractall` function that checks if the extracted file paths are within the designated destination directory, pre",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-53502",
+    "base_pred": "vulnerable",
+    "patch_verdict": "benign",
+    "diff_chars": 5006,
+    "rationale": "The patch correctly decodes percent-encoded paths before performing security checks, effectively preventing path traversal attacks.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-53505",
+    "base_pred": "benign",
+    "patch_verdict": "benign",
+    "diff_chars": 2491,
+    "rationale": "The patch adds a check to ensure the value is between 0 and 1.0, preventing unbounded post-transform resize.",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-54706",
+    "base_pred": "vulnerable",
+    "patch_verdict": "benign",
+    "diff_chars": 7797,
+    "rationale": "The patch adds a `_is_path_contained` method to verify that paths are within selected roots, effectively preventing symlink traversal.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-54707",
+    "base_pred": "vulnerable",
+    "patch_verdict": "benign",
+    "diff_chars": 7379,
+    "rationale": "The patch adds a check to reject file uploads when disabled, preventing the vulnerability.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-54785",
+    "base_pred": "vulnerable",
+    "patch_verdict": "vulnerable",
+    "diff_chars": 6630,
+    "rationale": "The fix does not address the vulnerability in the `_resolve_path` function, which allows for arbitrary file access.",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-59881",
+    "base_pred": "abstain",
+    "patch_verdict": "benign",
+    "diff_chars": 2350,
+    "rationale": "The fix ensures that the `compress` parameter is explicitly converted to a boolean, which prevents the WebSocket client from accepting compr",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-69243",
+    "base_pred": "benign",
+    "patch_verdict": "benign",
+    "diff_chars": 8005,
+    "rationale": "The patch introduces a flag `_pending_upgrade` to defer any requested upgrade until the complete request has been read, ensuring that the up",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-67424",
+    "base_pred": "vulnerable",
+    "patch_verdict": "benign",
+    "diff_chars": 3593,
+    "rationale": "The patch adds an SSRF guard to validate outbound URLs, preventing potential SSRF vulnerabilities.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-67435",
+    "base_pred": "vulnerable",
+    "patch_verdict": "benign",
+    "diff_chars": 3389,
+    "rationale": "The patch adds a function `_install_safe_redirect_stripping` that wraps the `_redirect_headers` method of the `httpx.Client` instance to dro",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-70487",
+    "base_pred": "benign",
+    "patch_verdict": "benign",
+    "diff_chars": 2246,
+    "rationale": "补丁通过 `_set_direct_model` 函数对 `direct` 模型知识进行了访问控制，确保只有可访问的文件内容被传递给模型。",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-70488",
+    "base_pred": "abstain",
+    "patch_verdict": "benign",
+    "diff_chars": 1206,
+    "rationale": "The patch adds checks to ensure that only files and directories belonging to the specified knowledge base are cleaned up, effectively preven",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-71433",
+    "base_pred": "abstain",
+    "patch_verdict": "benign",
+    "diff_chars": 8318,
+    "rationale": "The patch adds namespace validation and escaping, effectively preventing namespace prefix matching from crossing segment boundaries.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-71554",
+    "base_pred": "benign",
+    "patch_verdict": "benign",
+    "diff_chars": 713,
+    "rationale": "The patch adds a check to raise an exception if a second Host header is found, effectively preventing request smuggling.",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-54548",
+    "base_pred": "benign",
+    "patch_verdict": "benign",
+    "diff_chars": 790,
+    "rationale": "The patch adds a conditional check to disable SSH host key checking only when the environment is managed by kas, which mitigates the vulnera",
+    "improved": false
+  },
+  {
+    "sample": "CVE-2026-54553",
+    "base_pred": "abstain",
+    "patch_verdict": "benign",
+    "diff_chars": 6921,
+    "rationale": "The patch adds validation for the `order_by` parameter to ensure that only allowed fields are used, effectively mitigating the vulnerability",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-54569",
+    "base_pred": "vulnerable",
+    "patch_verdict": "benign",
+    "diff_chars": 2387,
+    "rationale": "The patch replaces the use of `eval` with `parse_record_literal`, which safely parses stringified record values without executing code.",
+    "improved": true
+  },
+  {
+    "sample": "CVE-2026-54338",
+    "base_pred": "benign",
+    "patch_verdict": "benign",
+    "diff_chars": 2097,
+    "rationale": "The patch limits the length of the username logged in error messages, preventing unbounded logging of usernames.",
+    "improved": false
+  }
+]

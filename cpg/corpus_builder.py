@@ -229,6 +229,7 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
         return []
     targets = changed[:20]
     extracted = []
+    missing_vuln: list[str] = []   # vuln（fix^）侧缺失的 changed 文件——重构式修复信号
     for f in targets:
         fixed_path = pair_dir / "fixed" / f
         vuln_path = pair_dir / "vuln" / f
@@ -242,6 +243,24 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
                     dst.write_bytes(src.read_bytes())
                     run(["git", "checkout", "HEAD", "--", f], cwd=str(repo_dir), timeout=60)  # 复位
                     extracted.append(str(dst.relative_to(ROOT)))
+                else:
+                    missing_vuln.append(f)
+            elif commit == f"{fix_commit}^":
+                # vuln 侧该文件在 fix^ 不存在——修复可能是重构式（文件移动/新增），
+                # 漏洞代码可能位于 fix^ 的其他路径，提取的 vuln 侧不完整
+                missing_vuln.append(f)
+    # 双侧完整性校验：vuln 侧缺失率过高说明修复为重构式，vuln 侧漏洞代码可能未提取
+    if missing_vuln and len(targets) > 0:
+        ratio = len(missing_vuln) / len(targets)
+        sig_path = pair_dir / "extraction_signal.json"
+        sig_path.write_text(json.dumps({
+            "vuln_side_missing": missing_vuln,
+            "missing_ratio": round(ratio, 2),
+            "note": "重构式修复或文件移动：vuln 侧漏洞代码可能未提取，truth 判定需人工核查"
+                   if ratio >= 0.3 else "少量 vuln 侧缺失，可接受",
+        }, ensure_ascii=False, indent=2), encoding="utf-8")
+        flag = "[重构式修复!]" if ratio >= 0.3 else "[小错位]"
+        print(f"    {flag} vuln 侧缺失 {len(missing_vuln)}/{len(targets)} 文件: {missing_vuln[:4]}")
     return extracted
 
 
