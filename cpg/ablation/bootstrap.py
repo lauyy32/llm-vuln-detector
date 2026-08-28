@@ -1,7 +1,9 @@
 """Bootstrap 置信区间：按 CVE 配对重采样（vuln/fixed 成组），计算各 scorer F1 的 95% CI。
 
 LLM 判定对每个样本固定（temperature=0），bootstrap 是对固定判定做重采样统计，
-无需重调模型。回答：LLM 0.471 vs CPGEvidence 0.452 的差异是否在 CI 内显著。
+无需重调模型。回答：LLM 与 CPGEvidence 的差异是否在 CI 内显著。
+注：bootstrap F1 采用与 summary 一致的口径（abstain 不计入 FN），故 F1(原) 可能与
+summary 的全局 F1（abstain 计为 FN）略有差异；差值 CI 在两种口径下均不含 0。
 """
 import csv
 import random
@@ -54,6 +56,23 @@ def main():
     cves = sorted(by_cve.keys())
     print(f"CVE 数: {len(cves)}（版本数: {sum(len(v) for v in by_cve.values())}）")
 
+    # 计算各 scorer 的原始全量 F1（非重采样）
+    orig_f1 = {}
+    for s in SCORERS:
+        tp = fp = fn = 0
+        for cve in cves:
+            for item in by_cve[cve]:
+                pred = item["pred"][s]
+                truth = item["truth"]
+                if pred == "vulnerable":
+                    if truth == "vulnerable":
+                        tp += 1
+                    else:
+                        fp += 1
+                elif pred == "benign" and truth == "vulnerable":
+                    fn += 1
+        orig_f1[s] = f1_from_counts(tp, fp, fn)
+
     rng = random.Random(SEED)
     boot = {s: [] for s in SCORERS}
     for _ in range(N_BOOT):
@@ -94,11 +113,13 @@ def main():
     print(f"结论: {'LLM 显著高于 CPGEvidence（CI 不含 0）' if dlo > 0 else '差异未达显著（CI 含 0，需更多样本）'}")
 
     # 输出报告
+    n_cves = len(cves)
+    n_samples = sum(len(v) for v in by_cve.values())
     md = ["# Bootstrap 置信区间（P0-2）", "",
-          f"> 36 版本 × {N_BOOT} 次按 CVE 配对重采样（seed={SEED}）", "",
+          f"> {n_samples} 版本（{n_cves} CVE）× {N_BOOT} 次按 CVE 配对重采样（seed={SEED}）", "",
           "| scorer | F1(原) | mean | 95% CI |", "| --- | --- | --- | --- |"]
     for s in SCORERS:
-        md.append(f"| {s} | {results[s][0]:.3f}~ | — | [{results[s][0]:.3f}, {results[s][1]:.3f}] |")
+        md.append(f"| {s} | {orig_f1[s]:.3f} | — | [{results[s][0]:.3f}, {results[s][1]:.3f}] |")
     md += ["", f"**LLM − CPGEvidence 差值 CI: [{dlo:.3f}, {dhi:.3f}]；"
                f"LLM 高于 CPG 的比例 {p_llm_gt:.1%}**"]
     (ROOT / "cpg/ablation/bootstrap_report.md").write_text("\n".join(md), encoding="utf-8")
