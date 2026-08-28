@@ -59,15 +59,19 @@ def run(cmd, **kw):
         return subprocess.CompletedProcess(cmd, 124, stdout="", stderr="[timeout]")
 
 
-def fetch_advisories(eco: str, pages: int):
+def fetch_advisories(eco: str, pages: int, merge: bool = True, start_page: int = 1):
     """拉取某生态的 GitHub advisory，缓存到本地。无 token 限流 60/hr，pages*100<=6000。
 
     GITHUB_TOKEN 环境变量可用时注入认证头（5000/hr 配额）。
+    ``merge``（默认 True）：新拉取的 advisory 与现有缓存**合并去重**（按 ghsa_id），
+    使多轮 fetch 可累积不同页的数据——网络中断重试不会丢已有缓存。
+    ``start_page``：从指定页码开始拉（API 按 published 倒序，页码越大越老），
+    用于分轮拉取历史深度数据（如 --start-page 20 拉 2000-3000 区间）。
     """
     all_advs = []
     token = os.environ.get("GITHUB_TOKEN", "")
     auth = ["-H", f"Authorization: Bearer {token}"] if token else []
-    for page in range(1, pages + 1):
+    for page in range(start_page, start_page + pages):
         url = f"{API_BASE}?ecosystem={eco}&per_page=100&page={page}&sort=published"
         r = run(["curl", "-sS", "-m", "30", "-H", f"Accept: {API_ACCEPT}",
                  "-H", f"X-GitHub-Api-Version: {API_VERSION}", *auth, url])
@@ -84,9 +88,19 @@ def fetch_advisories(eco: str, pages: int):
             break
         all_advs.extend(batch)
         print(f"[fetch] page {page}: +{len(batch)} (total {len(all_advs)})")
+    if merge and RAW_ADVISORIES.exists() and all_advs:
+        try:
+            cached = json.loads(RAW_ADVISORIES.read_text(encoding="utf-8"))
+            by_id = {a.get("ghsa_id"): a for a in cached if a.get("ghsa_id")}
+            for a in all_advs:
+                by_id[a.get("ghsa_id")] = a
+            all_advs = list(by_id.values())
+            print(f"[merge] merged with cache: {len(cached)} -> {len(all_advs)} unique")
+        except Exception as exc:
+            print(f"[warn] cache merge failed ({exc}); overwrite with new batch")
     if all_advs:
         # 仅在成功拉到数据时覆盖缓存；失败（网络中断拉 0 条）时保留旧缓存，
-        # 避免把已有 2000 条缓存清空导致后续 select 无源可用。
+        # 避免把已有缓存清空导致后续 select 无源可用。
         RAW_ADVISORIES.write_text(json.dumps(all_advs, indent=1), encoding="utf-8")
         print(f"[ok] saved {len(all_advs)} advisories -> {RAW_ADVISORIES}")
     else:
@@ -201,7 +215,14 @@ def select_candidates(out_path: str, max_per_repo: int = 2, seed: int = 0):
 
 def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
     """clone（blob:none 省空间）→ checkout fix + parent 的同名文件对。
-    返回提取到的文件列表；失败返回空。"""
+    返回提取到的文件列表；失败返回空。
+
+    fetch 策略修正（2026-08-28）：``blob:none`` 过滤克隆已包含**全量 commit 元数据**
+    （仅 blob 延迟加载），无需再 ``git fetch --depth 2 <commit>``——该命令在浅克隆
+    服务端常报 ``upload-pack: not our ref``（即使 commit 在 GitHub 上真实存在，
+    因服务端不允许浅 fetch 指定任意 commit）。改为直接 ``git cat-file -e`` 检查
+    本地对象；缺失时才尝试 fetch（失败则按数据源失效处理）。
+    """
     CORPUS_RAW.mkdir(parents=True, exist_ok=True)
     repo_dir = CORPUS_RAW / repo_slug.replace("/", "__")
     # 用 mirror/本地缓存避免重复网络拉取
@@ -213,12 +234,16 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
         if clone.returncode != 0:
             print(f"    [fail] clone {repo_slug}: {clone.stderr[:160]}")
             return []
-    # 确保 fix_commit 可达
-    fetch = run(["git", "fetch", "--depth", "2", "origin", fix_commit],
-                cwd=str(repo_dir), timeout=180)
-    if fetch.returncode != 0:
-        print(f"    [fail] fetch {fix_commit[:8]} in {repo_slug}: {fetch.stderr[:160]}")
-        return []
+    # 检查 fix_commit 本地可达性（blob:none 克隆已含全部 commit 对象）
+    check = run(["git", "cat-file", "-e", f"{fix_commit}^{{commit}}"],
+                cwd=str(repo_dir), timeout=30)
+    if check.returncode != 0:
+        # 本地无此 commit 对象——尝试 fetch 指定 commit；仍失败则数据源失效
+        fetch = run(["git", "fetch", "origin", fix_commit], cwd=str(repo_dir), timeout=180)
+        if fetch.returncode != 0:
+            print(f"    [fail] commit {fix_commit[:8]} unavailable in {repo_slug}: "
+                  f"{fetch.stderr[:160]}")
+            return []
     # 提取修复后文件列表（从 fix_commit 的 tree）
     show = run(["git", "ls-tree", "-r", "--name-only", fix_commit], cwd=str(repo_dir), timeout=60)
     if show.returncode != 0:
@@ -382,6 +407,8 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     pf = sub.add_parser("fetch"); pf.add_argument("--eco", default="pip"); pf.add_argument("--pages", type=int, default=5)
+    pf.add_argument("--no-merge", action="store_true", help="覆盖缓存而非合并（默认合并去重）")
+    pf.add_argument("--start-page", type=int, default=1, help="起始页码（按 published 倒序，越大越老）")
     ps = sub.add_parser("select")
     ps.add_argument("--out", default="candidates.jsonl")
     ps.add_argument("--max-per-repo", type=int, default=2, help="每仓库最多收录 CVE 数（打散来源聚集）")
@@ -391,7 +418,7 @@ def main():
     pi = sub.add_parser("index"); pi.add_argument("--max-per-repo", type=int, default=None, help="写出 dataset.jsonl 分层实验集（每仓库最多 N 条）")
     args = ap.parse_args()
     if args.cmd == "fetch":
-        fetch_advisories(args.eco, args.pages)
+        fetch_advisories(args.eco, args.pages, merge=not args.no_merge, start_page=args.start_page)
     elif args.cmd == "select":
         select_candidates(args.out, args.max_per_repo, args.seed)
     elif args.cmd == "extract":
