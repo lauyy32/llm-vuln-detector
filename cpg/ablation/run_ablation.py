@@ -322,6 +322,8 @@ def main() -> int:
                     help="禁用 CPG taint 注入（cpg_slices=None、taint_rows=[]），隔离「源码」与「CPG 证据」的增益")
     ap.add_argument("--no-code", action="store_true",
                     help="禁用源码注入（code_text 置空，仅保留摘要 + taint），隔离「源码」增益")
+    ap.add_argument("--no-summary", action="store_true",
+                    help="禁用公告摘要注入（隔离摘要泄漏嫌疑，检验 CPG 增益是否依赖摘要）")
     ap.add_argument("--demo", action="store_true", help="复用 sample_db + taint.csv 跑 cpg/samples（验证聚合）")
     ap.add_argument("--skip-baseline", action="store_true", help="跳过 CodeQL 基线（仅跑结构化启发式，提速）")
     ap.add_argument("--with-local-llm", action="store_true",
@@ -352,7 +354,7 @@ def main() -> int:
                 "sample_id": st["cve"],
                 "cwes": [st["cwe"]] if st["cwe"] else [],
                 "cwe": st["cwe"],
-                "summary": st.get("summary"),
+                "summary": "" if args.no_summary else st.get("summary"),
                 "version": st["version"],
                 "truth": st["truth"],
                 "prefix": st["prefix"],
