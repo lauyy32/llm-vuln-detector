@@ -4,10 +4,10 @@
 
 | scorer | F1(原) | mean | 95% CI |
 | --- | --- | --- | --- |
-| LocalLLMScorer | 0.364~ | — | [0.364, 0.643] |
-| CPGEvidenceScorer | 0.250~ | — | [0.250, 0.579] |
-| StructuralHeuristicScorer | 0.100~ | — | [0.100, 0.471] |
-| CodeQLBaselineScorer | 0.000~ | — | [0.000, 0.250] |
+| LocalLLMScorer | 0.400~ | — | [0.400, 0.625] |
+| CPGEvidenceScorer | 0.270~ | — | [0.270, 0.538] |
+| StructuralHeuristicScorer | 0.069~ | — | [0.069, 0.400] |
+| CodeQLBaselineScorer | 0.000~ | — | [0.000, 0.182] |
 | ConfigSigScorer | 0.000~ | — | [0.000, 0.000] |
 
-**LLM − CPGEvidence 差值 CI: [-0.015, 0.230]；LLM 高于 CPG 的比例 91.6%**
+**LLM − CPGEvidence 差值 CI: [0.023, 0.221]；LLM 高于 CPG 的比例 99.7%**

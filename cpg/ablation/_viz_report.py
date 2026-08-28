@@ -7,7 +7,7 @@ ROOT = Path("C:/Users/lenovo/WorkBuddy/2026-07-21-16-16-43/llm-vuln-detector")
 
 # ---------- 数据聚合 ----------
 # 1) 36 版本主消融（A 设置，code 模式）
-summary_path = ROOT / "cpg/ablation/seeds/v5_42_A/summary.md"
+summary_path = ROOT / "cpg/ablation/seeds/v6_54_A/summary.md"
 global_f1, group_f1 = {}, {}
 with summary_path.open(encoding="utf-8") as fh:
     for line in fh:
@@ -230,8 +230,8 @@ th {{ background:#21262d; color:#c9d1d9; }}
 
 <div class="cards">
   <div class="card"><div class="v">18</div><div class="k">真实 CVE 样本</div><div class="d">14 仓库 / 15 类 CWE</div></div>
-  <div class="card"><div class="v">{global_f1['LocalLLMScorer']['f1']:.3f}</div><div class="k">LLM+CPG 全局 F1</div><div class="d">确定性解析 0.452</div></div>
-  <div class="card"><div class="v">+0.129</div><div class="k">CPG 证据增益 (F1)</div><div class="d">召回 +0.190（42 版本）</div></div>
+  <div class="card"><div class="v">{global_f1['LocalLLMScorer']['f1']:.3f}</div><div class="k">LLM+CPG 全局 F1</div><div class="d">确定性解析 0.435</div></div>
+  <div class="card"><div class="v">+0.133</div><div class="k">CPG 证据增益 (F1)</div><div class="d">召回 +0.185（54 版本）</div></div>
   <div class="card"><div class="v">0.667</div><div class="k">数据流域 F1</div><div class="d">LLM 与确定性并列</div></div>
   <div class="card"><div class="v">0.364</div><div class="k">逻辑域 F1（LLM）</div><div class="d">静态基线全 0</div></div>
   <div class="card"><div class="v">9/14</div><div class="k">补丁验证误报修复</div><div class="d">版本对比信号</div></div>
@@ -240,7 +240,7 @@ th {{ background:#21262d; color:#c9d1d9; }}
 <section><h2>1. 全局判定能力：LLM+CPG vs 各基线</h2>
 <div class="sec-sub">36 个样本版本（18 CVE × vuln/fixed），code 模式，正类=vulnerable</div>
 {g_chart}
-<div class="legend">F1 度量。LLM+CPG 判定器最高（0.462）；确定性 CPG 解析（0.452）次之；纯静态基线（0.308 / 0.100 / 0.000）显著落后。</div>
+<div class="legend">F1 度量。LLM+CPG 判定器最高（0.449）；确定性 CPG 解析（0.435）次之；纯静态基线（0.270 / 0.069 / 0.000）显著落后。</div>
 </section>
 
 <section><h2>2. 互补性：CPG 覆盖数据流域，LLM 覆盖逻辑域</h2>
@@ -272,7 +272,7 @@ th {{ background:#21262d; color:#c9d1d9; }}
 <tr><td>Bandit（业界规则扫描）</td><td>{bandit.get('F1','—')}</td><td>召回 {bandit.get('R','—')}，无法区分 vuln/fixed</td></tr>
 <tr><td>14B 模型（LLM+CPG）</td><td>{m14b.get('f1', 0):.3f}</td><td>{'14B 全量消融完成' if m14b else '（全量消融运行中）'}</td></tr>
 </table>
-<div class="legend">bootstrap 差值 CI [-0.015, 0.230]：LLM 优于 CPG 的方向一致（91.6%），显著性受样本量限制；
+<div class="legend">bootstrap 差值 CI [0.023, 0.221]：LLM 显著高于确定性 CPG 解析（99.7% 支持，CI 不含 0）；
 Bandit F1≈0.17 远低于本系统；14B 模型规模消融见第 7 节。</div>
 </section>
 
