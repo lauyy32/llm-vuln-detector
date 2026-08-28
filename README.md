@@ -452,13 +452,13 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 
 - **代码属性图提取**：基于 CodeQL 2.26.2 原生 CLI，对目标仓库构建数据库并抽取 AST / CFG / DFG 三类图，由 `slice_builder.py` 聚合成可读的文本切片（验证样本：27/31/9 条边）。
 - **污点分析（taint）**：复用 CodeQL 上游按 CWE 分类的数据流查询，当前覆盖注入族（CWE-022/089/078/094）、SSRF（CWE-918）与反射型 XSS（CWE-079）；多文件数据库下按源文件限定污点结论，避免跨文件串味。
-- **三模式消融框架**（`cpg/ablation/`）：提供 `POST /api/v1/detect{mode: request|code|both}` 端点，配合可插拔 Scorer（CodeQLBaseline / StructuralHeuristic / LocalLLM 占位）。`request` 模式仅持 PoC / 公告、无源码，作为 abstain 上限基线；`code` 仅喂 CPG 切片；`both` 叠加二者。框架已在 4 个 vuln 正例的 demo 上跑通：StructuralHeuristic 与 CodeQLBaseline 在 code / both 模式下 F1 = 1.000（4/4）。
-- **真实语料**：从 GitHub Advisory API（pip 生态）分层抽样得到 `dataset.jsonl`（16 条跨 11 仓库，每仓库 ≤ 2 条，覆盖 11 个 CWE 族群），规避单来源聚集。
+- **三模式消融框架**（`cpg/ablation/`）：提供 `POST /api/v1/detect{mode: request|code|both}` 端点，配合可插拔 Scorer（CodeQLBaseline / StructuralHeuristic / ConfigSig / CPGEvidence / LocalLLM）。`request` 模式仅持 PoC / 公告、无源码，作为 abstain 上限基线；`code` 仅喂 CPG 切片；`both` 叠加二者。框架已在 4 个 vuln 正例的 demo 上跑通：StructuralHeuristic 与 CodeQLBaseline 在 code / both 模式下 F1 = 1.000（4/4）。
+- **真实语料**：从 GitHub Advisory API（pip 生态）分层抽样得到 `dataset.jsonl`（27 条跨 18 仓库，每仓库 ≤ 2 条，覆盖 19 个 CWE 族群，另含 open-webui 单仓库一致性子集），规避单来源聚集。
 
 已知局限与实测边界（OPEN-DECISIONS）：
 
-- **真实 `dataset.jsonl` 全量三模式消融已完成**（语料库级单数据库 `corpus_db.py`：建库一次 + 6 次自定义 taint 查询 + 1 次官方定向 analyze，按 `<cve>_<version>/` 前缀隔离样本；产物 `cpg/ablation/results.csv` + `summary.md`）。实证结论：标准静态分析（`StructuralHeuristicScorer` 自定义 taint + `CodeQLBaselineScorer` 官方 CWE-022/918/020/295 查询）在本题多样真实 CVE 上召回极低——自定义 taint 全零命中（真实仓库多为非框架化源码），官方基线全局 F1=0.111（R=0.062，仅 taint 组命中 1 真阳 + 1 误报）。这恰说明 LLM+CPG 语义层针对的正是此盲区，而非工程缺陷。
-- `LocalLLMScorer` 的 Ollama HTTP 接口已实现（纯标准库，无第三方依赖；Ollama 不可达时自动 abstain），但因本机未安装 Ollama（受"不下载不明软件"约束），消融尚未含真实 LLM 信号——接入属环境就绪后的下一步。
+- **真实 `dataset.jsonl` 全量三模式消融已完成**（语料库级单数据库 `corpus_db.py`：建库一次 + 7 次自定义 taint 查询 + 1 次官方定向 analyze，按 `<cve>_<version>/` 前缀隔离样本；产物 `cpg/ablation/results.csv` + `summary.md`）。54 版本（27 CVE）权威结果：LLM+CPG 判定器全局 F1=0.449，CPG 确定性解析 0.435，结构启发式 0.270，CodeQL 官方基线 0.069，配置签名 0.000；**CPG 污点证据增益（有码条件下）=+0.133 F1（召回 +0.185）**，随样本量（36→42→54 版本）稳定收敛；bootstrap（2000 次 CVE 配对重采样）显示 LLM 显著优于确定性解析（差值 95% CI [0.023, 0.221]，99.7% 支持）。
+- `LocalLLMScorer` 基于 Ollama（本地模型 qwen2.5-coder，7b/14b，temperature=0，无 API 漂移）。模型规模消融：14B 全局 F1=0.531（逻辑域 0.364→0.545，7B 基准 0.449），收益集中于逻辑型漏洞；"修复未消除数据流"类误报由版本对比（补丁验证，diff 注入）修复 7/8。补丁验证为与单版本检测互补的第二研究问题（`patch_verify.py`）。
 - 鉴权(862/863) / 请求走私(444) / TLS(295·347) / DoS(400) / 信息泄露(200) / IDOR(639) / 链接跟随(59) / 输入校验(20) 等结构型 CWE：经核查，其中 020/295 已有官方查询并已纳入基线，其余在 CodeQL Python 安全套件中确无成熟查询，静态基线天然失效，需上游结构查询或自定义配置指纹（ConfigSig）补充。
 - `request` 模式在本数据集上恒为 abstain（语料不含请求字段），其"天花板"需在后续从公告派生 PoC 才能评估。
 
@@ -494,9 +494,9 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 - [ ] 扩大数据集至 500+ 真实/对抗混合样本（`--seclists-dir` 生成本地免费，评测需 API）
 - [ ] 与 SQLMap、Burp Active Scan 横向对比
 - [ ] 接入服务端反馈（HTTP 响应），从"payload 识别"走向"漏洞确认"
-- [x] **CPG 代码级上下文子系统（研究主线，ADR-001）** — `cpg/`：CodeQL 管线（AST/CFG/DFG/taint，覆盖注入族 + SSRF + XSS）+ 切片构造 + 三模式消融框架（request/code/both）+ 真实语料分层抽样（dataset.jsonl，16 条 / 11 仓库）
+- [x] **CPG 代码级上下文子系统（研究主线，ADR-001）** — `cpg/`：CodeQL 管线（AST/CFG/DFG/taint，覆盖注入族 + SSRF + XSS）+ 切片构造 + 三模式消融框架（request/code/both）+ 真实语料分层抽样（dataset.jsonl，27 条 / 18 仓库 / 19 CWE）
 - [x] 真实 `dataset.jsonl` 全量三模式消融（语料库级单数据库 `corpus_db.py`，已产出 results.csv + summary.md）
-- [ ] 接入本地模型（Ollama）填充 `LocalLLMScorer`，锁定可复现实验（多 seed）
+- [x] 接入本地模型（Ollama）填充 `LocalLLMScorer`（qwen2.5-coder 7b/14b，temperature=0，多 seed 零方差；14B 规模消融完成）
 - [ ] 扩展结构型 CWE 覆盖（鉴权 / 走私 / TLS / DoS / 信息泄露 / IDOR 等），补上游结构查询或配置指纹
 
 ---
@@ -548,7 +548,7 @@ llm-vuln-detector/
 │   │   ├── context_build.py       # 按 mode 构造 DetectionContext
 │   │   ├── run_ablation.py        # 消融 harness
 │   │   └── summary.md             # demo 消融结果汇总
-│   └── dataset.jsonl              # 真实 CVE 语料（16 条 / 11 仓库）
+│   └── dataset.jsonl              # 真实 CVE 语料（27 条 / 18 仓库）
 ├── frontend/                      # Vue 3 前端
 │   ├── src/
 │   │   ├── App.vue
