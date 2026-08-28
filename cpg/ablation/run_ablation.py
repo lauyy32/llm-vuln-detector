@@ -326,6 +326,7 @@ def main() -> int:
     ap.add_argument("--skip-baseline", action="store_true", help="跳过 CodeQL 基线（仅跑结构化启发式，提速）")
     ap.add_argument("--with-local-llm", action="store_true",
                     help="纳入 LocalLLMScorer（需本机 Ollama + 模型已拉取；不可达时自动 abstain）")
+    ap.add_argument("--llm-model", type=str, default=None, help="本地 LLM 模型名（默认 qwen2.5-coder:7b，模型规模消融用）")
     ap.add_argument("--out-dir", type=Path, default=ABLATION_DIR)
     args = ap.parse_args()
 
@@ -366,8 +367,9 @@ def main() -> int:
         return 1
 
     # 本地 LLM 评分器（可选）：仅当 --with-local-llm 且本机 Ollama 实际可达时纳入；
-    # 否则不计入，避免一列全 abstain 干扰指标。
-    local_llm = LocalLLMScorer(timeout=600)
+    # 否则不计入，避免一列全 abstain 干扰指标。--llm-model 可指定模型（如 14b 规模消融）。
+    local_llm = LocalLLMScorer(model=getattr(args, "llm_model", None) or "qwen2.5-coder:7b",
+                               timeout=600)
     local_llm_enabled = bool(args.with_local_llm) and local_llm.reachable()
     if args.with_local_llm and not local_llm_enabled:
         print("[warn] --with-local-llm set but Ollama unreachable; LocalLLMScorer disabled")
