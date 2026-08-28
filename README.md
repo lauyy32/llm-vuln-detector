@@ -201,17 +201,25 @@ python tests/evaluate_v2.py --max-samples 20 --modes cot standard no-context
 
 ### DVWA 靶场端到端验证 + ModSecurity 对比
 
+> ⚠️ **基准决策（2026-08-28）：DVWA 评测已弃用，不再作为论文/消融基准。**
+> 理由：① 与 CPG 代码级主线无关——DVWA 是请求侧 MVP（v2.x）的评测，课题研究
+> 主线已收敛到 `cpg/` 代码级上下文；② 三档难度（low/medium/high）共用同一组
+> payload，仅更换 security cookie，不构成独立难度维度（DeepSeek 评审确认），
+> 测量的是同一组请求的重复计数；③ 请求侧分析上限已实证（v2.4：No-Context 反而
+> 略优于 CoT）。脚本 `backend/tests/benchmark_dvwa.py` 保留作历史冒烟工具，
+> 其结果不再进入任何消融/对比报告。
+
 ```bash
 # 启动靶场和 WAF（3 档 Paranoia Level）
 docker-compose up -d dvwa modsecurity-pl1 modsecurity-pl2 modsecurity-pl3
 
-# 启动后端 + 运行评测
+# 启动后端 + 运行评测（仅历史冒烟用，结果不作为基准）
 cd backend
 python tests/benchmark_dvwa.py                    # 完整: 3 难度 × 3 PL
 python tests/benchmark_dvwa.py --no-modsec         # 仅 LLM
 ```
 
-测试矩阵：**DVWA low/medium/high（3 档）× 6 个场景 × 2 种请求 = 36 条 LLM 检测**，每条同时过 ModSecurity PL1/PL2/PL3（3 档），共 108 次 WAF 检测。
+测试矩阵（历史）：**DVWA low/medium/high（3 档）× 6 个场景 × 2 种请求 = 36 条 LLM 检测**，每条同时过 ModSecurity PL1/PL2/PL3（3 档），共 108 次 WAF 检测。
 
 ### 消融实验
 
@@ -330,6 +338,8 @@ python tests/evaluate_v2.py --dataset adversarial --modes cot standard no-contex
 
 ### v2.2 DVWA 靶场端到端对比（真实 ModSecurity CRS 容器，2026-07-25）
 
+> ⚠️ **历史记录（2026-08-28 弃用）**：本节省略号内容为请求侧 MVP（v2.x）的历史评测，
+> 已不作为论文/消融基准（决策见上方「DVWA 靶场端到端验证」）。保留供追溯。
 > 本次在真实 Docker 环境中运行 **DVWA + ModSecurity OWASP CRS**（PL1/PL2/PL3 三档），替代此前的本地规则引擎基线（`waf_baseline.py`）。
 > 此前 v2.2「规则 WAF 基线版」仅用于沙箱无 Docker 时的临时演示，数据已不具参考价值，以本次真实容器数据为准。
 

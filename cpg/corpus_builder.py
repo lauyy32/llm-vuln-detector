@@ -249,18 +249,35 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
                 # vuln 侧该文件在 fix^ 不存在——修复可能是重构式（文件移动/新增），
                 # 漏洞代码可能位于 fix^ 的其他路径，提取的 vuln 侧不完整
                 missing_vuln.append(f)
-    # 双侧完整性校验：vuln 侧缺失率过高说明修复为重构式，vuln 侧漏洞代码可能未提取
+    # 双侧完整性校验（55419 教训，2026-08-28 升级为阻断）：
+    # 修复 diff 改动文件中，vuln 侧缺失率 ≥30% 视为重构式修复（文件移动/拆分），
+    # 此时"同名文件 checkout"策略漏掉 vuln 侧漏洞代码，truth 标签不可靠——
+    # **直接返回空，不写入 meta.json，阻止污染样本入库**。
+    # 少量缺失（<30%）允许但记录信号供人工核查。
     if missing_vuln and len(targets) > 0:
         ratio = len(missing_vuln) / len(targets)
         sig_path = pair_dir / "extraction_signal.json"
+        if ratio >= 0.3:
+            sig_path.write_text(json.dumps({
+                "vuln_side_missing": missing_vuln,
+                "missing_ratio": round(ratio, 2),
+                "note": "重构式修复或文件移动：vuln 侧漏洞代码可能未提取，truth 不可靠，已阻断入库",
+                "blocked": True,
+            }, ensure_ascii=False, indent=2), encoding="utf-8")
+            print(f"    [BLOCKED] 重构式修复，vuln 侧缺失 {len(missing_vuln)}/{len(targets)} "
+                  f"文件: {missing_vuln[:4]} —— 阻断入库")
+            # 清理半成品，避免 index 时误收
+            import shutil
+            if pair_dir.exists():
+                shutil.rmtree(pair_dir, ignore_errors=True)
+            return []
         sig_path.write_text(json.dumps({
             "vuln_side_missing": missing_vuln,
             "missing_ratio": round(ratio, 2),
-            "note": "重构式修复或文件移动：vuln 侧漏洞代码可能未提取，truth 判定需人工核查"
-                   if ratio >= 0.3 else "少量 vuln 侧缺失，可接受",
+            "note": "少量 vuln 侧缺失，可接受，人工核查",
+            "blocked": False,
         }, ensure_ascii=False, indent=2), encoding="utf-8")
-        flag = "[重构式修复!]" if ratio >= 0.3 else "[小错位]"
-        print(f"    {flag} vuln 侧缺失 {len(missing_vuln)}/{len(targets)} 文件: {missing_vuln[:4]}")
+        print(f"    [小错位] vuln 侧缺失 {len(missing_vuln)}/{len(targets)} 文件: {missing_vuln[:4]}")
     return extracted
 
 
