@@ -84,8 +84,14 @@ def fetch_advisories(eco: str, pages: int):
             break
         all_advs.extend(batch)
         print(f"[fetch] page {page}: +{len(batch)} (total {len(all_advs)})")
-    RAW_ADVISORIES.write_text(json.dumps(all_advs, indent=1), encoding="utf-8")
-    print(f"[ok] saved {len(all_advs)} advisories -> {RAW_ADVISORIES}")
+    if all_advs:
+        # 仅在成功拉到数据时覆盖缓存；失败（网络中断拉 0 条）时保留旧缓存，
+        # 避免把已有 2000 条缓存清空导致后续 select 无源可用。
+        RAW_ADVISORIES.write_text(json.dumps(all_advs, indent=1), encoding="utf-8")
+        print(f"[ok] saved {len(all_advs)} advisories -> {RAW_ADVISORIES}")
+    else:
+        print(f"[warn] fetched 0 advisories; keep existing cache "
+              f"({RAW_ADVISORIES.stat().st_size if RAW_ADVISORIES.exists() else 0} bytes)")
     return all_advs
 
 
