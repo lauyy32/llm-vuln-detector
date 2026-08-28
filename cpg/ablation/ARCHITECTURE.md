@@ -1,6 +1,6 @@
 # 后端架构：上下文增强漏洞检测（三模式消融）
 
-> 复用既有基础设施：`cpg/pipeline.py`（CodeQL 2.26.2 CLI 管线）、`cpg/slice_builder.py`、16 条 `dataset.jsonl`（vuln/→vulnerable，fixed/→benign）。不重写 CPG 提取。
+> 复用既有基础设施：`cpg/pipeline.py`（CodeQL 2.26.2 CLI 管线）、`cpg/slice_builder.py`、27 条 `dataset.jsonl`（vuln/→vulnerable，fixed/→benign）。不重写 CPG 提取。
 
 ## 1. API 端点（OpenAPI 风格）
 `POST /api/v1/detect`
