@@ -56,6 +56,7 @@ cpg/ablation/seeds/
 # 采集中间产物（可重建）
 cpg/candidates_t*.jsonl
 cpg/candidates_expand*.jsonl
+cpg/todo_batch_*
 
 # 重构式修复样本残留（P2 标记无效，不入库；meta/signal 已跟踪）
 cpg/corpus_pairs/CVE-2026-55244/
