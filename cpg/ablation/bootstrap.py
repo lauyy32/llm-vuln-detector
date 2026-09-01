@@ -5,6 +5,7 @@ LLM 判定对每个样本固定（temperature=0），bootstrap 是对固定判�
 注：bootstrap F1 采用与 summary 一致的口径（abstain 不计入 FN），故 F1(原) 可能与
 summary 的全局 F1（abstain 计为 FN）略有差异；差值 CI 在两种口径下均不含 0。
 """
+import argparse
 import csv
 import random
 import sys
@@ -20,6 +21,9 @@ SEED = 42
 SCORERS = ["LocalLLMScorer", "CPGEvidenceScorer", "StructuralHeuristicScorer",
            "CodeQLBaselineScorer", "ConfigSigScorer"]
 
+DEFAULT_CSV = ROOT / "cpg/ablation/results.csv"
+DEFAULT_OUT = ROOT / "cpg/ablation/bootstrap_report.md"
+
 
 def f1_from_counts(tp, fp, fn):
     if tp == 0:
@@ -30,9 +34,17 @@ def f1_from_counts(tp, fp, fn):
 
 
 def main():
+    ap = argparse.ArgumentParser(description="按 CVE 配对重采样计算各 scorer F1 的 95% CI")
+    ap.add_argument("--csv", type=Path, default=DEFAULT_CSV,
+                    help="消融结果 CSV（默认 %(default)s，可用 seeds/v8_74_14b/results.csv 等）")
+    ap.add_argument("--out", type=Path, default=DEFAULT_OUT,
+                    help="报告输出路径（默认 %(default)s）")
+    args = ap.parse_args()
+    csv_path, out_path = args.csv, args.out
+
     # 按 CVE 聚合逐样本判定（code 模式，每版本一条 item——以 LocalLLM 行为准建骨架）
     by_cve = defaultdict(list)
-    with (ROOT / "cpg/ablation/results.csv").open(newline="", encoding="utf-8") as fh:
+    with csv_path.open(newline="", encoding="utf-8") as fh:
         for r in csv.DictReader(fh):
             if r["mode"] != "code" or r["scorer"] != "LocalLLMScorer":
                 continue
@@ -42,7 +54,7 @@ def main():
             })
     # 重新读一遍填 pred
     by_cve2 = defaultdict(list)
-    with (ROOT / "cpg/ablation/results.csv").open(newline="", encoding="utf-8") as fh:
+    with csv_path.open(newline="", encoding="utf-8") as fh:
         for r in csv.DictReader(fh):
             if r["mode"] != "code" or r["scorer"] not in SCORERS:
                 continue
@@ -124,8 +136,8 @@ def main():
         md.append(f"| {s} | {orig_f1[s]:.3f} | — | [{results[s][0]:.3f}, {results[s][1]:.3f}] |")
     md += ["", f"**LLM − CPGEvidence 差值 CI: [{dlo:.3f}, {dhi:.3f}]；"
                f"LLM 高于 CPG 的比例 {p_llm_gt:.1%}**"]
-    (ROOT / "cpg/ablation/bootstrap_report.md").write_text("\n".join(md), encoding="utf-8")
-    print(f"[ok] wrote bootstrap_report.md")
+    out_path.write_text("\n".join(md), encoding="utf-8")
+    print(f"[ok] wrote {out_path}")
 
 
 if __name__ == "__main__":
