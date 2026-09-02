@@ -543,10 +543,27 @@ class CPGEvidenceScorer(Scorer):
             )
         flow_cwes = self._parse_flow_cwes(slices)
         if flow_cwes:
-            ev_cwe = config.normalize_cwe(flow_cwes[0]) or target
+            norm_flows = {config.normalize_cwe(c) for c in flow_cwes}
+            # D5 门禁（OPEN #25，2026-09-02）：CPG 污点证据仅在「检测到的污点流 CWE
+            # 与目标 CWE 一致」时才构成对本 CVE 的判定；否则该流属于越界证据
+            # （如逻辑类 CVE 的切片里出现无关的 CWE-022/918 流，或 taint CWE 与目标
+            # SSRF 不匹配），不能据此判定，显式 abstain。此门禁与
+            # StructuralHeuristicScorer 的「目标 CWE 匹配」逻辑对齐，消除 §8.5 的
+            # 双标误报，且不依赖任何 per-CVE 调参。
+            if target is not None and target in norm_flows:
+                return Verdict(
+                    label="vulnerable", confidence=0.8, cwe=target,
+                    evidence=[{"type": "cpg-evidence", "cwe": target, "flows": len(flow_cwes)}],
+                )
             return Verdict(
-                label="vulnerable", confidence=0.8, cwe=ev_cwe,
-                evidence=[{"type": "cpg-evidence", "cwe": flow_cwes[0], "flows": len(flow_cwes)}],
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{
+                    "type": "cpg-evidence",
+                    "reason": "taint flow(s) present but CWE mismatch with target; "
+                              "out of CPG evidence scope for this CVE",
+                    "flow_cwes": sorted(c for c in norm_flows if c),
+                    "target": target,
+                }],
             )
         # 切片非空但无结构化流信息（异常，如渲染格式变更）
         return Verdict(

@@ -119,9 +119,13 @@
 - **缺陷 3（核心）**：配对判别显示 **96%–99% 的 CVE 打补丁前后判定完全相同**
   （CPG 98.6% / 7B 97.3% / 14B 95.9%）；真正区分 vuln/fixed 仅 1–2 个 CVE，
   配对精确二项检验 p=0.25–0.50 不显著 → 系统实际度量的是「是否存在可疑数据流」而非「该版本是否有漏洞」
-- **机理**：CPGEvidence 全部 17 个误报系统性落在 17 个「双标记」CVE 上——补丁插入净化器
-  （safe_tar_extractall / 路径包含性校验 / SSRF 白名单）但**不切断** source→sink 路径，
-  CodeQL 未建模自定义净化器 → 污点证据在补丁边界同型、不携带信息
+- **机理（2026-09-02 重检修正）**：CPGEvidence 双标根因是**取切片第一条污点流作判定 CWE、无视
+  目标 CWE 匹配**（StructuralHeuristicScorer 已按目标 CWE 匹配故不双标），非「净化器未建模」。
+  17 个分两类：10/17 为 CPG 证据越界（7 逻辑类 CWE 切片里出现无关 CWE-022/918 流、3 个 SSRF 却
+  报 CWE-022，两端都有）；7/17 为真·taint 匹配（目标与判定均 CWE-022，两端均含同流，补丁不切断
+  该流）。**D5 目标 CWE 匹配门禁**（`scorers.py`）精确反事实测 17→7（移除 10 越界/不匹配），
+  BA/MCC 近不变（仍近随机）；残 7 属 CPG 补丁边界局限，isSanitizer 不足以解（需 per-CVE overfit，
+  违反纪律），principled 修法=pair-aware 判别性证据（OPEN）。详见 `docs/D5-双标机制与门禁.md`
 - **新增脚本**：`paired_metrics.py`（BA/MCC/配对判别/McNemar 精确检验 + 三个平凡基线）、
   `b2_complement_stats.py`（互补性四象限逐样本交叉表）
 - **新增报告**：`度量修正与配对判别报告.md`（含对既有 6 条结论的逐条处置表）
