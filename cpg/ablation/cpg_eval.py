@@ -14,11 +14,18 @@
 
 from __future__ import annotations
 
+import ast
 import csv
 import json
 from pathlib import Path
 
 from . import config
+
+# AST 显式注入（OPEN #11 消融）：单样本源码用 Python 原生 ast 模块物化父子边，
+# 产出与 CodeQL ast.csv 等价（同为目标函数 AST 边列表）的显式 AST，但逐样本、无
+# 跨样本泄漏、无需为每样本重建 CodeQL 库。本消融检验的假设是「显式 AST 边 vs 隐式
+# 从源码文本推断」——源码来源（原生 ast / CodeQL）不影响该假设检验。
+AST_EDGE_CAP = 500
 
 SAMPLE_FILENAME = "sample.py"
 
@@ -172,27 +179,91 @@ def _read_src_lines(r: dict, fallback_text: str) -> list[str] | None:
     return None
 
 
-def build_cpg_slices_text(taint_rows: list[dict], code_text: str) -> str:
-    """把结构化 taint 行渲染成可读 CPG 切片文本（供 LLM 上下文；非判定依据）。"""
-    if not taint_rows:
-        return "(no untrusted input reaches a modelled sink)\n"
-    out: list[str] = ["# CPG TAINT SLICE", ""]
-    for r in taint_rows:
-        cwe = r.get("cwe")
+def build_ast_section_from_source(code_text: str) -> list[str]:
+    """用 Python 原生 ast 物化源码的显式 AST 父子边（OPEN #11 消融用）。
+
+    返回边列表，每条形如 ``L<parent_line> <ParentType>  ->  L<child_line> <ChildType>``，
+    与 slice_builder.build_ast_section 的语法一致（仅父/子文本改为类型名，因原生 ast
+    不保留 CodeQL 的 toString 文本）。去除重复边并按出现顺序保留，超出 AST_EDGE_CAP
+    的尾部截断（避免无限烧 token；截断本身也是决策 #11 关注的「显式 AST 成本」信号）。
+
+    ``code_text`` 可能已被 ``_load_sample_code`` 在 6000 字符处截断为半个语句（多文件
+    拼接片段），直接 ``ast.parse`` 会失败。故采用 best-effort 恢复：逐行回退末段直到
+    能解析；恢复出的树与 LLM 实际看到的截断文本一致（同为片段），AST 边因此仍可信。
+    """
+    def _try(src: str):
         try:
-            a = int(r.get("sourceLine") or 0)
-            b = int(r.get("sinkLine") or 0)
-        except (TypeError, ValueError):
-            a = b = 0
-        lines = _read_src_lines(r, code_text)
-        if lines is None:
-            src_line = sink_line = "?"
-        else:
-            src_line = lines[a - 1].strip() if 1 <= a <= len(lines) else "?"
-            sink_line = lines[b - 1].strip() if 1 <= b <= len(lines) else "?"
-        out.append(f"### {cwe}")
-        out.append(f"UNTRUSTED  L{a}: {src_line}")
-        out.append(f"           ==> reaches sink at L{b}: {sink_line}")
-        out.append(f"           (flow: {r.get('sourceNode')} -> {r.get('sinkNode')})")
+            return ast.parse(src)
+        except SyntaxError:
+            return None
+
+    tree = _try(code_text)
+    if tree is None:
+        lines = code_text.splitlines()
+        for cut in range(len(lines), max(0, len(lines) - 20), -1):
+            t = _try("\n".join(lines[:cut]))
+            if t is not None:
+                tree = t
+                break
+    if tree is None:
+        return ["(AST 解析失败：非合法 Python 源码)"]
+
+    edges: list[tuple] = []
+    seen: set[tuple] = set()
+    for parent in ast.walk(tree):
+        if not hasattr(parent, "lineno"):
+            continue
+        pl = getattr(parent, "lineno")
+        pt = type(parent).__name__
+        for child in ast.iter_child_nodes(parent):
+            cl = getattr(child, "lineno", "?")
+            ct = type(child).__name__
+            key = (pl, pt, cl, ct)
+            if key in seen:
+                continue
+            seen.add(key)
+            edges.append(key)
+            if len(edges) >= AST_EDGE_CAP:
+                return [f"L{p} {pt}  ->  L{c} {ct}" for p, pt, c, ct in edges]
+    return [f"L{p} {pt}  ->  L{c} {ct}" for p, pt, c, ct in edges]
+
+
+def build_cpg_slices_text(
+    taint_rows: list[dict], code_text: str, ast_text: str | None = None
+) -> str:
+    """把结构化 taint 行渲染成可读 CPG 切片文本（供 LLM 上下文；非判定依据）。
+
+    ``ast_text``（可选）：由 build_ast_section_from_source 产出的显式 AST 边列表；
+    非空时追加 ``## AST`` 段，构成 OPEN #11「切片含 AST」条件。
+    """
+    if not taint_rows:
+        taint_block = "(no untrusted input reaches a modelled sink)\n"
+    else:
+        taint_block = ""
+    out: list[str] = ["# CPG TAINT SLICE", ""]
+    if taint_rows:
+        for r in taint_rows:
+            cwe = r.get("cwe")
+            try:
+                a = int(r.get("sourceLine") or 0)
+                b = int(r.get("sinkLine") or 0)
+            except (TypeError, ValueError):
+                a = b = 0
+            lines = _read_src_lines(r, code_text)
+            if lines is None:
+                src_line = sink_line = "?"
+            else:
+                src_line = lines[a - 1].strip() if 1 <= a <= len(lines) else "?"
+                sink_line = lines[b - 1].strip() if 1 <= b <= len(lines) else "?"
+            out.append(f"### {cwe}")
+            out.append(f"UNTRUSTED  L{a}: {src_line}")
+            out.append(f"           ==> reaches sink at L{b}: {sink_line}")
+            out.append(f"           (flow: {r.get('sourceNode')} -> {r.get('sinkNode')})")
+            out.append("")
+    else:
+        out.append(taint_block)
+    if ast_text:
+        out.append("## AST（显式语法树边）")
+        out.append(ast_text)
         out.append("")
     return "\n".join(out)

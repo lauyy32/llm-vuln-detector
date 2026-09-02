@@ -325,6 +325,9 @@ def main() -> int:
     ap.add_argument("--with-summary", action="store_true",
                     help="注入公告摘要（默认不注入——摘要描述漏洞位置/成因，构成标签泄漏，主结果保持无摘要；"
                          "此开关仅用于摘要隔离对照实验）")
+    ap.add_argument("--include-ast", action="store_true",
+                    help="在 CPG 切片中追加显式 AST 边列表（OPEN #11 消融：切片含 AST vs 不含 AST；"
+                         "默认不含——源码文本已隐式编码 AST，显式注入仅增加 token）")
     ap.add_argument("--modes", type=str, default="code",
                     help="逗号分隔的检测模式列表（默认 code；request/both 需显式指定——"
                          "语料不含请求字段时 request 恒 abstain、both 退化为 code）")
@@ -446,6 +449,8 @@ def main() -> int:
             ctx_kwargs = {"workdir": wd, "taint_rows": effective_taint}
             if args.no_taint:
                 ctx_kwargs["cpg_slices"] = None
+            if args.include_ast:
+                ctx_kwargs["include_ast"] = True
             ctx = build_context(mode, s, **ctx_kwargs)
             # 结构化启发式（吃注入的 taint_rows；request 模式 cpg_slices=None → 显式 abstain）
             v_sh = StructuralHeuristicScorer(taint_rows=effective_taint).score(ctx)

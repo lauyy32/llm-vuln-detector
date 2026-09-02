@@ -1,0 +1,102 @@
+{
+ "n_cve": 74,
+ "n_version": 148,
+ "baseline": {
+  "f1": 0.3207547169811321,
+  "precision": 0.53125,
+  "recall": 0.22972972972972974,
+  "ba": 0.5135135135135135,
+  "mcc": 0.032826608214930636,
+  "paired": {
+   "correct": 2,
+   "inverted": 0,
+   "both_flagged": 15,
+   "neither_flagged": 57,
+   "n_cve": 74,
+   "n_discordant": 2,
+   "discrimination_rate": 0.02702702702702703,
+   "net_discrimination": 0.02702702702702703,
+   "p_value_exact": 0.25,
+   "correct_ids": [
+    "CVE-2026-54574",
+    "CVE-2026-67435"
+   ],
+   "inverted_ids": []
+  }
+ },
+ "with_ast": {
+  "f1": 0.38016528925619836,
+  "precision": 0.48936170212765956,
+  "recall": 0.3108108108108108,
+  "ba": 0.4932432432432432,
+  "mcc": -0.014514109129006894,
+  "paired": {
+   "correct": 5,
+   "inverted": 6,
+   "both_flagged": 18,
+   "neither_flagged": 45,
+   "n_cve": 74,
+   "n_discordant": 11,
+   "discrimination_rate": 0.06756756756756757,
+   "net_discrimination": -0.013513513513513514,
+   "p_value_exact": 0.7255859375,
+   "correct_ids": [
+    "CVE-2026-13769",
+    "CVE-2026-48782",
+    "CVE-2026-54706",
+    "CVE-2026-55099",
+    "CVE-2026-55403"
+   ],
+   "inverted_ids": [
+    "CVE-2026-16584",
+    "CVE-2026-50180",
+    "CVE-2026-50181",
+    "CVE-2026-53598",
+    "CVE-2026-54548",
+    "CVE-2026-54707"
+   ]
+  }
+ },
+ "delta_net_discrimination": -0.04054054054054054,
+ "version_flip_count": 59,
+ "version_flip_rate": 0.39864864864864863,
+ "discrimination_category_changed_cves": [
+  "CVE-2026-12482",
+  "CVE-2026-13769",
+  "CVE-2026-16584",
+  "CVE-2026-45019",
+  "CVE-2026-47192",
+  "CVE-2026-48710",
+  "CVE-2026-48782",
+  "CVE-2026-49257",
+  "CVE-2026-50180",
+  "CVE-2026-50181",
+  "CVE-2026-53598",
+  "CVE-2026-53656",
+  "CVE-2026-54548",
+  "CVE-2026-54567",
+  "CVE-2026-54574",
+  "CVE-2026-54706",
+  "CVE-2026-54707",
+  "CVE-2026-55099",
+  "CVE-2026-55403",
+  "CVE-2026-59820",
+  "CVE-2026-59886",
+  "CVE-2026-59890",
+  "CVE-2026-59893",
+  "CVE-2026-59894",
+  "CVE-2026-61632",
+  "CVE-2026-63632",
+  "CVE-2026-67424",
+  "CVE-2026-67425",
+  "CVE-2026-67428",
+  "CVE-2026-67435",
+  "CVE-2026-68508",
+  "CVE-2026-69243",
+  "CVE-2026-70491",
+  "CVE-2026-70493",
+  "CVE-2026-73498",
+  "CVE-2026-73568"
+ ],
+ "discrimination_category_changed_count": 36
+}

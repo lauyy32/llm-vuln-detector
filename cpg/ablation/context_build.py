@@ -23,7 +23,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from . import config
-from .cpg_eval import build_cpg_slices_text, extract_taint
+from .cpg_eval import build_ast_section_from_source, build_cpg_slices_text, extract_taint
 from .scorers import DetectionContext
 
 VALID_MODES = ("request", "code", "both")
@@ -53,6 +53,7 @@ def build_context(
     taint_rows: list[dict] | None = None,
     cpg_slices: str | None = None,
     include_summary: bool = False,
+    include_ast: bool = False,
 ) -> DetectionContext:
     """构造 DetectionContext。
 
@@ -96,7 +97,30 @@ def build_context(
         wd = Path(workdir) if workdir else (config.WORK_DIR / "ctx" / (sid or "sample"))
         taint_rows = extract_taint(code_text, cwe, wd)
     if cpg_slices is None:
-        cpg_slices = build_cpg_slices_text(taint_rows, code_text)
+        ast_text = None
+        if include_ast:
+            # 优先用样本完整源码（语料库模式下按 prefix 读取真实 .py 文件）物化 AST——
+            # 截断后的 code_text 片段常因半个语句而 ast.parse 失败，完整文件则必然合法，
+            # 保证「含 AST」条件对所有样本都有有效 AST 边（与 LLM 看到的截断片段的微小
+            # 错位可接受：AST 是结构总览，本就允许覆盖片段之外的结构）。
+            ast_src = code_text or ""
+            if not sample.get("reuse_db") and sample.get("prefix"):
+                root = config.CORPUS_SRC / sample["prefix"]
+                if root.is_dir():
+                    blocks = []
+                    for fp in sorted(root.rglob("*.py")):
+                        try:
+                            blocks.append(
+                                f"# ===== FILE: {fp.name} =====\n"
+                                + fp.read_text(encoding="utf-8", errors="replace")
+                            )
+                        except OSError:
+                            continue
+                    if blocks:
+                        ast_src = "\n".join(blocks)
+            if ast_src:
+                ast_text = "\n".join(build_ast_section_from_source(ast_src))
+        cpg_slices = build_cpg_slices_text(taint_rows, code_text, ast_text=ast_text)
 
     request_info = sample.get("request") if mode == "both" else None
     return DetectionContext(

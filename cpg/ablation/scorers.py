@@ -243,7 +243,7 @@ class LocalLLMScorer(Scorer):
         if ctx.code_text:
             parts.append(f"\n# 目标代码（节选）\n```\n{ctx.code_text[:6000]}\n```")
         if ctx.cpg_slices:
-            parts.append(f"\n# 代码级上下文（CPG 污点切片）\n{ctx.cpg_slices[:4000]}")
+            parts.append(f"\n# 代码级上下文（CPG 污点切片）\n{ctx.cpg_slices[:12000]}")
         parts.append(
             "\n# 输出要求\n严格输出如下 JSON，不要任何额外文字：\n"
             '{"verdict":"vulnerable|benign|abstain","cwe":"CWE-xxx 或 null",'
