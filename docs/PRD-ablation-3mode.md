@@ -1,6 +1,6 @@
 # PRD：三模式上下文消融实验（LLM + CPG 漏洞检测）
 
-> 课题：基于大语言模型的上下文增强智能漏洞检测（ × 奇安信）
+> 课题：基于大语言模型的上下文增强智能漏洞检测（校企合作研究生课题）
 > 文档类型：产品需求文档（MVP 消融实验）
 > 作者：lauyy32
 > 基线事实：已读 `cpg/pipeline.py`、`cpg/dataset.jsonl`、`cpg/slice_builder.py`、`backend/tests/evaluate_v2.py`、`docs/RESEARCH-DESIGN.md`、`docs/decisions/ADR-001.md`；并参照 LLMxCPG(USENIX) — CPG 切片使 F1 提升 15–40%。
