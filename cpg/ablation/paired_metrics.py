@@ -46,6 +46,7 @@ import csv
 import json
 import math
 import random
+import sys
 from pathlib import Path
 
 VULN = "vulnerable"
@@ -163,6 +164,54 @@ def add_trivial_baselines(bundle: dict) -> None:
     bundle["scorers"]["[平凡]随机(p=0.5,seed=42)"] = {k: rng.random() < 0.5 for k in keys}
 
 
+TRIVIAL_BASELINE_MARKERS = ("[平凡]",)
+
+
+def verify_stat_contract(rows: list[dict]) -> list[str]:
+    """统计报告契约：任何对比表必须经此校验，防止回归到 F1-only。
+
+    强制四项：
+      1. 含平凡基线行（[平凡]全判vulnerable 等）——暴露 F1 度量缺陷；
+      2. 每行含 BA（平衡准确率）；
+      3. 每行含 MCC（马修斯相关系数）；
+      4. 每行含 McNemar 精确 p（配对判别）。
+    返回违例文本列表；空列表=通过。
+    """
+    violations: list[str] = []
+    names = [r["scorer"] for r in rows]
+    if not any(m in n for n in names for m in TRIVIAL_BASELINE_MARKERS):
+        violations.append("缺少平凡基线行（应含 [平凡]全判vulnerable 等）")
+    for r in rows:
+        if "ba" not in r or "mcc" not in r:
+            violations.append(f"scorer={r.get('scorer')} 缺 BA/MCC 字段")
+        paired = r.get("paired") or {}
+        if "p_value_exact" not in paired:
+            violations.append(f"scorer={r.get('scorer')} 缺 McNemar 精确 p")
+    return violations
+
+
+def self_test() -> int:
+    """内置统计契约自测：合成 2 CVE 配对，验证平凡基线注入与契约通过。"""
+    keys = [("CVE-X", "vuln"), ("CVE-X", "fixed"),
+            ("CVE-Y", "vuln"), ("CVE-Y", "fixed")]
+    bundle = {
+        "truth": {("CVE-X", "vuln"): True, ("CVE-X", "fixed"): False,
+                  ("CVE-Y", "vuln"): True, ("CVE-Y", "fixed"): False},
+        "scorers": {
+            "Demo": {("CVE-X", "vuln"): True, ("CVE-X", "fixed"): False,
+                     ("CVE-Y", "vuln"): True, ("CVE-Y", "fixed"): False},
+        },
+    }
+    add_trivial_baselines(bundle)
+    rows = evaluate(bundle)
+    violations = verify_stat_contract(rows)
+    tv = next(r for r in rows if "全判vulnerable" in r["scorer"])
+    ok = (not violations) and abs(tv["f1"] - 2 / 3) < 1e-9
+    print(f"self_test: contract_violations={len(violations)} "
+          f"trivial_F1={tv['f1']:.3f} -> {'PASS' if ok else 'FAIL'}")
+    return 0 if ok else 1
+
+
 # --------------------------------------------------------------------------
 # 输出
 # --------------------------------------------------------------------------
@@ -212,8 +261,13 @@ def main() -> None:
     ap.add_argument("--form", default="full", help="B-2 证据形态（full/sink_only/truncated）")
     ap.add_argument("--markdown", action="store_true")
     ap.add_argument("--no-trivial", action="store_true", help="不注入平凡基线")
+    ap.add_argument("--check", action="store_true", help="统计契约违例则退出码非零（CI/评审用）")
+    ap.add_argument("--self-test", action="store_true", help="跑内置统计契约自测后退出")
     ap.add_argument("--json-out", type=Path)
     args = ap.parse_args()
+
+    if args.self_test:
+        raise SystemExit(self_test())
 
     if args.b2:
         bundle = load_b2_json(args.b2, args.form)
@@ -230,6 +284,16 @@ def main() -> None:
     rows = evaluate(bundle)
     print(f"== {header} | {len(bundle['truth'])} 版本 / {len(bundle['truth']) // 2} CVE\n")
     print(render(rows, args.markdown))
+
+    violations = verify_stat_contract(rows)
+    if violations:
+        print("\n[统计契约 违例]")
+        for v in violations:
+            print("  -", v)
+    else:
+        print("\n[统计契约] 通过：含平凡基线 + BA/MCC + McNemar 精确 p")
+    if args.check and violations:
+        sys.exit(1)
 
     if args.json_out:
         args.json_out.write_text(
