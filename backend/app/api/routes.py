@@ -80,11 +80,23 @@ def _build_response(parsed, detection_result: dict) -> DetectResponse:
     )
 
 
-async def _do_detect(raw_request: str, llm_engine: LLMEngine) -> DetectResponse:
-    """内部：执行单次检测，返回 DetectResponse。"""
+async def _do_detect(
+    raw_request: str,
+    llm_engine: LLMEngine,
+    *,
+    include_pre_scan: bool = True,
+    include_feature_list: bool = True,
+    include_fewshot: bool = True,
+) -> DetectResponse:
+    """内部：执行单次检测，返回 DetectResponse。消融开关透传给上下文构造。"""
     parsed = _parse_request_or_422(raw_request)
     request_id = str(uuid.uuid4())[:8]
-    messages = build_detection_messages(parsed, request_id)
+    messages = build_detection_messages(
+        parsed, request_id,
+        include_pre_scan=include_pre_scan,
+        include_feature_list=include_feature_list,
+        include_fewshot=include_fewshot,
+    )
     detection_result = await llm_engine.detect(messages)
     return _build_response(parsed, detection_result)
 
@@ -94,10 +106,19 @@ async def detect_vulnerability(
     request: DetectRequest,
     llm_engine: LLMEngine = Depends(get_llm_engine),
     history_store=Depends(get_history_store),
+    pre_scan: bool = Query(True, description="消融开关：是否注入 RISK_PATTERNS 预扫描结果"),
+    feature_list: bool = Query(True, description="消融开关：System Prompt 是否含逐签名特征清单"),
+    fewshot: bool = Query(True, description="消融开关：System Prompt 是否含 few-shot 示例"),
 ):
-    """攻击载荷识别接口。接收原始 HTTP 请求文本，解析后调用 LLM 分析，返回疑似攻击载荷识别结果。"""
+    """攻击载荷识别接口（CoT 模式）。
+    默认开启全部上下文增强（与既有评测一致）；置 pre_scan/feature_list/fewshot=false 可做"有/无特征"消融。"""
     try:
-        response = await _do_detect(request.raw_request, llm_engine)
+        response = await _do_detect(
+            request.raw_request, llm_engine,
+            include_pre_scan=pre_scan,
+            include_feature_list=feature_list,
+            include_fewshot=fewshot,
+        )
     except LLMEngineError as e:
         logger.error("LLM 检测失败: %s", e)
         raise HTTPException(status_code=502, detail=f"LLM 检测失败: {e}")

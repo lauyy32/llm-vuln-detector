@@ -82,7 +82,7 @@
 - **混淆模式分析**：检测大小写混淆、空白符替代、注释注入、NULL截断、宽字节绕过等绕过手法
 - **CoT 分步推理**：引导 LLM 先理解上下文 → 解码 → 去混淆 → 语义分析 → 综合判定（非一次性输出）
 - **三种检测模式**（用于消融实验）：
-  - `cot` — 增强上下文 + CoT 分步推理（默认，最强）
+  - `cot` — 增强上下文 + CoT 分步推理（默认模式；实测未显示稳定增益，见 v2.1/v2.3 评测）
   - `standard` — 增强上下文 + 标准 Prompt（对比 CoT 的增益）
   - `no-context` — 无上下文增强（基线）
 - **降误报设计**：few-shot 示例 + 自检机制 + 置信度量化（0-100）
@@ -134,7 +134,7 @@ npm run dev            # http://localhost:5173
 
 | 接口 | 方法 | 说明 |
 |---|---|---|
-| `/api/detect` | POST | **CoT 模式** — 增强上下文 + 分步推理（推荐） |
+| `/api/detect` | POST | **CoT 模式** — 增强上下文 + 分步推理（默认模式） |
 | `/api/detect-standard` | POST | **标准模式** — 增强上下文 + 标准 Prompt（消融对比） |
 | `/api/detect-no-context` | POST | **消融基线** — 无上下文增强 |
 | `/api/batch-detect` | POST | 批量识别（最多50条） |
@@ -457,6 +457,16 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 **效率优化（同次提交）**：原 `run_robustness` 为嵌套 for 循环串行 `await`，409 变体约 1.5 小时、升级后 825+ 变体将达 ~3 小时。已改为**两阶段并发**：阶段1 所有样本原始判定并发（信号量限流，默认 8，可用 `--concurrency` 调），阶段2 仅对「原始判为攻击」的样本并发跑变体，保留「漏报样本跳过变体」省调用逻辑。预计 825+ 变体真实重跑从 ~3 小时降至 **约 20–40 分钟**（取决于 DeepSeek 限流与单请求延迟）。
 
 > ⚠️ **数据说明**：上方 v2.3 的「409 变体 / 2.0% 翻转率」由**升级前的 3 变体生成器**产出。升级后变体数量与分布已改变（约 825+ 变体），**该数字不能直接代表新生成器**；需用 `python tests/benchmark_robustness.py --dataset real-world --endpoint /api/detect --concurrency 8` 重跑后，以新结果替换本段落。
+
+---
+
+## 请求侧评测的泄漏消融（回应同行评审 §5）
+
+> 同行评审指出请求侧设计存在"先告诉答案"的信息泄漏：System Prompt 在步骤4 逐条枚举了各类攻击的具体特征签名，且与上下文构造器的预扫描正则（`RISK_PATTERNS`）及测试集同源；few-shot 示例与测试集同攻击族。本仓库已做如下整改，量化的"有/无特征"Δ 待带 API 重跑后补入 v2.1/v2.3 表（本机无 Key，见 `docs/DEEPSEEK-评审回应清单.md`）。
+
+- **可关消融开关**：`/api/detect` 新增 `pre_scan` / `feature_list` / `fewshot` 三个查询参数（默认 `true`，与既有评测一致）。置 `false` 即构造无泄漏消息——`SYSTEM_PROMPT_CLEAN`（仅任务框架、无逐签名清单与 few-shot）+ 上下文不含 `risk_signals` / `pre_scan` 块。开关生效由 `backend/tests/selfcheck_leakage_ablation.py` 无 API 机器验证。
+- **few-shot 独立性**：4 条 few-shot 示例为研究者手写，并非从 `dataset/` 取样；`include_fewshot` 开关可单独测量其贡献。
+- **对抗集同族堆叠量化**：`dataset/adversarial_samples.json` 246 条已加 `variant_group` 字段（去编码归一后基底 hash 分组）。实测独立基底 **221** 个、堆叠比 **1.11×**、最大同族组 9 条（XSS `alert(1)` 变体）、仅 2 组 ≥5 条。即评审"246 条 alert(1)/127.0.0.1 变体"的措辞被夸大——数据集表面多样性充足，仅少数簇聚集，后续可借 `variant_group` 做分层抽样避免过估。
 
 ---
 

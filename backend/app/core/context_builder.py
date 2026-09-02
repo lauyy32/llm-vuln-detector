@@ -23,6 +23,7 @@ from typing import Optional
 
 from app.core.prompt_templates import (
     SYSTEM_PROMPT,
+    build_system_prompt,
     USER_PROMPT_TEMPLATE,
     USER_PROMPT_TEMPLATE_NO_CONTEXT,
 )
@@ -517,13 +518,17 @@ def build_confusion_report(param: ParsedParam) -> dict:
     }
 
 
-def build_structured_context(parsed: ParsedHttpRequest, request_id: str) -> str:
+def build_structured_context(parsed: ParsedHttpRequest, request_id: str, include_pre_scan: bool = True) -> str:
     """
     将解析后的 HTTP 请求构造为多维结构化上下文字符串（v2.0 升级版）。
     包含预扫描结果 + 编码分析 + 混淆分析，帮助 LLM 全面理解攻击复杂度。
+
+    include_pre_scan=False 时移除 risk_signals / pre_scan 块（"无特征"消融，
+    回应 DeepSeek 锐评 §5 预扫描正则与测试集同源的泄漏指控）。编码/混淆分析属中性
+    解码归一，仍保留。
     """
     all_params = parsed.query_params + parsed.body_params
-    high_risk = [p.name for p in all_params if p.risk_signals]
+    high_risk = [p.name for p in all_params if p.risk_signals] if include_pre_scan else []
 
     context = {
         "request_id": request_id,
@@ -533,12 +538,12 @@ def build_structured_context(parsed: ParsedHttpRequest, request_id: str) -> str:
         # 全局摘要
         "global_summary": {
             "total_params": len(all_params),
-            "high_risk_params": len(high_risk),
+            "high_risk_params": len(high_risk) if include_pre_scan else 0,
             "encoding_layers_detected": parsed.global_encoding_summary,
             "confusion_techniques_detected": parsed.global_confusion_summary,
             "overall_threat_assessment": (
                 "高度可疑 — 存在多层编码和混淆手法" if parsed.global_encoding_summary and parsed.global_confusion_summary
-                else "可疑 — 检测到攻击载荷特征" if high_risk
+                else "可疑 — 检测到攻击载荷特征（预扫描）" if (high_risk and include_pre_scan)
                 else "低风险 — 未发现明显攻击特征"
             ),
         },
@@ -549,22 +554,24 @@ def build_structured_context(parsed: ParsedHttpRequest, request_id: str) -> str:
             if k.lower() in ("cookie", "content-type", "authorization", "referer", "user-agent",
                                "x-forwarded-for", "x-real-ip")
         },
-        "pre_scan": {
+    }
+    if include_pre_scan:
+        context["pre_scan"] = {
             "high_risk_params": high_risk,
             "note": (
                 f"预扫描发现 {len(high_risk)} 个可疑参数（含编码/混淆检测），建议分步推理分析"
                 if high_risk else "预扫描未发现明显风险信号"
             ),
-        },
-    }
+        }
 
     for p in parsed.query_params:
         entry = {
             "name": p.name,
             "value": p.value[:200],
             "decoded": p.decoded[:200],
-            "risk_signals": p.risk_signals,
         }
+        if include_pre_scan:
+            entry["risk_signals"] = p.risk_signals
         enc_report = build_encoding_report(p)
         if enc_report:
             entry["encoding_analysis"] = enc_report
@@ -577,8 +584,9 @@ def build_structured_context(parsed: ParsedHttpRequest, request_id: str) -> str:
         entry = {
             "name": p.name,
             "value": p.value[:200],
-            "risk_signals": p.risk_signals,
         }
+        if include_pre_scan:
+            entry["risk_signals"] = p.risk_signals
         enc_report = build_encoding_report(p)
         if enc_report:
             entry["encoding_analysis"] = enc_report
@@ -590,16 +598,30 @@ def build_structured_context(parsed: ParsedHttpRequest, request_id: str) -> str:
     return json.dumps(context, indent=2, ensure_ascii=False)
 
 
-def build_detection_messages(parsed: ParsedHttpRequest, request_id: str) -> list[dict]:
-    """构造 LLM messages 列表（system + user），使用增强版上下文。"""
-    structured_ctx = build_structured_context(parsed, request_id)
+def build_detection_messages(
+    parsed: ParsedHttpRequest,
+    request_id: str,
+    *,
+    include_pre_scan: bool = True,
+    include_feature_list: bool = True,
+    include_fewshot: bool = True,
+) -> list[dict]:
+    """构造 LLM messages 列表（system + user），使用增强版上下文。
+
+    消融开关（回应 DeepSeek 锐评 §5 信息泄漏）：
+    - include_pre_scan: 是否把 RISK_PATTERNS 预扫描结果（risk_signals/pre_scan）喂给模型
+    - include_feature_list / include_fewshot: 经 build_system_prompt 控制 System Prompt
+      是否含逐签名特征清单与 few-shot 示例
+    """
+    system_prompt = build_system_prompt(include_feature_list=include_feature_list, include_fewshot=include_fewshot)
+    structured_ctx = build_structured_context(parsed, request_id, include_pre_scan=include_pre_scan)
     user_content = USER_PROMPT_TEMPLATE.format(
         request_id=request_id,
         structured_context=structured_ctx,
         raw_http=parsed.raw,
     )
     return [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_content},
     ]
 
