@@ -572,6 +572,96 @@ class CPGEvidenceScorer(Scorer):
         )
 
 
+# ---------------------------------------------------------------------------
+# 已发表 LLM 方法风格基线（D3 head-to-head）
+# ---------------------------------------------------------------------------
+class PublishedLLMBaselineScorer(LocalLLMScorer):
+    """D3 head-to-head 基线：复现已发表 LLM 漏洞检测器风格的**纯源码**判定。
+
+    与 LocalLLMScorer（消费 CPG 污点切片增强上下文）同属本地 Ollama 调用，但本基线
+    **只喂函数源码（code-only）**，不含任何 CPG 证据——对应文献中零样本 LLM 漏洞检测器
+    （LineVul 风格 prompt 基线 / 通用 LLM-as-vuln-detector）的常见做法。两者同模型、同样本、
+    仅上下文差异，构成干净对照，量化「CPG 证据上下文」对 LLM 判定的增量（D3 回应审稿『无 SOTA』）。
+
+    复用 LocalLLMScorer 的 reachable/probe/generate/extract_json/_log_raw；仅重写 SYSTEM 与
+    _build_prompt 为 code-only，并令 score() 在无源码时 abstain。纯标准库 urllib，无第三方依赖。
+    """
+
+    name = "PublishedLLMBaselineScorer"
+
+    SYSTEM = (
+        "你是一名代码漏洞审查助手。给定目标 CWE 类型与待审查的函数源码，"
+        "判断该函数是否含有该类型漏洞（vulnerable）或无可证伪漏洞（benign）。"
+        "只依据所给源码本身判断，不假设任何外部上下文或数据流分析结论。只输出严格 JSON，不要任何解释性文字。"
+    )
+
+    def _build_prompt(self, ctx: DetectionContext) -> str:
+        meta = ctx.advisory_meta or {}
+        cwe = meta.get("cwe")
+        summary = meta.get("summary") or ""
+        cve = meta.get("cve_id") or "unknown"
+        parts = [
+            "# 漏洞审查任务",
+            f"- CVE: {cve}",
+            f"- 目标 CWE: {cwe or '未指定'}",
+        ]
+        if summary:
+            parts.append(f"- 公告摘要: {summary}")
+        if ctx.code_text and ctx.code_text.strip():
+            parts.append(f"\n# 待审查函数源码\n```\n{ctx.code_text[:6000]}\n```")
+        else:
+            # 无源码则无法审查，返回空串让 score() 判 abstain
+            return ""
+        parts.append(
+            "\n# 输出要求\n严格输出如下 JSON，不要任何额外文字：\n"
+            '{"verdict":"vulnerable|benign|abstain","cwe":"CWE-xxx 或 null",'
+            '"confidence":0.0到1.0的数字,"rationale":"一句话依据"}'
+        )
+        return "\n".join(parts)
+
+    def score(self, ctx: DetectionContext) -> Verdict:
+        target = config.normalize_cwe((ctx.advisory_meta or {}).get("cwe"))
+        if not ctx.code_text or not ctx.code_text.strip():
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{"reason": "no source code provided; code-only LLM baseline cannot review"}],
+            )
+        if not self.reachable():
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{"reason": f"Ollama unreachable at {self.base_url} (model {self.model})"}],
+            )
+        try:
+            prompt = self._build_prompt(ctx)
+            raw = self._generate(prompt)
+        except Exception as exc:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{"reason": f"PublishedLLM call failed: {exc}"}],
+            )
+        self._log_raw(ctx, prompt, raw)
+        obj = self._extract_json(raw)
+        if not obj:
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{"reason": "PublishedLLM returned non-JSON", "raw": raw[:500]}],
+            )
+        label = str(obj.get("verdict", "abstain")).lower()
+        if label not in ("vulnerable", "benign", "abstain"):
+            label = "abstain"
+        cwe_out = config.normalize_cwe(obj.get("cwe")) if obj.get("cwe") else target
+        try:
+            conf = float(obj.get("confidence", 0.0))
+        except (TypeError, ValueError):
+            conf = 0.0
+        conf = max(0.0, min(1.0, conf))
+        return Verdict(
+            label=label, confidence=conf, cwe=cwe_out,
+            evidence=[{"type": "published-llm-baseline", "model": self.model,
+                       "rationale": obj.get("rationale", "")}],
+        )
+
+
 # 名称 -> 类 注册表（harness / api 用）
 SCORER_REGISTRY: dict[str, type[Scorer]] = {
     "StructuralHeuristicScorer": StructuralHeuristicScorer,
@@ -579,4 +669,5 @@ SCORER_REGISTRY: dict[str, type[Scorer]] = {
     "ConfigSigScorer": ConfigSigScorer,
     "CPGEvidenceScorer": CPGEvidenceScorer,
     "LocalLLMScorer": LocalLLMScorer,
+    "PublishedLLMBaselineScorer": PublishedLLMBaselineScorer,
 }

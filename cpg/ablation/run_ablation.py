@@ -53,7 +53,7 @@ from cpg.ablation.corpus_db import build_corpus_db, CORPUS_SRC  # noqa: E402
 from cpg.ablation.codeql_baseline import run_codeql_baseline_corpus  # noqa: E402
 from cpg.ablation.scorers import (  # noqa: E402
     CodeQLBaselineScorer, ConfigSigScorer, CPGEvidenceScorer, DetectionContext, LocalLLMScorer,
-    StructuralHeuristicScorer, Verdict,
+    PublishedLLMBaselineScorer, StructuralHeuristicScorer, Verdict,
 )
 
 POSITIVE = "vulnerable"
@@ -336,6 +336,8 @@ def main() -> int:
     ap.add_argument("--with-local-llm", action="store_true",
                     help="纳入 LocalLLMScorer（需本机 Ollama + 模型已拉取；不可达时自动 abstain）")
     ap.add_argument("--llm-model", type=str, default=None, help="本地 LLM 模型名（默认 qwen2.5-coder:7b，模型规模消融用）")
+    ap.add_argument("--published-baseline", action="store_true",
+                    help="纳入 PublishedLLMBaselineScorer（仅喂函数源码的已发表 LLM 方法风格基线，D3 head-to-head；需 Ollama 可达）")
     ap.add_argument("--seed", type=int, default=None,
                     help="Ollama 采样 seed（temperature=0 下结果确定，此参数显式声明以满足可复现审计）")
     ap.add_argument("--out-dir", type=Path, default=ABLATION_DIR)
@@ -398,7 +400,20 @@ def main() -> int:
     local_llm_enabled = bool(args.with_local_llm) and local_llm.reachable()
     if args.with_local_llm and not local_llm_enabled:
         print("[warn] --with-local-llm set but Ollama unreachable; LocalLLMScorer disabled")
-    active_scorers = list(SCORERS) + (["LocalLLMScorer"] if local_llm_enabled else [])
+    # D3 head-to-head：已发表 LLM 方法风格基线（仅喂函数源码、无 CPG 切片），
+    # 子类化 LocalLLMScorer 复用同一 Ollama 通道与 raw_log 落盘机制，仅供 D3 对照。
+    published_llm = PublishedLLMBaselineScorer(
+        model=getattr(args, "llm_model", None) or "qwen2.5-coder:7b",
+        timeout=600,
+        raw_log=args.out_dir / "raw_published_llm_responses.jsonl",
+        seed=args.seed,
+    )
+    published_enabled = bool(args.published_baseline) and published_llm.reachable()
+    if args.published_baseline and not published_enabled:
+        print("[warn] --published-baseline set but Ollama unreachable; PublishedLLMBaselineScorer disabled")
+    active_scorers = (list(SCORERS)
+                      + (["LocalLLMScorer"] if local_llm_enabled else [])
+                      + (["PublishedLLMBaselineScorer"] if published_enabled else []))
 
     # 基线可用性：demo 逐样本走 CodeQLBaselineScorer（自带 db）；真实模式依赖 corpus SARIF，
     # 缺失（analyze 失败）时整轮跳过基线评分，避免崩溃。
@@ -485,6 +500,13 @@ def main() -> int:
                 v_llm = local_llm.score(ctx)
                 records.append((sid, s["version"], mode, "LocalLLMScorer",
                                 v_llm.label, s["truth"], v_llm.cwe, cwe, group))
+            # D3：已发表 LLM 方法风格基线（仅源码，无 CPG 上下文；Ollama 不可达自动 abstain）。
+            # 仅 code 模式评分——该基线对应零样本源码级 LLM 漏洞检测（LineVul 风格），
+            # request/both 模式无语义意义，限定 code 模式避免重复行污染 head-to-head。
+            if published_enabled and mode == "code":
+                v_pub = published_llm.score(ctx)
+                records.append((sid, s["version"], mode, "PublishedLLMBaselineScorer",
+                                v_pub.label, s["truth"], v_pub.cwe, cwe, group))
 
     _write_results(args.out_dir / "results.csv", records)
     summary = _build_summary(records, errors, args, len(samples), active_scorers, modes=modes)
