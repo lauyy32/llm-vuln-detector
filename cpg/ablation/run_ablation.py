@@ -206,10 +206,10 @@ def load_demo_samples() -> list[dict]:
     return samples
 
 
-def _load_dataset_rows(limit: int | None) -> list[dict]:
-    """读取 dataset.jsonl 原始行（供语料库级单数据库构建）。"""
+def _load_dataset_rows(limit: int | None, dataset_path: Path = DATASET_JSONL) -> list[dict]:
+    """读取 dataset.jsonl 原始行（供语料库级单数据库构建）。dataset_path 可覆盖默认语料（D1 扩语料用）。"""
     rows: list[dict] = []
-    with DATASET_JSONL.open(encoding="utf-8") as fh:
+    with dataset_path.open(encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
             if line:

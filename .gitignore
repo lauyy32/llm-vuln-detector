@@ -64,3 +64,8 @@ cpg/corpus_pairs/CVE-2026-55419/fixed/
 cpg/corpus_pairs/CVE-2026-55419/vuln/
 cpg/corpus_pairs/CVE-2026-55558/
 cpg/corpus_pairs/CVE-2026-73974/
+
+# 公开基准数据（外部下载，体积大，不入库；仅保留 loader/校验脚本）
+cpg/benchmarks/
+# 采集中间产物（可重建，源码节选体积大，不入库）
+cpg/corpus_pairs/
