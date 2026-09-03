@@ -185,6 +185,8 @@ def main() -> int:
                     choices=["real", "placebo", "shuffled"])
     ap.add_argument("--model", default="qwen2.5-coder:7b")
     ap.add_argument("--cves", nargs="*", help="显式指定 CVE（默认取 CPG 双标记子集）")
+    ap.add_argument("--dataset", type=Path, default=None,
+                    help="指定语料集路径（默认 DATASET_JSONL；扩到全量 D1 用 dataset_d1.jsonl）")
     ap.add_argument("--out", default="cpg/ablation/patch_verify_control.json")
     ap.add_argument("--raw-out", default="cpg/ablation/patch_verify_control_raw.jsonl")
     args = ap.parse_args()
@@ -192,7 +194,7 @@ def main() -> int:
     cves = args.cves or cpg_patch_blind_cves()
     print(f"[subset] CPG 双标记（对补丁失明）CVE {len(cves)} 个：{', '.join(cves)}\n")
 
-    rows = {r["cve_id"]: r for r in _load_dataset_rows(None)}
+    rows = {r["cve_id"]: r for r in _load_dataset_rows(None, args.dataset)}
     base_pred = load_main_baseline()
     llm = LocalLLMScorer(timeout=600)
     donor_cache: dict[str, str] = {}

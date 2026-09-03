@@ -1,0 +1,571 @@
+{
+ "model": "qwen2.5-coder:7b",
+ "subset": [
+  "CVE-2026-12482",
+  "CVE-2026-45019",
+  "CVE-2026-49257",
+  "CVE-2026-50181",
+  "CVE-2026-50558",
+  "CVE-2026-53502",
+  "CVE-2026-53598",
+  "CVE-2026-54574",
+  "CVE-2026-54706",
+  "CVE-2026-54707",
+  "CVE-2026-54785",
+  "CVE-2026-59890",
+  "CVE-2026-67424",
+  "CVE-2026-67425",
+  "CVE-2026-67428",
+  "CVE-2026-70491",
+  "CVE-2026-73498"
+ ],
+ "summary": {
+  "real": {
+   "n": 17,
+   "benign": 8,
+   "vulnerable": 9,
+   "benign_rate": 0.47058823529411764
+  },
+  "placebo": {
+   "n": 17,
+   "benign": 0,
+   "vulnerable": 17,
+   "benign_rate": 0.0
+  },
+  "shuffled": {
+   "n": 17,
+   "benign": 4,
+   "vulnerable": 13,
+   "benign_rate": 0.23529411764705882
+  }
+ },
+ "results": [
+  {
+   "cve": "CVE-2026-12482",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 1768,
+     "rationale": "The code does not sanitize the input path, allowing for arbitrary file access."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1275,
+     "rationale": "The code contains multiple instances where untrusted input is used to construct file paths, which can lead to path traversal vulnerabilities."
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-45019",
+     "diff_chars": 12085,
+     "rationale": "The code uses untrusted input (`path`) in multiple places without proper validation or sanitization, which can lead to directory traversal attacks."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-45019",
+   "cwe": "CWE-918",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 12085,
+     "rationale": "The provided patch does not address the input validation and sanitization issues in the `serve_public_file` function, which is vulnerable to directory traversal attacks."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 735,
+     "rationale": "The patch does not address the input validation or sanitization of the `filename` parameter, which is vulnerable to directory traversal attacks."
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-49257",
+     "diff_chars": 4377,
+     "rationale": "The provided patch does not address the input validation vulnerability in the file serving endpoint."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-49257",
+   "cwe": "CWE-306",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 4377,
+     "rationale": "The patch does not address the vulnerability related to untrusted input handling in the `reload_table_filters_from_file` function."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1471,
+     "rationale": "修复补丁仅修改了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "benign",
+     "expect": "vulnerable",
+     "correct": false,
+     "donor": "CVE-2026-50181",
+     "diff_chars": 7071,
+     "rationale": "The patch introduces a `safe_resolve_path` function that ensures the resolved path stays within the base directory, preventing path traversal attacks."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-50181",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7071,
+     "rationale": "The patch introduces a `safe_resolve_path` function that guards against path traversal attacks by ensuring that the resolved path stays within the specified base directory."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1513,
+     "rationale": "The patch does not address any of the untrusted inputs that could lead to path traversal vulnerabilities."
+    },
+    "shuffled": {
+     "verdict": "benign",
+     "expect": "vulnerable",
+     "correct": false,
+     "donor": "CVE-2026-50558",
+     "diff_chars": 2555,
+     "rationale": "The patch introduces a function `safe_tar_extractall` that guards against path traversal attacks by ensuring that extracted files and directories are within the specified destination directory."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-50558",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 2555,
+     "rationale": "The patch adds a function `safe_tar_extractall` that checks if the extracted file paths are within the designated directory, preventing directory traversal attacks."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 229,
+     "rationale": "修复补丁未涉及任何代码变更，仅进行了维护性整理，未修复漏洞。"
+    },
+    "shuffled": {
+     "verdict": "benign",
+     "expect": "vulnerable",
+     "correct": false,
+     "donor": "CVE-2026-53502",
+     "diff_chars": 5006,
+     "rationale": "The patch adds a security check to ensure that the decoded path is within the root directory, effectively preventing path traversal attacks."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-53502",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 5006,
+     "rationale": "The patch adds additional test cases to ensure that percent-encoded traversal attacks are blocked, but it does not modify the core logic that prevents path traversal vulnerabilities."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1275,
+     "rationale": "补丁仅修改了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-53598",
+     "diff_chars": 7331,
+     "rationale": "The patch does not address the vulnerability in the file loader. It only changes the version number and adds a new parameter to a function, which is unrelated to the security issue."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-53598",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7331,
+     "rationale": "The patch adds a `allowed_file_roots` parameter to the `_pre_process` and `_build_agent` functions, which limits file references to the prompt directory and any additional allowed roots, effectively p"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1583,
+     "rationale": "修复补丁仅更新了版本号和添加了维护性注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54574",
+     "diff_chars": 9655,
+     "rationale": "The provided patch does not address the vulnerability in the `loader.py` file. The patch appears to be for a different file (`restore.py`) and does not modify the `load` or `load_async` functions wher"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54574",
+   "cwe": "CWE-61",
+   "base_pred_no_diff": "abstain",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 9655,
+     "rationale": "The patch introduces a `_safe_dest` function to resolve the destination path safely, ensuring it cannot be redirected out of the container's directory. This effectively mitigates the risk of path trav"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1559,
+     "rationale": "修复补丁仅修改了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54706",
+     "diff_chars": 7797,
+     "rationale": "The patch does not address the vulnerability related to directory traversal and unsafe file operations."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54706",
+   "cwe": "CWE-59",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 7797,
+     "rationale": "The patch does not address the symlink vulnerability. It only adds a `_is_path_contained` method but does not use it in the `add_file` and `add_dir` methods to prevent the addition of symlinks."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 905,
+     "rationale": "修复补丁仅更新了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54707",
+     "diff_chars": 7379,
+     "rationale": "The provided patch does not address the symlink vulnerability. It only adds a check for file uploads being disabled, which is unrelated to the symlink issue."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54707",
+   "cwe": "CWE-863",
+   "base_pred_no_diff": "abstain",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 7379,
+     "rationale": "The patch does not address the vulnerability in the `upload` function where files can still be uploaded when disabled."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 508,
+     "rationale": "补丁仅修改了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54785",
+     "diff_chars": 6630,
+     "rationale": "The patch only changes the version number and does not address the input validation or sanitization vulnerability."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54785",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 6630,
+     "rationale": "The code does not validate the input directory, allowing for traversal attacks."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1456,
+     "rationale": "The code does not validate the input directory, which can lead to directory traversal vulnerabilities."
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-59890",
+     "diff_chars": 5906,
+     "rationale": "The code does not validate or sanitize the input directory, allowing for arbitrary directory traversal."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-59890",
+   "cwe": "CWE-176",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 5906,
+     "rationale": "The patch introduces a `_NormalizedMatcher` class to normalize file paths and patterns, preventing issues related to Unicode normalization form mismatches."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1904,
+     "rationale": "The patch does not address any security vulnerabilities or weaknesses in the code."
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-67424",
+     "diff_chars": 3593,
+     "rationale": "The provided patch does not address the vulnerability in the `egg_info.py` file. The patch appears to be related to SSRF protection in other modules, but it does not modify the `egg_info.py` file wher"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-67424",
+   "cwe": "CWE-918",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 3593,
+     "rationale": "The provided patch does not address the vulnerability in the target code. The patch appears to be for a different module (e.g., `vision_analyze.py`, `proxy_rotate.py`, `slack_send.py`) and does not mo"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 2008,
+     "rationale": "修复补丁仅更新了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "benign",
+     "expect": "vulnerable",
+     "correct": false,
+     "donor": "CVE-2026-67425",
+     "diff_chars": 5861,
+     "rationale": "The patch adds a policy to denylist environment variable access through interpolation, which addresses the vulnerability."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-67425",
+   "cwe": "CWE-201",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 5861,
+     "rationale": "The fix does not address the path traversal vulnerability in the VectorDBConnector class."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1916,
+     "rationale": "修复补丁仅修改了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-67428",
+     "diff_chars": 3593,
+     "rationale": "The provided patch does not address the vulnerability in the VectorDBConnector class. The patch is for a different module and does not modify the VectorDBConnector's URL validation logic."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-67428",
+   "cwe": "CWE-918",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 3593,
+     "rationale": "The provided patch does not address the vulnerability in the target code. The patch appears to be for a different module (e.g., `vision_analyze.py`, `proxy_rotate.py`, `slack_send.py`) and does not mo"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 2008,
+     "rationale": "修复补丁仅更新了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-70491",
+     "diff_chars": 1827,
+     "rationale": "The patch does not address the input validation or sanitization required to prevent directory traversal attacks."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-70491",
+   "cwe": "CWE-200",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1827,
+     "rationale": "The patch adds a conditional check to remove the 'content' field from the response if the user does not have write access, thus preventing unauthorized access to sensitive data."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 644,
+     "rationale": "修复补丁仅修改了版本号和添加了注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-73498",
+     "diff_chars": 6660,
+     "rationale": "The provided patch does not address the vulnerability in the target code. The patch appears to be for a different library or context."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-73498",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 6660,
+     "rationale": "The patch introduces a function `validate_safe_path` to restrict the file path to the current working directory, preventing arbitrary file read vulnerabilities."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1568,
+     "rationale": "修复补丁仅修改了版本号和添加了维护性注释，未对漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-12482",
+     "diff_chars": 1768,
+     "rationale": "The patch does not address the untrusted file path vulnerability. It simply removes the realpath call, which does not prevent the use of relative paths or symlinks to access arbitrary files."
+    }
+   }
+  }
+ ]
+}
