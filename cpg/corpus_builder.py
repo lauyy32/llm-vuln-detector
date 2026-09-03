@@ -238,12 +238,19 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
     check = run(["git", "cat-file", "-e", f"{fix_commit}^{{commit}}"],
                 cwd=str(repo_dir), timeout=30)
     if check.returncode != 0:
-        # 本地无此 commit 对象——尝试 fetch 指定 commit；仍失败则数据源失效
-        fetch = run(["git", "fetch", "origin", fix_commit], cwd=str(repo_dir), timeout=180)
-        if fetch.returncode != 0:
-            print(f"    [fail] commit {fix_commit[:8]} unavailable in {repo_slug}: "
-                  f"{fetch.stderr[:160]}")
-            return []
+        # 回退 1：全分支拉取（fix_commit 可能在非默认分支，单分支 blob:none 克隆漏掉）
+        fb = run(["git", "fetch", "origin", "+refs/heads/*:refs/remotes/origin/*"],
+                 cwd=str(repo_dir), timeout=240)
+        if fb.returncode == 0:
+            check = run(["git", "cat-file", "-e", f"{fix_commit}^{{commit}}"],
+                        cwd=str(repo_dir), timeout=30)
+        # 回退 2：直接按 SHA fetch（GitHub 公开仓库若对象仍存在则允许；否则即数据源失效）
+        if check.returncode != 0:
+            fetch = run(["git", "fetch", "origin", fix_commit], cwd=str(repo_dir), timeout=180)
+            if fetch.returncode != 0:
+                print(f"    [fail] commit {fix_commit[:8]} unavailable in {repo_slug} "
+                      f"(dangling/not our ref): {fetch.stderr[:120]}")
+                return []
     # 提取修复后文件列表（从 fix_commit 的 tree）
     show = run(["git", "ls-tree", "-r", "--name-only", fix_commit], cwd=str(repo_dir), timeout=60)
     if show.returncode != 0:

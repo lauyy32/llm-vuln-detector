@@ -316,6 +316,8 @@ def md_table(headers: list[str], rows: list[list]) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--limit", type=int, default=None, help="只跑前 N 条 dataset 样本（仅真实模式）")
+    ap.add_argument("--dataset", type=Path, default=DATASET_JSONL,
+                   help="指定语料集路径（默认 dataset.jsonl；D1 扩语料用扩展集，不改动 74-CVE 基线）")
     ap.add_argument("--exclude-cves", type=str, default="",
                     help="逗号分隔的 CVE 列表，从真实模式中剔除（如跨语言修复样本，Python 侧不可判定）")
     ap.add_argument("--no-taint", action="store_true",
@@ -349,7 +351,7 @@ def main() -> int:
         print(f"[fatal] invalid --modes {args.modes!r}; expected subset of request,code,both")
         return 1
     # 语料级单数据库构建前先加载 rows 以判断是否有请求字段
-    rows = _load_dataset_rows(args.limit)
+    rows = _load_dataset_rows(args.limit, args.dataset)
     has_request_field = any(bool(r.get("request")) for r in rows)
     if not has_request_field and any(m in ("request", "both") for m in modes):
         print("[warn] dataset 不含 request 字段：request 模式将恒 abstain；both 模式退化为 code "
