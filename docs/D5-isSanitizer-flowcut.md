@@ -79,6 +79,12 @@ cut CVE（流集 vuln≠fixed，patch 确实改变了污点流）：`CVE-2026-53
 本测量进一步显示其 vuln/fixed 流集实际不同（patch 改变了流），但 CPGEvidence 非 pair-aware，
 仍两端判 vulnerable；若引入 pair-aware 门禁（OPEN）此 2 例可借流集差异判别，但仅 2/74，不改整体结论。
 
+> ⚠️ **2026-09-04 pair-aware 实测更正（PA1）**：上述"53502/54785 可借流集差异判别 2 例"**已被实测否定**。
+> pair-aware 门禁（`cpg/ablation/pair_aware_gate.py`）比较 target-CWE 语义流集后 rule1（vuln 有 target 流 ∧ fixed 无）= **0 例**；
+> 5 个 cut CVE 的流差异方向几乎全为 fixed 侧 **target 流保留/增多**（53502/67424/67428 fixed 流更多；53598 语义级相等；67435 target 错配）。
+> 即净化器盲区**下沉到证据层**：全 74 集不存在"fixed 侧 target 流被切断"事件，流存在性层面的 pair-aware 判别力为零。
+> 详见 `cpg/ablation/PA1-pair-aware门禁报告.md`；"2/74 可判别"预期撤回。
+
 ---
 
 ## 3. D5-A 方法：通用 isSanitizer 谓词
