@@ -39,6 +39,13 @@ class DetectionContext:
     advisory_meta: dict | None  # cve_id / cwe / summary
     code_text: str | None
     cpg_slices: str | None      # slice_builder / taint 文本
+    # 2026-09-03 外部审计交叉验证修复：CPGEvidenceScorer 此前无法区分「污点查询
+    # 真的跑过且确认无 flow」与「污点查询对该 repo 根本没产出任何证据（建库/checkout
+    # 静默失败）」。二者在 cpg_slices 文本上都渲染成「no untrusted input reaches a
+    # modelled sink」，被统一判 benign，导致空污点 CVE 的 vuln 版本被记假阴性、系统性
+    # 拉低 CPG 召回/F1。以下两字段让评分器获知真实覆盖情况：
+    taint_rows: list[dict] | None = None      # 注入的污点行（结构化 scorer / 覆盖判定用）
+    cpg_evidence_available: bool = True       # 该样本所属 repo 的 taint 查询是否实际产出证据
 
 
 @dataclass
@@ -241,7 +248,7 @@ class LocalLLMScorer(Scorer):
             req_txt = json.dumps(ctx.request_info, ensure_ascii=False)
             parts.append(f"\n# 请求侧触发信息\n{req_txt[:2000]}")
         if ctx.code_text:
-            parts.append(f"\n# 目标代码（节选）\n```\n{ctx.code_text[:6000]}\n```")
+            parts.append(f"\n# 目标代码（节选）\n```\n{ctx.code_text[:8000]}\n```")
         if ctx.cpg_slices:
             parts.append(f"\n# 代码级上下文（CPG 污点切片）\n{ctx.cpg_slices[:12000]}")
         parts.append(
@@ -529,6 +536,21 @@ class CPGEvidenceScorer(Scorer):
         return flows
 
     def score(self, ctx: DetectionContext) -> Verdict:
+        # 污点证据不可用：该 CVE 所属 repo 的 taint 查询未产出任何证据（可能建库 /
+        # checkout 静默失败，或语料缺该仓的源码）。此时 cpg_slices 即便渲染出
+        # 「no untrusted input reaches a modelled sink」也属于「查询没跑」而非「已证明
+        # 无 flow」——绝不可判 benign（否则 vuln 版本被记假阴性，系统性拉低 CPG 召回 /
+        # F1）。这是 2026-09-03 外部审计交叉验证发现的静默数据 bug 的根因修复：CPG 增益
+        # 在缺证据的样本上本就不可测，显式 abstain 比假 benign 更诚实。
+        if not getattr(ctx, "cpg_evidence_available", True):
+            target = config.normalize_cwe((ctx.advisory_meta or {}).get("cwe"))
+            return Verdict(
+                label="abstain", confidence=0.0, cwe=target,
+                evidence=[{
+                    "reason": "CPG taint query produced no evidence for this CVE's repo; "
+                              "CPG gain not measurable — abstain (NOT false-benign)",
+                }],
+            )
         if ctx.cpg_slices is None:
             return Verdict(
                 label="abstain", confidence=0.0, cwe=None,
@@ -608,7 +630,7 @@ class PublishedLLMBaselineScorer(LocalLLMScorer):
         if summary:
             parts.append(f"- 公告摘要: {summary}")
         if ctx.code_text and ctx.code_text.strip():
-            parts.append(f"\n# 待审查函数源码\n```\n{ctx.code_text[:6000]}\n```")
+            parts.append(f"\n# 待审查函数源码\n```\n{ctx.code_text[:8000]}\n```")
         else:
             # 无源码则无法审查，返回空串让 score() 判 abstain
             return ""

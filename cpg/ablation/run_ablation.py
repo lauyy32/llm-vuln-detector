@@ -97,19 +97,21 @@ def _taint_row_in_prefix(row: dict, prefix: str) -> bool:
     return f"/{prefix}/" in p
 
 
-def _load_sample_code(prefix: str, taint_rows: list[dict], max_chars: int = 6000) -> str:
+def _load_sample_code(prefix: str, taint_rows: list[dict], max_chars: int = 8000) -> str:
     """从 ``corpus_src/<prefix>/`` 读取真实源码节选，作为 code_text 注入 LLM 上下文。
 
     语料库模式下样本源码落在 ``corpus_src/<cve>_<version>/``；此前 harness 把真实样本
     的 ``code_text`` 置空串，导致 LLM 在真实 CVE 上看不到任何源码，仅靠 taint 占位文本
     与公告摘要盲判。此函数按「taint 锚点优先 + 窗口截断」选取对判定最有价值的节选：
 
-    * taint 命中的文件：把每个 source/sink 行号展开为锚点区间（sink±60 / source±40），
+    * taint 命中的文件：把每个 source/sink 行号展开为锚点区间（sink±90 / source±50），
       合并重叠区间后**按命中行数降序**输出——保证 sink 附近（含安全包装、守卫等判定
-      关键上下文）优先进入文本，而非简单取大窗口开头（大窗口会因 6000 字符截断
-      丢掉 sink 之后的安全 wrapper 定义，导致 LLM 误判）；
+      关键上下文）优先进入文本。外部审计（2026-09-03）指出原 sink±60 / source±30 窗口
+      在 wrapped 安全函数场景下会截断 sink 之后的 sanitizer / 守卫定义，使 LLM 的语义
+      兜底丢失真正判定所需上下文；此处放大窗口以覆盖典型安全包装（详见 §修正记录）。
     * 其余 ``.py`` 文件：取头部前 100 行（通常含入口 / import / 配置上下文）；
-    * 总量受 ``max_chars`` 约束（与 LocalLLMScorer 的 ``code_text[:6000]`` 对齐），
+    * 总量受 ``max_chars`` 约束（与 LocalLLMScorer 的 ``code_text[:8000]`` 对齐，
+      由 6000 放大至 8000，进一步降低大文件安全 wrapper 被截断的概率），
       文件/区间间以 ``# ===== FILE: <basename> (L<lo>-L<hi>) =====`` 分隔标注。
 
     切片文本的行号经 ``cpg_eval._read_src_lines`` 按 abs_path 独立读取，不受节选影响。
@@ -147,8 +149,8 @@ def _load_sample_code(prefix: str, taint_rows: list[dict], max_chars: int = 6000
         if ab:
             spans: list[tuple[int, int]] = []
             for a, b in ab:
-                spans.append((max(1, b - 60), min(len(lines), b + 60)))
-                spans.append((max(1, a - 30), min(len(lines), a + 60)))
+                spans.append((max(1, b - 90), min(len(lines), b + 90)))
+                spans.append((max(1, a - 50), min(len(lines), a + 80)))
             spans.sort()
             merged: list[list[int]] = []
             for lo, hi in spans:
@@ -335,6 +337,9 @@ def main() -> int:
                          "语料不含请求字段时 request 恒 abstain、both 退化为 code）")
     ap.add_argument("--demo", action="store_true", help="复用 sample_db + taint.csv 跑 cpg/samples（验证聚合）")
     ap.add_argument("--skip-baseline", action="store_true", help="跳过 CodeQL 基线（仅跑结构化启发式，提速）")
+    ap.add_argument("--strict-taint", action="store_true",
+                    help="严格污点覆盖：任一「可污点类 CWE」样本若其 repo 污点查询产出 0 行，"
+                         "则整轮 exit(1)，杜绝静默空证据评分（2026-09-03 外部审计数据 bug 护栏）")
     ap.add_argument("--with-local-llm", action="store_true",
                     help="纳入 LocalLLMScorer（需本机 Ollama + 模型已拉取；不可达时自动 abstain）")
     ap.add_argument("--llm-model", type=str, default=None, help="本地 LLM 模型名（默认 qwen2.5-coder:7b，模型规模消融用）")
@@ -373,6 +378,36 @@ def main() -> int:
             print(f"[fatal] corpus database build failed: {exc}")
             return 1
         corpus = {"db": _db, "staged": _staged, "taint": _taint, "sarif": _sarif}
+        # 污点覆盖护栏（2026-09-03 外部审计数据 bug 修复）：统计每个 staged 样本前缀的
+        # 污点行数，标记「可污点类 CWE 但 0 行」的 CVE——这些样本此前被 CPGEvidenceScorer
+        # 静默判 benign（假阴性），系统性拉低 CPG 数字。此处显式列出并写 taint_coverage.json；
+        # --strict-taint 时整轮中止，强制先修复缺失仓库的建库/checkout。
+        _taint_coverage = {}
+        for st in _staged:
+            _p = st.get("prefix")
+            _taint_coverage[_p] = len([r for r in _taint if _taint_row_in_prefix(r, _p)])
+        _missing = sorted(
+            st["cve"] for st in _staged
+            if st.get("cwe") in TAINT_COVERED_CWES and _taint_coverage.get(st.get("prefix"), 0) == 0
+        )
+        _cov_path = args.out_dir / "taint_coverage.json"
+        _cov_path.parent.mkdir(parents=True, exist_ok=True)
+        _cov_path.write_text(json.dumps({
+            "total_staged": len(_staged),
+            "taint_rows_total": len(_taint),
+            "missing_taint_cves": _missing,
+            "missing_count": len(_missing),
+            "per_prefix": _taint_coverage,
+        }, indent=2, ensure_ascii=False), encoding="utf-8")
+        if _missing:
+            print(f"[warn] {len(_missing)} 个可污点类 CVE 污点查询产出 0 行（repo 建库/checkout "
+                  f"可能静默失败）：{_missing}")
+            print(f"[warn] 这些样本将从 CPG 证据评分中显式 abstain（cpg_evidence_available=False），"
+                  f"并写入 {_cov_path}")
+            if args.strict_taint:
+                print(f"[fatal] --strict-taint：存在缺污点证据的可污点类 CVE，整轮中止。"
+                      f"请先修复这些 repo 的建库/checkout 后重跑。")
+                return 1
         samples = [
             {
                 "sample_id": st["cve"],
@@ -443,12 +478,14 @@ def main() -> int:
             db_path = Path(s["reuse_db"])
             sample_file = Path(s["source_file"])
             taint_rows = _read_taint_csv_for_file(Path(s["reuse_taint_csv"]), sample_file.name)
+            cpg_evidence_available = bool(taint_rows)
             wd = None
             baseline_key = (str(db_path), str(sample_file), cwe)
         else:
             # 真实：语料库级单数据库，按样本前缀过滤 taint 行；baseline 按前缀过滤 SARIF
             prefix = s.get("prefix")
             taint_rows = [r for r in corpus["taint"] if _taint_row_in_prefix(r, prefix)]
+            cpg_evidence_available = bool(taint_rows)
             # B-0.5：注入真实源码节选（此前 code_text 恒为空串，LLM 在真实样本上看不到源码；
             # 三模式共享同一 code_text，只构造一次）。--no-code 时保持空串，隔离源码增益。
             if not s.get("code_text") and not args.no_code:
@@ -463,7 +500,8 @@ def main() -> int:
             # --no-taint：隔离 CPG 增益。taint_rows 置空 + cpg_slices 显式 None，
             # 使 LLM / 确定性 scorer 均不消费 CPG 污点证据（仅源码 + 摘要）。
             effective_taint = [] if args.no_taint else taint_rows
-            ctx_kwargs = {"workdir": wd, "taint_rows": effective_taint}
+            ctx_kwargs = {"workdir": wd, "taint_rows": effective_taint,
+                          "cpg_evidence_available": cpg_evidence_available}
             if args.no_taint:
                 ctx_kwargs["cpg_slices"] = None
             if args.include_ast:
@@ -583,6 +621,31 @@ def _build_summary(records: list[tuple], errors: list[str], args, n_samples: int
         for e in errors:
             lines.append(f"- {e}")
     lines.append("")
+
+    # 污点覆盖与 CPG 证据排除（2026-09-03 外部审计数据 bug 修复）
+    _cov_json = args.out_dir / "taint_coverage.json"
+    _missing: list[str] = []
+    if _cov_json.exists():
+        try:
+            _cov = json.loads(_cov_json.read_text(encoding="utf-8"))
+            _missing = _cov.get("missing_taint_cves", [])
+        except (json.JSONDecodeError, OSError):
+            _missing = []
+    if _missing:
+        lines.append(f"## 污点覆盖与 CPG 证据排除（{len(_missing)} 个样本）")
+        lines.append("")
+        lines.append("> 以下「可污点类 CWE」样本的 repo 污点查询产出 0 行（建库 / checkout 静默失败），"
+                     "其 CPG 证据评分已显式 **abstain**（不再误判 benign），从 CPGEvidence 指标中自动剔除。"
+                     "CPG 增益仅在这些样本修复并重跑后才可公平评估。完整清单见 `taint_coverage.json`。")
+        lines.append("")
+        for c in _missing:
+            lines.append(f"- {c}")
+        lines.append("")
+    else:
+        lines.append("## 污点覆盖")
+        lines.append("")
+        lines.append("> 全部可污点类 CWE 样本均具备非空污点证据（无缺证据 CVE），CPG 评分有效。")
+        lines.append("")
 
     # 全局（scorer, mode）
     lines.append("## 全局指标（正类=vulnerable；abstain 计为未判 vulnerable → 正例召回 0）")

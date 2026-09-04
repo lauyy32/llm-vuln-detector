@@ -54,6 +54,7 @@ def build_context(
     cpg_slices: str | None = None,
     include_summary: bool = False,
     include_ast: bool = False,
+    cpg_evidence_available: bool = True,
 ) -> DetectionContext:
     """构造 DetectionContext。
 
@@ -80,6 +81,8 @@ def build_context(
             advisory_meta=advisory_meta,
             code_text=None,
             cpg_slices=None,
+            taint_rows=taint_rows,
+            cpg_evidence_available=False,  # 请求模式无代码分析，无 CPG 证据
         )
 
     # code / both：需要代码文本
@@ -91,6 +94,8 @@ def build_context(
             advisory_meta=advisory_meta,
             code_text=None,
             cpg_slices=None,
+            taint_rows=taint_rows,
+            cpg_evidence_available=False,
         )
 
     if taint_rows is None:
@@ -128,4 +133,6 @@ def build_context(
         advisory_meta=advisory_meta,
         code_text=code_text,
         cpg_slices=cpg_slices,
+        taint_rows=taint_rows,
+        cpg_evidence_available=cpg_evidence_available,
     )
