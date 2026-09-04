@@ -34,3 +34,33 @@
 1. 重跑 `d5_flowcut_baserate.py` → 覆盖/flow-cut 变化；
 2. 重跑 `pair_aware_gate.py` → 看是否出现 rule1（vuln target 流 ∧ fixed 无）新事件；
 3. 若 D1-5 出现流 → 其 fixed 侧若被切断即"修复引入 cut"证据，抬升 CPG 判别下界。
+
+---
+
+## 4. 重建完成复测（2026-09-04，corpus_db force 重建 93 CVE，8.4min）
+
+重建成功：staged=186 样本、taint_rows=297、SARIF 刷新（task JRNhjz，产物 `.work/d5_flowcut_poststep2_74.json` / `pair_aware_poststep2_{74,d1}.json`）。
+
+### 复测结果
+
+| 指标 | 重建前 | 重建后 |
+|---|---|---|
+| 74-set flow-cut（coverage / cut） | 18/74 (24.3%) / 5 (27.8%) | **不变**（18/74 / 5）→ D5-B 结论跨重建稳健 |
+| 74-set PA rule1 | 0 | **0**（74-set 10 个建模盲区重建后仍 0/0 流） |
+| D1-set PA rule1 | 0 | 1（70485）→ **剔除后 0**（70485 fixed 侧 0 文件 = 语料缺口假象，非真 cut） |
+
+### 恢复的 D1 4 个逐一定位
+
+- **70479**（CWE-918）：vuln/fixed 各有 1 target 流且相同 → rule2 双标，无判别。
+- **70485**（CWE-918）：vuln 1 target 流 / fixed 0 → 表面 rule1，但 **fixed 侧源缺失（0 文件）** → 空洞，剔除申报。
+- **70486 / 70492**（CWE-079）：vuln/fixed 各 1 流但**均非 target CWE（找到的是 CWE-918 流）** → target 0/0，CWE 错配，无判别。
+- **62677**（CWE-022）：重建后仍 0/0 → agent 入参 source 盲区。
+
+### 第二步结论（② 闭环）
+
+1. **建库缺口修复有效**（D1 4 个恢复流），但**未产生任何可用判别事件**：全部落入双标 / CWE 错配 / 语料缺口三类。
+2. **74-set 10 个经 force 重建仍 0/0** → 建模盲区实锤（守卫绕过、反射/反序列化 sink、agent 入参 source 三类），非重建可修复 → **申报排除**（per-CVE 建模即泄漏，不做，入论文局限）。
+3. **CPG 判别上限收口**：在 74∪D1=93 CVE 的修复后语料上，**rule1（vuln target 流 ∧ fixed 被切断）可用事件 = 0**。
+   与 GT0（17/17 标签真修复）、PA1（pair-aware 0 增益）三线闭合：净化器盲区使 fixed 侧 target 流在模型内从不消失，
+   **任何 CPG 评分器（v9 门禁 / pair-aware / isSanitizer / 覆盖修复后）在补丁边界判别上均零信号 → CPG-alone 维持随机是稳健负面结论**。
+4. **if-not 分支触发**：论文 CPG 侧走负面结果方法论稿（无模型可救 + 规模无关负结果），机制解释 = 证据层净化器盲区。
