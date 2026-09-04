@@ -165,7 +165,7 @@ def ask_llm(llm: LocalLLMScorer, prompt: str, model: str, timeout: int = 600) ->
             "system": DIFF_SYSTEM,
             "prompt": prompt,
             "stream": False,
-            "options": {"temperature": 0},
+            "options": {"temperature": 0, "num_predict": 512},
         }
     ).encode("utf-8")
     req = urllib.request.Request(
