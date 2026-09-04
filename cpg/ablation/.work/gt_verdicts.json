@@ -1,0 +1,155 @@
+[
+ {
+  "cve": "CVE-2026-12482",
+  "repo": "keras-team/keras",
+  "kind": "tar symlink 路径穿越",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "resolve_path 移除 abspath（防 abspath 先折叠 link/..）；filter_safe_tarinfos 拒绝经 symlink 路由成员，新增回归测试",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-45019",
+  "repo": "Chainlit/chainlit",
+  "kind": "SSRF via MCP SSE/streamable-http",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "MCP SSE 默认关闭、user_servers 引入 allowed_urls 白名单默认拒绝、mcp.py 服务端 stdio manager 移除",
+  "note": "diff 夹带大型架构重构(+1400行/10文件)，判别信号被噪声淹没但安全语义确实关闭"
+ },
+ {
+  "cve": "CVE-2026-49257",
+  "repo": "mcp_pinot",
+  "kind": "未认证网络暴露+非只读SQL",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "默认绑定 127.0.0.1；非回环+无 OAuth 拒绝启动；read-query 改 sqlglot 解析仅 SELECT/WITH、禁写关键词、去注释",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-50181",
+  "repo": "langroid/langroid",
+  "kind": "file tools 路径穿越",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "新增 safe_resolve_path：..、绝对路径、越界 symlink 全拒；file_tools 各入口接入",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-50558",
+  "repo": "brightio/penelope",
+  "kind": "tar 解包穿越",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "safe_tar_extractall 守卫 _extract_member（commonpath 校验），替代旧 add_w 权限补丁",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-53502",
+  "repo": "thumbor/thumbor",
+  "kind": "file loader %2e%2e 编码穿越",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "先 unquote 再 abspath+commonpath 校验（修编码后穿越绕过）；D5 flow-cut cut 例",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-53598",
+  "repo": "microsoft/prompty",
+  "kind": "${file:} 引用路径穿越",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "load/load_async 加 allowed_file_roots，规范化后拒绝越界引用",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-54574",
+  "repo": "termux/proot-distro",
+  "kind": "tar symlink→host 写入",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "_safe_resolve 每 hop 钳制 rootfs 内、绝对 symlink 重根、hardlink linkname 同样过滤；restore/copy_step 同步",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-54706",
+  "repo": "onionshare/onionshare",
+  "kind": "分享 symlink 泄露",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "send/share 跳过 symlink、os.walk followlinks=False、_is_path_contained 校验",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-54707",
+  "repo": "onionshare/onionshare",
+  "kind": "upload 禁用绕过",
+  "fixed_verdict": "真修复",
+  "conf": "中高",
+  "evidence": "receive_mode 上传禁用时显式拒绝文件提交(ajax/非ajax)",
+  "note": "建议对照 advisory 复核完整绕过面"
+ },
+ {
+  "cve": "CVE-2026-54785",
+  "repo": "eLyiN/gemini-bridge",
+  "kind": "任意本地文件读",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "路径显示改 resolve()+relative_to(root)；越界 rel_path=None；调用点(198/254行)均跳过并告警",
+  "note": "已知疑点解除：越界文件确实被排除"
+ },
+ {
+  "cve": "CVE-2026-59890",
+  "repo": "pypa/setuptools",
+  "kind": "MANIFEST.in Unicode 归一绕过排除",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "_NormalizedMatcher NFC 归一两侧匹配(GHSA-h35f-9h28-mq5c)",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-67424",
+  "repo": "flytohub/flyto-core",
+  "kind": "SSRF 批量加固(GHSA-c9hr/jx74/pgwh)",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "全出站模块 enforce_outbound_url + guarded_aiohttp_request 逐跳校验 + callback 白名单",
+  "note": "⚠ 与 67428 diff 文件集/行数逐字节相同→疑似同一修复批次，语料重复样本"
+ },
+ {
+  "cve": "CVE-2026-67425",
+  "repo": "flytohub/flyto-core",
+  "kind": "env插值/凭据外泄/路径沙箱(GHSA-hr7p/qq9q/2956)",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "${env.*} 门禁 deny-by-default、env 凭据禁止转发非信任端点、路径写改中心沙箱校验",
+  "note": ""
+ },
+ {
+  "cve": "CVE-2026-67428",
+  "repo": "flytohub/flyto-core",
+  "kind": "SSRF 批量加固",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "同 67424 同型改动",
+  "note": "⚠ 与 67424 重复样本（见 67424 note）"
+ },
+ {
+  "cve": "CVE-2026-70491",
+  "repo": "open-webui/open-webui",
+  "kind": "工具元数据越权(写权限)",
+  "fixed_verdict": "真修复",
+  "conf": "中",
+  "evidence": "write_access 判定与 data 注入拆分，无写权时清除",
+  "note": "建议完整读 hunk 复核"
+ },
+ {
+  "cve": "CVE-2026-73498",
+  "repo": "sooperset/mcp-atlassian",
+  "kind": "SSRF rebinding+路径(多GHSA)",
+  "fixed_verdict": "真修复",
+  "conf": "高",
+  "evidence": "DNS pinning adapter 反 rebinding TOCTOU、redirect hook、validate_safe_path 工作区限制、token 0o600、oauth XSS escape",
+  "note": "批量加固提交，含多个独立安全改进"
+ }
+]
