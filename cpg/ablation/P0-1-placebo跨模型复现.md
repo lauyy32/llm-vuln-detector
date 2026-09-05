@@ -1,7 +1,7 @@
 # P0-1 · placebo 跨模型复现报告（2026-09-04）
 
 > 目的：把全篇唯一 p<0.01 的正面发现（placebo 三臂）从"单模型 n=15 的 case study"升为"跨模型复现"。
-> 协议：`patch_verify_control.py --dataset cpg/dataset_d1.jsonl`，CPG 双标记子集（理论 17，有效 n=15，2 个 fixed 源缺失），real/placebo/shuffled 三臂，本地 Ollama temp=0。
+> 协议：`patch_verify_control.py --dataset cpg/dataset_d1.jsonl`，CPG 双标记子集（理论 17，有效 n=15——49257/67428 为 74 主集独有、不在 D1，脚本跳过；源码实存于 corpus_src，排除原因是语料集关系），real/placebo/shuffled 三臂，本地 Ollama temp=0。
 > 产物：`patch_verify_control_p0_2_full_{7b,14b,codellama-instruct}.json` + 对应 raw。
 
 ## 1. 结果（三模型对照，最终）

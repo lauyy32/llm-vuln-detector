@@ -69,7 +69,7 @@ CVE 在 D1 中无法取回 fixed 源码**被跳过，故有效三臂 CVE = **15*
 ## 5. 可复现命令
 
 默认即取 CPG 双标记（对补丁失明）17-CVE 子集；`--dataset` 指定从 D1 语料取回 fixed 源码
-（其中 2 个在 D1 无源码 → 有效 n=15）。
+（其中 CVE-2026-49257 / CVE-2026-67428 为 74 主集独有、不在 D1 语料中，脚本按"不在 dataset"跳过 → 有效 n=15；二者源码在 corpus_src 中实际存在，排除原因是语料集关系而非源码缺失——此前"fixed 源缺失/在 D1 无源码"的表述不确，2026-09-05 勘误）。
 
 ```bash
 python cpg/ablation/patch_verify_control.py \
