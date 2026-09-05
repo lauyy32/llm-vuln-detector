@@ -31,7 +31,7 @@
 
 ---
 
-## P1 — 投稿前应修复
+## P1 — 成稿前应修复
 
 ### 4. 加 seed 参数 ✅（提交中，2026-08-28 晚）
 - **实现**：`LocalLLMScorer(seed=...)` → `/api/generate` options 加 `"seed"`；`run_ablation.py --seed N`；raw 日志记录 seed+temperature 字段

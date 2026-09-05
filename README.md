@@ -474,7 +474,7 @@ PL3: 检出率差距 +0.0% | 误报率差距 +0.0%
 
 ## 请求侧评测的泄漏消融（回应同行评审 §5）
 
-> 同行评审指出请求侧设计存在"先告诉答案"的信息泄漏：System Prompt 在步骤4 逐条枚举了各类攻击的具体特征签名，且与上下文构造器的预扫描正则（`RISK_PATTERNS`）及测试集同源；few-shot 示例与测试集同攻击族。本仓库已做如下整改，量化的"有/无特征"Δ 待带 API 重跑后补入 v2.1/v2.3 表（本机无 Key，见 `docs/DEEPSEEK-评审回应清单.md`）。
+> 同行评审指出请求侧设计存在"先告诉答案"的信息泄漏：System Prompt 在步骤4 逐条枚举了各类攻击的具体特征签名，且与上下文构造器的预扫描正则（`RISK_PATTERNS`）及测试集同源；few-shot 示例与测试集同攻击族。本仓库已做如下整改，量化的"有/无特征"Δ 待带 API 重跑后补入 v2.1/v2.3 表。
 
 - **可关消融开关**：`/api/detect` 新增 `pre_scan` / `feature_list` / `fewshot` 三个查询参数（默认 `true`，与既有评测一致）。置 `false` 即构造无泄漏消息——`SYSTEM_PROMPT_CLEAN`（仅任务框架、无逐签名清单与 few-shot）+ 上下文不含 `risk_signals` / `pre_scan` 块。开关生效由 `backend/tests/selfcheck_leakage_ablation.py` 无 API 机器验证。
 - **few-shot 独立性**：4 条 few-shot 示例为研究者手写，并非从 `dataset/` 取样；`include_fewshot` 开关可单独测量其贡献。

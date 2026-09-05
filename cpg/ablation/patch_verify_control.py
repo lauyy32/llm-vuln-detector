@@ -179,6 +179,37 @@ def ask_llm(llm: LocalLLMScorer, prompt: str, model: str, timeout: int = 600) ->
     return {"raw": raw, "parsed": llm._extract_json(raw) or {}}
 
 
+def ask_llm_openai(llm: LocalLLMScorer, prompt: str, model: str,
+                   base_url: str, key: str, timeout: int = 600) -> dict:
+    """OpenAI 兼容后端（frontier spot-check 用）。与 Ollama 臂同 system prompt、
+    同 temperature=0；API 残余非确定性通过 --repeats 多轮观测并全量落 raw。"""
+    import os
+    key = key or os.environ.get("DEEPSEEK_API_KEY", "")
+    if not key:
+        raise SystemExit("openai 后端需要 --key 或环境变量 DEEPSEEK_API_KEY")
+    payload = json.dumps(
+        {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": DIFF_SYSTEM},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0,
+            "max_tokens": 1024,
+        }
+    ).encode("utf-8")
+    req = urllib.request.Request(
+        base_url.rstrip("/") + "/chat/completions",
+        data=payload,
+        headers={"Content-Type": "application/json",
+                 "Authorization": f"Bearer {key}"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        raw = json.loads(resp.read().decode("utf-8"))["choices"][0]["message"]["content"]
+    return {"raw": raw, "parsed": llm._extract_json(raw) or {}}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--arms", nargs="+", default=["real", "placebo", "shuffled"],
@@ -189,6 +220,11 @@ def main() -> int:
                     help="指定语料集路径（默认 DATASET_JSONL；扩到全量 D1 用 dataset_d1.jsonl）")
     ap.add_argument("--out", default="cpg/ablation/patch_verify_control.json")
     ap.add_argument("--raw-out", default="cpg/ablation/patch_verify_control_raw.jsonl")
+    ap.add_argument("--backend", choices=["ollama", "openai"], default="ollama",
+                    help="openai 用于 frontier spot-check（DeepSeek 等 API 模型）")
+    ap.add_argument("--base-url", default="https://api.deepseek.com/v1")
+    ap.add_argument("--key", default="",
+                    help="缺省读环境变量 DEEPSEEK_API_KEY，避免进 shell 历史")
     args = ap.parse_args()
 
     cves = args.cves or cpg_patch_blind_cves()
@@ -238,7 +274,10 @@ def main() -> int:
                 rec["arms"][arm] = {"verdict": "no_diff", "correct": None}
                 continue
             prompt = base_prompt + f"\n# 修复补丁（vuln→fixed diff）\n```diff\n{diff[:4000]}\n```"
-            got = ask_llm(llm, prompt, args.model)
+            if args.backend == "ollama":
+                got = ask_llm(llm, prompt, args.model)
+            else:
+                got = ask_llm_openai(llm, prompt, args.model, args.base_url, args.key)
             verdict = got["parsed"].get("verdict", "?")
             rec["arms"][arm] = {
                 "verdict": verdict,

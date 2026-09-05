@@ -69,3 +69,18 @@ cpg/corpus_pairs/CVE-2026-73974/
 cpg/benchmarks/
 # 采集中间产物（可重建，源码节选体积大，不入库）
 cpg/corpus_pairs/
+
+# 论文写作与投稿相关（双盲要求，移出公开树；本地保留于仓外 paper-private/）
+docs/PAPER-SKELETON.md
+docs/PAPER-PLAN-B.md
+docs/FINAL-DECISION-2026-09-04.md
+docs/FINAL-PLAN-v2-2026-09-05.md
+docs/DEEPSEEK-评审回应清单.md
+docs/REVIEW-INTEGRATION-2026-09-04.md
+docs/RELATED-WORK.md
+docs/advisor-report-2026-09-04.md
+docs/advisor-followup-other-directions-2026-09-04.md
+docs/advisor-followup-reverse-2026-09-04.md
+
+# 历史损坏残留（待确认后清理）
+.git.broken/
