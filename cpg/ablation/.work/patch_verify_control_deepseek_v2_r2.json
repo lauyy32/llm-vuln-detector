@@ -1,0 +1,509 @@
+{
+ "model": "deepseek-v4-flash",
+ "subset": [
+  "CVE-2026-12482",
+  "CVE-2026-45019",
+  "CVE-2026-49257",
+  "CVE-2026-50181",
+  "CVE-2026-50558",
+  "CVE-2026-53502",
+  "CVE-2026-53598",
+  "CVE-2026-54574",
+  "CVE-2026-54706",
+  "CVE-2026-54707",
+  "CVE-2026-54785",
+  "CVE-2026-59890",
+  "CVE-2026-67424",
+  "CVE-2026-67425",
+  "CVE-2026-67428",
+  "CVE-2026-70491",
+  "CVE-2026-73498"
+ ],
+ "summary": {
+  "real": {
+   "n": 15,
+   "benign": 13,
+   "vulnerable": 0,
+   "benign_rate": 0.8666666666666667
+  },
+  "placebo": {
+   "n": 15,
+   "benign": 0,
+   "vulnerable": 15,
+   "benign_rate": 0.0
+  },
+  "shuffled": {
+   "n": 15,
+   "benign": 0,
+   "vulnerable": 14,
+   "benign_rate": 0.0
+  }
+ },
+ "results": [
+  {
+   "cve": "CVE-2026-12482",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "?",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 1768,
+     "rationale": ""
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1275,
+     "rationale": "补丁仅修改注释与版本号，未对解压路径校验或过滤逻辑做任何有效防护，路径遍历漏洞仍然存在。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-45019",
+     "diff_chars": 12085,
+     "rationale": "补丁修改的是 chainlit MCP 配置校验逻辑，与 CVE-2026-12482 涉及的 Keras 归档解压路径穿越漏洞无任何关联，未能修复解压路径校验问题。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-45019",
+   "cwe": "CWE-918",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 12085,
+     "rationale": "补丁新增McpUserServersFeature.allowed_urls白名单并默认拒绝所有未配置的URL，同时阻止重复的MCP服务器名覆盖，对用户提供的MCP服务器URL导致的SSRF施加了有效限制。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 735,
+     "rationale": "补丁仅包含注释和版本号变更，未对SSRF漏洞路径施加任何防护，漏洞仍可被利用。"
+    },
+    "shuffled": {
+     "verdict": "?",
+     "expect": "vulnerable",
+     "correct": false,
+     "donor": "CVE-2026-49257",
+     "diff_chars": 4377,
+     "rationale": ""
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-50181",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7071,
+     "rationale": "补丁新增 safe_resolve_path 路径守卫，并在 ReadFileTool/WriteFileTool/ListDirTool 各 handle 中于实际文件操作前校验路径必须位于当前目录内，可有效阻断目录穿越，漏洞点已获防护。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1513,
+     "rationale": "修复补丁仅修改注释、空行和版本号，未对任何路径处理逻辑（如 safe_resolve_path 使用或路径校验）施加防护，漏洞路径仍可利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-50558",
+     "diff_chars": 2555,
+     "rationale": "补丁仅修复了penelope.py中tar提取的路径穿越，未对langroid system.py中create_file/read_file/rmdir等无防护文件路径操作施加任何校验，漏洞路径仍可利用。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-50558",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 2555,
+     "rationale": "补丁使用 safe_tar_extractall 对 tar 解压路径进行目录边界校验、拒绝特殊文件和越界链接，有效阻止了路径遍历利用。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 229,
+     "rationale": "补丁仅包含注释与版本号变更，没有任何针对路径遍历漏洞的功能性修复，漏洞路径仍可能存在。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-53502",
+     "diff_chars": 5006,
+     "rationale": "补丁仅修改了 thumbor/file_loader.py 的路径校验逻辑，与目标 penelope.py 中的路径遍历代码无关，公告所示漏洞路径未被修复。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-53502",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 5006,
+     "rationale": "补丁先解码百分号路径并使用 commonpath 做根目录边界校验，同时对所有字面/解码路径均重复检查，已阻断路径穿越逃逸。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1275,
+     "rationale": "补丁仅修改注释、版本号和TODO文本，未对路径遍历漏洞实施任何功能防护，漏洞路径依然存在。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-53598",
+     "diff_chars": 7331,
+     "rationale": "补丁仅修改了 prompty 模块与版本号，未涉及目标代码 thumbor/file_loader.py 的路径穿越逻辑，因此公告所述漏洞未被修复。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-53598",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7331,
+     "rationale": "补丁新增 allowed_file_roots 参数并对 ${file:...} 引用进行规范化和根目录校验，限制文件读取在允许范围内，消除了路径遍历风险。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1583,
+     "rationale": "补丁仅修改版本号与注释，未对loader.py中文件引用路径校验或读取逻辑做任何安全变更，路径穿越漏洞仍可利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54574",
+     "diff_chars": 9655,
+     "rationale": "修复补丁仅修改 proot_distro 相关文件中与目标 loader.py 无关的代码，未对 ${file:...} 路径解析/加载点实施任何防护，CVE-2026-53598 所述路径遍历风险仍然存在。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54574",
+   "cwe": "CWE-61",
+   "base_pred_no_diff": "abstain",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 9655,
+     "rationale": "补丁在 restore.py 中新增 _safe_dest，对解包目标路径和硬链接源路径经 _safe_resolve 进行逐跳限制，阻止借由档案内符号链接逃逸到容器目录之外，完整封堵了公告所述的路径穿越/符号链接覆盖漏洞。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1559,
+     "rationale": "补丁仅修改注释与版本号，无任何功能变更，漏洞涉及的安全逻辑（tar_extract/restore）完全未被修复，漏洞路径仍可利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54706",
+     "diff_chars": 7797,
+     "rationale": "补丁修改的是OnionShare的目录遍历代码，与漏洞涉及的tar_extract.py/restore.py无关，未对目标漏洞点施加有效防护。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54706",
+   "cwe": "CWE-59",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7797,
+     "rationale": "补丁在send_base_mode.py中通过followlinks=False、跳过符号链接并引入_is_path_contained路径包含校验，阻断了符号链接指向外部文件的泄露路径，且该防护覆盖了share_mode.py压缩流程所依赖的文件索引来源。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 905,
+     "rationale": "补丁仅修改注释和版本号，无任何功能性防护变更，未消除符号链接相关漏洞。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54707",
+     "diff_chars": 7379,
+     "rationale": "补丁仅修改 receive_mode.py 上传禁用逻辑，未对 share_mode.py 的符号链接路径（CWE-59）施加任何防护，漏洞路径仍存在。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54707",
+   "cwe": "CWE-863",
+   "base_pred_no_diff": "abstain",
+   "arms": {
+    "real": {
+     "verdict": "?",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 7379,
+     "rationale": ""
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 508,
+     "rationale": "该补丁仅修改注释和版本号，未对 receive_mode.py 中的授权验证或上传文件名路径处理施加任何功能性防护，CVE-2026-54707 所述的不正确授权漏洞仍可能存在。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54785",
+     "diff_chars": 6630,
+     "rationale": "补丁针对的是无关项目（Gemini MCP Server）的路径穿越修复，未触及 receive_mode.py 中与 CWE-863 授权缺陷相关的任何逻辑。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54785",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 6630,
+     "rationale": "补丁在_resolve_path中使用resolve()解析符号链接并严格以relative_to限制在directory内，同时强制调用方跳过rel_path为None的外部路径，彻底阻断路径遍历与符号链接逃逸。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1456,
+     "rationale": "补丁仅变更注释和版本号，未对路径遍历防护逻辑（_resolve_path 及相关文件读取）做任何功能修复，故漏洞路径仍可被利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-59890",
+     "diff_chars": 5906,
+     "rationale": "修复补丁仅涉及setuptools的egg_info.py中Unicode归一化问题，与目标代码mcp_server.py的路径遍历(CWE-022)完全无关，未对该漏洞施加任何防护。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-59890",
+   "cwe": "CWE-176",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 5906,
+     "rationale": "补丁通过_ NormalizedMatcher对MANIFEST.in模式与磁盘路径同时进行Unicode规范化，修复了因NFC/NFD不一致导致排除规则被绕过的问题，并添加回归测试，公告所述漏洞已消除。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1904,
+     "rationale": "补丁仅修改注释、空行和版本号，未对文件名路径校验等漏洞点施加任何防护，污点切片中的任意写/删路径（open/unlink/SOURCES.txt写入）仍可被利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-67424",
+     "diff_chars": 3593,
+     "rationale": "补丁仅对无关模块（vision_analyze.py、proxy_rotate.py、slack_send.py）添加SSRF防护，未修改目标代码egg_info.py中任何路径处理或文件写入/删除逻辑，漏洞路径仍可利用。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-67424",
+   "cwe": "CWE-918",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 3593,
+     "rationale": "补丁在多个用户可控URL请求入口（vision_analyze、proxy_rotate、slack_send）统一调用enforce_outbound_url进行SSRF防护，阻断内网/元数据地址访问，有效修复CWE-918漏洞。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 2008,
+     "rationale": "修复补丁仅修改注释、统一空行和提升版本号，无任何功能变更，未对 SSRF 漏洞路径施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-67425",
+     "diff_chars": 5861,
+     "rationale": "补丁仅限定了${env.*}插值策略，与CWE-918 SSRF无关，未对target_url/allowed_targets的执行路径添加防护，SSRF仍可利用。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-67425",
+   "cwe": "CWE-201",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 5861,
+     "rationale": "补丁在 ${env.*} 插值处新增 is_env_var_allowed 统一策略门控，默认拒绝未白名单环境变量读取，阻止通过插值绕过 env.get 管控的敏感信息泄露，故该漏洞点已被完整修复。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1916,
+     "rationale": "补丁仅修改注释和版本号，无任何功能变更，未对目标代码中信息泄露等漏洞路径施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-67428",
+     "diff_chars": 3593,
+     "rationale": "补丁仅在其他模块添加SSRF防护，未修复connector.py中CWE-201相关的敏感凭据发送漏洞。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-70491",
+   "cwe": "CWE-200",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1827,
+     "rationale": "补丁在无写权限时主动移除返回数据中的 content 字段，阻止了工具敏感内容被越权读取，完整修复信息泄露路径。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 644,
+     "rationale": "补丁仅修改注释与版本号，未对信息泄露路径施加任何有效防护，漏洞仍可利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-73498",
+     "diff_chars": 6660,
+     "rationale": "修复补丁针对 mcp_atlassian/confluence 模块，与目标 Open WebUI tools.py 的漏洞路径无关，未对公告所述信息泄露施加任何有效防护。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-73498",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 6660,
+     "rationale": "补丁用 validate_safe_path 强制将 file_path 限制在工作区内并拒绝目录穿越/绝对路径逃逸，覆盖了 open(file_path) 的任意文件读取路径，漏洞已消除。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1568,
+     "rationale": "补丁仅修改注释与版本号，未对file_path/open路径做任何校验或修复，路径遍历漏洞仍可被利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-12482",
+     "diff_chars": 1768,
+     "rationale": "修复补丁针对 keras 的 resolve_path，与目标代码 attachments.py 中 file_path 直达 open() 的路径遍历漏洞无关，漏洞点未得到任何防护。"
+    }
+   }
+  }
+ ]
+}

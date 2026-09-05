@@ -1,0 +1,1 @@
+{"cve": "CVE-2026-12482", "arm": "real", "model": "deepseek-v4-flash", "verdict": "benign", "raw": "{\"verdict\":\"benign\",\"cwe\":\"CWE-022\",\"confidence\":0.95,\"rationale\":\"补丁移除 resolve_path 中提前词法归一化的 abspath 调用，使 symlink 与 .. 组合的真实逃逸路径被正确拒绝，并增加回归测试，有效封堵了路径穿越漏洞。\"}"}

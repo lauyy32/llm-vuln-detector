@@ -180,9 +180,11 @@ def ask_llm(llm: LocalLLMScorer, prompt: str, model: str, timeout: int = 600) ->
 
 
 def ask_llm_openai(llm: LocalLLMScorer, prompt: str, model: str,
-                   base_url: str, key: str, timeout: int = 600) -> dict:
+                   base_url: str, key: str, timeout: int = 600,
+                   max_tokens: int = 1024) -> dict:
     """OpenAI 兼容后端（frontier spot-check 用）。与 Ollama 臂同 system prompt、
-    同 temperature=0；API 残余非确定性通过 --repeats 多轮观测并全量落 raw。"""
+    同 temperature=0；API 残余非确定性通过多轮重复观测并全量落 raw。
+    注意：reasoning 模型若 max_tokens 过小会被 reasoning_content 耗尽而 content 为空。"""
     import os
     key = key or os.environ.get("DEEPSEEK_API_KEY", "")
     if not key:
@@ -195,7 +197,7 @@ def ask_llm_openai(llm: LocalLLMScorer, prompt: str, model: str,
                 {"role": "user", "content": prompt},
             ],
             "temperature": 0,
-            "max_tokens": 1024,
+            "max_tokens": max_tokens,
         }
     ).encode("utf-8")
     req = urllib.request.Request(
@@ -223,6 +225,8 @@ def main() -> int:
     ap.add_argument("--backend", choices=["ollama", "openai"], default="ollama",
                     help="openai 用于 frontier spot-check（DeepSeek 等 API 模型）")
     ap.add_argument("--base-url", default="https://api.deepseek.com/v1")
+    ap.add_argument("--max-tokens", type=int, default=1024,
+                    help="API 臂 max_tokens（reasoning 模型需调大防空响应截断）")
     ap.add_argument("--key", default="",
                     help="缺省读环境变量 DEEPSEEK_API_KEY，避免进 shell 历史")
     args = ap.parse_args()
@@ -277,7 +281,8 @@ def main() -> int:
             if args.backend == "ollama":
                 got = ask_llm(llm, prompt, args.model)
             else:
-                got = ask_llm_openai(llm, prompt, args.model, args.base_url, args.key)
+                got = ask_llm_openai(llm, prompt, args.model, args.base_url, args.key,
+                             max_tokens=args.max_tokens)
             verdict = got["parsed"].get("verdict", "?")
             rec["arms"][arm] = {
                 "verdict": verdict,
