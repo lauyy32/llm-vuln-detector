@@ -52,7 +52,7 @@ from cpg.ablation.cpg_eval import build_cpg_slices_text, extract_taint  # noqa: 
 from cpg.ablation.corpus_db import build_corpus_db, CORPUS_SRC  # noqa: E402
 from cpg.ablation.codeql_baseline import run_codeql_baseline_corpus  # noqa: E402
 from cpg.ablation.scorers import (  # noqa: E402
-    CodeQLBaselineScorer, ConfigSigScorer, CPGEvidenceScorer, DetectionContext, LocalLLMScorer,
+    APILLMScorer, CodeQLBaselineScorer, ConfigSigScorer, CPGEvidenceScorer, DetectionContext, LocalLLMScorer,
     PublishedLLMBaselineScorer, StructuralHeuristicScorer, Verdict,
 )
 
@@ -343,6 +343,12 @@ def main() -> int:
     ap.add_argument("--with-local-llm", action="store_true",
                     help="纳入 LocalLLMScorer（需本机 Ollama + 模型已拉取；不可达时自动 abstain）")
     ap.add_argument("--llm-model", type=str, default=None, help="本地 LLM 模型名（默认 qwen2.5-coder:7b，模型规模消融用）")
+    ap.add_argument("--with-api-llm", action="store_true",
+                    help="纳入 APILLMScorer（OpenAI 兼容 API 前沿模型；key 走环境变量 DEEPSEEK_API_KEY）")
+    ap.add_argument("--api-model", type=str, default="deepseek-v4-flash")
+    ap.add_argument("--api-base-url", type=str, default="https://api.deepseek.com/v1")
+    ap.add_argument("--api-max-tokens", type=int, default=8192,
+                    help="API 臂输出预算（reasoning 模型须覆盖思维链，P1-12 教训）")
     ap.add_argument("--published-baseline", action="store_true",
                     help="纳入 PublishedLLMBaselineScorer（仅喂函数源码的已发表 LLM 方法风格基线，D3 head-to-head；需 Ollama 可达）")
     ap.add_argument("--seed", type=int, default=None,
@@ -448,9 +454,19 @@ def main() -> int:
     published_enabled = bool(args.published_baseline) and published_llm.reachable()
     if args.published_baseline and not published_enabled:
         print("[warn] --published-baseline set but Ollama unreachable; PublishedLLMBaselineScorer disabled")
+    # RQ1 前沿臂（P1-13）：API 前沿模型，与本地臂同 prompt/上下文/temp=0；
+    # 失败由父类异常捕获转 abstain，不中断跑批。
+    api_llm = APILLMScorer(model=args.api_model, api_base_url=args.api_base_url,
+                           max_tokens=args.api_max_tokens, timeout=600,
+                           raw_log=args.out_dir / "raw_api_llm_responses.jsonl",
+                           seed=args.seed)
+    api_llm_enabled = bool(args.with_api_llm) and api_llm.reachable()
+    if args.with_api_llm and not api_llm_enabled:
+        print("[warn] --with-api-llm set but API unreachable/key missing; APILLMScorer disabled")
     active_scorers = (list(SCORERS)
                       + (["LocalLLMScorer"] if local_llm_enabled else [])
-                      + (["PublishedLLMBaselineScorer"] if published_enabled else []))
+                      + (["PublishedLLMBaselineScorer"] if published_enabled else [])
+                      + (["APILLMScorer"] if api_llm_enabled else []))
 
     # 基线可用性：demo 逐样本走 CodeQLBaselineScorer（自带 db）；真实模式依赖 corpus SARIF，
     # 缺失（analyze 失败）时整轮跳过基线评分，避免崩溃。
@@ -547,6 +563,11 @@ def main() -> int:
                 v_pub = published_llm.score(ctx)
                 records.append((sid, s["version"], mode, "PublishedLLMBaselineScorer",
                                 v_pub.label, s["truth"], v_pub.cwe, cwe, group))
+            # RQ1 前沿臂（P1-13）：API 前沿模型判别（网络失败自动 abstain，独立申报）
+            if api_llm_enabled:
+                v_api = api_llm.score(ctx)
+                records.append((sid, s["version"], mode, "APILLMScorer",
+                                v_api.label, s["truth"], v_api.cwe, cwe, group))
 
     _write_results(args.out_dir / "results.csv", records)
     summary = _build_summary(records, errors, args, len(samples), active_scorers, modes=modes)

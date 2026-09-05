@@ -685,6 +685,72 @@ class PublishedLLMBaselineScorer(LocalLLMScorer):
 
 
 # 名称 -> 类 注册表（harness / api 用）
+
+
+# ---------------------------------------------------------------------------
+# API 前沿模型评分器（RQ1 前沿臂，P1-13）
+# ---------------------------------------------------------------------------
+class APILLMScorer(LocalLLMScorer):
+    """OpenAI 兼容 API 的前沿模型评分器（P1-13 RQ1 前沿臂）。
+
+    与 LocalLLMScorer 共享 prompt 构造、JSON 解析与 raw 落盘机制；仅把传输层
+    从本地 Ollama 换成 OpenAI 兼容 chat/completions（temperature=0，max_tokens
+    默认 8192——reasoning 模型预算教训见 P1-12）。key 只从环境变量
+    DEEPSEEK_API_KEY 读取，避免进入命令行/进程列表。
+    API 调用失败由父类 score() 的异常捕获统一转 abstain（网络抖动不中断跑批）。
+    """
+
+    name = "APILLMScorer"
+
+    def __init__(self, model: str = "deepseek-v4-flash",
+                 api_base_url: str = "https://api.deepseek.com/v1",
+                 max_tokens: int = 8192, **kwargs):
+        kwargs.pop("base_url", None)
+        super().__init__(model=model, **kwargs)
+        self.api_base_url = api_base_url.rstrip("/")
+        self.max_tokens = max_tokens
+
+    @staticmethod
+    def _api_key() -> str:
+        import os
+        return os.environ.get("DEEPSEEK_API_KEY", "")
+
+    def _probe(self) -> bool:
+        if not self._api_key():
+            return False
+        try:
+            req = urllib.request.Request(
+                f"{self.api_base_url}/models", method="GET",
+                headers={"Authorization": f"Bearer {self._api_key()}"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return resp.status == 200
+        except Exception:
+            return False
+
+    def _generate(self, prompt: str) -> str:
+        payload = json.dumps(
+            {
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": self.SYSTEM},
+                    {"role": "user", "content": prompt},
+                ],
+                "temperature": 0,
+                "max_tokens": self.max_tokens,
+            }
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"{self.api_base_url}/chat/completions",
+            data=payload,
+            headers={"Content-Type": "application/json",
+                     "Authorization": f"Bearer {self._api_key()}"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data["choices"][0]["message"].get("content") or ""
+
+
 SCORER_REGISTRY: dict[str, type[Scorer]] = {
     "StructuralHeuristicScorer": StructuralHeuristicScorer,
     "CodeQLBaselineScorer": CodeQLBaselineScorer,
@@ -692,4 +758,5 @@ SCORER_REGISTRY: dict[str, type[Scorer]] = {
     "CPGEvidenceScorer": CPGEvidenceScorer,
     "LocalLLMScorer": LocalLLMScorer,
     "PublishedLLMBaselineScorer": PublishedLLMBaselineScorer,
+    "APILLMScorer": APILLMScorer,
 }
