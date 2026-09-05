@@ -90,9 +90,16 @@ def main() -> None:
     ap.add_argument("--out", required=True)
     ap.add_argument("--n", type=int, default=15)
     ap.add_argument("--seed", type=int, default=20260904)
+    ap.add_argument(
+        "--cves",
+        nargs="*",
+        default=None,
+        help="显式指定 CVE 列表（优先级高于 --dataset 抽样）；用于 P1-7 阳性对照——"
+        "对训练截止前的知名 CVE 提问，探测应能'说出'，以证明探测具备灵敏度。",
+    )
     args = ap.parse_args()
 
-    cves = load_cves(args.dataset, args.n, args.seed)
+    cves = args.cves if args.cves else load_cves(args.dataset, args.n, args.seed)
     rows = []
     for cve in cves:
         if args.backend == "ollama":

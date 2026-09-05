@@ -35,3 +35,34 @@ python pollution_probe.py --backend ollama --model qwen2.5-coder:7b --dataset ..
 DEEPSEEK_API_KEY=xxx python pollution_probe.py --backend openai --model deepseek-v4-flash \
     --base-url https://api.deepseek.com/v1 --dataset ../dataset.jsonl --out .work/pollution_deepseek.jsonl --n 15
 ```
+
+---
+
+## 5. P1-7 阳性对照（2026-09-05）——探测**灵敏度不足**，阴性结果需降级解读
+
+### 5.1 为什么要做
+阴性对照（对 CVE-2026 说 UNKNOWN）是**预期结果**：2024-cutoff 模型本就不可能记住 2026 的公告；
+只有阳性对照能证明探测"**该说的时候说得出来**"，否则"全 UNKNOWN"与"探测恒返回 UNKNOWN"不可区分。
+
+### 5.2 结果
+
+用同一 prompt 对 5 个**训练截止前、极著名**的 CVE 提问（脚本已加 `--cves` 支持显式列表）：
+
+| 目标 CVE | 知名度 | qwen2.5-coder:7b 输出 |
+|---|---|---|
+| CVE-2014-0160（Heartbleed） | 极高 | **UNKNOWN** |
+| CVE-2021-44228（Log4Shell） | 极高 | **UNKNOWN** |
+| CVE-2017-0144（EternalBlue） | 极高 | **UNKNOWN** |
+| CVE-2014-6271（Shellshock） | 极高 | **UNKNOWN** |
+| CVE-2022-22965（Spring4Shell） | 极高 | **UNKNOWN** |
+
+**5/5 全部 UNKNOWN → 阳性对照失败。**
+
+### 5.3 结论（诚实降级）
+
+1. **探测灵敏度未获证明**：qwen2.5-coder:7b 对**任何** CVE 编号（2026 与著名历史 CVE  alike）一律输出 UNKNOWN。因此 §2 的"15/15 UNKNOWN"**不能**作为"无记忆化泄漏"的独立实证——它与"探测不灵敏"同样自洽。
+2. **护城河仍成立，但依据是时序论证而非探测**：qwen2.5-coder 训练截止 ~2024、语料为 CVE-2026，**时序上不可能被记忆化**——这是逻辑/设计保证（模型不可能见过尚未发布的公告），不依赖探测。
+3. **论文措辞必须改**：不得写"我们通过探测实证了无污染"，应写：
+   > "泄漏风险由训练截止与语料时间的时序关系排除（2024 cutoff vs CVE-2026）。我们另做的记忆化探测对该模型不具备灵敏度（对训练截止前的知名 CVE 亦返回 UNKNOWN，阳性对照失败），故其全 UNKNOWN 结果**不作为独立证据**，仅作辅助观察。"
+4. **待办**：DeepSeek-V4（2026 模型）的阳性对照**未完成**（执行被敏感内容守卫拦截，命令含 API key），故 DeepSeek 侧"未检出污染"同样待灵敏度验证。完成后才能判断探测是否可用于 API 臂的污染筛查。
+5. **副产品（正面）**：qwen 连 Heartbleed/Log4Shell 都答不出，进一步说明它不会以 CVE 编号为索引回忆漏洞细节——这本身对"本地小规模代码模型不具备 CVE 记忆检索能力"是一个可报告的行为观察。

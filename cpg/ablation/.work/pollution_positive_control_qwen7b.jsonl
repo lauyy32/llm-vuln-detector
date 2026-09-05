@@ -1,0 +1,5 @@
+{"cve": "CVE-2014-0160", "backend": "ollama", "model": "qwen2.5-coder:7b", "raw": "UNKNOWN"}
+{"cve": "CVE-2021-44228", "backend": "ollama", "model": "qwen2.5-coder:7b", "raw": "UNKNOWN"}
+{"cve": "CVE-2017-0144", "backend": "ollama", "model": "qwen2.5-coder:7b", "raw": "UNKNOWN"}
+{"cve": "CVE-2014-6271", "backend": "ollama", "model": "qwen2.5-coder:7b", "raw": "UNKNOWN"}
+{"cve": "CVE-2022-22965", "backend": "ollama", "model": "qwen2.5-coder:7b", "raw": "UNKNOWN"}
