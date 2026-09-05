@@ -225,7 +225,7 @@ def main() -> int:
     ap.add_argument("--backend", choices=["ollama", "openai"], default="ollama",
                     help="openai 用于 frontier spot-check（DeepSeek 等 API 模型）")
     ap.add_argument("--base-url", default="https://api.deepseek.com/v1")
-    ap.add_argument("--max-tokens", type=int, default=1024,
+    ap.add_argument("--max-tokens", type=int, default=8192,
                     help="API 臂 max_tokens（reasoning 模型需调大防空响应截断）")
     ap.add_argument("--key", default="",
                     help="缺省读环境变量 DEEPSEEK_API_KEY，避免进 shell 历史")

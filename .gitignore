@@ -70,7 +70,7 @@ cpg/benchmarks/
 # 采集中间产物（可重建，源码节选体积大，不入库）
 cpg/corpus_pairs/
 
-# 论文写作与投稿相关（双盲要求，移出公开树；本地保留于仓外 paper-private/）
+# 内部写作资料（已移至仓外独立仓管理）
 docs/PAPER-SKELETON.md
 docs/PAPER-PLAN-B.md
 docs/FINAL-DECISION-2026-09-04.md

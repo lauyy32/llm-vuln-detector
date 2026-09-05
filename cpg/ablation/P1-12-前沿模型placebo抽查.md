@@ -1,11 +1,11 @@
 # P1-12：placebo 三臂的前沿模型 spot-check（DeepSeek-v4-flash，2026-09-05）
 
 > 目的：主协议锁定本地 2024-cutoff 模型（qwen2.5-coder 7B/14B，时序隔离记忆化污染）。
-> 评审风险点是"结论是否 2024 小模型特异"。本实验把**全篇唯一 p<0.01 的阳性锚点**
+> 评审风险点是"结论是否 2024 小模型特异"。本实验把**本地协议中唯一 p<0.01 的阳性锚点**
 > （placebo 三臂）在前沿 API 模型上做一次**加法式**抽查——不动任何冻结数字，
 > 结果只进附录小节。
 >
-> 预注册解释分支：① placebo 拒绝率复现 → 阳性锚点升为跨世代证据；② placebo 翻车 →
+> 解释分支（先于跑批确定，非时间戳工件）：① placebo 拒绝率复现 → 阳性锚点升为跨世代证据；② placebo 翻车 →
 > "读补丁"能力为世代特异，结论收窄；③ real 臂 benign 率远高于 53% → "漏判真实修复"
 > 边界移动，须改写叙事。
 
@@ -16,6 +16,7 @@
 - 模型：deepseek-v4-flash（API，2026 世代）；`--dataset cpg/dataset_d1.jsonl`，
   CPG 双标记子集有效 n=15（49257/67428 不在 D1，与主协议口径一致）。
 - 规模：15 CVE × 3 臂 × 3 轮 = 135 次调用；raw 全量落盘。
+- 复现：`python cpg/ablation/patch_verify_control.py --backend openai --model deepseek-v4-flash --dataset cpg/dataset_d1.jsonl --max-tokens 8192 --out <out>.json --raw-out <raw>.jsonl`（key 走环境变量 DEEPSEEK_API_KEY；须绕过本机代理）。
 - 污染前提：该模型已通过灵敏度验证的记忆化探测（GT0 §5：阳性 4/5，阴性 85/85
   UNKNOWN），且 placebo/shuffled 臂的 diff 为合成/移植，记忆化通道天然微弱。
 
@@ -42,20 +43,24 @@
 14B real 8/15 / placebo 0/15 / shuffled 0/15。
 
 产物：`.work/patch_verify_control_deepseek_v2_r{1,2,3}.json` +
-`_v2_raw_r{1,2,3}.jsonl`（135 条 raw 全量入库）。
+`_v2_raw_r{1,2,3}.jsonl`（135 条 raw 全量落盘入库；其中 4 条空响应按独立类别申报，不计被骗）。
 
 ## 4. 发现
 
-1. **阳性锚点跨世代复现成立且更强（分支①）**：placebo 臂 45/45 全拒（v1 唯一滑点
-   53502 证实为预算截断伪影，v2 消失）；shuffled 0/45 被骗。逐轮 McNemar
+1. **阳性锚点跨世代复现成立且更强（分支①）**：placebo 臂 45/45 全拒；v1 曾出现 1 次滑点
+   （53502，raw 完整未截断、150 字符、JSON 闭合——该次 rationale 显示模型凭模式而非
+   diff 内容作答，属真实误判），v2 三轮未复现 → 归因为 temp=0 下 API 非确定性
+   漂移，**非**截断伪影（2026-09-05 晚勘误：本报告初版"截断伪影"表述有误，
+   以 v1 raw 为证）；shuffled 0/45 被骗。逐轮 McNemar
    p∈[3e-5, 2.4e-4]，强于本地（b=8/c=0, p=0.0039）——因为前沿模型 real 臂更敢判
    benign 而 placebo 臂仍全拒，real−placebo 差拉大到 +0.80~+1.00。
 2. **real 臂边界移动（分支③部分命中，须收窄措辞）**：前沿模型识别真实修复
    40/45（89%），显著高于本地 7B/14B 的 53%。"LLM 漏判约一半真实修复"**仅是
    本地小模型现象**，不得外推至前沿模型；论文相关表述统一收窄为
    "本地 7B/14B + CPG 证据链上"。
-3. **实例关系为超集而非错位**：v2 两轮中 7B 的 8 个 real-benign 全部落入
-   DeepSeek 的 12-13 个之内（DS ⊇ 7B）。v1 报告的"5/8 重合"系空响应污染，已作废。
+3. **实例关系为超集而非错位**：v2 三轮中 7B 的 8 个 real-benign 全部落入
+   DeepSeek 的 real-benign 集合（DS ⊇ 7B，三轮均成立）。v1 报告的"5/8 重合"
+   系空响应污染，已作废。
 4. **仪表教训**：reasoning 模型的 max_tokens 须覆盖思维链；空响应排查先看
    `finish_reason`，再谈内容过滤。
 
