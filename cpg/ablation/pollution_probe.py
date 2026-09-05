@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import random
 import urllib.request
 
@@ -85,7 +86,9 @@ def main() -> None:
     ap.add_argument("--backend", choices=["ollama", "openai"], required=True)
     ap.add_argument("--model", required=True)
     ap.add_argument("--base-url", default="https://api.deepseek.com/v1")
-    ap.add_argument("--key", default="")
+    ap.add_argument("--key", default="",
+                    help="API key。缺省时读环境变量 DEEPSEEK_API_KEY——优先用环境变量，"
+                         "避免 key 进入 shell 历史/进程列表")
     ap.add_argument("--dataset", default="../../cpg/dataset.jsonl")
     ap.add_argument("--out", required=True)
     ap.add_argument("--n", type=int, default=15)
@@ -98,6 +101,10 @@ def main() -> None:
         "对训练截止前的知名 CVE 提问，探测应能'说出'，以证明探测具备灵敏度。",
     )
     args = ap.parse_args()
+    if args.backend == "openai":
+        args.key = args.key or os.environ.get("DEEPSEEK_API_KEY", "")
+        if not args.key:
+            ap.error("openai 后端需要 --key 或环境变量 DEEPSEEK_API_KEY")
 
     cves = args.cves if args.cves else load_cves(args.dataset, args.n, args.seed)
     rows = []
