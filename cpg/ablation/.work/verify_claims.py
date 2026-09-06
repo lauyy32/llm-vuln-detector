@@ -95,6 +95,8 @@ def main() -> int:
                 ok = fail(f"{cid}: {got} != {exp}")
             else:
                 print(f"[ok] {cid}: {got['genuine']}/{got['total']} = {got['rate']:.3f}")
+        else:
+            ok = fail(f"unknown claim id: {cid}")
 
     print('\nVERIFY_CLAIMS:', 'PASS' if ok else 'FAIL')
     return 0 if ok else 1

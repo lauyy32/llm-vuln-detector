@@ -7,7 +7,6 @@
    "expect": 2,
    "n": 82,
    "script": "cpg/ablation/.work/strict_recompute.py",
-   "data": "cpg/ablation/seeds/v9_llm_d1/results.csv",
    "data_files": [
     "cpg/ablation/seeds/v9_llm_d1/results.csv"
    ]
@@ -18,7 +17,6 @@
    "expect": 0,
    "n": 74,
    "script": "cpg/ablation/.work/strict_recompute.py",
-   "data": "cpg/ablation/seeds/v9_llm_74_14b/results.csv",
    "data_files": [
     "cpg/ablation/seeds/v9_llm_74_14b/results.csv"
    ]
@@ -29,7 +27,6 @@
    "expect": 7,
    "n": 82,
    "script": "cpg/ablation/.work/strict_recompute.py",
-   "data": "cpg/ablation/seeds/v13_85_ds_r1a/results.csv",
    "data_files": [
     "cpg/ablation/seeds/v13_85_ds_r1a/results.csv",
     "cpg/ablation/seeds/v13_85_ds_r1b/results.csv"
@@ -46,7 +43,8 @@
    "script": "cpg/ablation/.work/strict_recompute.py",
    "data_files": [
     "cpg/ablation/seeds/v9_llm_d1/results.csv",
-    "cpg/ablation/seeds/v13_85_ds_r1a/results.csv"
+    "cpg/ablation/seeds/v13_85_ds_r1a/results.csv",
+    "cpg/ablation/seeds/v13_85_ds_r1b/results.csv"
    ]
   },
   {
@@ -89,7 +87,10 @@
    },
    "script": "cpg/ablation/.work/strict_recompute.py",
    "data_files": [
-    "cpg/ablation/seeds/v13_85_ds_r1a/results.csv"
+    "cpg/ablation/seeds/v13_85_ds_r1a/results.csv",
+    "cpg/ablation/seeds/v13_85_ds_r1b/results.csv",
+    "cpg/ablation/seeds/v13_85_ds_r2a/results.csv",
+    "cpg/ablation/seeds/v13_85_ds_r2b/results.csv"
    ]
   }
  ]

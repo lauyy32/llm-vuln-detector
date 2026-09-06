@@ -203,7 +203,9 @@ for tag in ['DS r1', 'DS r2']:
     nd = cor + inv
     _dir[tag] = {'answered_pairs': len(ans), 'correct': cor, 'inverted': inv,
                  'p': sum(math.comb(nd, k) for k in range(cor, nd + 1)) * 0.5 ** nd}
-_abst = {'genuine': 148, 'total': 159, 'rate': 148 / 159}
+assert tot_abst > 0, 'fail-closed: 弃权计数为 0，数据源异常'
+_abst = {'genuine': tot_abst - tot_fault, 'total': tot_abst,
+         'rate': (tot_abst - tot_fault) / tot_abst}
 _result = {'disc_strict': _disc, 'mcnemar': _mcn, 'directional': _dir, 'abstain': _abst}
 with open('cpg/ablation/.work/strict_recompute_out.json', 'w', encoding='utf-8') as fh:
     _json.dump(_result, fh, ensure_ascii=False, indent=1)

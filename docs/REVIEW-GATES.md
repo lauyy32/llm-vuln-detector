@@ -48,3 +48,4 @@
 | 2026-09-06 | strict_recompute 重复样本断言失效（dict 化后断言恒真） | 改原始 CSV 行级 (sample_id,version,mode,scorer) 唯一键断言 + 精确样本数断言 |
 | 2026-09-06 | P1-13 判读残留（§5.2"两轮有效"、§5.3"C/C"、README"落 C 分支"、analyze 输出 C） | 全部改"A/C overlap—inconclusive（探索性）" |
 | 2026-09-06 | P1-16 §3"文档级修正本轮一并闭合"（未实际完成） | 改"待闭合"并逐条登记 |
+| 2026-09-06 | strict_recompute 弃权统计硬编码（_abst 写死 148/159，与刚拆掉的 verify 硬编码同类） | 改用 tot_abst/tot_fault 数据计算值 + fail-closed（第三次验收 P0，已修） |
