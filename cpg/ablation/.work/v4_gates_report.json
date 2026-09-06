@@ -1,6 +1,6 @@
 {
  "generated_from": {
-  "git_commit": "4e5fcd0a39af0530a7194c62b999edab09831037",
+  "git_commit": "53a3e3bbbdf342f411ac11932b4ec09c7d2a1931",
   "generator_sha256": "36a8efece4b985b9c739787481878f9e563262615976712c5ba0ae9304750bfa",
   "python": "3.13.14",
   "git_version": "git version 2.55.0.windows.3",
@@ -389,5 +389,5 @@
    }
   }
  },
- "cross_process_deterministic": true
+ "determinism_spotcheck": true
 }
