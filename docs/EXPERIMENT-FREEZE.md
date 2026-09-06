@@ -120,7 +120,7 @@
 - 四臂混合盲标 + 仲裁 + 纳入名单冻结；构造者此前未查看 partial 模型结果；
 - partial 的 prompt/token/apply 门禁通过。
 
-**冻结** = Gate A 与 Gate B 各自通过后，相应臂进入跑批；两臂结果 + 分析完成后
+**冻结** = Gate A 与 Gate B 各自通过后，相应臂进入跑批；四臂结果（real/placebo/shuffled + partial）+ 分析完成后
 进入论文层。此后只许跑批、分析、写论文，门禁层不再新增条目
 （新发现的问题进 backlog，投稿后再议）。
 
