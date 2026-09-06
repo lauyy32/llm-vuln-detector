@@ -36,7 +36,7 @@
 
 ## 2. v4 实验对象真实性（G0-G4 实现）
 
-- [~] real diff 完整性（语料树等价 15/15 G1_G2_STRUCTURAL_PASS：canonical diff 应用后与 fixed 树双向集合+字节+类型一致；报告 .work/v4_gates_report.json）。**但 P0-3 待定**：只证语料快照完整，未证等于上游 fix_commit 真实补丁——45019 语料 10 文件 vs 上游 ~23 文件。待决：上游来源的机械化 Python 投影（只按语言/扩展名客观过滤，禁人工挑 hunk）vs corpus-complete 命名。名称已定为 "corpus-complete / Python-scoped candidate patch"，不得称"完整真实补丁"。
+- [~] real diff 完整性（语料树等价 15/15 G1_G2_STRUCTURAL_PASS：canonical diff 应用后与 fixed 树双向集合+字节+类型一致；报告 .work/v4_gates_report.json）。**P0-3 已定（2026-09-06 第六轮）**：real 主臂 = 上游 `fix_commit^..fix_commit` 的**机械化 Python 投影**（按预注册语言/扩展名客观提取，禁人工挑 hunk）；corpus-complete 降为一致性/敏感性分析。命名 "*upstream fix-commit derived Python projection*"，不得称"完整真实补丁"，不得称"CPG 收窄补丁"。⚠️ 已知 45019 语料 10 文件 vs 上游 ~23 文件，须标 `composite_fix_commit=true` 并从长度匹配子集（主分析）排除。
   **应用后与 fixed 快照逐文件哈希一致**（或显式标记不等价原因）；
   禁字典序子集/禁中间截断
 - [~] placebo：结构门禁 15/15 apply-clean+AST 等价；**锚点字节偏移/死分支/统一模板/shebang 位移四处已修（2026-09-06 v2.2）**；token 比未达 [0.8,1.25] 带（proxy 值随实现变动，不固化具体范围）；注释自然度天花板=自动化不可达"第二标注者看不出自动生成"，最终由构造者撰写+盲标仲裁——**此项验收前置于 Gate A**（real/placebo/shuffled 跑批前必须完成，不能等 partial 的 Gate B）。
@@ -47,8 +47,8 @@
   T2 确定性语义断言（路径/权限/返回字段等领域检查可脚本化者）；
   T3 均不可行 → 冻结的书面残余利用路径 + 双人独立确认。
   三类数量分别报告，不混为同一证据等级。
-- [ ] partial：基于规范化完整 diff 重构（14 例构造表已定）
-- [~] token 比门禁硬执行（[0.8,1.25]，按最终送入模型的 diff token 数计；冒烟三例未过，扩容/子集策略见下）
+- [ ] partial：**主对照**（real–partial 为 Judging 主比较）——基于上游投影 real 删除**双人确认**的关键安全 hunk（14 例构造表已定）；**与 G0/G3/G4 并行启动构造+双标**（勿串行，是 10-19 前最长的杆）；预注册标注滑期的 fallback（placebo 操纵检验 + corpus-complete，claim 显式收窄为"外观敏感性"）。效度押在"删对 hunk"上：双人独立识别+仲裁+报 κ，删错则 partial 仍充分、对比作废。
+- [~] token 比门禁硬执行（目标 [0.8,1.25] 在**六层作用域定下后基于新数据重设并预注册**，不得以"删范围"变相放宽；按最终送入模型的 diff token 数计；冒烟三例未过，扩容/子集策略见下）
   **长度匹配策略（2026-09-06 冒烟实测后预注册）**：real diff 巨大（≥~25k 字符）的 CVE，
   等长纯装饰 placebo 需注入数万字符注释，不自然且可被当线索——此类 CVE：
   a) 先尝试确定性 cosmetic 扩容（跨多个真实文件锚点注入，目标落带内）；
@@ -112,42 +112,65 @@
 - [ ] 导师确认：注册（全价）+ 差旅（里士满 2027-03）+ 学校认定
 - [ ] .git.broken 物理删除确认 + 工作区垃圾目录清理
 
-## 决策备忘：P0-3（real 臂范围）与 token 长度门禁是【同一个决策】（2026-09-06 第五轮评审）
+## 决策备忘：real 臂范围【终版六层设计，CPG 路径裁剪方案出局】（2026-09-06 第六轮评审）
 
-**结构性事实**：real 臂为语料全量 vuln→fixed diff，placebo 为 2 文件各 1 条注释——
-尺寸失配为数量级（实测 45019=161×、73498=54×、12482=1.3×），15 例 **0 例**落在
-[0.8,1.25]。**这不是测量误差，装真实 tokenizer 也不会让它通过**——模型可凭 diff 大小
-100% 区分臂属，是比注释模板严重一个数量级的臂指纹。
+**背景**：real 臂（语料全量 vuln→fixed diff）与 placebo（2 文件各 1 条注释）尺寸失配为
+数量级（实测 45019=161×、73498=54×、12482=1.3×），15 例 **0 例**落在 [0.8,1.25]。据此
+patch size 是**严重且可完全分离配对样本的潜在混淆**（注：这是数据的性质，不等于"模型单样本
+识别率 100%"——后者需训练仅用 token 数的分类器做留一交叉验证才可声称，故不写"100%"）。
 
-**两个评审的分歧**：
-- codex：主分析用「上游 fix_commit^..fix_commit 的机械化 Python 投影」，corpus-complete 降为一致性检查；
-- Hy4：维持 corpus-complete + 3-5 例上游敏感性；把 real 收窄到「CPG 污点路径文件 ∩ Python」（客观规则、机械化、禁人工挑 hunk），一并解决 P0-3 与长度；反对全量上游投影（45019 上游为复合提交，整包投影会污染"该 CVE 的 ground-truth 归属"）。
+**CPG 路径裁剪方案已否决（三审一致，用仓库自身证据钉死）**：
+1. **循环定义**：研究 CPG 上下文是否帮 LLM 判补丁，却反过来用 CPG 输出决定模型看到哪些补丁
+   文件 → 测得"LLM 能否验证 CPG 预裁剪表示"，研究问题被换掉。
+2. **机械删新增文件**：73498 的 `ssrf_adapter.py` 为修复**新增**文件（vuln 侧 utils 无、fixed
+   侧有），"∩ vuln 侧 CPG 污点路径文件"会删掉这个以漏洞类型命名的核心修复文件。
+3. **按错误路径裁焦点案例**：D5:42 明载 45019（目标 CWE-918 SSRF）被 `CpgPathSource` 抓成
+   CWE-022 路径遍历流 → 会让 CPG 按错误 CWE 去裁 real。
+4. **不能为匹配对照而改处理组定义**：real patch 定义属研究构念，token 长度属混淆控制，二者
+   不是"同一个决策"。不能因为 placebo 太短就把 real 裁短——等长是实现了，"真实补丁验证"这个
+   研究对象被改掉了。
 
-**我的建议（供负责人+导师裁定，非我单方执行）**：
-1. real 臂作用域 = **CPG 污点路径文件 ∩ Python**（复用现有 CPG 工具链，客观、可审计），命名
-   "vulnerability-path-scoped candidate patch"；
-2. corpus-complete diff 留作一致性检查（证明收窄未丢安全关键 hunk）；
-3. **预注册 3-5 例上游敏感性**（fix_commit^..fix_commit，客观比对：收窄是否丢失安全相关 hunk，
-   丢失则如实报告、不挑 favorable 口径）；
-4. 复合提交（45019：24 文件、含两项 CVE 修复）标 `composite_fix_commit=true`，按统一大小规则
-   进排除或敏感性分析，不与单漏洞补丁直接可比；
-5. 长度门禁在**收窄后的 real** 上重新标定目标（先定作用域再定 [0.8,1.25]，预注册），
-   若匹配子集 n≤3 则走 Hy4 备选口径——把 patch size 当已测混淆（尺寸分层/尺寸匹配对照），
-   并将 claim 收窄为"placebo 检验的是**外观敏感性**而非语义判断"。
+**终版六层设计（Codex 裁决，三审收敛）**：
+1. **real 主臂** = 上游 `fix_commit^..fix_commit` 的**机械化 Python 投影**（按预注册语言/扩展名
+   规则客观提取，禁人工挑"安全相关 hunk"）。命名："*upstream fix-commit derived Python
+   projection*"，不得称"完整真实补丁"，也不得称"CPG 收窄补丁"。
+2. **partial 主对照** = 从同一 real 投影删除**双人确认**的关键安全 hunk。与 real 天然近等长，
+   是判断"补丁充分性"的核心对照（real–partial 为 Judging 主比较）。
+3. **cosmetic placebo** = 仅作操纵检验，证明模型对补丁内容/外观有反应，**不单独支撑**"会判断
+   充分性"。
+4. **shuffled** = 按 token 数匹配 donor 的无关补丁对照（匹配后须报协变量平衡表/标准化均值差，
+   不得只写"已匹配"；n=15 下平衡大概率不理想，诚实披露）。
+5. **corpus-complete** = 语料一致性与敏感性分析（不充当"收窄未丢安全 hunk"的充分性 oracle）。
+6. **CPG-path-scoped** = 仅列**探索性消融**（full patch vs CPG-path-scoped representation，
+   回答"CPG 裁剪到底帮助还是损害判断"），**不得作为 real 主臂**。
 
-> 状态：**待负责人裁定**后实施；裁定前不跑任何 arm。
+**超大/复合提交处置（预注册）**：
+- 预注册 token 上限；超限样本进 oversized/composite 分层，**不截断、不按 CPG 路径裁剪**；
+- 本地模型装不下则从确认性匹配子集排除；大上下文 API 另做敏感性分析；
+- 复合提交（如 45019：上游 24 文件、含两项 CVE 修复）除标 `composite_fix_commit=true` 外，
+  **从长度匹配子集（主分析）排除**，仅入全样本并单独报告——只打标签不足以消解"该 CVE 的
+  ground-truth 归属被污染"。
+
+**长度修复必须双侧**：不只收窄 real——placebo 必须作用于 real 所改的**同一文件集**并按目标
+体量增加 AST 中性编辑；四臂（real/placebo/shuffled/partial）统一作用域，否则指纹转移到
+shuffled/partial。token 比目标 [0.8,1.25] 在**六层作用域定下后基于新数据重设并预注册**，
+不得以"删范围"变相放宽。
+
+> 状态：**六层设计已固定**；待执行=构建 15 例上游投影 manifest + 测 real–partial/real–placebo
+> 真实 token 分布 + 重跑新门禁报告；导师只裁定分层设计与排除阈值（token 上限/文件数规则），
+> 不裁定"是否允许 CPG 定义 ground truth"（该条已否决）。
 
 ## 完成判据（2026-09-06 拆分 Gate A/B，消除"§3 含 partial 标注 vs 排期先跑三臂"的冲突）
 
 **Gate A（三臂跑批前）** —— 通过后只运行 real/placebo/shuffled：
 - **placebo 人工自然度/臂指纹盲验（构造者+第二标注者，在见模型结果前完成）**；
-- G0-G4 门禁对三臂候选包全绿（**语料完整 real diff（Python-scoped candidate patch）** + apply-clean placebo + 残余漏洞
-  分层 oracle + token 比 [0.8,1.25]）；
+- G0-G4 门禁对三臂候选包全绿（**upstream fix-commit derived Python projection（real）** + apply-clean placebo + 残余漏洞
+  分层 oracle + token 比 [0.8,1.25]（六层作用域定下后重设））；
 - prompt/diff/digest/日志与统计协议冻结；端到端 smoke 通过；
 - 外部验收通过。
 
 **Gate B（partial 跑批前）** —— 通过后才运行 partial 臂：
-- partial 基于**语料完整 real diff** 重构（14 例构造表 + 45019 定夺）；
+- partial 基于**上游投影 real** 重构（删除双人确认关键安全 hunk；14 例构造表 + 45019 从确认性主分析排除、仅入全样本）；
 - oracle 分层完成（T1 可执行约 3 例/T2 断言/T3 人工+双人确认）；
 - 四臂混合盲标 + 仲裁 + 纳入名单冻结；构造者此前未查看 partial 模型结果；
 - partial 的 prompt/token/apply 门禁通过。
