@@ -55,7 +55,8 @@ def main() -> int:
             e["g2"] = {"len_chars": len(pd), "edits": prep.get("edits"),
                        "ast_equivalent": prep.get("ast_equivalent"),
                        "apply_clean": prep.get("apply_clean"),
-                       "apply_error": prep.get("apply_error", "")}
+                       "apply_error": prep.get("apply_error", ""),
+                       "diff_sha256": diff_sha256(pd) if pd else None}
             if rd and pd:
                 e["g2"]["token_ratio_proxy"] = round(tokens_estimate(pd) /
                                                      tokens_estimate(rd), 3)
@@ -64,6 +65,24 @@ def main() -> int:
         except Exception as ex:
             e["g2"] = {"pass": False, "error": str(ex)[:200]}; all_ok = False
         report["cves"][cve] = e
+    # 跨进程确定性回归（P0：内置 hash 加盐已弃，此处守卫）
+    import subprocess as _sp, hashlib as _hl
+    det_ok = True
+    for cve in args.cves[:3]:
+        code = ("import sys; sys.path.insert(0, '.'); "
+                "from cpg.ablation.v4_patch_gen import gen_placebo_diff, diff_sha256; "
+                f"d,_ = gen_placebo_diff('{cve}'); print(diff_sha256(d))")
+        r = _sp.run([sys.executable, "-c", code], capture_output=True, text=True,
+                    encoding="utf-8", cwd=str(ROOT))
+        sub_sha = r.stdout.strip()
+        d_in, _ = gen_placebo_diff(cve)
+        if sub_sha and sub_sha != diff_sha256(d_in):
+            det_ok = False
+            print(f"[DETERMINISM FAIL] {cve}: sub={sub_sha[:12]} in={diff_sha256(d_in)[:12]}")
+    report["cross_process_deterministic"] = det_ok
+    if not det_ok:
+        all_ok = False
+
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")

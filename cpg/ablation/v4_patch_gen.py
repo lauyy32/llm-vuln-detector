@@ -173,6 +173,11 @@ _DIRECTIVE = ("coding:", "type:", "noqa", "pylint:", "flake8:", "coverage:",
               "isort:", "mypy:", "pyright:")
 
 
+def _stable_k(cve: str, rel: str, n: int) -> int:
+    """确定性变体键：sha256 取模（Python 内置 hash 对 str 按进程加盐，禁用）。"""
+    return hashlib.sha256(f"{cve}|{rel}".encode("utf-8")).digest()[0] % n
+
+
 def _first_def(text: str) -> str:
     m = re.search(r"^(?:async\s+def|def|class)\s+([A-Za-z_]\w*)", text, re.M)
     return m.group(1) if m else ""
@@ -206,7 +211,7 @@ def _make_natural_comment(text: str, pos: int, rel: str, cve: str = "") -> Optio
         "entry point of the nearby code",
         "used around this section",
     )
-    k = (hash(cve + "|" + rel) & 0x7FFFFFFF) % len(variants)
+    k = _stable_k(cve, rel, len(variants))
     return f"# {ref} — {variants[k]}\n"
 
 
@@ -228,7 +233,7 @@ def _safe_anchor(text: str) -> Optional[int]:
             if tok.start[0] <= 1:
                 continue  # 跳过第 1 行（许可头/模块首注释），避免文件头位移
             low = t.lstrip("# ").strip().lower()
-            if low.startswith(_DIRECTIVE):
+            if low.startswith(_DIRECTIVE) or low.startswith("-*-") or "coding" in low:
                 continue
             return line_offsets[tok.start[0] - 1]  # 行首字符偏移
     except (tokenize.TokenError, IndentationError, SyntaxError):
@@ -264,7 +269,7 @@ def gen_placebo_diff(cve: str, seed_files: int = 2) -> tuple[str, dict]:
                     continue
                 variants = ("referenced by the block below", "see the following lines",
                             "entry point of the nearby code", "used around this section")
-                k = (hash(cve + "|" + p.relative_to(dst).as_posix()) & 0x7FFFFFFF) % len(variants)
+                k = _stable_k(cve, p.relative_to(dst).as_posix(), len(variants))
                 comment = f"# {ref} — {variants[k]}\n"
                 pos = len(txt)  # EOF 兜底
             if any(w in comment.lower() for w in _DECORATION_WORDS):
@@ -281,10 +286,14 @@ def gen_placebo_diff(cve: str, seed_files: int = 2) -> tuple[str, dict]:
             if before != after:
                 ast_ok = False
                 continue
-            # 硬断言：shebang 不位移（仅当原文件首行为 #! 时）
+            # 硬断言：shebang 与编码声明均不位移（detect_encoding 前后一致）
             if txt.startswith("#!"):
                 if not new_txt.startswith("#!"):
                     continue
+            enc_before = tokenize.detect_encoding(io.BytesIO(txt.encode("utf-8")).readline)
+            enc_after = tokenize.detect_encoding(io.BytesIO(new_txt.encode("utf-8")).readline)
+            if enc_before != enc_after:
+                continue
             p.write_text(new_txt, encoding="utf-8")
             edits.append(f"comment in {p.relative_to(dst).as_posix()}: {comment.strip()[:60]}")
             done += 1
