@@ -52,7 +52,7 @@
   T3 均不可行 → 冻结的书面残余利用路径 + 双人独立确认。
   三类数量分别报告，不混为同一证据等级。
 - [ ] partial：**主对照**（real–partial 为 Judging 主比较）——基于上游投影 real 删除**双人确认**的关键安全 hunk（14 例构造表已定）；**与 G0/G3/G4 并行启动构造+双标**（勿串行，是 10-19 前最长的杆）；预注册标注滑期的 fallback（placebo 操纵检验 + corpus-complete，claim 显式收窄为"外观敏感性"）。效度押在"删对 hunk"上：双人独立识别+仲裁+报 κ，删错则 partial 仍充分、对比作废。
-- [~] token 比门禁硬执行（目标 [0.8,1.25] 在**六层作用域定下后基于新数据重设并预注册**，不得以"删范围"变相放宽；按最终送入模型的 diff token 数计；冒烟三例未过，扩容/子集策略见下）
+- [~] token 比门禁硬执行（目标 [0.8,1.25] 在**四臂作用域定下后基于新数据重设并预注册**，不得以"删范围"变相放宽；按最终送入模型的 diff token 数计；冒烟三例未过，扩容/子集策略见下）
   **长度匹配策略（2026-09-06 冒烟实测后预注册）**：real diff 巨大（≥~25k 字符）的 CVE，
   等长纯装饰 placebo 需注入数万字符注释，不自然且可被当线索——此类 CVE：
   a) 先尝试确定性 cosmetic 扩容（跨多个真实文件锚点注入，目标落带内）；
@@ -211,28 +211,82 @@ corpus 树非同一对象；投影是 corpus 超集时（45019：语料 10 文�
 | repository | str | repo_slug |
 | advisory_url | str | 上游 advisory/PR 链接 |
 | fix_commit | str | 完整 40 位 hash |
-| parent_commits | list[str] | fix_commit 的全部父提交 |
-| selected_base_commit | str | 实际作为投影基线的父提交 |
-| upstream_changed_files | list[str] | 上游 fix_commit^..fix_commit 改动文件全集 |
-| python_included_files | list[str] | 机械 Python 投影（含 .py） |
+| parent_commits | list[str] | fix_commit 全部父提交 |
+| parents_count | int | 父提交数 |
+| is_merge | bool | merge/复合提交自动线索（提交信息含 "Merge"） |
+| selected_base_commit | str | 实际投影基线（fail-closed 选择，见下） |
+| selected_base_reason | str | 选此父提交的理由 |
+| upstream_changed_files | list[str] | fix_commit^..fix_commit 改动文件全集 |
+| python_included_files | list[str] | 机械 Python 投影 |
 | non_python_excluded_files | list[str] | 被排除的非 Python 文件 |
 | added/deleted/renamed_files | dict | 三类结构化记录 |
 | co_fixed_cves | list[str] | 同提交修复的其它 CVE |
-| **composite_fix_commit** | bool | **fail-closed**：true 即排除确认性 |
-| **security_critical_non_python_change** | bool | **fail-closed**：true 即排除 |
-| **python_projection_sufficient** | bool | **fail-closed**：非 true 即排除 |
+| candidate_patch_base_commit | str | 候选补丁应用的基线 |
+| prompt_source_commit | str | 模型看到的 vulnerable 源码来源 |
+| cpg_context_source_commit | str | CPG 上下文来源 |
+| corpus_vuln_vs_upstream_parent_delta | obj | corpus vuln 与 upstream parent 的差异（双向） |
+| relevant_source_files_byte_equivalent | bool | 相关源文件字节等价证明 |
+| patch_apply_clean_to_prompt_source | bool | 补丁能否 apply 到 prompt source |
+| cpg_rebuild_required | bool | 是否需重建 CPG |
+| **composite_fix_commit** | bool | **fail-closed**：`== true` 排除 |
+| **security_critical_non_python_change** | bool | **fail-closed**：`== true` 排除 |
+| **python_projection_sufficient** | bool | **fail-closed**：`!= true` 排除 |
 | token_count | int | 投影后 token 数 |
-| context_limit_eligible | bool | 本地模型上下文能否装下 |
-| confirmatory_eligible | bool | 推导字段（三布尔 + token/context 综合） |
+| context_limit_eligible | bool | 本地模型能否装下 |
+| confirmatory_eligible | bool | 推导（三布尔 + token/context + 三源一致，见下） |
 | exclusion_reason | str | 排除理由（fail-closed 时必填） |
 | reviewer_1 / reviewer_2 | str | 双人核验 |
 | adjudication | str | 分歧仲裁 |
 
-**三个 fail-closed 布尔（任一成立或无法判定，不得进确认性 real–partial 主分析）**：
-1. `composite_fix_commit = true`（同提交修了多个 CVE，ground-truth 归属污染）；
-2. `security_critical_non_python_change = true`（被排除的非 Python 文件含修复该 CVE 必需的安全
-   行为变更，如依赖版本/配置/模板/路由/YAML 权限/前端或代理层改动）；
-3. `python_projection_sufficient != true`（投影无法自证"补丁充分性"）。
+**三源一致性纳入条件（P0-2；否则出现"上游补丁 + corpus 源码 + corpus CPG"语义错配）**：
+
+```text
+candidate_patch_base_commit == prompt_source_commit
+cpg_context_source_commit == prompt_source_commit
+```
+
+二者**必须相同**，或提供机器可核验的"相关源文件字节等价"证明（`relevant_source_files_byte_equivalent`）。
+具体回答四问：①模型看到的 vulnerable source 是否来自 upstream parent；②旧 corpus CPG 能否继续
+用；③corpus vuln 与 upstream parent 不一致时是否重建 CPG（`cpg_rebuild_required`）；④patch 是否
+可 apply 到实际 prompt source（`patch_apply_clean_to_prompt_source`）。三源未对齐的样本退出确认性。
+
+**Python 投影规则冻结（Hy4：先冻结再测量，否则 Δ 表作废）**：投影 = 上游 fix_commit 改动文件里
+**所有 `.py`（含 tests，含 `.pyi`）**。此规则在测量前写死，不得事后改"排除 tests"或"含/不含 .pyi"
+以迁就结果。
+
+**Δ 指标精确定义（P1-1；先定义再判"近似"，禁看完数据再定"差异不算大"）**：
+- 文件集合：`python_included_files` vs corpus 改动 `.py` 文件集；
+- 双向差集分列：`|P\C|`（上游投影有、corpus 无）与 `|C\P|`（corpus 有、投影无），**不合成单标量**；
+- canonical patch SHA、hunk 集合、added/deleted/renamed 文件、修改行集合/行数分别比对；
+- corpus vuln vs upstream parent 字节差异、corpus fixed vs upstream fix 字节差异分别记录。
+"Δ=0" = 上述全部一致。**即使 14/15 的 Δ=0，旧 G1 也只说明实现大概率可复用，新 upstream G1 仍须
+全量重跑，不自动继承认证结果。**
+
+**多 parent 选择 fail-closed（P1-2）**：
+- 单 parent：暂取唯一 parent，但**仍须确认其含漏洞**（advisory/PR 佐证）；
+- 多 parent / merge：**禁默认取 `^1`**；须从 advisory/PR 确认哪个是干净 vulnerable base；
+- cherry-pick / 合并 / 复合安全提交：parent 未必是干净 vulnerable base；
+- 无法从 advisory/PR 确认 base → `selected_base_commit` 置 `unverifiable`，**退出确认性**。
+- `parents_count` / `is_merge` 是零成本自动化复合检测线索（45019 提交信息即 "Merge commit from fork"）。
+
+**三个 fail-closed 布尔（三布尔异号，禁自然语言并列；未知值一律不过）**：
+
+```python
+confirmatory_eligible = (
+    composite_fix_commit is False
+    and security_critical_non_python_change is False
+    and python_projection_sufficient is True
+)
+```
+
+1. `composite_fix_commit == true` → **排除**（同提交修了多个 CVE，ground-truth 归属污染）；
+2. `security_critical_non_python_change == true` → **排除**（被排除的非 Python 文件含修复该 CVE
+   必需的安全行为变更，如依赖版本/配置/模板/路由/YAML 权限/前端或代理层改动）；
+3. `python_projection_sufficient != true` → **排除**（即 **=true 才是纳入的必要条件**；投影无法
+   自证"补丁充分性"则排除）。
+
+⚠️ 三条极性不同：前两条 `== true` 排除、第三条 `!= true` 排除。代码必须用
+`is False / is True` 显式判定，`None`（未知值）一律不通过——**禁把三者写成"任一成立即排除"**。
 判定来源 = upstream advisory/PR + 差异审阅 + 第二标注者，**禁 CPG 判断**；无法确认的样本退出
 确认性主分析，进敏感性分析。
 
@@ -258,11 +312,19 @@ corpus 树非同一对象；投影是 corpus 超集时（45019：语料 10 文�
 - 无执行 oracle 时明确标"构造性/人工 oracle"；
 - 构造者不得看到 partial 臂模型结果后再调整补丁。
 
-### n 下限预注册（go/no-go 阈值）
+### n 下限预注册（go/no-go 阈值；待功效分析确定，暂不冻结具体数字）
 
-复合提交 + 超限排除后，确认性样本 n 的**下限 = 8**。若 n < 8：主 estimand（real vs partial
-配对判定差异）降级为探索性，claim 收窄为"外观敏感性"（placebo 操纵检验 + corpus-complete
-口径），并预注册标注滑期 fallback。第 1 天知道 n 不够可改设计，第 20 天只能砍 claim。
+总样本量不是 McNemar 检验的有效信息量——有效信息主要来自 **discordant pairs**。`n=8` 即使全部
+合格，也可能只有一两对 discordant，撑不起确认性结论。故：
+
+1. 在未知模型结果前，先给出若干预期 discordance 场景；
+2. 对 n=8..15 做 **exact McNemar / binomial 功效或可检测效应分析**（纯标准库脚本，可复算）；
+3. 再冻结确认性最低 n（当前 `n=8` 仅作占位，**非已注册下限**）；
+4. 若最终 n 不足：real–partial 降级为"**探索性补丁充分性研究**"（**非"外观敏感性"**——后者是
+   placebo/shuffled 才涉及的概念，不能张冠李戴）。
+
+功效分析在填数据阶段用脚本产出，结果并入 manifest 交付物。第 1 天知道 n 不够可改设计，第 20 天
+只能砍 claim。
 
 ### 排期（人不可并行，优先锁日历）
 
@@ -276,7 +338,7 @@ corpus 树非同一对象；投影是 corpus 超集时（45019：语料 10 文�
 **Gate A（三臂跑批前）** —— 通过后只运行 real/placebo/shuffled：
 - **placebo 人工自然度/臂指纹盲验（构造者+第二标注者，在见模型结果前完成）**；
 - G0-G4 门禁对三臂候选包全绿（**upstream fix-commit derived Python projection（real）** + apply-clean placebo + 残余漏洞
-  分层 oracle + token 比 [0.8,1.25]（六层作用域定下后重设））；
+  分层 oracle + token 比 [0.8,1.25]（四臂作用域定下后重设））；
 - prompt/diff/digest/日志与统计协议冻结；端到端 smoke 通过；
 - 外部验收通过。
 
