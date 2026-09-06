@@ -37,6 +37,10 @@
 ## 2. v4 实验对象真实性（G0-G4 实现）
 
 - [~] real diff 完整性（语料树等价 15/15 G1_G2_STRUCTURAL_PASS：canonical diff 应用后与 fixed 树双向集合+字节+类型一致；报告 .work/v4_gates_report.json）。**P0-3 已定（2026-09-06 第六轮）**：real 主臂 = 上游 `fix_commit^..fix_commit` 的**机械化 Python 投影**（按预注册语言/扩展名客观提取，禁人工挑 hunk）；corpus-complete 降为一致性/敏感性分析。命名 "*upstream fix-commit derived Python projection*"，不得称"完整真实补丁"，不得称"CPG 收窄补丁"。⚠️ 已知 45019 语料 10 文件 vs 上游 ~23 文件，须标 `composite_fix_commit=true` 并从长度匹配子集（主分析）排除。
+  **⚠️ 第七轮更正**：上述 15/15 报告验证的是 corpus 快照生成器，**非新 real 臂**——已降级命名
+  "corpus-snapshot structural validation"，不得作为新 real 臂 Gate A 证据。新 real 的结构门禁
+  G1 已重定义为"对上游树的判定"（投影应用到 parent 的 Python 文件 == fix commit 的 Python 文件，
+  apply-clean），产出独立报告 `v4_upstream_real_report.json`（详见"manifest 协议冻结"节）。
   **应用后与 fixed 快照逐文件哈希一致**（或显式标记不等价原因）；
   禁字典序子集/禁中间截断
 - [~] placebo：结构门禁 15/15 apply-clean+AST 等价；**锚点字节偏移/死分支/统一模板/shebang 位移四处已修（2026-09-06 v2.2）**；token 比未达 [0.8,1.25] 带（proxy 值随实现变动，不固化具体范围）；注释自然度天花板=自动化不可达"第二标注者看不出自动生成"，最终由构造者撰写+盲标仲裁——**此项验收前置于 Gate A**（real/placebo/shuffled 跑批前必须完成，不能等 partial 的 Gate B）。
@@ -112,7 +116,7 @@
 - [ ] 导师确认：注册（全价）+ 差旅（里士满 2027-03）+ 学校认定
 - [ ] .git.broken 物理删除确认 + 工作区垃圾目录清理
 
-## 决策备忘：real 臂范围【终版六层设计，CPG 路径裁剪方案出局】（2026-09-06 第六轮评审）
+## 决策备忘：real 臂范围【四臂+两表示，CPG 路径裁剪方案出局】（2026-09-06 第六/七轮评审）
 
 **背景**：real 臂（语料全量 vuln→fixed diff）与 placebo（2 文件各 1 条注释）尺寸失配为
 数量级（实测 45019=161×、73498=54×、12482=1.3×），15 例 **0 例**落在 [0.8,1.25]。据此
@@ -130,19 +134,29 @@ patch size 是**严重且可完全分离配对样本的潜在混淆**（注：�
    不是"同一个决策"。不能因为 placebo 太短就把 real 裁短——等长是实现了，"真实补丁验证"这个
    研究对象被改掉了。
 
-**终版六层设计（Codex 裁决，三审收敛）**：
+**终版臂设计（Codex 裁决，三审收敛；2026-09-06 第七轮改"六层"→"四臂+两表示"）**：
+
+> **命名纪律（Codex P0-1）**：不是"六个臂"，而是 **确认性四臂 + 两个敏感性/表示条件**。
+> 审稿人会追问"六臂是否共享样本/是否共同进多重比较/哪个是主 estimand"——故须先分清楚。
+
+**确认性四臂**（共享样本、进入主分析）：
 1. **real 主臂** = 上游 `fix_commit^..fix_commit` 的**机械化 Python 投影**（按预注册语言/扩展名
-   规则客观提取，禁人工挑"安全相关 hunk"）。命名："*upstream fix-commit derived Python
+   规则客观提取，禁人工挑"安全相关 hunk"）。命名 "*upstream fix-commit derived Python
    projection*"，不得称"完整真实补丁"，也不得称"CPG 收窄补丁"。
-2. **partial 主对照** = 从同一 real 投影删除**双人确认**的关键安全 hunk。与 real 天然近等长，
-   是判断"补丁充分性"的核心对照（real–partial 为 Judging 主比较）。
+2. **partial 主对照** = 从同一 real 投影删除**双人确认**的关键安全 hunk。与 real 天然近等长。
 3. **cosmetic placebo** = 仅作操纵检验，证明模型对补丁内容/外观有反应，**不单独支撑**"会判断
    充分性"。
 4. **shuffled** = 按 token 数匹配 donor 的无关补丁对照（匹配后须报协变量平衡表/标准化均值差，
    不得只写"已匹配"；n=15 下平衡大概率不理想，诚实披露）。
+
+**敏感性/表示条件**（不进主 estimand、不共享主解释权重）：
 5. **corpus-complete** = 语料一致性与敏感性分析（不充当"收窄未丢安全 hunk"的充分性 oracle）。
 6. **CPG-path-scoped** = 仅列**探索性消融**（full patch vs CPG-path-scoped representation，
    回答"CPG 裁剪到底帮助还是损害判断"），**不得作为 real 主臂**。
+
+**主 estimand（提前写死）**：
+> 在确认性合格样本中，real 与 partial 的**配对判定差异**（paired judgement difference）。
+> placebo 与 shuffled 是辅助对照，不与主比较拥有同等解释权重。
 
 **超大/复合提交处置（预注册）**：
 - 预注册 token 上限；超限样本进 oversized/composite 分层，**不截断、不按 CPG 路径裁剪**；
@@ -153,12 +167,109 @@ patch size 是**严重且可完全分离配对样本的潜在混淆**（注：�
 
 **长度修复必须双侧**：不只收窄 real——placebo 必须作用于 real 所改的**同一文件集**并按目标
 体量增加 AST 中性编辑；四臂（real/placebo/shuffled/partial）统一作用域，否则指纹转移到
-shuffled/partial。token 比目标 [0.8,1.25] 在**六层作用域定下后基于新数据重设并预注册**，
+shuffled/partial。token 比目标 [0.8,1.25] 在**四臂作用域定下后基于新数据重设并预注册**，
 不得以"删范围"变相放宽。
 
-> 状态：**六层设计已固定**；待执行=构建 15 例上游投影 manifest + 测 real–partial/real–placebo
+> 状态：**四臂+两表示设计已固定**；待执行=构建 15 例上游投影 manifest + 测 real–partial/real–placebo
 > 真实 token 分布 + 重跑新门禁报告；导师只裁定分层设计与排除阈值（token 上限/文件数规则），
 > 不裁定"是否允许 CPG 定义 ground truth"（该条已否决）。
+
+## manifest 协议冻结（2026-09-06 第七轮；real 改上游投影后的操作化规则）
+
+### (A)/(B) 裁定：选 (A)——G1 重定义为"对上游树的判定"
+
+real 主臂改为上游 Python 投影后，原 G1（"canonical diff 应用到 corpus vuln/ == corpus fixed/"）
+**失效，15/15 不会自动延续**——上游投影基线是 `parent(fix_commit)`、目标是 `fix_commit`，与
+corpus 树非同一对象；投影是 corpus 超集时（45019：语料 10 文件 vs 上游 ~23），G1 双向路径比较
+必然 FAIL。
+
+**裁定（选 A，与四臂设计一致）**：
+- **新 G1（upstream-real 结构门禁）**：fetch `parent(fix_commit)` 与 `fix_commit` 两棵树，机械
+  提取 Python 投影；门禁目标 = "投影应用到 parent 树的 Python 文件 == fix commit 树的 Python
+  文件"（双向路径集合 + 逐文件字节/哈希 + apply-clean）。产出独立报告
+  `v4_upstream_real_report.json`。
+- **原 corpus G1 降级**：作为**一致性层（第⑤层 corpus-complete）**，不再充当 real 主臂的结构
+  证据。
+- 否决 (B) 的理由：real 主臂已是 upstream projection（Codex 已裁决），(B) 会退回 corpus 作
+  real，与"corpus-complete 已降级为一致性检查"自相矛盾，且会复现"名为 real 实为 partial"
+  （45019 语料漏了上游安全关键文件）。
+
+### 报告降级
+
+当前 `v4_gates_report.json`（15/15 G1_G2_STRUCTURAL_PASS）验证的是 **corpus 快照生成器**，
+非新 real 臂。**命名降级为 "corpus-snapshot structural validation"**，保留不删，但**不得作为
+新 real 臂的 Gate A 证据**。新 upstream manifest + 生成器完成后，须重新生成
+`v4_upstream_real_report.json`（含上游来源/父提交/Python 投影/apply-clean/树一致性/纳入排除
+文件/实际送模 diff SHA/token 统计）。
+
+### manifest schema（填充 15 例前冻结；先提交 schema 再填数据，不得先做数据后补规则）
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| sample_id | str | 唯一键 |
+| cve_id | str | |
+| repository | str | repo_slug |
+| advisory_url | str | 上游 advisory/PR 链接 |
+| fix_commit | str | 完整 40 位 hash |
+| parent_commits | list[str] | fix_commit 的全部父提交 |
+| selected_base_commit | str | 实际作为投影基线的父提交 |
+| upstream_changed_files | list[str] | 上游 fix_commit^..fix_commit 改动文件全集 |
+| python_included_files | list[str] | 机械 Python 投影（含 .py） |
+| non_python_excluded_files | list[str] | 被排除的非 Python 文件 |
+| added/deleted/renamed_files | dict | 三类结构化记录 |
+| co_fixed_cves | list[str] | 同提交修复的其它 CVE |
+| **composite_fix_commit** | bool | **fail-closed**：true 即排除确认性 |
+| **security_critical_non_python_change** | bool | **fail-closed**：true 即排除 |
+| **python_projection_sufficient** | bool | **fail-closed**：非 true 即排除 |
+| token_count | int | 投影后 token 数 |
+| context_limit_eligible | bool | 本地模型上下文能否装下 |
+| confirmatory_eligible | bool | 推导字段（三布尔 + token/context 综合） |
+| exclusion_reason | str | 排除理由（fail-closed 时必填） |
+| reviewer_1 / reviewer_2 | str | 双人核验 |
+| adjudication | str | 分歧仲裁 |
+
+**三个 fail-closed 布尔（任一成立或无法判定，不得进确认性 real–partial 主分析）**：
+1. `composite_fix_commit = true`（同提交修了多个 CVE，ground-truth 归属污染）；
+2. `security_critical_non_python_change = true`（被排除的非 Python 文件含修复该 CVE 必需的安全
+   行为变更，如依赖版本/配置/模板/路由/YAML 权限/前端或代理层改动）；
+3. `python_projection_sufficient != true`（投影无法自证"补丁充分性"）。
+判定来源 = upstream advisory/PR + 差异审阅 + 第二标注者，**禁 CPG 判断**；无法确认的样本退出
+确认性主分析，进敏感性分析。
+
+### shuffled donor 匹配规则（冻结；Codex P0-4）
+
+"token 匹配 donor"不够。另一 CVE 的 diff 常文件名不对应/不可 apply/CWE 完全不同/一眼可判无关。
+规则（按优先级）：
+1. 优先**同仓库** donor；
+2. 相近 CWE/修复类型；
+3. token 数、文件数、hunk 数、修改行数匹配；
+4. 新增/删除文件**结构**匹配；
+5. 明确是否要求 apply-clean（建议要求，否则模型可凭"不可 apply"识破）；
+6. **无合适 donor 时排除，不任意抽取**——不得把明显不相关的 patch 伪装成 hard negative，也
+   不得强行把不同文件名改成相同文件名伪装。
+匹配后报协变量平衡表/标准化均值差，n=15 下不平衡如实披露。
+
+### partial 构造规则（冻结；Codex + ai2）
+
+- 构造依据在模型结果产生前冻结；
+- 第二标注者**独立**判断关键 hunk；分歧由导师/第三人仲裁；报 κ；
+- partial 必须 apply-clean；必须说明剩余漏洞路径；
+- 可执行 PoC 可用时优先验证：vuln→失败、partial→仍触发、real→不触发；
+- 无执行 oracle 时明确标"构造性/人工 oracle"；
+- 构造者不得看到 partial 臂模型结果后再调整补丁。
+
+### n 下限预注册（go/no-go 阈值）
+
+复合提交 + 超限排除后，确认性样本 n 的**下限 = 8**。若 n < 8：主 estimand（real vs partial
+配对判定差异）降级为探索性，claim 收窄为"外观敏感性"（placebo 操纵检验 + corpus-complete
+口径），并预注册标注滑期 fallback。第 1 天知道 n 不够可改设计，第 20 天只能砍 claim。
+
+### 排期（人不可并行，优先锁日历）
+
+- **partial 双标日历今日锁死**（依赖师兄，不可并行不可压缩），优先级高于任何代码；
+- 双标**不必等 manifest**：先在 corpus diff + advisory 文本上立即启动关键 hunk 识别，上游投影
+  出来后再重新锚定（关键 hunk 大概率本就在 corpus 子集，重锚定成本低）；
+- 45019（复合提交）后置——难标注且已排除出确认性分析。
 
 ## 完成判据（2026-09-06 拆分 Gate A/B，消除"§3 含 partial 标注 vs 排期先跑三臂"的冲突）
 
