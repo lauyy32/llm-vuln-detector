@@ -10,7 +10,7 @@ from collections import Counter, defaultdict
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SEEDS = os.path.join(ROOT, "..", "seeds")
 INCOMPLETE = {"CVE-2026-53500", "CVE-2026-59224", "CVE-2026-70485"}  # frozen n=82 gate
-LOCAL_DISC = {"CVE-2026-54574", "CVE-2026-61539", "CVE-2026-67435"}  # 本地 3/82 判别集
+LOCAL_DISC = {"CVE-2026-61539", "CVE-2026-67435"}  # 本地 strict 2/82 判别集（54574=复现弃权行为）
 
 
 def load_round(tag_a, tag_b):
@@ -60,13 +60,41 @@ def analyze(rows, label):
     den = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)) or 1
     mcc = num / den
     n_disc = len(disc)
-    p_one = sum(math.comb(len(pairs), k) for k in range(n_disc, len(pairs) + 1)) * 0.5 ** len(pairs) \
-        if pairs else 1.0
+    # 判别率 CP-CI（替代初版无意义"vs 0.5"稻草人检验；strict 口径）
+    def _ble(x, n, p):
+        return sum(math.comb(n, k) * p**k * (1 - p)**(n - k) for k in range(0, x + 1))
+    def _bge(x, n, p):
+        return sum(math.comb(n, k) * p**k * (1 - p)**(n - k) for k in range(x, n + 1))
+    def _cp(x, n):
+        def si(fn, t):
+            lo, hi = 0.0, 1.0
+            for _ in range(80):
+                mid = (lo + hi) / 2
+                if fn(mid) > t:
+                    hi = mid
+                else:
+                    lo = mid
+            return (lo + hi) / 2
+        def sd(fn, t):
+            lo, hi = 0.0, 1.0
+            for _ in range(80):
+                mid = (lo + hi) / 2
+                if fn(mid) > t:
+                    lo = mid
+                else:
+                    hi = mid
+            return (lo + hi) / 2
+        lo = 0.0 if x == 0 else si(lambda pp: _bge(x, n, pp), 0.025)
+        up = 1.0 if x == n else sd(lambda pp: _ble(x, n, pp), 0.025)
+        u1 = 1.0 if x == n else sd(lambda pp: _ble(x, n, pp), 0.05)
+        return lo, up, u1
+    ci_lo, ci_up, ci_u1 = _cp(n_disc, len(pairs)) if pairs else (0.0, 0.0, 0.0)
+    p_one = None
     print(f"\n=== {label} ===")
     print(f"完整对 n={len(pairs)}  判别正确 {n_disc}（{sorted(x[-5:] for x in disc)}）")
     print(f"含弃权对 {len(partial)}  单端 answered {len(ans)}: TP={tp} FN={fn} TN={tn} FP={fp}")
-    print(f"BA={ba:.3f} MCC={mcc:+.3f}（平凡基线 F1=0.667 不适用此任务；参考本地 7B 判别 3/82、BA=0.512）")
-    print(f"判别 ≥ 观察值的单侧精确二项 p={p_one:.2e}（H0: 判别率=0.5×？仅作描述）")
+    print(f"BA={ba:.3f} MCC={mcc:+.3f}（answered-only；参考本地 7B strict 判别 2/82、BA=0.514）")
+    print(f"判别率 CP-CI [{ci_lo*100:.1f}%, {ci_up*100:.1f}%] 单侧95%上界 {ci_u1*100:.1f}%（strict）")
     inter = set(x[-5:] for x in disc) & set(x[-5:] for x in LOCAL_DISC)
     print(f"与本地判别集交集: {sorted(inter)}")
     return n_disc, p_one

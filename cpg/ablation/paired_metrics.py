@@ -124,8 +124,11 @@ def paired_metrics(flags: dict[tuple[str, str], bool], cves: list[str]) -> dict:
 # --------------------------------------------------------------------------
 # 数据装载
 # --------------------------------------------------------------------------
+# 弃权映射申报（2026-09-06 起强制）：本装载把 predicted=="vulnerable" 布尔化——
+# abstain → False → 落入"非 vuln"侧（lenient 映射）。lenient 仅用于历史可比；
+# 一切判别成功计数须用 strict（fixed 端显式 benign），见 strict_recompute.py 与 P1-13 §5。
 def load_results_csv(path: Path, mode: str) -> dict[str, dict]:
-    """返回 {scorer: {(cve, version): pred_is_vuln}}"""
+    """返回 {scorer: {(cve, version): pred_is_vuln}}（lenient 映射，见模块头申报）"""
     per_scorer: dict[str, dict[tuple[str, str], bool]] = {}
     truth: dict[tuple[str, str], bool] = {}
     with path.open(encoding="utf-8") as fh:

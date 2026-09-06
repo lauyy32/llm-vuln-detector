@@ -309,6 +309,7 @@ class LocalLLMScorer(Scorer):
             self.raw_log.parent.mkdir(parents=True, exist_ok=True)
             rec = {
                 "cve_id": (ctx.advisory_meta or {}).get("cve_id"),
+                "version": getattr(ctx, "version", None),
                 "mode": "request" if (ctx.cpg_slices is None and not ctx.code_text) else
                         ("both" if ctx.request_info else "code"),
                 "model": self.model,
