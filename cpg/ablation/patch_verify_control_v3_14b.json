@@ -1,0 +1,509 @@
+{
+ "model": "qwen2.5-coder:14b",
+ "subset": [
+  "CVE-2026-12482",
+  "CVE-2026-45019",
+  "CVE-2026-49257",
+  "CVE-2026-50181",
+  "CVE-2026-50558",
+  "CVE-2026-53502",
+  "CVE-2026-53598",
+  "CVE-2026-54574",
+  "CVE-2026-54706",
+  "CVE-2026-54707",
+  "CVE-2026-54785",
+  "CVE-2026-59890",
+  "CVE-2026-67424",
+  "CVE-2026-67425",
+  "CVE-2026-67428",
+  "CVE-2026-70491",
+  "CVE-2026-73498"
+ ],
+ "summary": {
+  "real": {
+   "n": 15,
+   "benign": 9,
+   "vulnerable": 6,
+   "benign_rate": 0.6
+  },
+  "placebo": {
+   "n": 15,
+   "benign": 0,
+   "vulnerable": 13,
+   "benign_rate": 0.0
+  },
+  "shuffled": {
+   "n": 15,
+   "benign": 0,
+   "vulnerable": 15,
+   "benign_rate": 0.0
+  }
+ },
+ "results": [
+  {
+   "cve": "CVE-2026-12482",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 1768,
+     "rationale": "The code processes untrusted input paths that can lead to directory traversal attacks."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1115,
+     "rationale": "The code processes untrusted input and uses it to perform file operations, which can lead to directory traversal attacks."
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-45019",
+     "diff_chars": 12085,
+     "rationale": "The code allows untrusted input to be used in file operations, leading to potential directory traversal attacks."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-45019",
+   "cwe": "CWE-918",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 12085,
+     "rationale": "The filename parameter is directly used to construct file paths without validation, leading to potential directory traversal attacks."
+    },
+    "placebo": {
+     "verdict": "abstain",
+     "expect": "vulnerable",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 615,
+     "rationale": "提供的补丁没有对目标代码中的漏洞点施加任何防护措施。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-49257",
+     "diff_chars": 4377,
+     "rationale": "The filename parameter is directly used to construct file paths, which can lead to directory traversal attacks."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-50181",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7071,
+     "rationale": "The patch introduces a `safe_resolve_path` function that ensures paths are resolved within a base directory, preventing path traversal attacks."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1313,
+     "rationale": "The provided patch does not address the vulnerability in the rmdir function, which still allows deletion of directories without proper validation."
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-50558",
+     "diff_chars": 2555,
+     "rationale": "The provided patch does not address the vulnerability in the 'rmdir' function or other functions mentioned in the CPG taint slice."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-50558",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 2555,
+     "rationale": "补丁通过引入路径校验和白名单机制，有效防止了目录遍历攻击。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 189,
+     "rationale": "补丁未对路径校验或消毒进行任何修改，漏洞路径仍可被利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-53502",
+     "diff_chars": 5006,
+     "rationale": "The patch does not address the vulnerability in the provided code snippet."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-53502",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 5006,
+     "rationale": "The patch ensures that percent-encoded traversal sequences are decoded before the security check, preventing them from bypassing the abspath/startswith guard."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1115,
+     "rationale": "补丁未对文件路径进行有效防护，仍然存在路径遍历漏洞。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-53598",
+     "diff_chars": 7331,
+     "rationale": "The patch does not address the vulnerability in the file_loader.py code. The vulnerability is related to file path traversal, but the patch provided is for a different file (prompty/_version.py) and d"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-53598",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7331,
+     "rationale": "补丁通过引入 allowed_file_roots 参数限制了文件引用的路径，有效防止了路径遍历攻击。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1383,
+     "rationale": "补丁中没有对路径校验、白名单、守卫、消毒或限流等防护措施，漏洞路径仍可被利用。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54574",
+     "diff_chars": 9655,
+     "rationale": "补丁与漏洞无关，未对目标代码中的路径校验或防护进行修改。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54574",
+   "cwe": "CWE-61",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 9655,
+     "rationale": "补丁通过引入 _safe_dest 函数对目标路径进行了安全解析，防止了路径遍历攻击。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1359,
+     "rationale": "补丁仅更新了版本号，未对 _remove_fstree 函数进行任何安全防护措施，因此漏洞仍然存在。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54706",
+     "diff_chars": 7797,
+     "rationale": "The patch does not address the vulnerability in the provided code snippet."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54706",
+   "cwe": "CWE-59",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7797,
+     "rationale": "补丁通过在遍历目录时跳过符号链接，并验证文件路径是否在选定的根目录内，有效防止了路径遍历攻击。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 785,
+     "rationale": "补丁中没有对输入的文件路径进行验证或过滤，仍然存在路径遍历漏洞。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54707",
+     "diff_chars": 7379,
+     "rationale": "The patch does not address the vulnerability in the provided code snippet. The vulnerability is related to file handling and compression, which is not addressed in the given patch."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54707",
+   "cwe": "CWE-863",
+   "base_pred_no_diff": "abstain",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 7379,
+     "rationale": "补丁在上传处理逻辑中添加了对文件上传禁用的检查，并在检测到禁用时返回错误信息，有效防止了文件上传。"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 428,
+     "rationale": "补丁中没有对文件名进行校验或过滤，仍然存在路径遍历风险。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-54785",
+     "diff_chars": 6630,
+     "rationale": "The patch does not address the vulnerability in the ReceiveModeFile class where an untrusted filename is used to open a file without proper validation."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-54785",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 6630,
+     "rationale": "The code processes untrusted input for directory paths, which can lead to directory traversal vulnerabilities."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1256,
+     "rationale": "The code processes untrusted input for file paths, which can lead to directory traversal attacks."
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-59890",
+     "diff_chars": 5906,
+     "rationale": "The code processes untrusted input for directory paths, which can lead to directory traversal vulnerabilities."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-59890",
+   "cwe": "CWE-176",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 5906,
+     "rationale": "The patch does not address the vulnerability in the provided code snippet."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1664,
+     "rationale": "补丁仅更新了版本号，未对文件路径进行校验或防护，因此漏洞仍然存在。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-67424",
+     "diff_chars": 3593,
+     "rationale": "The provided patch does not address the vulnerability in the given source code. The patch is related to SSRF protection in different modules, while the vulnerability is in file handling operations."
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-67424",
+   "cwe": "CWE-918",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 3593,
+     "rationale": "The provided patch does not address the vulnerability in the target code. The vulnerability is related to untrusted input leading to SSRF, but the patch only affects different modules and does not inc"
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1768,
+     "rationale": "补丁与漏洞无关，未对目标代码中的漏洞点施加有效防护。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-67425",
+     "diff_chars": 5861,
+     "rationale": "补丁未对目标代码中的漏洞点施加有效防护。"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-67425",
+   "cwe": "CWE-201",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "vulnerable",
+     "expect": "benign",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 5861,
+     "rationale": "The patch does not address the vulnerability in the provided code snippet. The vulnerability is related to untrusted input for the 'path' parameter, which is not mitigated by the patch."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1676,
+     "rationale": "The patch does not address the vulnerability in the VectorDBConnector class where an untrusted path is used to create a directory without any validation or sanitization."
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-67428",
+     "diff_chars": 3593,
+     "rationale": "The patch does not address the vulnerability in the provided code snippet. The vulnerability is related to untrusted input for the 'path' parameter in the VectorDBConnector class, which is not mitigat"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-70491",
+   "cwe": "CWE-200",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1827,
+     "rationale": "The patch ensures that the 'content' field is removed from the response if the user does not have write access, effectively preventing unauthorized access to sensitive information."
+    },
+    "placebo": {
+     "verdict": "abstain",
+     "expect": "vulnerable",
+     "correct": false,
+     "donor": "",
+     "diff_chars": 564,
+     "rationale": "补丁仅修改了版本号和注释，未对漏洞点施加任何防护措施。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-73498",
+     "diff_chars": 6660,
+     "rationale": "The provided patch does not address the vulnerability in the given source code. The patch is for a different file and does not include any changes that would prevent unauthorized access or data leakag"
+    }
+   }
+  },
+  {
+   "cve": "CVE-2026-73498",
+   "cwe": "CWE-22",
+   "base_pred_no_diff": "vulnerable",
+   "arms": {
+    "real": {
+     "verdict": "benign",
+     "expect": "benign",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 6660,
+     "rationale": "The patch introduces a function `validate_safe_path` to confine the upload source to the workspace, effectively preventing arbitrary file read and exfiltration via a caller-supplied file_path."
+    },
+    "placebo": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "",
+     "diff_chars": 1368,
+     "rationale": "补丁未对文件路径进行有效防护，仍然存在路径遍历风险。"
+    },
+    "shuffled": {
+     "verdict": "vulnerable",
+     "expect": "vulnerable",
+     "correct": true,
+     "donor": "CVE-2026-12482",
+     "diff_chars": 1768,
+     "rationale": "The patch does not address the vulnerability in the provided code snippet."
+    }
+   }
+  }
+ ]
+}
