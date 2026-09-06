@@ -36,10 +36,10 @@
 
 ## 2. v4 实验对象真实性（G0-G4 实现）
 
-- [x] real diff 完整性（2026-09-06 v4_gates_smoke.py 全 15/15 ALL_PASS：含新增/删除/重命名；canonical diff 应用后与 fixed 树双向路径集合+逐文件字节+类型一致；报告 .work/v4_gates_report.json）：
+- [~] real diff 完整性（语料树等价 15/15 G1_G2_STRUCTURAL_PASS：canonical diff 应用后与 fixed 树双向集合+字节+类型一致；报告 .work/v4_gates_report.json）。**但 P0-3 待定**：只证语料快照完整，未证等于上游 fix_commit 真实补丁——45019 语料 10 文件 vs 上游 ~23 文件。待决：上游来源的机械化 Python 投影（只按语言/扩展名客观过滤，禁人工挑 hunk）vs corpus-complete 命名。名称已定为 "corpus-complete / Python-scoped candidate patch"，不得称"完整真实补丁"。
   **应用后与 fixed 快照逐文件哈希一致**（或显式标记不等价原因）；
   禁字典序子集/禁中间截断
-- [~] placebo：生成器可用（15/15 apply-clean+AST 等价+无行为自述+逐文件不同），但 **token 比未达 [0.8,1.25]（全例 0.02-0.30）**，长度匹配与 token 门禁仍 [ ]。
+- [~] placebo：结构门禁 15/15 apply-clean+AST 等价；**锚点字节偏移/死分支/统一模板/shebang 位移四处已修（2026-09-06 v2.2）**；token 比仍 0.02-0.30 未达带；注释自然度天花板=自动化不可达"第二标注者看不出自动生成"，最终由构造者撰写+盲标仲裁（Gate B）。
   **残余漏洞 oracle 分层（修正"机器 oracle 原理上不可用"的过宽推论——
   实际只是 CodeQL 对本子集不可用，其它层存在）**：
   T1 可执行 oracle（上游修复自带安全回归测试且环境可跑：12482/53502/50181

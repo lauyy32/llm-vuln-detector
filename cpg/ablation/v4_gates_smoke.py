@@ -25,7 +25,17 @@ def main() -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-    report = {"generated_from": None, "cves": {}}
+    import platform, subprocess as _sp, hashlib as _hl
+    _gen_src = Path('cpg/ablation/v4_patch_gen.py').read_text(encoding='utf-8')
+    report = {"generated_from": {
+        "git_commit": _sp.run(["git", "rev-parse", "HEAD"], capture_output=True,
+                              text=True, encoding="utf-8").stdout.strip(),
+        "generator_sha256": _hl.sha256(_gen_src.encode('utf-8')).hexdigest(),
+        "python": platform.python_version(),
+        "git_version": _sp.run(["git", "--version"], capture_output=True,
+                               text=True, encoding="utf-8").stdout.strip(),
+        "invocation": " ".join(sys.argv),
+    }, "cves": {}}
     all_ok = True
     for cve in args.cves:
         e = {}
@@ -58,7 +68,7 @@ def main() -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"[report] 已写 {out}")
-    print("[RESULT]", "ALL_PASS" if all_ok else "HAS_FAILURES")
+    print("[RESULT]", "G1_G2_STRUCTURAL_PASS" if all_ok else "HAS_FAILURES")
     return 0 if all_ok else 1
 
 

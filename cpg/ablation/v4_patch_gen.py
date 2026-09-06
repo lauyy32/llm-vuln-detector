@@ -58,7 +58,8 @@ def _norm_header(full: str) -> str:
     out = []
     for ln in full.splitlines():
         if ln.startswith(("diff --git", "--- ", "+++ ", "rename from", "rename to")):
-            ln = ln.replace("a/vuln/", "a/").replace("b/vuln/", "b/")
+            ln = (ln.replace("a/vuln/", "a/").replace("b/vuln/", "b/")
+                    .replace("vuln/", "", 1))
         out.append(ln)
     text = "\n".join(out)
     return text + "\n" if full.endswith("\n") else text + "\n"
@@ -123,7 +124,8 @@ def gen_complete_real_diff(cve: str, override_pair: Optional[Path] = None) -> tu
         r = _run(["git", "diff", "--binary", "--full-index", "-M",
                   f"{vrev}..HEAD", "--", "vuln/"], repo)
         full = r.stdout
-    return _norm_header(full), _parse_sections(full)
+    norm = _norm_header(full)
+    return norm, _parse_sections(norm)
 
 
 def apply_and_verify(cve: str, diff_text: str) -> tuple[bool, str]:
@@ -171,6 +173,11 @@ _DIRECTIVE = ("coding:", "type:", "noqa", "pylint:", "flake8:", "coverage:",
               "isort:", "mypy:", "pyright:")
 
 
+def _first_def(text: str) -> str:
+    m = re.search(r"^(?:async\s+def|def|class)\s+([A-Za-z_]\w*)", text, re.M)
+    return m.group(1) if m else ""
+
+
 def _enclosing_def(text: str, pos: int) -> str:
     head = text[:pos]
     names = [m.group(1) for m in
@@ -184,20 +191,33 @@ def _next_identifier(text: str, pos: int) -> str:
     return m.group(1) if m else ""
 
 
-def _make_natural_comment(text: str, pos: int, rel: str) -> str:
-    """交叉引用式注释（无行为声明、无装饰词、逐文件不同）。"""
-    stem = Path(rel).stem.replace("_", " ").strip()
+def _make_natural_comment(text: str, pos: int, rel: str, cve: str = "") -> Optional[str]:
+    """从真实代码结构生成注释：fn（最近 def/class）优先，否则下一代码标识符；
+    **无 fn/ident 则返回 None（跳过该文件，绝不产出 stem==stem 同义反复）**。
+    后缀按 (cve, rel) 确定性选一，避免全局统一模板。无行为声明、无装饰词。"""
     fn = _enclosing_def(text, pos)
-    ident = _next_identifier(text, pos) if fn is None else ""
-    ref = fn or ident or stem or "below"
-    if ref in ("def", "class", "import", "from", "return"):
-        ref = stem or "below"
-    return f"# see also: {ref} (in {stem})\n"
+    ident = _next_identifier(text, pos) if not fn else ""
+    ref = fn or ident
+    if not ref or ref in ("def", "class", "import", "from", "return", "if", "for"):
+        return None
+    variants = (
+        "referenced by the block below",
+        "see the following lines",
+        "entry point of the nearby code",
+        "used around this section",
+    )
+    k = (hash(cve + "|" + rel) & 0x7FFFFFFF) % len(variants)
+    return f"# {ref} — {variants[k]}\n"
 
 
 def _safe_anchor(text: str) -> Optional[int]:
-    """用 tokenize 找首个安全 COMMENT token 的字节起点（天然排除字符串内的 # 行、
-    shebang 与编码声明；再排除 noqa/type/coverage 等指令）。无则 None（走 EOF 兜底）。"""
+    """找首个安全 COMMENT token 所在行的【行首字符偏移】（tokenize 的 start[1] 是
+    列号非字节偏移，必须自行换算为全文字符偏移）。排除 shebang、编码声明与
+    noqa/type/coverage 等指令。无则 None（走 EOF 兜底）。"""
+    lines = text.splitlines(keepends=True)
+    line_offsets = [0]
+    for ln in lines:
+        line_offsets.append(line_offsets[-1] + len(ln))
     try:
         for tok in tokenize.generate_tokens(io.StringIO(text).readline):
             if tok.type != tokenize.COMMENT:
@@ -205,10 +225,12 @@ def _safe_anchor(text: str) -> Optional[int]:
             t = tok.string.strip()
             if t.startswith("!") or t.startswith("#!"):
                 continue
+            if tok.start[0] <= 1:
+                continue  # 跳过第 1 行（许可头/模块首注释），避免文件头位移
             low = t.lstrip("# ").strip().lower()
             if low.startswith(_DIRECTIVE):
                 continue
-            return tok.start[1]  # 字节偏移
+            return line_offsets[tok.start[0] - 1]  # 行首字符偏移
     except (tokenize.TokenError, IndentationError, SyntaxError):
         return None
     return None
@@ -235,7 +257,16 @@ def gen_placebo_diff(cve: str, seed_files: int = 2) -> tuple[str, dict]:
                 before = ast.dump(ast.parse(txt))
             except SyntaxError:
                 continue
-            comment = _make_natural_comment(txt, pos, rel=p.relative_to(dst).as_posix())
+            comment = _make_natural_comment(txt, pos, rel=p.relative_to(dst).as_posix(), cve=cve)
+            if comment is None:
+                ref = _first_def(txt) or _next_identifier(txt, 0)
+                if not ref or ref in ("def", "class", "import", "from"):
+                    continue
+                variants = ("referenced by the block below", "see the following lines",
+                            "entry point of the nearby code", "used around this section")
+                k = (hash(cve + "|" + p.relative_to(dst).as_posix()) & 0x7FFFFFFF) % len(variants)
+                comment = f"# {ref} — {variants[k]}\n"
+                pos = len(txt)  # EOF 兜底
             if any(w in comment.lower() for w in _DECORATION_WORDS):
                 continue
             if pos == len(txt):
@@ -250,6 +281,10 @@ def gen_placebo_diff(cve: str, seed_files: int = 2) -> tuple[str, dict]:
             if before != after:
                 ast_ok = False
                 continue
+            # 硬断言：shebang 不位移（仅当原文件首行为 #! 时）
+            if txt.startswith("#!"):
+                if not new_txt.startswith("#!"):
+                    continue
             p.write_text(new_txt, encoding="utf-8")
             edits.append(f"comment in {p.relative_to(dst).as_posix()}: {comment.strip()[:60]}")
             done += 1
