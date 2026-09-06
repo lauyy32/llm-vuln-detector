@@ -1,7 +1,7 @@
 {
  "generated_from": {
-  "git_commit": "de2e5f876d8ea850a1e5eb9b5e77089c3c9b4a9e",
-  "generator_sha256": "9a939655230d11bb92c5f6ce42b20b113a2182bb4ee060c8e4531b9d222fa6f1",
+  "git_commit": "4e5fcd0a39af0530a7194c62b999edab09831037",
+  "generator_sha256": "36a8efece4b985b9c739787481878f9e563262615976712c5ba0ae9304750bfa",
   "python": "3.13.14",
   "git_version": "git version 2.55.0.windows.3",
   "invocation": "cpg/ablation/v4_gates_smoke.py --cves CVE-2026-12482 CVE-2026-45019 CVE-2026-50181 CVE-2026-50558 CVE-2026-53502 CVE-2026-53598 CVE-2026-54574 CVE-2026-54706 CVE-2026-54707 CVE-2026-54785 CVE-2026-59890 CVE-2026-67424 CVE-2026-67425 CVE-2026-70491 CVE-2026-73498 --out cpg/ablation/.work/v4_gates_report.json"
@@ -20,15 +20,16 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1174,
+    "len_chars": 1179,
     "edits": [
-     "comment in keras/src/utils/file_utils.py: # is_link_in_dir — entry point of the nearby code",
-     "comment in keras/src/utils/file_utils_test.py: # IsLinkInDirTest — see the following lines"
+     "comment in keras/src/utils/file_utils.py: # is_link_in_dir — referenced by the block below",
+     "comment in keras/src/utils/file_utils_test.py: # IsLinkInDirTest — referenced by the block below"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
-    "token_ratio_proxy": 0.746
+    "diff_sha256": "c09488e691eb117f57cf86a4da9325ef59357945f4404f3d4376f899b63dca89",
+    "token_ratio_proxy": 0.749
    }
   },
   "CVE-2026-45019": {
@@ -48,14 +49,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1234,
+    "len_chars": 1244,
     "edits": [
-     "comment in backend/chainlit/config.py: # Request — used around this section",
-     "comment in backend/chainlit/mcp.py: # validate_mcp_command — used around this section"
+     "comment in backend/chainlit/config.py: # Request — referenced by the block below",
+     "comment in backend/chainlit/mcp.py: # validate_mcp_command — referenced by the block below"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
+    "diff_sha256": "680d2a5397cd776a56fd87e1738df95a4cb56e9a77ea8dc3bda8dbfb1124347c",
     "token_ratio_proxy": 0.006
    }
   },
@@ -72,15 +74,16 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1134,
+    "len_chars": 1123,
     "edits": [
-     "comment in langroid/agent/tools/file_tools.py: # ReadFileTool — referenced by the block below",
-     "comment in langroid/utils/system.py: # LazyLoad — referenced by the block below"
+     "comment in langroid/agent/tools/file_tools.py: # ReadFileTool — used around this section",
+     "comment in langroid/utils/system.py: # LazyLoad — see the following lines"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
-    "token_ratio_proxy": 0.156
+    "diff_sha256": "b24553daeb9de11b20a9f39c74e3c519aea10e3597d849707beec3775aa5323e",
+    "token_ratio_proxy": 0.155
    }
   },
   "CVE-2026-50558": {
@@ -96,14 +99,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 397,
+    "len_chars": 390,
     "edits": [
-     "comment in penelope.py: # __program__ — entry point of the nearby code"
+     "comment in penelope.py: # __program__ — see the following lines"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
-    "token_ratio_proxy": 0.131
+    "diff_sha256": "2862b583e18e6ac1e548f574628f3eb371f255314cb42e6f4b2245e854080726",
+    "token_ratio_proxy": 0.13
    }
   },
   "CVE-2026-53502": {
@@ -119,14 +123,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 932,
+    "len_chars": 933,
     "edits": [
-     "comment in tests/loaders/test_file_loader.py: # FileLoaderTestCase — referenced by the block below",
+     "comment in tests/loaders/test_file_loader.py: # FileLoaderTestCase — entry point of the nearby code",
      "comment in thumbor/loaders/file_loader.py: # load — used around this section"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
+    "diff_sha256": "c4555f4e1abefd5e55e0ba9d941b0d629ca39aa755a809f116f2ee5288b7ab1c",
     "token_ratio_proxy": 0.194
    }
   },
@@ -143,14 +148,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 860,
+    "len_chars": 854,
     "edits": [
      "comment in runtime/python/prompty/prompty/_version.py: # VERSION — used around this section",
-     "comment in runtime/python/prompty/prompty/core/loader.py: # load — referenced by the block below"
+     "comment in runtime/python/prompty/prompty/core/loader.py: # load — see the following lines"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
+    "diff_sha256": "cb9762cebb0b2d17e410c16ae1d10da3e136ac5efc4cb3ae056a6f89b5048c1f",
     "token_ratio_proxy": 0.09
    }
   },
@@ -167,14 +173,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1008,
+    "len_chars": 1009,
     "edits": [
      "comment in proot_distro/commands/restore.py: # _detect_compression — referenced by the block below",
-     "comment in proot_distro/helpers/build_engine/copy_step.py: # do_copy — referenced by the block below"
+     "comment in proot_distro/helpers/build_engine/copy_step.py: # do_copy — entry point of the nearby code"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
+    "diff_sha256": "65c1fa76bace8ee524f4462d42914335b3019ecaa4bd7b62aaa44785111e396a",
     "token_ratio_proxy": 0.07
    }
   },
@@ -193,14 +200,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1203,
+    "len_chars": 1207,
     "edits": [
-     "comment in cli/onionshare_cli/web/send_base_mode.py: # SendBaseModeWeb — used around this section",
-     "comment in cli/onionshare_cli/web/share_mode.py: # parse_range_header — entry point of the nearby code"
+     "comment in cli/onionshare_cli/web/send_base_mode.py: # SendBaseModeWeb — referenced by the block below",
+     "comment in cli/onionshare_cli/web/share_mode.py: # parse_range_header — referenced by the block below"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
+    "diff_sha256": "4c8879d18a3cb91438e1c774a64ad6a85186de5c6c6e38d303fe340a54dad3cb",
     "token_ratio_proxy": 0.054
    }
   },
@@ -217,14 +225,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 989,
+    "len_chars": 988,
     "edits": [
      "comment in cli/onionshare_cli/web/receive_mode.py: # ReceiveModeWeb — entry point of the nearby code",
-     "comment in desktop/tests/test_gui_receive.py: # TestReceive — entry point of the nearby code"
+     "comment in desktop/tests/test_gui_receive.py: # TestReceive — referenced by the block below"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
+    "diff_sha256": "0916cb4966a55dcf326d1f7b1300dafaa270ad8ea99512a0c659cf6e0e60996f",
     "token_ratio_proxy": 0.105
    }
   },
@@ -241,15 +250,16 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1302,
+    "len_chars": 1290,
     "edits": [
-     "comment in src/mcp_server.py: # MAX_INLINE_FILE_COUNT — referenced by the block below",
+     "comment in src/mcp_server.py: # MAX_INLINE_FILE_COUNT — see the following lines",
      "comment in tests/test_mcp_server.py: # test_execute_gemini_with_files_at_command_warns_on_missing"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
-    "token_ratio_proxy": 0.182
+    "diff_sha256": "b0c9a7434de0e8c80fc531677ccd863f2483fdba65a379dfd51d8640b87ef61d",
+    "token_ratio_proxy": 0.18
    }
   },
   "CVE-2026-59890": {
@@ -265,15 +275,16 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1031,
+    "len_chars": 1036,
     "edits": [
-     "comment in setuptools/command/egg_info.py: # translate_pattern — used around this section",
+     "comment in setuptools/command/egg_info.py: # translate_pattern — referenced by the block below",
      "comment in setuptools/tests/test_manifest.py: # touch — entry point of the nearby code"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
-    "token_ratio_proxy": 0.177
+    "diff_sha256": "347a4fbd72a7b1a4c40a6d32790e97080e9027e29a0515fb997fc99f49c792f3",
+    "token_ratio_proxy": 0.178
    }
   },
   "CVE-2026-67424": {
@@ -289,14 +300,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1265,
+    "len_chars": 1270,
     "edits": [
-     "comment in src/core/modules/atomic/ai/vision_analyze.py: # ai_vision_analyze — used around this section",
-     "comment in src/core/modules/atomic/browser/proxy_rotate.py: # BrowserProxyRotateModule — see the following lines"
+     "comment in src/core/modules/atomic/ai/vision_analyze.py: # ai_vision_analyze — see the following lines",
+     "comment in src/core/modules/atomic/browser/proxy_rotate.py: # BrowserProxyRotateModule — referenced by the block below"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
+    "diff_sha256": "3e0a2f7faeb120ef778543748b1c5f7b1ca496f46ee69fa7a6e3ee87146dbda7",
     "token_ratio_proxy": 0.04
    }
   },
@@ -321,6 +333,7 @@
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
+    "diff_sha256": "64400347d818846ade17dc6c3788489970d5af981e52a5b88149915523f3dc8e",
     "token_ratio_proxy": 0.037
    }
   },
@@ -337,14 +350,15 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 518,
+    "len_chars": 524,
     "edits": [
-     "comment in backend/open_webui/routers/tools.py: # get_tool_module — see the following lines"
+     "comment in backend/open_webui/routers/tools.py: # get_tool_module — referenced by the block below"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
-    "token_ratio_proxy": 0.29
+    "diff_sha256": "9c87d7f4671aff8d1d7bf2acc942f0420d4f084026b7198b176801e8b2e862ab",
+    "token_ratio_proxy": 0.292
    }
   },
   "CVE-2026-73498": {
@@ -362,16 +376,18 @@
     "pass": true
    },
    "g2": {
-    "len_chars": 1105,
+    "len_chars": 1110,
     "edits": [
-     "comment in src/mcp_atlassian/confluence/attachments.py: # logger — used around this section",
+     "comment in src/mcp_atlassian/confluence/attachments.py: # logger — referenced by the block below",
      "comment in src/mcp_atlassian/confluence/client.py: # logger — see the following lines"
     ],
     "ast_equivalent": true,
     "apply_clean": true,
     "apply_error": "",
-    "token_ratio_proxy": 0.018
+    "diff_sha256": "bcdef28082588e0817dc5d78902c0fceb6f748bcef8c496679c9e9b14d935688",
+    "token_ratio_proxy": 0.019
    }
   }
- }
+ },
+ "cross_process_deterministic": true
 }
