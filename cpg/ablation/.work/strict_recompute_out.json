@@ -1,0 +1,74 @@
+{
+ "disc_strict": {
+  "7B v9 D1": {
+   "n": 82,
+   "strict_count": 2,
+   "strict_set": [
+    "61539",
+    "67435"
+   ]
+  },
+  "14B v9 74": {
+   "n": 74,
+   "strict_count": 0,
+   "strict_set": []
+  },
+  "DS r1": {
+   "n": 82,
+   "strict_count": 7,
+   "strict_set": [
+    "12482",
+    "13769",
+    "53502",
+    "53505",
+    "61539",
+    "67424",
+    "73498"
+   ]
+  },
+  "DS r2": {
+   "n": 82,
+   "strict_count": 7,
+   "strict_set": [
+    "49852",
+    "53502",
+    "53505",
+    "54706",
+    "61539",
+    "61632",
+    "67425"
+   ]
+  }
+ },
+ "mcnemar": {
+  "DS r1": {
+   "b": 6,
+   "c": 1,
+   "p": 0.0625
+  },
+  "DS r2": {
+   "b": 6,
+   "c": 1,
+   "p": 0.0625
+  }
+ },
+ "directional": {
+  "DS r1": {
+   "answered_pairs": 26,
+   "correct": 7,
+   "inverted": 2,
+   "p": 0.08984375
+  },
+  "DS r2": {
+   "answered_pairs": 36,
+   "correct": 7,
+   "inverted": 3,
+   "p": 0.171875
+  }
+ },
+ "abstain": {
+  "genuine": 148,
+  "total": 159,
+  "rate": 0.9308176100628931
+ }
+}

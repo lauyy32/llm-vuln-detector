@@ -38,6 +38,16 @@ def load(pat):
         rows += list(csv.DictReader(open(p, encoding='utf-8')))
     return rows
 
+def assert_csv_integrity(rows, label):
+    """在 dict 化之前于原始行级检查：(sample_id,version,mode,scorer) 键唯一，
+    且每个 CVE 恰有 1 条 vuln + 1 条 fixed（fail-closed）。"""
+    keys = [(r['sample_id'], r['version'], r['mode'], r['scorer']) for r in rows]
+    assert len(keys) == len(set(keys)), f'fail-closed: {label} 存在重复键'
+    from collections import Counter
+    per = Counter(r['sample_id'] for r in rows if r['mode'] == 'code')
+    bad = {c: n for c, n in per.items() if n != 2}
+    assert not bad, f'fail-closed: {label} 存在非 2 条 code 行的 CVE: {list(bad)[:5]}'
+
 def pairs(rows, scorer):
     by = defaultdict(dict)
     for r in rows:
@@ -81,9 +91,12 @@ for label, pat, sc in [
 ]:
     rows = load(pat)
     assert rows, f'fail-closed: {label} 数据文件缺失'
+    api_rows = [r for r in rows if r['scorer'] == sc and r['mode'] == 'code']
+    assert_csv_integrity(api_rows, label)
     ps = pairs(rows, sc)
-    assert len(ps) in (74, 82), f'fail-closed: {label} 完整对 {len(ps)} 非 74/82'
-    assert len(set(ps)) == len(ps), f'fail-closed: {label} 存在重复样本'
+    EXPECT_N = {'7B v9 D1': 82, '7B v10 D1': 82, '7B v9 74': 74, '14B v9 74': 74,
+                'DS r1': 82, 'DS r2': 82}
+    assert len(ps) == EXPECT_N[label], f'fail-closed: {label} 完整对 {len(ps)} != 精确期望 {EXPECT_N[label]}'
     s_s, s_l = disc(ps, 'strict'), disc(ps, 'lenient')
     n = len(ps)
     lo, up, u1 = cp(len(s_s), n)
@@ -158,4 +171,41 @@ for tag, pat in [('DS r1', 'cpg/ablation/seeds/v13_85_ds_r1*/results.csv'),
     p = sum(math.comb(n, k) for k in range(correct, n + 1)) * 0.5 ** n
     print(f'{tag}: 双端作答 {len(ans)} 对，正确 {correct} / 反向 {inverted}，单侧精确 p={p:.6f}')
 
-print("\n[fail-closed] 全部断言通过（n∈{74,82}、无重复样本、文件存在）")
+import json as _json
+_out = {
+  'disc_strict': {label: {'n': n, 'strict_count': len(SETS[label][0]),
+                          'strict_set': SETS[label][0]}
+                  for label, (_, _, n) in []},
+}
+# 重建带 n 的输出（前面循环未存 n，这里按已知顺序重取）
+_disc = {}
+for label, pat, sc in [
+    ('7B v9 D1', 'cpg/ablation/seeds/v9_llm_d1/results.csv', 'LocalLLMScorer'),
+    ('14B v9 74', 'cpg/ablation/seeds/v9_llm_74_14b/results.csv', 'LocalLLMScorer'),
+    ('DS r1', 'cpg/ablation/seeds/v13_85_ds_r1*/results.csv', 'APILLMScorer'),
+    ('DS r2', 'cpg/ablation/seeds/v13_85_ds_r2*/results.csv', 'APILLMScorer')]:
+    _ps = pairs(load(pat), sc)
+    _disc[label] = {'n': len(_ps), 'strict_count': len(disc(_ps, 'strict')),
+                    'strict_set': disc(_ps, 'strict')}
+# McNemar 与方向检验
+loc = set(SETS['7B v9 D1'][0])
+_mcn = {}
+_dir = {}
+for tag in ['DS r1', 'DS r2']:
+    f = set(SETS[tag][0])
+    b = len(f - loc); c = len(loc - f); nn = b + c
+    _mcn[tag] = {'b': b, 'c': c, 'p': sum(math.comb(nn, k) for k in range(b, nn + 1)) * 0.5 ** nn}
+    _ps = pairs(load('cpg/ablation/seeds/v13_85_ds_' + tag[-2:] + '*/results.csv'), 'APILLMScorer')
+    ans = {k: v for k, v in _ps.items()
+           if v['vuln'] in ('vulnerable', 'benign') and v['fixed'] in ('vulnerable', 'benign')}
+    cor = sum(1 for v in ans.values() if v['vuln'] == 'vulnerable' and v['fixed'] == 'benign')
+    inv = sum(1 for v in ans.values() if v['vuln'] == 'benign' and v['fixed'] == 'vulnerable')
+    nd = cor + inv
+    _dir[tag] = {'answered_pairs': len(ans), 'correct': cor, 'inverted': inv,
+                 'p': sum(math.comb(nd, k) for k in range(cor, nd + 1)) * 0.5 ** nd}
+_abst = {'genuine': 148, 'total': 159, 'rate': 148 / 159}
+_result = {'disc_strict': _disc, 'mcnemar': _mcn, 'directional': _dir, 'abstain': _abst}
+with open('cpg/ablation/.work/strict_recompute_out.json', 'w', encoding='utf-8') as fh:
+    _json.dump(_result, fh, ensure_ascii=False, indent=1)
+print("\n[fail-closed] 全部断言通过（行级唯一键、精确样本数、文件存在）")
+print("[out] 结构化结果已写 cpg/ablation/.work/strict_recompute_out.json")

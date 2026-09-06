@@ -1,53 +1,96 @@
 {
-  "_doc": "机器可读数字账本（G-3 复算门禁）。每条：数字含义、结果文件、复算脚本、期望值。verify_claims.py 校验脚本存在且数字可复算。",
-  "claims": [
-    {
-      "id": "local7b_strict_disc_d1",
-      "desc": "本地 7B strict 判别数（D1 完整对）",
-      "expect": 2,
-      "n": 82,
-      "script": "cpg/ablation/.work/strict_recompute.py",
-      "data": "cpg/ablation/seeds/v9_llm_d1/results.csv"
-    },
-    {
-      "id": "local14b_strict_disc_74",
-      "desc": "本地 14B strict 判别数（74 集）",
-      "expect": 0,
-      "n": 74,
-      "script": "cpg/ablation/.work/strict_recompute.py",
-      "data": "cpg/ablation/seeds/v9_llm_74_14b/results.csv"
-    },
-    {
-      "id": "frontier_strict_disc_r1",
-      "desc": "前沿 r1 strict 判别数",
-      "expect": 7,
-      "n": 82,
-      "script": "cpg/ablation/.work/strict_recompute.py",
-      "data": "cpg/ablation/seeds/v13_85_ds_r1a/results.csv"
-    },
-    {
-      "id": "frontier_vs_local_mcnemar",
-      "desc": "前沿 vs 本地对称 strict McNemar",
-      "expect": {"b": 6, "c": 1, "p": 0.0625},
-      "script": "cpg/ablation/.work/strict_recompute.py"
-    },
-    {
-      "id": "frontier_directional_r1",
-      "desc": "前沿 r1 自身方向检验（双端作答对）",
-      "expect": {"correct": 7, "inverted": 2, "answered_pairs": 26, "p": 0.08984375},
-      "script": "cpg/ablation/.work/strict_recompute.py"
-    },
-    {
-      "id": "frontier_directional_r2",
-      "desc": "前沿 r2 自身方向检验（双端作答对）",
-      "expect": {"correct": 7, "inverted": 3, "answered_pairs": 36, "p": 0.171875},
-      "script": "cpg/ablation/.work/strict_recompute.py"
-    },
-    {
-      "id": "frontier_abstain_genuine_rate",
-      "desc": "前沿真弃权率（故障剔除后）",
-      "expect": {"genuine": 148, "total": 159, "rate": 0.931},
-      "script": "cpg/ablation/.work/strict_recompute.py"
-    }
-  ]
+ "_doc": "机器可读数字账本（G-3 复算门禁）。每条：数字含义、结果文件、复算脚本、期望值。verify_claims.py 校验脚本存在且数字可复算。",
+ "claims": [
+  {
+   "id": "local7b_strict_disc_d1",
+   "desc": "本地 7B strict 判别数（D1 完整对）",
+   "expect": 2,
+   "n": 82,
+   "script": "cpg/ablation/.work/strict_recompute.py",
+   "data": "cpg/ablation/seeds/v9_llm_d1/results.csv",
+   "data_files": [
+    "cpg/ablation/seeds/v9_llm_d1/results.csv"
+   ]
+  },
+  {
+   "id": "local14b_strict_disc_74",
+   "desc": "本地 14B strict 判别数（74 集）",
+   "expect": 0,
+   "n": 74,
+   "script": "cpg/ablation/.work/strict_recompute.py",
+   "data": "cpg/ablation/seeds/v9_llm_74_14b/results.csv",
+   "data_files": [
+    "cpg/ablation/seeds/v9_llm_74_14b/results.csv"
+   ]
+  },
+  {
+   "id": "frontier_strict_disc_r1",
+   "desc": "前沿 r1 strict 判别数",
+   "expect": 7,
+   "n": 82,
+   "script": "cpg/ablation/.work/strict_recompute.py",
+   "data": "cpg/ablation/seeds/v13_85_ds_r1a/results.csv",
+   "data_files": [
+    "cpg/ablation/seeds/v13_85_ds_r1a/results.csv",
+    "cpg/ablation/seeds/v13_85_ds_r1b/results.csv"
+   ]
+  },
+  {
+   "id": "frontier_vs_local_mcnemar",
+   "desc": "前沿 vs 本地对称 strict McNemar",
+   "expect": {
+    "b": 6,
+    "c": 1,
+    "p": 0.0625
+   },
+   "script": "cpg/ablation/.work/strict_recompute.py",
+   "data_files": [
+    "cpg/ablation/seeds/v9_llm_d1/results.csv",
+    "cpg/ablation/seeds/v13_85_ds_r1a/results.csv"
+   ]
+  },
+  {
+   "id": "frontier_directional_r1",
+   "desc": "前沿 r1 自身方向检验（双端作答对）",
+   "expect": {
+    "correct": 7,
+    "inverted": 2,
+    "answered_pairs": 26,
+    "p": 0.08984375
+   },
+   "script": "cpg/ablation/.work/strict_recompute.py",
+   "data_files": [
+    "cpg/ablation/seeds/v13_85_ds_r1a/results.csv",
+    "cpg/ablation/seeds/v13_85_ds_r1b/results.csv"
+   ]
+  },
+  {
+   "id": "frontier_directional_r2",
+   "desc": "前沿 r2 自身方向检验（双端作答对）",
+   "expect": {
+    "correct": 7,
+    "inverted": 3,
+    "answered_pairs": 36,
+    "p": 0.171875
+   },
+   "script": "cpg/ablation/.work/strict_recompute.py",
+   "data_files": [
+    "cpg/ablation/seeds/v13_85_ds_r2a/results.csv",
+    "cpg/ablation/seeds/v13_85_ds_r2b/results.csv"
+   ]
+  },
+  {
+   "id": "frontier_abstain_genuine_rate",
+   "desc": "前沿真弃权率（故障剔除后）",
+   "expect": {
+    "genuine": 148,
+    "total": 159,
+    "rate": 0.9308176100628931
+   },
+   "script": "cpg/ablation/.work/strict_recompute.py",
+   "data_files": [
+    "cpg/ablation/seeds/v13_85_ds_r1a/results.csv"
+   ]
+  }
+ ]
 }

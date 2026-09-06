@@ -123,5 +123,6 @@ print("\n=== A/B/C 判读（预注册阈值：A ≤5 或不显著 / B ≥10 且 
 for tag, n in [("r1", n1), ("r2", n2)]:
     if n is None:
         continue
-    verdict = "A" if n <= 5 else ("B" if n >= 10 else "C")
-    print(f"{tag}: 判别 {n}/82 → 分支 {verdict}")
+    # 2026-09-06：A（≤5 或不显著）与 C（6-9）在 7/82 处重叠，预注册无法唯一判定
+    verdict = "A/C overlap—inconclusive（探索性结果，按原弃权条款不作确认性推断）"
+    print(f"{tag}: 判别 {n}/82 → {verdict}")
