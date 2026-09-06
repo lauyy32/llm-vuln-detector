@@ -7,6 +7,7 @@ exit 0 = 全部 G1/G2 通过；非 0 = 存在失败（报告内记 fail 原因�
 """
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -72,14 +73,22 @@ def main() -> int:
         code = ("import sys; sys.path.insert(0, '.'); "
                 "from cpg.ablation.v4_patch_gen import gen_placebo_diff, diff_sha256; "
                 f"d,_ = gen_placebo_diff('{cve}'); print(diff_sha256(d))")
-        r = _sp.run([sys.executable, "-c", code], capture_output=True, text=True,
-                    encoding="utf-8", cwd=str(ROOT))
+        try:
+            r = _sp.run([sys.executable, "-c", code], capture_output=True, text=True,
+                        encoding="utf-8", cwd=str(ROOT), timeout=120)
+        except _sp.TimeoutExpired:
+            det_ok = False
+            print(f"[DETERMINISM FAIL] {cve}: 子进程超时"); continue
         sub_sha = r.stdout.strip()
         d_in, _ = gen_placebo_diff(cve)
-        if sub_sha and sub_sha != diff_sha256(d_in):
+        expected = diff_sha256(d_in)
+        if (r.returncode != 0
+                or not re.fullmatch(r"[0-9a-f]{64}", sub_sha)
+                or sub_sha != expected):
             det_ok = False
-            print(f"[DETERMINISM FAIL] {cve}: sub={sub_sha[:12]} in={diff_sha256(d_in)[:12]}")
-    report["cross_process_deterministic"] = det_ok
+            print(f"[DETERMINISM FAIL] {cve}: rc={r.returncode} sub={sub_sha[:12]} "
+                  f"in={expected[:12]} stderr={r.stderr.strip()[:80]}")
+    report["determinism_spotcheck"] = det_ok  # 仅抽样前 3 例，非全量
     if not det_ok:
         all_ok = False
 
