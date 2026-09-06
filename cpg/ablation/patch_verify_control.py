@@ -33,6 +33,10 @@
 证据无法区分补丁前后时才有意义，这些正是该子集。子集由 `b2_74_7b.json` 的
 `cpg_full` 字段确定性导出，不做人工挑选。
 
+v3（P1-15，2026-09-06）：基线源码由 fixed 改为 vuln（三臂语义自洽："给漏洞代码 +
+候选补丁，问补丁能否修好"）；删除 placebo 的"无功能变更"自述 marker 与系统提示中的
+教学例。旧 fixed 基线结果降级为 flawed pilot（git 历史留档，不池化）。
+
 用法
 ----
     python cpg/ablation/patch_verify_control.py --arms real placebo shuffled
@@ -82,9 +86,6 @@ def cpg_patch_blind_cves(path: Path = B2_JSON) -> list[str]:
 # --------------------------------------------------------------------------
 # 三个实验臂的 diff 构造
 # --------------------------------------------------------------------------
-COSMETIC_HEADER = "维护性整理：补充模块注释、统一空行、同步版本号（无功能变更）"
-
-
 def make_placebo_diff(cve: str, real_diff: str) -> str:
     """在真实 diff 的文件头与行号上下文之上，合成仅注释/空行/版本号的装饰性变更。
 
@@ -98,11 +99,10 @@ def make_placebo_diff(cve: str, real_diff: str) -> str:
     for i, rel in enumerate(files):
         parts.append(
             f"--- {rel}\n"
+            # v3（P1-15）：删除"无功能变更"自述 marker——装饰 diff 只保留客观
+            # 变更（版本号自增/注释现代化），不自我声明，避免模型读字面线索即可拒答。
             f"@@ -1,4 +1,8 @@\n"
             f" # -*- coding: utf-8 -*-\n"
-            f"+#\n"
-            f"+# {COSMETIC_HEADER}\n"
-            f"+#\n"
             f"+\n"
             f" import os\n"
             f" import sys\n"
@@ -151,7 +151,7 @@ def load_main_baseline() -> dict[str, str]:
         for r in csv.DictReader(fh):
             if (
                 r["mode"] == "code"
-                and r["version"] == "fixed"
+                and r["version"] == "vuln"
                 and r["scorer"] == "LocalLLMScorer"
             ):
                 base[r["sample_id"]] = r["predicted"]
@@ -246,7 +246,9 @@ def main() -> int:
         if row is None:
             print(f"[skip] {cve}: 不在 dataset 中")
             continue
-        prefix = f"{cve}_fixed"
+        # v3（P1-15）：基线由 fixed 改为 vuln——"给漏洞代码 + 候选补丁，问补丁能否修好"，
+        # 三臂语义自洽；旧 fixed 基线（flawed pilot）见 git 历史。
+        prefix = f"{cve}_vuln"
         trows = load_taint_rows(prefix)
         code = _load_sample_code(prefix, trows)
         if not code:
@@ -256,8 +258,8 @@ def main() -> int:
         # CWE 取自 dataset 真实字段（原 patch_verify 硬编码 CWE-022，此处修正）
         cwes = row.get("cwes") or ([row["cwe"]] if row.get("cwe") else [])
         sample = {
-            "sample_id": cve, "version": "fixed", "cwes": cwes,
-            "cwe": (cwes[0] if cwes else None), "truth": "benign",
+            "sample_id": cve, "version": "vuln", "cwes": cwes,
+            "cwe": (cwes[0] if cwes else None), "truth": "vulnerable",
             "prefix": prefix, "code_text": code,
         }
         ctx = build_context("code", sample, taint_rows=trows, cpg_slices=slices)
