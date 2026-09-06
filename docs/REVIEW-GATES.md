@@ -49,3 +49,4 @@
 | 2026-09-06 | P1-13 判读残留（§5.2"两轮有效"、§5.3"C/C"、README"落 C 分支"、analyze 输出 C） | 全部改"A/C overlap—inconclusive（探索性）" |
 | 2026-09-06 | P1-16 §3"文档级修正本轮一并闭合"（未实际完成） | 改"待闭合"并逐条登记 |
 | 2026-09-06 | strict_recompute 弃权统计硬编码（_abst 写死 148/159，与刚拆掉的 verify 硬编码同类） | 改用 tot_abst/tot_fault 数据计算值 + fail-closed（第三次验收 P0，已修） |
+| 2026-09-06 | self-test T3 用 csv.reader/writer 整文件往返篡改，致含内嵌换行引用字段的 CSV 丢 92 行（681→589），69247 行数 2→1 致完整性误报 | T3 改行级字符串替换（与 T2 同法）后 PASS；教训：此类 CSV 只允许行级手术，禁整文件 csv 往返 |
