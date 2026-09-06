@@ -254,20 +254,42 @@ cpg_context_source_commit == prompt_source_commit
 **所有 `.py`（含 tests，含 `.pyi`）**。此规则在测量前写死，不得事后改"排除 tests"或"含/不含 .pyi"
 以迁就结果。
 
-**Δ 指标精确定义（P1-1；先定义再判"近似"，禁看完数据再定"差异不算大"）**：
-- 文件集合：`python_included_files` vs corpus 改动 `.py` 文件集；
-- 双向差集分列：`|P\C|`（上游投影有、corpus 无）与 `|C\P|`（corpus 有、投影无），**不合成单标量**；
-- canonical patch SHA、hunk 集合、added/deleted/renamed 文件、修改行集合/行数分别比对；
-- corpus vuln vs upstream parent 字节差异、corpus fixed vs upstream fix 字节差异分别记录。
-"Δ=0" = 上述全部一致。**即使 14/15 的 Δ=0，旧 G1 也只说明实现大概率可复用，新 upstream G1 仍须
-全量重跑，不自动继承认证结果。**
+**Δ 指标精确定义（P1-1 + 第十轮升级为分层；先定义再判"近似"，禁看完数据再定"差异不算大"）**：
+
+> ⚠️ **第十轮核心教训**：路径级 Δ=0 **只证明"文件路径集合一致"，不证明补丁内容完整**（早期
+> "90 行窗口 + [:4000]"同类问题）。实测 45019 路径级 Δ=0，但内容级发现 **fixed 快照缺了
+> mcp.py/types.py/test_session.py**——见下"内容级"。故 Δ 分两级，禁混称。
+
+**L1 路径级（path-set）**：
+- `delta_paths`：上游 Python 投影文件集 vs corpus `.py` 文件集，双向差集 `|P\C|` / `|C\P|` 分列；
+- `delta_change_types`：added/deleted/renamed/status 是否一致。
+
+**L2 内容级（blob，须逐个文件比对上游 parent/fix blob 与 corpus vuln/fixed）**：
+- `delta_base_blobs`：corpus vuln 与 upstream parent 对应 blob 字节是否一致；
+- `delta_fixed_blobs`：corpus fixed 与 upstream fix 对应 blob 字节是否一致；
+- `delta_patch_hunks`：每文件 canonical patch 的 SHA/hunk 集合是否一致；
+- `delta_file_modes`：file mode / symlink / 末尾换行是否一致；
+- 存在性：`delta_base_presence` / `delta_fixed_presence`（文件在两端是否都存在）。
+
+**字节级 vs 内容级**：corpus 在 Windows checkout 下 LF→CRLF（git autocrlf），属环境行尾差非内容
+差；内容级比较按**归一化行尾（CRLF→LF）**，`line_ending_diff` 单独记录原始字节行尾差。
+
+"内容级等价（byte-equivalent）" = L1 + L2 全部通过。**即使路径级 14/15 Δ=0，内容级仍须全量重跑，
+不自动继承认证结果。** 权威 diff 来自本地 Git 对象 `git diff --binary --full-index <base> <fix>`，
+**不以 API 的 patch 字段为权威**（patch 可能分页/截断）。
 
 **多 parent 选择 fail-closed（P1-2）**：
 - 单 parent：暂取唯一 parent，但**仍须确认其含漏洞**（advisory/PR 佐证）；
 - 多 parent / merge：**禁默认取 `^1`**；须从 advisory/PR 确认哪个是干净 vulnerable base；
 - cherry-pick / 合并 / 复合安全提交：parent 未必是干净 vulnerable base；
 - 无法从 advisory/PR 确认 base → `selected_base_commit` 置 `unverifiable`，**退出确认性**。
-- `parents_count` / `is_merge` 是零成本自动化复合检测线索（45019 提交信息即 "Merge commit from fork"）。
+- ⚠️ **第十轮实测**：`parents_count=1` 对全部 15 例，`is_merge=0`——**`is_merge` 在本语料完全
+  不能用作复合信号**（45019 标题 "Merge commit from fork" 是假 merge）。复合判定一律走
+  advisory/PR + 第二标注者，不得指望 `is_merge`。
+
+**API 工件复现门禁（Codex）**：GitHub API/raw 结果须保存原始证据或元数据——请求 URL、HTTP 状态、
+fetch 时间、commit SHA、parent SHA、原始响应 SHA-256、是否分页。API 的 `files[].patch` 可能分页/
+截断/缺失，**不作权威补丁**。
 
 **三个 fail-closed 布尔（三布尔异号，禁自然语言并列；未知值一律不过）**：
 

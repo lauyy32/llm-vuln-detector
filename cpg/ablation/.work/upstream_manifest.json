@@ -1,6 +1,9 @@
 {
  "generated_from": {
-  "git_commit": "3fb52c422ff59ef69f3aba23f46c844cd0bd4b6d"
+  "git_commit": "d824cfd45faa3e3882c67b259063f201f9e6d1b9",
+  "content_compare": true,
+  "line_ending_normalized": true,
+  "note": "L2 内容级按归一化行尾(CRLF→LF)比对；原始字节差异见 line_ending_diff"
  },
  "samples": {
   "CVE-2026-12482": {
@@ -26,9 +29,23 @@
     "renamed": 0
    },
    "corpus_py_n": 2,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "keras/src/utils/file_utils.py",
+     "keras/src/utils/file_utils_test.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 16,
    "token_estimate": 128,
    "advisory_url": "",
@@ -80,9 +97,35 @@
     "renamed": 0
    },
    "corpus_py_n": 10,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [
+     "backend/chainlit/mcp.py",
+     "backend/chainlit/types.py",
+     "backend/tests/test_session.py"
+    ],
+    "line_ending_diff": [
+     "backend/chainlit/config.py",
+     "backend/chainlit/mcp.py",
+     "backend/chainlit/server.py",
+     "backend/chainlit/session.py",
+     "backend/chainlit/types.py",
+     "backend/chainlit/version.py",
+     "backend/tests/test_config.py",
+     "backend/tests/test_mcp.py",
+     "backend/tests/test_session.py",
+     "cypress/e2e/config_overrides/main.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": false
+   },
    "changed_lines": 4163,
    "token_estimate": 33304,
    "advisory_url": "",
@@ -127,9 +170,24 @@
     "renamed": 0
    },
    "corpus_py_n": 3,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "langroid/agent/tools/file_tools.py",
+     "langroid/utils/system.py",
+     "tests/main/test_file_tools.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 135,
    "token_estimate": 1080,
    "advisory_url": "",
@@ -172,9 +230,22 @@
     "renamed": 0
    },
    "corpus_py_n": 1,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "penelope.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 62,
    "token_estimate": 496,
    "advisory_url": "",
@@ -218,9 +289,23 @@
     "renamed": 0
    },
    "corpus_py_n": 2,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "tests/loaders/test_file_loader.py",
+     "thumbor/loaders/file_loader.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 73,
    "token_estimate": 584,
    "advisory_url": "",
@@ -265,9 +350,24 @@
     "renamed": 0
    },
    "corpus_py_n": 3,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "runtime/python/prompty/prompty/_version.py",
+     "runtime/python/prompty/prompty/core/loader.py",
+     "runtime/python/prompty/tests/test_loader.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 126,
    "token_estimate": 1008,
    "advisory_url": "",
@@ -312,9 +412,24 @@
     "renamed": 0
    },
    "corpus_py_n": 3,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "proot_distro/commands/restore.py",
+     "proot_distro/helpers/build_engine/copy_step.py",
+     "proot_distro/helpers/tar_extract.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 195,
    "token_estimate": 1560,
    "advisory_url": "",
@@ -359,9 +474,24 @@
     "renamed": 0
    },
    "corpus_py_n": 3,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "cli/onionshare_cli/web/send_base_mode.py",
+     "cli/onionshare_cli/web/share_mode.py",
+     "cli/tests/test_cli_web_symlink.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 375,
    "token_estimate": 3000,
    "advisory_url": "",
@@ -405,9 +535,23 @@
     "renamed": 0
    },
    "corpus_py_n": 2,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "cli/onionshare_cli/web/receive_mode.py",
+     "desktop/tests/test_gui_receive.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 143,
    "token_estimate": 1144,
    "advisory_url": "",
@@ -452,9 +596,24 @@
     "renamed": 0
    },
    "corpus_py_n": 3,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "src/__init__.py",
+     "src/mcp_server.py",
+     "tests/test_mcp_server.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 127,
    "token_estimate": 1016,
    "advisory_url": "",
@@ -499,9 +658,24 @@
     "renamed": 0
    },
    "corpus_py_n": 3,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "setuptools/command/egg_info.py",
+     "setuptools/tests/test_manifest.py",
+     "setuptools/unicode_utils.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 87,
    "token_estimate": 696,
    "advisory_url": "",
@@ -560,9 +734,38 @@
     "renamed": 0
    },
    "corpus_py_n": 17,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "src/core/modules/atomic/ai/vision_analyze.py",
+     "src/core/modules/atomic/browser/proxy_rotate.py",
+     "src/core/modules/atomic/communication/slack_send.py",
+     "src/core/modules/atomic/graphql/mutation.py",
+     "src/core/modules/atomic/graphql/query.py",
+     "src/core/modules/atomic/http/batch.py",
+     "src/core/modules/atomic/http/get.py",
+     "src/core/modules/atomic/http/request.py",
+     "src/core/modules/atomic/monitor/http_check.py",
+     "src/core/modules/atomic/verify/visual_diff.py",
+     "src/core/modules/third_party/communication/messaging/discord.py",
+     "src/core/modules/third_party/communication/messaging/slack.py",
+     "src/core/modules/third_party/communication/messaging/teams.py",
+     "src/core/modules/third_party/developer/http/requests.py",
+     "src/core/utils.py",
+     "src/core/verification_service.py",
+     "tests/test_verification_service.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 369,
    "token_estimate": 2952,
    "advisory_url": "",
@@ -625,11 +828,47 @@
     "renamed": 0
    },
    "corpus_py_n": 20,
-   "delta_p_minus_c": [
-    "tests/modules/test_new_modules.py"
-   ],
-   "delta_c_minus_p": [],
-   "delta_zero": false,
+   "delta_paths": {
+    "p_minus_c": [
+     "tests/modules/test_new_modules.py"
+    ],
+    "c_minus_p": [],
+    "path_set_equivalent": false
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [
+     "tests/modules/test_new_modules.py"
+    ],
+    "delta_fixed_presence": [
+     "tests/modules/test_new_modules.py"
+    ],
+    "line_ending_diff": [
+     "src/core/engine/variable_resolver.py",
+     "src/core/module_policy.py",
+     "src/core/modules/atomic/ai/model.py",
+     "src/core/modules/atomic/browser/pagination.py",
+     "src/core/modules/atomic/document/excel_write.py",
+     "src/core/modules/atomic/document/pdf_fill_form.py",
+     "src/core/modules/atomic/document/pdf_to_word.py",
+     "src/core/modules/atomic/document/word_to_pdf.py",
+     "src/core/modules/atomic/image/compress.py",
+     "src/core/modules/atomic/image/convert.py",
+     "src/core/modules/atomic/image/crop.py",
+     "src/core/modules/atomic/image/download.py",
+     "src/core/modules/atomic/image/qrcode_generate.py",
+     "src/core/modules/atomic/image/resize.py",
+     "src/core/modules/atomic/image/rotate.py",
+     "src/core/modules/atomic/image/watermark.py",
+     "src/core/modules/atomic/llm/agent.py",
+     "src/core/modules/atomic/llm/chat.py",
+     "src/core/modules/atomic/vector/connector.py",
+     "src/core/utils.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": false
+   },
    "changed_lines": 322,
    "token_estimate": 2576,
    "advisory_url": "",
@@ -672,9 +911,22 @@
     "renamed": 0
    },
    "corpus_py_n": 1,
-   "delta_p_minus_c": [],
-   "delta_c_minus_p": [],
-   "delta_zero": true,
+   "delta_paths": {
+    "p_minus_c": [],
+    "c_minus_p": [],
+    "path_set_equivalent": true
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [],
+    "delta_fixed_presence": [],
+    "line_ending_diff": [
+     "backend/open_webui/routers/tools.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": true
+   },
    "changed_lines": 28,
    "token_estimate": 224,
    "advisory_url": "",
@@ -749,23 +1001,81 @@
     "renamed": 0
    },
    "corpus_py_n": 20,
-   "delta_p_minus_c": [
-    "tests/unit/confluence/test_client.py",
-    "tests/unit/confluence/test_search.py",
-    "tests/unit/jira/test_attachments.py",
-    "tests/unit/jira/test_client.py",
-    "tests/unit/jira/test_search.py",
-    "tests/unit/servers/test_confluence_server.py",
-    "tests/unit/servers/test_dependencies.py",
-    "tests/unit/servers/test_main_server.py",
-    "tests/unit/servers/test_mcp_protocol.py",
-    "tests/unit/utils/test_oauth.py",
-    "tests/unit/utils/test_oauth_setup.py",
-    "tests/unit/utils/test_ssrf_adapter.py",
-    "tests/unit/utils/test_urls.py"
-   ],
-   "delta_c_minus_p": [],
-   "delta_zero": false,
+   "delta_paths": {
+    "p_minus_c": [
+     "tests/unit/confluence/test_client.py",
+     "tests/unit/confluence/test_search.py",
+     "tests/unit/jira/test_attachments.py",
+     "tests/unit/jira/test_client.py",
+     "tests/unit/jira/test_search.py",
+     "tests/unit/servers/test_confluence_server.py",
+     "tests/unit/servers/test_dependencies.py",
+     "tests/unit/servers/test_main_server.py",
+     "tests/unit/servers/test_mcp_protocol.py",
+     "tests/unit/utils/test_oauth.py",
+     "tests/unit/utils/test_oauth_setup.py",
+     "tests/unit/utils/test_ssrf_adapter.py",
+     "tests/unit/utils/test_urls.py"
+    ],
+    "c_minus_p": [],
+    "path_set_equivalent": false
+   },
+   "content": {
+    "delta_base_blobs": [],
+    "delta_fixed_blobs": [],
+    "delta_base_presence": [
+     "tests/unit/confluence/test_client.py",
+     "tests/unit/confluence/test_search.py",
+     "tests/unit/jira/test_attachments.py",
+     "tests/unit/jira/test_client.py",
+     "tests/unit/jira/test_search.py",
+     "tests/unit/servers/test_confluence_server.py",
+     "tests/unit/servers/test_dependencies.py",
+     "tests/unit/servers/test_main_server.py",
+     "tests/unit/servers/test_mcp_protocol.py",
+     "tests/unit/utils/test_oauth.py",
+     "tests/unit/utils/test_oauth_setup.py",
+     "tests/unit/utils/test_urls.py"
+    ],
+    "delta_fixed_presence": [
+     "tests/unit/confluence/test_client.py",
+     "tests/unit/confluence/test_search.py",
+     "tests/unit/jira/test_attachments.py",
+     "tests/unit/jira/test_client.py",
+     "tests/unit/jira/test_search.py",
+     "tests/unit/servers/test_confluence_server.py",
+     "tests/unit/servers/test_dependencies.py",
+     "tests/unit/servers/test_main_server.py",
+     "tests/unit/servers/test_mcp_protocol.py",
+     "tests/unit/utils/test_oauth.py",
+     "tests/unit/utils/test_oauth_setup.py",
+     "tests/unit/utils/test_ssrf_adapter.py",
+     "tests/unit/utils/test_urls.py"
+    ],
+    "line_ending_diff": [
+     "src/mcp_atlassian/confluence/attachments.py",
+     "src/mcp_atlassian/confluence/client.py",
+     "src/mcp_atlassian/confluence/search.py",
+     "src/mcp_atlassian/jira/attachments.py",
+     "src/mcp_atlassian/jira/client.py",
+     "src/mcp_atlassian/jira/search.py",
+     "src/mcp_atlassian/servers/confluence.py",
+     "src/mcp_atlassian/servers/dependencies.py",
+     "src/mcp_atlassian/servers/main.py",
+     "src/mcp_atlassian/utils/oauth_setup.py",
+     "src/mcp_atlassian/utils/ssl.py",
+     "src/mcp_atlassian/utils/ssrf_adapter.py",
+     "src/mcp_atlassian/utils/urls.py",
+     "tests/e2e/cloud/test_confluence_cloud_operations.py",
+     "tests/e2e/cloud/test_mcp_tools_cloud.py",
+     "tests/e2e/conftest.py",
+     "tests/e2e/test_confluence_dc_operations.py",
+     "tests/e2e/test_mcp_tools_dc.py",
+     "tests/unit/confluence/test_attachments.py"
+    ],
+    "fetch_error": [],
+    "content_equivalent": false
+   },
    "changed_lines": 1900,
    "token_estimate": 15200,
    "advisory_url": "",
