@@ -1,0 +1,371 @@
+{
+ "generated_from": null,
+ "cves": {
+  "CVE-2026-12482": {
+   "g1": {
+    "files": 2,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 1579,
+    "diff_sha256": "1832ae1d19454d7cd23066f03141a415c6c7151644d9844ea885cc03100a432d",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 709,
+    "edits": [
+     "comment in keras/src/utils/file_utils.py: # see also: file utils (in file utils)",
+     "comment in keras/src/utils/file_utils_test.py: # see also: file utils test (in file utils test)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.449
+   }
+  },
+  "CVE-2026-45019": {
+   "g1": {
+    "files": 10,
+    "added": [],
+    "deleted": [
+     "vuln/backend/chainlit/mcp.py",
+     "vuln/backend/chainlit/types.py",
+     "vuln/backend/tests/test_session.py"
+    ],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 200970,
+    "diff_sha256": "3e81a750e5855b6bd4472d3899afb09bfca94667bb17b52c0f36cc5b6315cf47",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 644,
+    "edits": [
+     "comment in backend/chainlit/config.py: # see also: config (in config)",
+     "comment in backend/chainlit/mcp.py: # see also: mcp (in mcp)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.003
+   }
+  },
+  "CVE-2026-50181": {
+   "g1": {
+    "files": 3,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 7274,
+    "diff_sha256": "5376d150c0ab2cb557e9f3172602c8b3d4974036c2557655381c15d0a755df17",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 789,
+    "edits": [
+     "comment in langroid/agent/tools/file_tools.py: # see also: file tools (in file tools)",
+     "comment in langroid/utils/system.py: # see also: system (in system)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.108
+   }
+  },
+  "CVE-2026-50558": {
+   "g1": {
+    "files": 1,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 3020,
+    "diff_sha256": "e0c8479d14c1de6f2dbe1e3dbd38e4861b68fb03f7df443ce0e28a91656c4499",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 311,
+    "edits": [
+     "comment in penelope.py: # see also: penelope (in penelope)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.102
+   }
+  },
+  "CVE-2026-53502": {
+   "g1": {
+    "files": 2,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 4808,
+    "diff_sha256": "51fdad307815b10ad181072afc3e1c9c0eed8aa7e72c4dda2e29a66f6139f6d7",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 740,
+    "edits": [
+     "comment in tests/loaders/test_file_loader.py: # see also: test file loader (in test file loader)",
+     "comment in thumbor/loaders/file_loader.py: # see also: file loader (in file loader)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.154
+   }
+  },
+  "CVE-2026-53598": {
+   "g1": {
+    "files": 3,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 9547,
+    "diff_sha256": "ac1af4bbbbfe5b4c3dda4d77fa6e20bf7d1b0f120eec09524853ae8987805bf2",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 862,
+    "edits": [
+     "comment in runtime/python/prompty/prompty/_version.py: # see also: version (in version)",
+     "comment in runtime/python/prompty/prompty/core/loader.py: # see also: loader (in loader)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.09
+   }
+  },
+  "CVE-2026-54574": {
+   "g1": {
+    "files": 3,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 14450,
+    "diff_sha256": "c9d23ab2bb360792af3a1f4499698f964d978b9445d9567826be2003aaf5d090",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 768,
+    "edits": [
+     "comment in proot_distro/commands/restore.py: # see also: restore (in restore)",
+     "comment in proot_distro/helpers/build_engine/copy_step.py: # see also: copy step (in copy step)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.053
+   }
+  },
+  "CVE-2026-54706": {
+   "g1": {
+    "files": 3,
+    "added": [
+     "vuln/cli/tests/test_cli_web_symlink.py"
+    ],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 22329,
+    "diff_sha256": "be969d61993f84c069ac839af23bc71a7607a415722d9145bb4253b590871be6",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 814,
+    "edits": [
+     "comment in cli/onionshare_cli/web/send_base_mode.py: # see also: send base mode (in send base mode)",
+     "comment in cli/onionshare_cli/web/share_mode.py: # see also: share mode (in share mode)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.036
+   }
+  },
+  "CVE-2026-54707": {
+   "g1": {
+    "files": 2,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 9380,
+    "diff_sha256": "653d075e76e245c043d12aa12955347ee12757bacafd750e8464fc58aa48937e",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 773,
+    "edits": [
+     "comment in cli/onionshare_cli/web/receive_mode.py: # see also: receive mode (in receive mode)",
+     "comment in desktop/tests/test_gui_receive.py: # see also: test gui receive (in test gui receive)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.082
+   }
+  },
+  "CVE-2026-54785": {
+   "g1": {
+    "files": 3,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 7136,
+    "diff_sha256": "42e457541ee95b8c9df5b35ca2b672877ece4da2a392b531cfaba570733aa5fe",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 624,
+    "edits": [
+     "comment in src/__init__.py: # see also: init (in init)",
+     "comment in src/mcp_server.py: # see also: mcp server (in mcp server)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.087
+   }
+  },
+  "CVE-2026-59890": {
+   "g1": {
+    "files": 3,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 5826,
+    "diff_sha256": "8e25ac7d38646543962d0e9073fb83af3d6c076cb99d7e9f39f4d6cd5ff4ea9f",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 772,
+    "edits": [
+     "comment in setuptools/command/egg_info.py: # see also: egg info (in egg info)",
+     "comment in setuptools/tests/test_manifest.py: # see also: test manifest (in test manifest)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.132
+   }
+  },
+  "CVE-2026-67424": {
+   "g1": {
+    "files": 17,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 31532,
+    "diff_sha256": "44cecb8bf440b2135af2896bd8b2f8d82cfcc940873826c324b986078e07b5ba",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 888,
+    "edits": [
+     "comment in src/core/modules/atomic/ai/vision_analyze.py: # see also: vision analyze (in vision analyze)",
+     "comment in src/core/modules/atomic/browser/proxy_rotate.py: # see also: proxy rotate (in proxy rotate)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.028
+   }
+  },
+  "CVE-2026-67425": {
+   "g1": {
+    "files": 20,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 31233,
+    "diff_sha256": "07042f4f4660f8fbc63b53561ffc2838c4b7f6fbdeef5c3d4626d997ea1a459f",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 776,
+    "edits": [
+     "comment in src/core/engine/variable_resolver.py: # see also: variable resolver (in variable resolver)",
+     "comment in src/core/module_policy.py: # see also: module policy (in module policy)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.025
+   }
+  },
+  "CVE-2026-70491": {
+   "g1": {
+    "files": 1,
+    "added": [],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 1781,
+    "diff_sha256": "74b46a397cfce41f9ebfedeb5e3c02f3b882e002dc9988fb3c6b75c417a44a42",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 367,
+    "edits": [
+     "comment in backend/open_webui/routers/tools.py: # see also: tools (in tools)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.204
+   }
+  },
+  "CVE-2026-73498": {
+   "g1": {
+    "files": 20,
+    "added": [
+     "vuln/src/mcp_atlassian/utils/ssrf_adapter.py"
+    ],
+    "deleted": [],
+    "renamed": [],
+    "binary": [],
+    "len_chars": 60091,
+    "diff_sha256": "ae3a26551014a3ed8f75ea6d34e24abe3e5dfb8685185a54f81e3dfc5b774cdf",
+    "tree": "应用后与 fixed 树逐文件哈希一致（双向集合+字节+类型）",
+    "pass": true
+   },
+   "g2": {
+    "len_chars": 828,
+    "edits": [
+     "comment in src/mcp_atlassian/confluence/attachments.py: # see also: attachments (in attachments)",
+     "comment in src/mcp_atlassian/confluence/client.py: # see also: client (in client)"
+    ],
+    "ast_equivalent": true,
+    "apply_clean": true,
+    "apply_error": "",
+    "token_ratio_proxy": 0.014
+   }
+  }
+ }
+}
