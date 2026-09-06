@@ -80,7 +80,10 @@ for label, pat, sc in [
     ('DS r2',      'cpg/ablation/seeds/v13_85_ds_r2*/results.csv','APILLMScorer'),
 ]:
     rows = load(pat)
+    assert rows, f'fail-closed: {label} 数据文件缺失'
     ps = pairs(rows, sc)
+    assert len(ps) in (74, 82), f'fail-closed: {label} 完整对 {len(ps)} 非 74/82'
+    assert len(set(ps)) == len(ps), f'fail-closed: {label} 存在重复样本'
     s_s, s_l = disc(ps, 'strict'), disc(ps, 'lenient')
     n = len(ps)
     lo, up, u1 = cp(len(s_s), n)
@@ -137,3 +140,22 @@ for tag, raws_pat in [('r1', 'cpg/ablation/seeds/v13_85_ds_r1*/results.csv'),
     tot_abst += n_abst; tot_fault += fault
     print(f'{tag}: API {len(api)} abstain {n_abst} | raw {raw_n}（缺 {missing}）空 {empty} → 故障 {fault}，真弃权 {n_abst-fault}')
 print(f'合计: abstain {tot_abst} 故障 {tot_fault} 真弃权 {tot_abst-tot_fault} = {(tot_abst-tot_fault)/tot_abst*100:.1f}%')
+
+print("\n========== 7. 前沿自身方向检验（双端作答对，strict）==========")
+for tag, pat in [('DS r1', 'cpg/ablation/seeds/v13_85_ds_r1*/results.csv'),
+                 ('DS r2', 'cpg/ablation/seeds/v13_85_ds_r2*/results.csv')]:
+    rows = load(pat)
+    assert rows, f'fail-closed: {pat} 无数据'
+    ps = pairs(rows, 'APILLMScorer')
+    assert len(ps) == 82, f'fail-closed: 完整对 {len(ps)} != 82'
+    assert len(set(ps)) == len(ps), 'fail-closed: 重复样本'
+    ans = {c: v for c, v in ps.items()
+           if v['vuln'] in ('vulnerable', 'benign') and v['fixed'] in ('vulnerable', 'benign')}
+    correct = sum(1 for v in ans.values() if v['vuln'] == 'vulnerable' and v['fixed'] == 'benign')
+    inverted = sum(1 for v in ans.values() if v['vuln'] == 'benign' and v['fixed'] == 'vulnerable')
+    n = correct + inverted
+    assert n > 0, f'fail-closed: {tag} 无方向不一致对'
+    p = sum(math.comb(n, k) for k in range(correct, n + 1)) * 0.5 ** n
+    print(f'{tag}: 双端作答 {len(ans)} 对，正确 {correct} / 反向 {inverted}，单侧精确 p={p:.6f}')
+
+print("\n[fail-closed] 全部断言通过（n∈{74,82}、无重复样本、文件存在）")

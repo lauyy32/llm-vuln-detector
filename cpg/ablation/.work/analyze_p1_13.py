@@ -89,7 +89,14 @@ def analyze(rows, label):
         u1 = 1.0 if x == n else sd(lambda pp: _ble(x, n, pp), 0.05)
         return lo, up, u1
     ci_lo, ci_up, ci_u1 = _cp(n_disc, len(pairs)) if pairs else (0.0, 0.0, 0.0)
-    p_one = None
+    # 方向检验（2026-09-06 补，真正脚本化）：双端作答对上的单侧精确二项
+    _ans2 = {c: v for c, v in pairs.items()
+             if v['vuln'] in ('vulnerable', 'benign') and v['fixed'] in ('vulnerable', 'benign')}
+    _cor = sum(1 for v in _ans2.values() if v['vuln'] == 'vulnerable' and v['fixed'] == 'benign')
+    _inv = sum(1 for v in _ans2.values() if v['vuln'] == 'benign' and v['fixed'] == 'vulnerable')
+    _nd = _cor + _inv
+    p_one = (sum(math.comb(_nd, k) for k in range(_cor, _nd + 1)) * 0.5 ** _nd) if _nd else None
+    print(f"方向检验: 双端作答 {len(_ans2)} 对，正确 {_cor} / 反向 {_inv}，单侧精确 p={p_one}")
     print(f"\n=== {label} ===")
     print(f"完整对 n={len(pairs)}  判别正确 {n_disc}（{sorted(x[-5:] for x in disc)}）")
     print(f"含弃权对 {len(partial)}  单端 answered {len(ans)}: TP={tp} FN={fn} TN={tn} FP={fp}")
