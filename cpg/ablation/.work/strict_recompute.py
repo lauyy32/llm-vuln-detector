@@ -1,0 +1,139 @@
+# -*- coding: utf-8 -*-
+"""P1-14 严格弃权口径（strict）权威复算脚本——单一事实源。
+规则：判别 = vuln 显式 vulnerable AND fixed 显式 benign（abstain 不记为任何一侧；
+与预注册 P1-13 §3 及无假良性纪律一致）。lenient（abstain→非 vuln）仅用于
+规则敏感性申报，不用于任何结论。
+用法：python cpg/ablation/.work/strict_recompute.py
+"""
+import csv, math, glob
+from collections import defaultdict, Counter
+
+INCOMPLETE = {"CVE-2026-53500", "CVE-2026-59224", "CVE-2026-70485"}
+
+def ble(x,n,p): return sum(math.comb(n,k)*p**k*(1-p)**(n-k) for k in range(0,x+1))
+def bge(x,n,p): return sum(math.comb(n,k)*p**k*(1-p)**(n-k) for k in range(x,n+1))
+def cp(x,n):
+    def sd(fn,t):
+        lo,hi=0.0,1.0
+        for _ in range(80):
+            mid=(lo+hi)/2
+            if fn(mid)>t: lo=mid
+            else: hi=mid
+        return (lo+hi)/2
+    def si(fn,t):
+        lo,hi=0.0,1.0
+        for _ in range(80):
+            mid=(lo+hi)/2
+            if fn(mid)>t: hi=mid
+            else: lo=mid
+        return (lo+hi)/2
+    lo = 0.0 if x==0 else si(lambda p:bge(x,n,p),0.025)
+    up = 1.0 if x==n else sd(lambda p:ble(x,n,p),0.025)
+    u1 = 1.0 if x==n else sd(lambda p:ble(x,n,p),0.05)
+    return lo,up,u1
+
+def load(pat):
+    rows=[]
+    for p in glob.glob(pat):
+        rows += list(csv.DictReader(open(p, encoding='utf-8')))
+    return rows
+
+def pairs(rows, scorer):
+    by = defaultdict(dict)
+    for r in rows:
+        if r['scorer'] != scorer or r['mode'] != 'code' or r['sample_id'] in INCOMPLETE:
+            continue
+        by[r['sample_id']][r['version']] = r['predicted']
+    return {c: v for c, v in by.items() if 'vuln' in v and 'fixed' in v}
+
+def disc(ps, rule):
+    out = []
+    for c, v in ps.items():
+        vv, vf = v['vuln'], v['fixed']
+        ok = (vv == 'vulnerable' and vf == 'benign') if rule == 'strict' \
+             else (vv == 'vulnerable' and vf != 'vulnerable')
+        if ok: out.append(c[-5:])
+    return sorted(out)
+
+def answered_ba(rows, scorer):
+    api = [r for r in rows if r['scorer'] == scorer and r['mode'] == 'code'
+           and r['sample_id'] not in INCOMPLETE]
+    ans = [r for r in api if r['predicted'] in ('vulnerable', 'benign')]
+    tp = sum(1 for r in ans if r['predicted'] == 'vulnerable' and r['truth'] == 'vulnerable')
+    fn = sum(1 for r in ans if r['predicted'] == 'benign' and r['truth'] == 'vulnerable')
+    tn = sum(1 for r in ans if r['predicted'] == 'benign' and r['truth'] == 'benign')
+    fp = sum(1 for r in ans if r['predicted'] == 'vulnerable' and r['truth'] == 'benign')
+    tpr = tp/(tp+fn) if tp+fn else 0
+    tnr = tn/(tn+fp) if tn+fp else 0
+    mcc = (tp*tn-fp*fn)/(math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)) or 1)
+    abst = sum(1 for r in api if r['predicted'] == 'abstain')
+    return len(api), len(ans), abst, (tpr+tnr)/2, mcc, (tp, fn, tn, fp)
+
+print("========== 1. strict/lenient 判别集 ==========")
+SETS = {}
+for label, pat, sc in [
+    ('7B v9 D1',   'cpg/ablation/seeds/v9_llm_d1/results.csv',   'LocalLLMScorer'),
+    ('7B v10 D1',  'cpg/ablation/seeds/v10_d1_7b/results.csv',   'LocalLLMScorer'),
+    ('7B v9 74',   'cpg/ablation/seeds/v9_llm_74/results.csv',   'LocalLLMScorer'),
+    ('14B v9 74',  'cpg/ablation/seeds/v9_llm_74_14b/results.csv','LocalLLMScorer'),
+    ('DS r1',      'cpg/ablation/seeds/v13_85_ds_r1*/results.csv','APILLMScorer'),
+    ('DS r2',      'cpg/ablation/seeds/v13_85_ds_r2*/results.csv','APILLMScorer'),
+]:
+    rows = load(pat)
+    ps = pairs(rows, sc)
+    s_s, s_l = disc(ps, 'strict'), disc(ps, 'lenient')
+    n = len(ps)
+    lo, up, u1 = cp(len(s_s), n)
+    SETS[label] = (s_s, s_l)
+    print(f'{label:10s} n={n} strict {len(s_s)}/{n} {s_s}')
+    print(f'{"":10s} CI[{lo*100:.1f}%,{up*100:.1f}%] 单侧上界{u1*100:.1f}% | lenient {len(s_l)}（辅助 {len(s_l)-len(s_s)}）')
+
+print("\n========== 2. 54574 跨种子行为（vuln 标记 + fixed 弃权是否复现）==========")
+for seed in ['v9_llm_d1','v10_d1_7b','v9_llm_74','v9_llm_74_14b']:
+    rows = load(f'cpg/ablation/seeds/{seed}/results.csv')
+    ps = pairs(rows, 'LocalLLMScorer')
+    v = ps.get('CVE-2026-54574', {})
+    print(f'{seed:14s} 54574: vuln={v.get("vuln")} fixed={v.get("fixed")}')
+
+print("\n========== 3. 对称 strict McNemar（前沿 vs 本地 7B v9 D1）==========")
+loc = set(SETS['7B v9 D1'][0])
+for tag in ['DS r1', 'DS r2']:
+    f = set(SETS[tag][0])
+    b = len(f - loc); c = len(loc - f); n = b + c
+    p = sum(math.comb(n, k) for k in range(b, n+1)) * 0.5**n
+    print(f'{tag}: b={b} c={c} n={n} 单侧精确 p={p:.4f}')
+
+print("\n========== 4. 规则敏感性（lenient 反事实，仅申报用）==========")
+loc_l = set(SETS['7B v9 D1'][1])
+for tag in ['DS r1', 'DS r2']:
+    f = set(SETS[tag][1])
+    b = len(f - loc_l); c = len(loc_l - f); n = b + c
+    p = sum(math.comb(n, k) for k in range(b, n+1)) * 0.5**n
+    print(f'{tag} lenient: 判别 {len(f)}/82，vs 本地 lenient b={b} c={c} p={p:.2e}')
+    print(f'   lenient 集合: {sorted(f)}')
+
+print("\n========== 5. 本地 answered-only BA/MCC ==========")
+for label, pat in [('7B v9 D1','cpg/ablation/seeds/v9_llm_d1/results.csv'),
+                   ('7B v10 D1','cpg/ablation/seeds/v10_d1_7b/results.csv')]:
+    rows = load(pat)
+    n_all, n_ans, n_ab, ba, mcc, cm = answered_ba(rows, 'LocalLLMScorer')
+    print(f'{label}: 行 {n_all} answered {n_ans} abstain {n_ab} BA={ba:.3f} MCC={mcc:+.3f} (TP{cm[0]} FN{cm[1]} TN{cm[2]} FP{cm[3]})')
+
+print("\n========== 6. 前沿弃权账目 ==========")
+tot_abst, tot_fault = 0, 0
+for tag, raws_pat in [('r1', 'cpg/ablation/seeds/v13_85_ds_r1*/results.csv'),
+                      ('r2', 'cpg/ablation/seeds/v13_85_ds_r2*/results.csv')]:
+    rows = load(raws_pat)
+    api = [r for r in rows if r['scorer'] == 'APILLMScorer' and r['mode'] == 'code']
+    n_abst = sum(1 for r in api if r['predicted'] == 'abstain')
+    raw_n, empty = 0, 0
+    for rp in glob.glob(raws_pat.replace('results.csv', 'raw_api_llm_responses.jsonl')):
+        for line in open(rp, encoding='utf-8'):
+            raw_n += 1
+            if not __import__('json').loads(line)['raw_response'].strip():
+                empty += 1
+    missing = len(api) - raw_n
+    fault = missing + empty
+    tot_abst += n_abst; tot_fault += fault
+    print(f'{tag}: API {len(api)} abstain {n_abst} | raw {raw_n}（缺 {missing}）空 {empty} → 故障 {fault}，真弃权 {n_abst-fault}')
+print(f'合计: abstain {tot_abst} 故障 {tot_fault} 真弃权 {tot_abst-tot_fault} = {(tot_abst-tot_fault)/tot_abst*100:.1f}%')
