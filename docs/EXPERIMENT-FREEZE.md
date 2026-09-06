@@ -16,7 +16,7 @@
 | 09-07 | §1 复算链 + §4 决策（API 臂）完成 |
 | 09-07~08 | §2 v4 候选包（real/placebo）+ §3 门禁测试全绿 |
 | 09-08 | **师兄盲标包发出（关键路径，先行）** |
-| 09-09 | 实验前最终验收（外部，仅 real/placebo/shuffled 候选包） |
+| 09-09 | **Gate A 验收**（外部：G0-G4 对三臂全绿 + 协议冻结 + smoke；通过后仅跑 real/placebo/shuffled） |
 | 09-09~12 | 标注窗口期：跑 real/placebo/shuffled 三臂（与 partial 标签无涉） |
 | 标注完成+仲裁+纳入名单冻结后 | **partial 臂才跑批**（构造者/仲裁者此前不见模型结果） |
 | 09-13~14 | v4 分析 + 聚类敏感性 + P1-16 §6 成稿 |
@@ -31,7 +31,8 @@
 - [x] claims.json 补全 data_files、unknown claim→fail、行级唯一键断言
 - [x] **三类负向测试**（verify_claims --self-test，T1/T2/T3 实测全 PASS，2026-09-06）：
   ①篡改 expect→FAIL；②删/复制原始记录→FAIL；③篡改一行预测→相应统计值变化
-- [ ] 干净克隆一条命令复算（fresh clone → verify_claims PASS）
+- [x] 干净克隆一条命令复算（2026-09-06 codex 在全新克隆 HEAD fe20a38 上独立执行验证：local 7B 2/82、14B 0/74、r1/r2 7/82、b=6/c=1 p=0.0625、方向 0.089844/0.171875、abstain 148/159、VERIFY_CLAIMS: PASS）
+- 复现命令：`git clone <url> && cd <dir> && python cpg/ablation/.work/verify_claims.py`（须已装 Python ≥3.9；统计脚本纯标准库，无第三方依赖）
 
 ## 2. v4 实验对象真实性（G0-G4 实现）
 
@@ -105,7 +106,23 @@
 - [ ] 导师确认：注册（全价）+ 差旅（里士满 2027-03）+ 学校认定
 - [ ] .git.broken 物理删除确认 + 工作区垃圾目录清理
 
-## 完成判据
+## 完成判据（2026-09-06 拆分 Gate A/B，消除"§3 含 partial 标注 vs 排期先跑三臂"的冲突）
 
-§1-§6 全 [x] 且实验前最终验收通过 = **冻结**。此后只许跑批、分析、写论文，
-门禁层不再新增条目（新发现的问题进 issue  backlog，投稿后再议）。
+**Gate A（三臂跑批前）** —— 通过后只运行 real/placebo/shuffled：
+- G0-G4 门禁对三臂候选包全绿（完整 real diff + apply-clean placebo + 残余漏洞
+  分层 oracle + token 比 [0.8,1.25]）；
+- prompt/diff/digest/日志与统计协议冻结；端到端 smoke 通过；
+- 外部验收通过。
+
+**Gate B（partial 跑批前）** —— 通过后才运行 partial 臂：
+- partial 基于完整 real diff 重构（14 例构造表 + 45019 定夺）；
+- oracle 分层完成（T1 可执行约 3 例/T2 断言/T3 人工+双人确认）；
+- 四臂混合盲标 + 仲裁 + 纳入名单冻结；构造者此前未查看 partial 模型结果；
+- partial 的 prompt/token/apply 门禁通过。
+
+**冻结** = Gate A 与 Gate B 各自通过后，相应臂进入跑批；两臂结果 + 分析完成后
+进入论文层。此后只许跑批、分析、写论文，门禁层不再新增条目
+（新发现的问题进 backlog，投稿后再议）。
+
+> 注：**"干净克隆复算通过"只解锁 G0-G4 实现，不等于可申请最终验收**——
+> 验收对象是候选包与门禁结果，不是复算脚本。
