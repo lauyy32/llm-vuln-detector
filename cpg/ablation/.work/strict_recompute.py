@@ -32,7 +32,11 @@ def cp(x,n):
     u1 = 1.0 if x==n else sd(lambda p:ble(x,n,p),0.05)
     return lo,up,u1
 
+import os as _os
+_SEED_ROOT = _os.environ.get('ST_SEEDS', 'cpg/ablation/seeds')
+
 def load(pat):
+    pat = pat.replace('cpg/ablation/seeds', _SEED_ROOT, 1)
     rows=[]
     for p in glob.glob(pat):
         rows += list(csv.DictReader(open(p, encoding='utf-8')))

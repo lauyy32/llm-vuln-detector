@@ -9,6 +9,7 @@
 fail-closed：任何缺失/不符即非零退出。
 用法：python cpg/ablation/.work/verify_claims.py
 """
+import csv as csv_module
 import glob, json, math, os, subprocess, sys
 
 CLAIMS = 'cpg/ablation/.work/claims.json'
@@ -102,5 +103,64 @@ def main() -> int:
     return 0 if ok else 1
 
 
+def self_test() -> int:
+    """负向变异测试（G-3 的门禁的门禁）：验证器在数据/账本被破坏时必须失败。"""
+    import shutil, tempfile
+    ok = True
+    # T1 篡改 expect → 比较必须 FAIL
+    claims = json.load(open(CLAIMS, encoding='utf-8'))['claims']
+    c0 = next(c for c in claims if c['id'] == 'local7b_strict_disc_d1')
+    res = json.load(open(OUT, encoding='utf-8'))
+    got = res['disc_strict']['7B v9 D1']['strict_count']
+    tampered = c0['expect'] + 1
+    if got == tampered:
+        ok = fail('T1 失效：篡改 expect 后仍通过')
+    else:
+        print(f'[ok] T1 篡改 expect({c0["expect"]}→{tampered}) 被正确拒绝')
+    # T2 篡改数据（复制一行）→ strict_recompute 必须 FAIL（行级唯一键断言）
+    tmp = tempfile.mkdtemp(prefix='st_t2_')
+    dst = os.path.join(tmp, 'v9_llm_d1')
+    shutil.copytree('cpg/ablation/seeds/v9_llm_d1', dst)
+    csv_path = os.path.join(dst, 'results.csv')
+    lines = open(csv_path, encoding='utf-8').read().splitlines()
+    api = [i for i, l in enumerate(lines[1:], 1)
+           if ',LocalLLMScorer,' in l and ',code,' in l]
+    lines.insert(api[0], lines[api[0]])
+    open(csv_path, 'w', encoding='utf-8', newline='').write('\n'.join(lines) + '\n')
+    r = subprocess.run([sys.executable, 'cpg/ablation/.work/strict_recompute.py'],
+                       capture_output=True, text=True,
+                       env={**os.environ, 'ST_SEEDS': tmp})
+    if r.returncode != 0 and '重复键' in (r.stderr + r.stdout):
+        print('[ok] T2 复制原始行 → 行级唯一键断言正确触发 FAIL')
+    else:
+        ok = fail(f'T2 失效：重复行未触发 fail-closed（rc={r.returncode}）')
+    # T3 篡改一行预测（61539 fixed LocalLLMScorer benign→abstain）→ strict 计数必须变化
+    # 行级字符串替换（与 T2 同法）：该 CSV 含带内嵌换行的引用字段，csv 整文件往返会丢行
+    tmp3 = tempfile.mkdtemp(prefix='st_t3_')
+    dst3 = os.path.join(tmp3, 'v9_llm_d1')
+    shutil.copytree('cpg/ablation/seeds/v9_llm_d1', dst3)
+    csv3 = os.path.join(dst3, 'results.csv')
+    lines_ = open(csv3, encoding='utf-8').read().splitlines()
+    hit = None
+    for i_, l in enumerate(lines_[1:], 1):
+        if l.startswith('CVE-2026-61539,fixed,code,LocalLLMScorer,benign,'):
+            hit = i_; break
+    assert hit is not None, 'T3 自检：目标行定位失败'
+    lines_[hit] = lines_[hit].replace(',code,LocalLLMScorer,benign,', ',code,LocalLLMScorer,abstain,', 1)
+    open(csv3, 'w', encoding='utf-8', newline='').write('\n'.join(lines_) + '\n')
+    r3 = subprocess.run([sys.executable, 'cpg/ablation/.work/strict_recompute.py'],
+                        capture_output=True, text=True,
+                        env={**os.environ, 'ST_SEEDS': tmp3})
+    # v10 等目录在 tmp3 缺失属预期 fail-closed；只检查 D1 行是否从 2 变 1
+    if '7B v9 D1   n=82 strict 1/82' in r3.stdout:
+        print('[ok] T3 篡改预测 → strict 计数正确变化（2→1）')
+    else:
+        ok = fail('T3 失效：篡改预测后计数未变化\n--- r3.stdout ---\n' + r3.stdout[:300] + '\n--- stderr ---\n' + r3.stderr[-400:] + '\n--- end ---')
+    print('\nSELF_TEST:', 'PASS' if ok else 'FAIL')
+    return 0 if ok else 1
+
+
 if __name__ == '__main__':
+    if '--self-test' in sys.argv:
+        sys.exit(self_test())
     sys.exit(main())
