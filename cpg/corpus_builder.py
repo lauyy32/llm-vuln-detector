@@ -267,13 +267,16 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
         return []
     targets = changed[:20]
     extracted = []
-    missing_vuln: list[str] = []   # vuln（fix^）侧缺失的 changed 文件——重构式修复信号
+    missing_vuln: list = []    # vuln（fix^）侧缺失——重构式修复信号
+    missing_fixed: list = []   # fixed（fix_commit）侧缺失——2026-09-07 修复：原静默跳过
     for f in targets:
         fixed_path = pair_dir / "fixed" / f
         vuln_path = pair_dir / "vuln" / f
         for commit, dst in ((fix_commit, fixed_path), (f"{fix_commit}^", vuln_path)):
             dst.parent.mkdir(parents=True, exist_ok=True)
             cp = run(["git", "checkout", commit, "--", f], cwd=str(repo_dir), timeout=90)
+            is_fixed = (commit == fix_commit)
+            bucket = missing_fixed if is_fixed else missing_vuln
             if cp.returncode == 0:
                 # 把 checkout 出的文件移到目标位置
                 src = repo_dir / f
@@ -282,28 +285,30 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
                     run(["git", "checkout", "HEAD", "--", f], cwd=str(repo_dir), timeout=60)  # 复位
                     extracted.append(str(dst.relative_to(ROOT)))
                 else:
-                    missing_vuln.append(f)
-            elif commit == f"{fix_commit}^":
-                # vuln 侧该文件在 fix^ 不存在——修复可能是重构式（文件移动/新增），
-                # 漏洞代码可能位于 fix^ 的其他路径，提取的 vuln 侧不完整
-                missing_vuln.append(f)
-    # 双侧完整性校验（55419 教训，2026-08-28 升级为阻断）：
-    # 修复 diff 改动文件中，vuln 侧缺失率 ≥30% 视为重构式修复（文件移动/拆分），
-    # 此时"同名文件 checkout"策略漏掉 vuln 侧漏洞代码，truth 标签不可靠——
-    # **直接返回空，不写入 meta.json，阻止污染样本入库**。
+                    # checkout 返回 0 但文件不在工作区——记对应侧，不再静默
+                    bucket.append(f"{f} [checkout-ok-but-missing]")
+            else:
+                # fail-closed：任一侧 checkout 失败都记录（含 stderr），不再静默跳过
+                err = (cp.stderr or "").strip()[:120] or "(no stderr)"
+                bucket.append(f"{f} [rc={cp.returncode} {err}]")
+    # 双侧完整性校验（55419 教训 + 2026-09-07 fixed 侧静默跳过修复）：
+    # 修复 diff 改动文件中，任一侧缺失率 ≥30% 视为提取不完整（重构式修复 / checkout 失败），
+    # truth 标签不可靠——直接返回空，不写入 meta.json，阻止污染样本入库。
     # 少量缺失（<30%）允许但记录信号供人工核查。
-    if missing_vuln and len(targets) > 0:
-        ratio = len(missing_vuln) / len(targets)
+    missing = len(missing_vuln) + len(missing_fixed)
+    if missing and len(targets) > 0:
+        ratio = missing / len(targets)
         sig_path = pair_dir / "extraction_signal.json"
         if ratio >= 0.3:
             sig_path.write_text(json.dumps({
                 "vuln_side_missing": missing_vuln,
+                "fixed_side_missing": missing_fixed,
                 "missing_ratio": round(ratio, 2),
-                "note": "重构式修复或文件移动：vuln 侧漏洞代码可能未提取，truth 不可靠，已阻断入库",
+                "note": "任一侧源码缺失（重构式修复或 checkout 失败）：truth 不可靠，已阻断入库",
                 "blocked": True,
             }, ensure_ascii=False, indent=2), encoding="utf-8")
-            print(f"    [BLOCKED] 重构式修复，vuln 侧缺失 {len(missing_vuln)}/{len(targets)} "
-                  f"文件: {missing_vuln[:4]} —— 阻断入库")
+            print(f"    [BLOCKED] 任一侧缺失 {missing}/{len(targets)} "
+                  f"(vuln {len(missing_vuln)}/fixed {len(missing_fixed)}) 文件 —— 阻断入库")
             # 清理半成品，避免 index 时误收
             import shutil
             if pair_dir.exists():
@@ -311,11 +316,13 @@ def clone_and_extract(repo_slug: str, fix_commit: str, pair_dir: Path):
             return []
         sig_path.write_text(json.dumps({
             "vuln_side_missing": missing_vuln,
+            "fixed_side_missing": missing_fixed,
             "missing_ratio": round(ratio, 2),
-            "note": "少量 vuln 侧缺失，可接受，人工核查",
+            "note": "少量任一侧缺失，可接受，人工核查",
             "blocked": False,
         }, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"    [小错位] vuln 侧缺失 {len(missing_vuln)}/{len(targets)} 文件: {missing_vuln[:4]}")
+        print(f"    [小错位] 任一侧缺失 {missing}/{len(targets)} "
+              f"(vuln {len(missing_vuln)}/fixed {len(missing_fixed)}) 文件")
     return extracted
 
 
