@@ -1,0 +1,24 @@
+{
+ "version": "v2",
+ "taint_total": 0,
+ "prompts": {
+  "vuln": {
+   "prompt_sha256": "3612e28f21af97764037c11bc15f7f876112d317aaddc82195b386861e19a921",
+   "prompt_chars": 8332,
+   "taint_rows": 0,
+   "has_llama3_tool_parser": true,
+   "has_utils": true,
+   "code_text_chars": 8014,
+   "cpg_slices_chars": 64
+  },
+  "fixed": {
+   "prompt_sha256": "c864bd7fa3f52334a5920785b95d41a8b830e52dddc4b1f5146c56febba5f59a",
+   "prompt_chars": 8332,
+   "taint_rows": 0,
+   "has_llama3_tool_parser": true,
+   "has_utils": false,
+   "code_text_chars": 8014,
+   "cpg_slices_chars": 64
+  }
+ }
+}
