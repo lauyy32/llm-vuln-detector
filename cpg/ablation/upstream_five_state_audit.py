@@ -26,6 +26,7 @@ CORPUS = ROOT / "cpg" / "corpus_pairs"
 sys.path.insert(0, str(ROOT))
 from cpg.ablation.upstream_manifest import (  # noqa: E402
     curl_json, api_url, read_meta, corpus_py_files,
+    curl_raw, raw_url, norm_eol,
 )
 
 
@@ -73,6 +74,9 @@ def audit_one(cve, cache_dir):
 
     mismatches = []
     nonpy = []
+    content_mismatches = []
+    parents = [p["sha"] for p in d.get("parents", [])]
+    parent_sha = parents[0] if len(parents) == 1 else None
     for f in d["files"]:
         fn = f["filename"]
         st = f.get("status", "")
@@ -98,14 +102,30 @@ def audit_one(cve, cache_dir):
             if exp_v is False or not f_ex:
                 mismatches.append((fn, st, f"vuln_prev={exp_v} fixed={f_ex}"))
             continue
+        elif st == "copied":
+            # copied：原路径保留、新路径在 fix 出现（罕见，单独记录不计 mismatch）
+            nonpy.append((fn, "copied"))
+            continue
         else:
-            continue  # copied 等罕见态单独记录，不计 mismatch
+            continue  # 未知态单独记录
         if v_ex != exp_v or f_ex != exp_f:
             mismatches.append((fn, st, f"vuln={v_ex}(exp {exp_v}) fixed={f_ex}(exp {exp_f})"))
+            continue
+        # 内容核验（Codex 门禁 1）：modified 且两侧都存在时，比对 blob 内容（归一化行尾）
+        if st == "modified" and v_ex and f_ex and parent_sha:
+            v_bytes = (CORPUS / cve / "vuln" / fn).read_bytes()
+            f_bytes = (CORPUS / cve / "fixed" / fn).read_bytes()
+            p_raw = curl_raw(raw_url(repo, parent_sha, fn))
+            x_raw = curl_raw(raw_url(repo, sha, fn))
+            if p_raw["status"] == 200 and norm_eol(v_bytes) != norm_eol(p_raw["body"]):
+                content_mismatches.append((fn, "vuln-blob≠upstream-parent"))
+            if x_raw["status"] == 200 and norm_eol(f_bytes) != norm_eol(x_raw["body"]):
+                content_mismatches.append((fn, "fixed-blob≠upstream-fix"))
 
-    status = "OK" if not mismatches else "CORPUS_ERROR"
+    status = "OK" if (not mismatches and not content_mismatches) else "CORPUS_ERROR"
     return {"status": status, "repo": repo, "commit": sha,
-            "mismatches": mismatches, "nonpy": nonpy}
+            "mismatches": mismatches, "content_mismatches": content_mismatches,
+            "nonpy": nonpy}
 
 
 def main():
