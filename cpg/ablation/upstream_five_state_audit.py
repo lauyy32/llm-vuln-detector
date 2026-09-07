@@ -169,12 +169,16 @@ def audit_one(cve, cache_dir):
 
 
 def main():
+    global CORPUS
     ap = argparse.ArgumentParser()
     ap.add_argument("--cves", nargs="+")
     ap.add_argument("--out", default="cpg/ablation/.work/upstream_five_state.json")
+    ap.add_argument("--corpus", default=str(ROOT / "cpg" / "corpus_pairs"),
+                    help="语料目录（默认 corpus_pairs；验证 corpus-v2 时传 cpg/corpus-v2）")
     ap.add_argument("--dataset", default="union",
                     help="union | main74 | d1_85（默认 union=74∪85）")
     args = ap.parse_args()
+    CORPUS = Path(args.corpus)
 
     if args.cves:
         cves = set(args.cves)
