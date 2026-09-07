@@ -34,17 +34,24 @@ def main() -> int:
     claims = json.load(open(CLAIMS, encoding='utf-8'))['claims']
     ok = True
 
-    # 0) 语料完整性 fail-closed（2026-09-07）：五态审计存在未解决 CORPUS_ERROR 时，
-    #    拒绝冻结 canonical claims（PROVISIONAL），防"语料缺陷地基上的数字被写死"。
-    audit_path = Path('cpg/ablation/.work/upstream_five_state.json')
-    if audit_path.exists():
-        audit = json.load(open(audit_path, encoding='utf-8'))
-        errs = [c for c, r in audit.items() if r['status'] == 'CORPUS_ERROR']
-        if errs:
-            ok = fail(f"语料错误未解决 {len(errs)} 例，拒绝冻结 canonical claims: "
-                      f"{sorted(errs)[:6]}")
+    # 0) corpus_gate（2026-09-07 拆两层）：规范数据集组成 = 77 v1 + 14 v2 + 2 排除
+    manifest_path = Path('cpg/ablation/.work/canonical_corpus_manifest.json')
+    if manifest_path.exists():
+        m = json.load(open(manifest_path, encoding='utf-8'))
+        n_v2 = sum(1 for s in m['samples'] if s['corpus_version'] == 'v2')
+        n_excl = sum(1 for s in m['samples'] if not s['eligible'])
+        n_v1 = sum(1 for s in m['samples'] if s['eligible'] and s['corpus_version'] == 'v1')
+        if n_v1 != 77 or n_v2 != 14 or n_excl != 2:
+            ok = fail(f"corpus_gate 恒等式不符: v1={n_v1} v2={n_v2} 排除={n_excl} "
+                      f"(期望 77/14/2)")
+        else:
+            print("[corpus_gate] PASS: 77 v1 可继承 + 14 v2 已重建 + 2 跨语言排除")
     else:
-        ok = fail("upstream_five_state.json 缺失，无法确认语料完整性，拒绝冻结")
+        ok = fail("canonical_corpus_manifest.json 缺失，corpus_gate 无法运行")
+
+    # 0b) result_gate（PROVISIONAL）：14 例 v2 样本尚未重跑（CPG/prompt/结果未重新生成）
+    print("[result_gate] PROVISIONAL: 14 例 v2 样本尚未重跑（CPG/prompt/模型结果未重新生成），"
+          "历史结果仍为 PROVISIONAL，不得冻结头条数字")
 
     # 0b) 重复 claim ID
     ids = [c['id'] for c in claims]

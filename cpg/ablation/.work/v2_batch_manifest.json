@@ -1,0 +1,91 @@
+{
+ "generated_at": "2026-09-07",
+ "generator": "rebuild_pair.py (from-zero atomic)",
+ "samples": [
+  {
+   "sample_id": "CVE-2026-10692",
+   "fix_commit": "25bc02fac74051ddae15ce79e952f00211b1ea6b",
+   "parent_commit": "c45e9396f8ddc0054fd2619809136c75864ad126",
+   "n_projection_files": 12
+  },
+  {
+   "sample_id": "CVE-2026-45019",
+   "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+   "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+   "n_projection_files": 10
+  },
+  {
+   "sample_id": "CVE-2026-53500",
+   "fix_commit": "68876715350c6c8f49c324e5515e64908830aed7",
+   "parent_commit": "8b6250998baaf807d7a912e2e23dc25248d64f16",
+   "n_projection_files": 6
+  },
+  {
+   "sample_id": "CVE-2026-53503",
+   "fix_commit": "447e192e3fb92e64c12e5354a56a4a7133f69d73",
+   "parent_commit": "2c716119de986cfc68c7071af52a98187e006023",
+   "n_projection_files": 2
+  },
+  {
+   "sample_id": "CVE-2026-54338",
+   "fix_commit": "d6dc595f84b7509969686da31d87d6d69e7fce0a",
+   "parent_commit": "808cb08df195dd48f96e85356197500d6468e064",
+   "n_projection_files": 3
+  },
+  {
+   "sample_id": "CVE-2026-54569",
+   "fix_commit": "a24d65e99a17ac43c5374ed9f0a60d0fe60d2f74",
+   "parent_commit": "3195f890fe591c0e962294edc013f77826209c5c",
+   "n_projection_files": 5
+  },
+  {
+   "sample_id": "CVE-2026-54770",
+   "fix_commit": "ff89560643fb252751b4db8806a283b5377f1f07",
+   "parent_commit": "54c1133c79e48940776a272f4500530e1cc3232a",
+   "n_projection_files": 5
+  },
+  {
+   "sample_id": "CVE-2026-59224",
+   "fix_commit": "5f3a628a8d291bb5d33e1a0b0c89fb62a2927934",
+   "parent_commit": "8b35ce924b120ac7c6eec0eb6119243f23c6202b",
+   "n_projection_files": 1
+  },
+  {
+   "sample_id": "CVE-2026-61539",
+   "fix_commit": "1b3d220f342ce68d34cec4586d9409d457dadc42",
+   "parent_commit": "4cefcaa1e63d7e29d26bcd4be96cb267da113871",
+   "n_projection_files": 4
+  },
+  {
+   "sample_id": "CVE-2026-67422",
+   "fix_commit": "c68498598d7b13011bb4571350b6e3612a4ce44b",
+   "parent_commit": "6d0097b85a52468e7cd8eaceaa192ff3348c41e0",
+   "n_projection_files": 5
+  },
+  {
+   "sample_id": "CVE-2026-67425",
+   "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+   "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+   "n_projection_files": 21
+  },
+  {
+   "sample_id": "CVE-2026-69247",
+   "fix_commit": "53fccd93413a8d7f07d6d8999681f27b75cffa3f",
+   "parent_commit": "d472f978470fbefa521b86d98b2ecccbbb4d1dd8",
+   "n_projection_files": 3
+  },
+  {
+   "sample_id": "CVE-2026-70485",
+   "fix_commit": "1717b493d83c86afa82aa8bc50139250852dd2f3",
+   "parent_commit": "5c505c1119fec6170c1bc092ed162f86262a887e",
+   "n_projection_files": 1
+  },
+  {
+   "sample_id": "CVE-2026-73498",
+   "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+   "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+   "n_projection_files": 33
+  }
+ ],
+ "total_sha256": "836d9984968de09f717b57323e6c0433e34a5a5d8f6176b9347d8f060b9695d0"
+}

@@ -8,6 +8,7 @@
 用法：python cpg/ablation/zero_diff_check.py [--corpus cpg/corpus_pairs]
 """
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -36,11 +37,48 @@ def zero_diff_pairs(corpus: Path) -> list:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", default=str(ROOT / "cpg" / "corpus_pairs"))
+    ap.add_argument("--dataset", default="union",
+                    help="union | main74 | d1_85（用于与零差异对求交）")
     args = ap.parse_args()
+
+    # 数据集成员（求交范围）
+    def load(f):
+        out = set()
+        for l in open(f, encoding="utf-8"):
+            l = l.strip()
+            if l:
+                try:
+                    out.add(json.loads(l)["cve_id"])
+                except Exception:
+                    pass
+        return out
+
+    d74 = load(ROOT / "cpg" / "dataset.jsonl")
+    d85 = load(ROOT / "cpg" / "dataset_d1.jsonl")
+    if args.dataset == "main74":
+        members = d74
+    elif args.dataset == "d1_85":
+        members = d85
+    else:
+        members = d74 | d85
+
     pairs = zero_diff_pairs(Path(args.corpus))
+    # 与数据集成员求交（磁盘残留不计入门禁）
+    in_dataset = [(c, n) for c, n in pairs if c in members]
+    residual = [(c, n) for c, n in pairs if c not in members]
+
     print(f"零差异对（vuln/fixed .py 字节全同）: {len(pairs)} 例")
-    for cve, n in pairs:
-        print(f"  {cve} ({n} 文件)")
+    for c, n in pairs:
+        mark = " [数据集内]" if c in members else " [磁盘残留]"
+        print(f"  {c} ({n} 文件){mark}")
+    if residual:
+        print(f"\n磁盘残留（不在数据集，不触发门禁）: {len(residual)} 例")
+    # 门禁：数据集内零差异对非空 → 退出非零（fail-closed）
+    if in_dataset:
+        print(f"\n[GATE FAIL] 数据集内零差异对 {len(in_dataset)} 例，须排除: "
+              f"{[c for c, _ in in_dataset]}")
+        return 1
+    print("\n[GATE PASS] 数据集内零差异对 0 例")
     return 0
 
 
