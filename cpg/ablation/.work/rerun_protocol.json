@@ -1,0 +1,51 @@
+{
+ "protocol_version": "1",
+ "frozen_at": "2026-09-07",
+ "git_head": "235f55005181d250ea976e56e5f427a8db1bdb4c",
+ "sample": "CVE-2026-61539",
+ "corpus": {
+  "v1_path": "cpg/corpus_pairs/CVE-2026-61539",
+  "v2_path": "cpg/corpus-v2/CVE-2026-61539",
+  "note": "v1 为历史损坏快照(fixed 缺 llama3_tool_parser.py 等 3 文件 + vuln 缺 utils.py)，v2 为 rebuild_pair 从上游 parent/fix 重建"
+ },
+ "cpg": {
+  "tool": "CodeQL",
+  "tool_version": "以 HEAD 的 cpg/ablation/pipeline.py + codeql-queries 为准",
+  "command": "见 cpg/ablation/pipeline.py（ast/cfg/dfg/taint 四查询）"
+ },
+ "prompt": {
+  "template": "cpg/ablation/scorers.py LocalLLMScorer._build_prompt（HEAD 冻结）",
+  "truncation": "code_text[:8000] + cpg_slices[:12000]"
+ },
+ "model": {
+  "name": "qwen2.5-coder:7b",
+  "temperature": 0,
+  "seed": "None",
+  "digest": "以 ollama 实际返回为准，跑前记录"
+ },
+ "sides": [
+  "vuln",
+  "fixed"
+ ],
+ "same_env_v1_v2": true,
+ "note_same_env": "v1 与 v2 在同一冻结环境同期重跑，不以历史 v1 结果 vs 今日 v2 结果对比（避免运行时/CPG/prompt 漂移混入）",
+ "output": {
+  "dir": "cpg/ablation/.work/rerun_61539/",
+  "do_not_overwrite_history": true,
+  "record_layers": [
+   "source",
+   "cpg",
+   "prompt",
+   "prediction"
+  ]
+ },
+ "steps": [
+  "1 分别从 v1/v2 生成两侧 CPG",
+  "2 生成 v1/v2 完整 prompt 落盘",
+  "3 保存 source/cpg/prompt SHA-256",
+  "4 检查安全关键文件(llama3_tool_parser.py/utils.py)及修改区域是否进入 prompt",
+  "5 看模型输出前完成 prompt 验收",
+  "6 同环境跑 v1 与 v2 两侧",
+  "7 报告 source→cpg→prompt→prediction 四层变化"
+ ]
+}
