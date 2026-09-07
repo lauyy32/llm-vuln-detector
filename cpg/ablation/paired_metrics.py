@@ -250,7 +250,7 @@ def evaluate(bundle: dict, exclude: set = frozenset()) -> list[dict]:
         # strict 三分类（Codex P0-3）：clean = fixed 端显式 benign；abstain-assisted =
         # fixed 端显式 abstain（lenient 下被当"非 vuln"计为成功，须分开，不能混称判别成功）
         raw_preds = raw.get(name, {})
-        clean_ids, abstain_ids = [], []
+        clean_ids, abstain_ids, invert_ids = [], [], []
         for cve in cves:
             pv = raw_preds.get((cve, "vuln"))
             pf = raw_preds.get((cve, "fixed"))
@@ -258,8 +258,17 @@ def evaluate(bundle: dict, exclude: set = frozenset()) -> list[dict]:
                 clean_ids.append(cve)
             elif pv == VULN and pf == "abstain":
                 abstain_ids.append(cve)
+            elif pv == "benign" and pf == VULN:
+                invert_ids.append(cve)
+        # strict 口径独立 McNemar（discordant = clean + strict-inverted）
+        n_disc_strict = len(clean_ids) + len(invert_ids)
+        sp1 = binom_sf(len(clean_ids), n_disc_strict)
+        sp2 = (min(1.0, 2 * min(sp1, 1 - binom_sf(len(clean_ids) + 1, n_disc_strict)))
+               if n_disc_strict else 1.0)
         rows.append({"scorer": name, **c, **m, "paired": pm,
-                     "strict": {"clean": clean_ids, "abstain_assisted": abstain_ids}})
+                     "strict": {"clean": clean_ids, "abstain_assisted": abstain_ids,
+                                "inverted": invert_ids, "n_discordant": n_disc_strict,
+                                "p_one_sided": sp1, "p_two_sided": sp2}})
     return rows
 
 
@@ -327,7 +336,8 @@ def render(rows: list[dict], markdown: bool) -> str:
                 f"判别率={p['discrimination_rate']:.3f} p单侧={p['p_value_exact']:.4f} p双侧={p['p_two_sided']:.4f}"
             )
             out.append(
-                f"    strict: clean={len(clean)} {clean} | abstain-assisted={len(abstain)} {abstain}"
+                f"    strict: clean={len(clean)} {clean} | abstain-assisted={len(abstain)} {abstain} "
+                f"| strict p单侧={st.get('p_one_sided', 0):.4f} p双侧={st.get('p_two_sided', 0):.4f}"
             )
     return "\n".join(out)
 
@@ -385,7 +395,9 @@ def main() -> None:
         print(f"[机器排除] 共 {len(exclude)} 例: {sorted(exclude)}")
 
     rows = evaluate(bundle, exclude)
-    print(f"== {header} | {len(bundle['truth'])} 版本 / {len(bundle['truth']) // 2} CVE\n")
+    n_versions = sum(1 for k in bundle["truth"] if k[0] not in exclude)
+    print(f"== {header} | {n_versions} 版本 / {n_versions // 2} CVE"
+          f"{'（已排除 ' + str(len(exclude)) + ' 例）' if exclude else ''}\n")
     print(render(rows, args.markdown))
 
     violations = verify_stat_contract(rows)

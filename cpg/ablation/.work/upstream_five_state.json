@@ -1,0 +1,1581 @@
+{
+ "CVE-2026-10692": {
+  "status": "CORPUS_ERROR",
+  "repo": "johnhuang316/code-index-mcp",
+  "commit": "25bc02fac74051ddae15ce79e952f00211b1ea6b",
+  "mismatches": [
+   [
+    "src/code_index_mcp/search/ag.py",
+    "modified",
+    "vuln=False(exp True) fixed=True(exp True)"
+   ],
+   [
+    "src/code_index_mcp/search/ugrep.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    ".gitignore",
+    "modified"
+   ],
+   [
+    "README.md",
+    "modified"
+   ],
+   [
+    "README_ja.md",
+    "modified"
+   ],
+   [
+    "README_ko.md",
+    "modified"
+   ],
+   [
+    "README_zh.md",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-12482": {
+  "status": "OK",
+  "repo": "keras-team/keras",
+  "commit": "9867df45c456dd1077a6243bb56219f66e288150",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-13769": {
+  "status": "OK",
+  "repo": "aws/aws-cli",
+  "commit": "68811b5ad5cd74d06e944e073ee17bf889babf13",
+  "mismatches": [],
+  "nonpy": [
+   [
+    ".changes/next-release/bugfix-iam-84710.json",
+    "added"
+   ]
+  ]
+ },
+ "CVE-2026-16584": {
+  "status": "OK",
+  "repo": "awslabs/mcp",
+  "commit": "ab1bbebc097d674c1cdd4bd75a8f313be18473bf",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "src/aws-api-mcp-server/CHANGELOG.md",
+    "modified"
+   ],
+   [
+    "src/aws-api-mcp-server/DO_NOT_RELEASE",
+    "removed"
+   ],
+   [
+    "src/aws-api-mcp-server/pyproject.toml",
+    "modified"
+   ],
+   [
+    "src/aws-api-mcp-server/uv.lock",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-16796": {
+  "status": "OK",
+  "repo": "aws/bedrock-agentcore-sdk-python",
+  "commit": "3c4b4ee6b8730e6313a82c743ac37dbcc1c21cdb",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-45019": {
+  "status": "CORPUS_ERROR",
+  "repo": "Chainlit/chainlit",
+  "commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+  "mismatches": [
+   [
+    "backend/chainlit/mcp.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "backend/chainlit/types.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "backend/tests/test_session.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    "CHANGELOG.md",
+    "modified"
+   ],
+   [
+    "docs/security-advisory-2026-mcp.md",
+    "added"
+   ],
+   [
+    "frontend/src/api/index.ts",
+    "modified"
+   ],
+   [
+    "frontend/src/components/chat/MessageComposer/Mcp/AddForm.tsx",
+    "modified"
+   ],
+   [
+    "frontend/src/components/chat/MessageComposer/Mcp/List.tsx",
+    "modified"
+   ],
+   [
+    "frontend/src/components/chat/MessageComposer/Mcp/index.tsx",
+    "modified"
+   ],
+   [
+    "libs/react-client/package.json",
+    "modified"
+   ],
+   [
+    "libs/react-client/src/api/index.tsx",
+    "modified"
+   ],
+   [
+    "libs/react-client/src/state.spec.ts",
+    "added"
+   ],
+   [
+    "libs/react-client/src/state.ts",
+    "modified"
+   ],
+   [
+    "libs/react-client/src/types/config.ts",
+    "modified"
+   ],
+   [
+    "libs/react-client/src/types/mcp.ts",
+    "modified"
+   ],
+   [
+    "libs/react-client/src/useChatSession.ts",
+    "modified"
+   ],
+   [
+    "libs/react-client/vitest.config.ts",
+    "added"
+   ]
+  ]
+ },
+ "CVE-2026-47192": {
+  "status": "OK",
+  "repo": "siemens/kas",
+  "commit": "4cb4a3d01122ffaec9feaae768a5814092f6f9b5",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-48710": {
+  "status": "OK",
+  "repo": "Kludex/starlette",
+  "commit": "764dab0dcfb9033d75442d7a359645c9f94648c6",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-48782": {
+  "status": "OK",
+  "repo": "pydantic/pydantic-ai",
+  "commit": "1add06179ba4de259f7ab977620b697b7209f7e4",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-49257": {
+  "status": "OK",
+  "repo": "startreedata/mcp-pinot",
+  "commit": "1c7d3f9cd384854bf72c127d230bdb32299475ad",
+  "mismatches": [],
+  "nonpy": [
+   [
+    ".env.example",
+    "modified"
+   ],
+   [
+    "CHANGELOG.md",
+    "modified"
+   ],
+   [
+    "PR_DESCRIPTION.md",
+    "removed"
+   ],
+   [
+    "README.md",
+    "modified"
+   ],
+   [
+    "SECURITY.md",
+    "added"
+   ],
+   [
+    "docs/index.html",
+    "modified"
+   ],
+   [
+    "helm/README.md",
+    "modified"
+   ],
+   [
+    "helm/mcp-pinot/templates/_helpers.tpl",
+    "modified"
+   ],
+   [
+    "helm/mcp-pinot/templates/deployment.yaml",
+    "modified"
+   ],
+   [
+    "helm/mcp-pinot/templates/service.yaml",
+    "modified"
+   ],
+   [
+    "helm/mcp-pinot/values.yaml",
+    "modified"
+   ],
+   [
+    "pyproject.toml",
+    "modified"
+   ],
+   [
+    "user_guide.md",
+    "modified"
+   ],
+   [
+    "uv.lock",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-49296": {
+  "status": "OK",
+  "repo": "apache/airflow",
+  "commit": "992e602015b5e9a3fd297e18047cff9d85094c95",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "airflow-core/docs/security/security_model.rst",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-49471": {
+  "status": "OK",
+  "repo": "oraios/serena",
+  "commit": "016ccbe1c095a3eed7967737ac1d4df2754f5d96",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-49852": {
+  "status": "OK",
+  "repo": "authlib/joserfc",
+  "commit": "86d00910b2b2d2d07503fee9b572906daefab7f1",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-50180": {
+  "status": "OK",
+  "repo": "langroid/langroid",
+  "commit": "00b7dd7b79c5d03c94be284cf3459d98195ebfba",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-50181": {
+  "status": "OK",
+  "repo": "langroid/langroid",
+  "commit": "56e2756ecab70a70a7e6edbee2f2187b8484683e",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-50558": {
+  "status": "OK",
+  "repo": "brightio/penelope",
+  "commit": "a040afb5db32c7e80b5e8a2f9b2164cf911cfa62",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-52869": {
+  "status": "OK",
+  "repo": "modelcontextprotocol/python-sdk",
+  "commit": "1abcca2408a6b50e10ec601181f63f9978705c00",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-53500": {
+  "status": "CORPUS_ERROR",
+  "repo": "thumbor/thumbor",
+  "commit": "68876715350c6c8f49c324e5515e64908830aed7",
+  "mismatches": [
+   [
+    "tests/loaders/test_http_loader.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/test_server.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "thumbor/config.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "thumbor/loaders/__init__.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "thumbor/loaders/http_loader.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "thumbor/server.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    "docs/configuration.rst",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-53502": {
+  "status": "OK",
+  "repo": "thumbor/thumbor",
+  "commit": "3b986d13677b30fe6651c8c72ebb25957ac0a40d",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-53503": {
+  "status": "CORPUS_ERROR",
+  "repo": "thumbor/thumbor",
+  "commit": "447e192e3fb92e64c12e5354a56a4a7133f69d73",
+  "mismatches": [
+   [
+    "thumbor/filters/convolution.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    "thumbor/ext/filters/_convolution.c",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-53504": {
+  "status": "OK",
+  "repo": "thumbor/thumbor",
+  "commit": "3f38fe1610d20168e91f76d432212de30727eb2e",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "docs/convolution.rst",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-53505": {
+  "status": "OK",
+  "repo": "thumbor/thumbor",
+  "commit": "2c716119de986cfc68c7071af52a98187e006023",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-53598": {
+  "status": "OK",
+  "repo": "microsoft/prompty",
+  "commit": "88ac9948d7d37995edbb2f6d36913436626c39e1",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "README.md",
+    "modified"
+   ],
+   [
+    "runtime/csharp/Prompty.Anthropic/Prompty.Anthropic.csproj",
+    "modified"
+   ],
+   [
+    "runtime/csharp/Prompty.Core.Tests/LoaderTests.cs",
+    "modified"
+   ],
+   [
+    "runtime/csharp/Prompty.Core.Tests/SpecVectorTests.cs",
+    "modified"
+   ],
+   [
+    "runtime/csharp/Prompty.Core/Prompty.Core.csproj",
+    "modified"
+   ],
+   [
+    "runtime/csharp/Prompty.Core/PromptyLoadOptions.cs",
+    "added"
+   ],
+   [
+    "runtime/csharp/Prompty.Core/PromptyLoader.cs",
+    "modified"
+   ],
+   [
+    "runtime/csharp/Prompty.Core/ReferenceResolver.cs",
+    "modified"
+   ],
+   [
+    "runtime/csharp/Prompty.Foundry/Prompty.Foundry.csproj",
+    "modified"
+   ],
+   [
+    "runtime/csharp/Prompty.OpenAI/Prompty.OpenAI.csproj",
+    "modified"
+   ],
+   [
+    "runtime/python/prompty/README.md",
+    "modified"
+   ],
+   [
+    "runtime/python/prompty/uv.lock",
+    "modified"
+   ],
+   [
+    "runtime/rust/Cargo.lock",
+    "modified"
+   ],
+   [
+    "runtime/rust/prompty-anthropic/Cargo.toml",
+    "modified"
+   ],
+   [
+    "runtime/rust/prompty-foundry/Cargo.toml",
+    "modified"
+   ],
+   [
+    "runtime/rust/prompty-openai/Cargo.toml",
+    "modified"
+   ],
+   [
+    "runtime/rust/prompty/Cargo.toml",
+    "modified"
+   ],
+   [
+    "runtime/rust/prompty/src/lib.rs",
+    "modified"
+   ],
+   [
+    "runtime/rust/prompty/src/loader.rs",
+    "modified"
+   ],
+   [
+    "runtime/rust/prompty/src/loader/resolve.rs",
+    "modified"
+   ],
+   [
+    "runtime/typescript/package-lock.json",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/anthropic/package.json",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/core/package.json",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/core/src/core/index.ts",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/core/src/core/loader.ts",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/core/src/index.ts",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/core/tests/loader.test.ts",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/foundry/package.json",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/foundry/tests/models.test.ts",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/openai/package.json",
+    "modified"
+   ],
+   [
+    "runtime/typescript/packages/openai/tests/models.test.ts",
+    "modified"
+   ],
+   [
+    "schema/emitter/package-lock.json",
+    "modified"
+   ],
+   [
+    "schema/model/agent/agent.tsp",
+    "modified"
+   ],
+   [
+    "schema/package-lock.json",
+    "modified"
+   ],
+   [
+    "spec/spec.md",
+    "modified"
+   ],
+   [
+    "vscode/prompty/package-lock.json",
+    "modified"
+   ],
+   [
+    "vscode/prompty/packages/core/package-lock.json",
+    "modified"
+   ],
+   [
+    "vscode/prompty/packages/server/package-lock.json",
+    "modified"
+   ],
+   [
+    "web/docs-examples/typescript/package-lock.json",
+    "modified"
+   ],
+   [
+    "web/docs-examples/typescript/package.json",
+    "modified"
+   ],
+   [
+    "web/package-lock.json",
+    "modified"
+   ],
+   [
+    "web/package.json",
+    "modified"
+   ],
+   [
+    "web/src/content/docs/core-concepts/file-format.mdx",
+    "modified"
+   ],
+   [
+    "web/src/content/docs/specification/file-format.mdx",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-53656": {
+  "status": "OK",
+  "repo": "voxel51/fiftyone",
+  "commit": "7c5b92eec5c7c0210c0c8134351ced77d2800ae0",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "docs/source/installation/environments.rst",
+    "modified"
+   ],
+   [
+    "docs/source/user_guide/config.rst",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-54254": {
+  "status": "OK",
+  "repo": "Cyberdrop-DL/cyberdrop-dl",
+  "commit": "4479555ae3f9d56d7657d6179a5bac3123eb4e2b",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54284": {
+  "status": "OK",
+  "repo": "andialbrecht/sqlparse",
+  "commit": "939b129e24c0ad5d51368b1aa72fffcaca76f06f",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54338": {
+  "status": "CORPUS_ERROR",
+  "repo": "jupyterhub/jupyterhub",
+  "commit": "d6dc595f84b7509969686da31d87d6d69e7fce0a",
+  "mismatches": [
+   [
+    "jupyterhub/handlers/base.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": []
+ },
+ "CVE-2026-54446": {
+  "status": "OK",
+  "repo": "Labs64/NetLicensing-MCP",
+  "commit": "fbbb1d5ff88eb5400ec933a84e75601ebee48927",
+  "mismatches": [],
+  "nonpy": [
+   [
+    ".env.example",
+    "modified"
+   ],
+   [
+    ".gitignore",
+    "modified"
+   ],
+   [
+    "AGENTS.md",
+    "added"
+   ],
+   [
+    "CLAUDE.md",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-54457": {
+  "status": "OK",
+  "repo": "tensorzero/tensorzero",
+  "commit": "0abbc838bae3394fe7491dad7009670d4e3b6cf8",
+  "mismatches": [],
+  "nonpy": [
+   [
+    ".github/workflows/clickhouse-tests.yml",
+    "modified"
+   ],
+   [
+    ".github/workflows/client-tests.yml",
+    "modified"
+   ],
+   [
+    "crates/.cargo/config.toml",
+    "modified"
+   ],
+   [
+    "crates/evaluations/tests/e2e/common/mod.rs",
+    "modified"
+   ],
+   [
+    "crates/evaluations/tests/e2e/tests.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-client/src/test_helpers.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-client/tests/tests.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/src/client/mod.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/src/db/clickhouse/inference_queries.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/src/db/clickhouse/query_builder/mod.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/src/db/postgres/inference_filter_helpers.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/src/db/postgres/inference_queries.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/src/endpoints/datasets/v1/conversion_utils.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/src/endpoints/object_storage.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/src/test_helpers.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/config/object-storage-disabled.gateway.toml",
+    "added"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/config/object-storage-s3.gateway.toml",
+    "added"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/config/tensorzero.misc.toml",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/db/inference_count_queries.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/db/inference_queries.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/db/model_inference_queries.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/docker-compose.clickhouse.yml",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/docker-compose.live.yml",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/howdy.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/object_storage.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-core/tests/e2e/providers/common.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-optimizers/tests/common/dicl.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-optimizers/tests/common/gepa.rs",
+    "modified"
+   ],
+   [
+    "crates/tensorzero-optimizers/tests/e2e/gepa/mod.rs",
+    "modified"
+   ],
+   [
+    "ui/app/utils/resolve.server.test.ts",
+    "modified"
+   ],
+   [
+    "ui/app/utils/resolve.server.ts",
+    "modified"
+   ],
+   [
+    "ui/app/utils/tensorzero/tensorzero.ts",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-54548": {
+  "status": "OK",
+  "repo": "siemens/kas",
+  "commit": "1c1e861c9f241ce082b86bef6bedc7da9b676294",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "docs/userguide/credentials.rst",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-54553": {
+  "status": "OK",
+  "repo": "jowilf/starlette-admin",
+  "commit": "af05b45cd90944b726949fd650ab9d19f1abafc3",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54567": {
+  "status": "OK",
+  "repo": "jugmac00/flask-reuploaded",
+  "commit": "5ded76092429c6eb8a4af941b14fbde40a38fff4",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGES.rst",
+    "modified"
+   ],
+   [
+    "pyproject.toml",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-54569": {
+  "status": "CORPUS_ERROR",
+  "repo": "senaite/senaite.core",
+  "commit": "a24d65e99a17ac43c5374ed9f0a60d0fe60d2f74",
+  "mismatches": [
+   [
+    "src/bika/lims/jsonapi/__init__.py",
+    "modified",
+    "vuln=False(exp True) fixed=True(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    "CHANGES.rst",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-54574": {
+  "status": "OK",
+  "repo": "termux/proot-distro",
+  "commit": "a96d7a9667f38e45d812614852ee3915d1c0ae45",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54635": {
+  "status": "OK",
+  "repo": "nessshon/tonapi",
+  "commit": "854222b7ee68d3fb7b4d6d899d200f388483bd86",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54654": {
+  "status": "OK",
+  "repo": "koxudaxi/datamodel-code-generator",
+  "commit": "b73abb5cd703a50471b8950bbd3bd0b82ad71de7",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54706": {
+  "status": "OK",
+  "repo": "onionshare/onionshare",
+  "commit": "48f31cfac077fcc9c04c67c2a6dbf87d956f5eec",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54707": {
+  "status": "OK",
+  "repo": "onionshare/onionshare",
+  "commit": "a090e97193efc91fbeac9dace7793ea568b83cf5",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54727": {
+  "status": "OK",
+  "repo": "termux/proot-distro",
+  "commit": "98aff324b7d8500ff75a8ca9ac087ee636be4716",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-54770": {
+  "status": "CORPUS_ERROR",
+  "repo": "Pylons/webob",
+  "commit": "ff89560643fb252751b4db8806a283b5377f1f07",
+  "mismatches": [
+   [
+    "src/webob/util.py",
+    "modified",
+    "vuln=False(exp True) fixed=True(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    "CHANGES.txt",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-54785": {
+  "status": "OK",
+  "repo": "eLyiN/gemini-bridge",
+  "commit": "8f3b85afd02b692c4bc974b5176e12fb277ea801",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGELOG.md",
+    "modified"
+   ],
+   [
+    "pyproject.toml",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-55099": {
+  "status": "OK",
+  "repo": "collective/icalendar",
+  "commit": "b6b2608ae3af6de40695b4e40f71847485aa0b49",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-55211": {
+  "status": "OK",
+  "repo": "equinor/surfio",
+  "commit": "1619750bce28e39c4f378d2fb6d28b72380a12aa",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "src/lib/irap_import_ascii.cpp",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-55403": {
+  "status": "OK",
+  "repo": "koxudaxi/datamodel-code-generator",
+  "commit": "a585c037c8307b7aae815de193b7fe1c4c44994b",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-55404": {
+  "status": "OK",
+  "repo": "yt-dlp/yt-dlp",
+  "commit": "6fc85f617a5850307fd5b258477070e6ee177796",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "README.md",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-55618": {
+  "status": "OK",
+  "repo": "GOVCERT-LU/eml_parser",
+  "commit": "746a69f86443eb0b6a47f77db3cfe727c21f92b3",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGELOG.md",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-55620": {
+  "status": "OK",
+  "repo": "GOVCERT-LU/eml_parser",
+  "commit": "746a69f86443eb0b6a47f77db3cfe727c21f92b3",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGELOG.md",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-57516": {
+  "status": "OK",
+  "repo": "ray-project/ray",
+  "commit": "41443a18f9e6403a072de69098a279c23e2d943c",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-59215": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "a66477b7104c5d141ce7bffaea424b43e7666ef1",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-59224": {
+  "status": "CORPUS_ERROR",
+  "repo": "open-webui/open-webui",
+  "commit": "5f3a628a8d291bb5d33e1a0b0c89fb62a2927934",
+  "mismatches": [
+   [
+    "backend/open_webui/routers/terminals.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": []
+ },
+ "CVE-2026-59820": {
+  "status": "OK",
+  "repo": "BerriAI/litellm",
+  "commit": "6a15adcd64137d37f73dee76dfe7481f8c2d9196",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-59881": {
+  "status": "OK",
+  "repo": "aio-libs/aiohttp",
+  "commit": "47fb6ae354d4fa22048f4dbe7dbf82b625f0a2f6",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGES/12976.bugfix.rst",
+    "added"
+   ],
+   [
+    "THREAT_MODEL.md",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-59886": {
+  "status": "OK",
+  "repo": "pyasn1/pyasn1",
+  "commit": "e60c691cb91addb8fcefa2f537e85ede6fb1e886",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-59890": {
+  "status": "OK",
+  "repo": "pypa/setuptools",
+  "commit": "dd9f436a36486b4cb8a4c70a2321548b0be09b8f",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "newsfragments/+ghsa-h35f-9h28-mq5c.bugfix.rst",
+    "added"
+   ]
+  ]
+ },
+ "CVE-2026-59893": {
+  "status": "OK",
+  "repo": "andialbrecht/sqlparse",
+  "commit": "d1d80602741f77ec78e5a04ce4719244cf32352e",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGELOG",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-59894": {
+  "status": "OK",
+  "repo": "andialbrecht/sqlparse",
+  "commit": "53ff44b53e27cff78259acc1af015506fea60f63",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGELOG",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-59939": {
+  "status": "OK",
+  "repo": "httplib2/httplib2",
+  "commit": "87581ad6cf752fe3da2090c59058261d2d00a427",
+  "mismatches": [],
+  "nonpy": [
+   [
+    ".github/workflows/publish.yaml",
+    "modified"
+   ],
+   [
+    ".github/workflows/style.yaml",
+    "modified"
+   ],
+   [
+    ".github/workflows/test.yaml",
+    "modified"
+   ],
+   [
+    "README.md",
+    "modified"
+   ],
+   [
+    "setup.cfg",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-61539": {
+  "status": "CORPUS_ERROR",
+  "repo": "xorbitsai/inference",
+  "commit": "1b3d220f342ce68d34cec4586d9409d457dadc42",
+  "mismatches": [
+   [
+    "xinference/model/llm/tests/test_utils.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "xinference/model/llm/tool_parsers/llama3_tool_parser.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "xinference/model/llm/tool_parsers/tests/test_llama3_tool_parser.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ],
+   [
+    "xinference/model/llm/utils.py",
+    "modified",
+    "vuln=False(exp True) fixed=True(exp True)"
+   ]
+  ],
+  "nonpy": []
+ },
+ "CVE-2026-61632": {
+  "status": "OK",
+  "repo": "facelessuser/pymdown-extensions",
+  "commit": "edce35586d11a1ef78bb187bc60497fe6dbf3b64",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "docs/src/markdown/extensions/b64.md",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-62676": {
+  "status": "OK",
+  "repo": "omnigent-ai/omnigent",
+  "commit": "1a05b7b139ef504bf2be89bf37918abe104fb95c",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-62677": {
+  "status": "OK",
+  "repo": "omnigent-ai/omnigent",
+  "commit": "7ca0cca3c9a65c04c489edf68f0e080424a26868",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-63632": {
+  "status": "OK",
+  "repo": "onnx/onnx",
+  "commit": "e9c74f596eaa0250f89e52a54160a25bbcb25b66",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "onnx/version_converter/adapters/gemm_6_7.h",
+    "modified"
+   ],
+   [
+    "onnx/version_converter/adapters/gemm_7_6.h",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-67422": {
+  "status": "CORPUS_ERROR",
+  "repo": "facelessuser/pymdown-extensions",
+  "commit": "c68498598d7b13011bb4571350b6e3612a4ce44b",
+  "mismatches": [
+   [
+    "pymdownx/caret.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    "docs/src/markdown/about/changelog.md",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-67424": {
+  "status": "OK",
+  "repo": "flytohub/flyto-core",
+  "commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-67425": {
+  "status": "CORPUS_ERROR",
+  "repo": "flytohub/flyto-core",
+  "commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+  "mismatches": [
+   [
+    "tests/modules/test_new_modules.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": []
+ },
+ "CVE-2026-67428": {
+  "status": "OK",
+  "repo": "flytohub/flyto-core",
+  "commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-67435": {
+  "status": "OK",
+  "repo": "Linuxfabrik/lib",
+  "commit": "6573ff9347e541200305d278d2663d2e54e052ff",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGELOG.md",
+    "modified"
+   ],
+   [
+    "tests/url/unit-test/run",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-68508": {
+  "status": "OK",
+  "repo": "hydra-ecosystem/hydra",
+  "commit": "7faad0dcedfb4c0a364aa1067c0080fd6fdf8dca",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "news/3259.bugfix",
+    "added"
+   ]
+  ]
+ },
+ "CVE-2026-69243": {
+  "status": "OK",
+  "repo": "aio-libs/aiohttp",
+  "commit": "6ae358f0983c3f4d6f67692b2f8e65dc8e091c98",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "CHANGES/13016.bugfix.rst",
+    "added"
+   ],
+   [
+    "aiohttp/_http_parser.pyx",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-69247": {
+  "status": "CORPUS_ERROR",
+  "repo": "pyca/cryptography",
+  "commit": "53fccd93413a8d7f07d6d8999681f27b75cffa3f",
+  "mismatches": [
+   [
+    "tests/doubles.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    "CHANGELOG.rst",
+    "modified"
+   ],
+   [
+    "docs/hazmat/primitives/asymmetric/serialization.rst",
+    "modified"
+   ],
+   [
+    "docs/spelling_wordlist.txt",
+    "modified"
+   ],
+   [
+    "src/rust/src/pkcs7.rs",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-70479": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "bef63a2ae915571d50d2722a635e8bfa753d7877",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-70483": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "4f93c3e36c1734342a32c312bdb0516c66d8e93c",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-70485": {
+  "status": "CORPUS_ERROR",
+  "repo": "open-webui/open-webui",
+  "commit": "1717b493d83c86afa82aa8bc50139250852dd2f3",
+  "mismatches": [
+   [
+    "backend/open_webui/retrieval/web/utils.py",
+    "modified",
+    "vuln=True(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": []
+ },
+ "CVE-2026-70486": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "65a5fad7b97db99d490d81f4e0860282c3a4543c",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "src/lib/components/chat/FileNav/FilePreview.svelte",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-70487": {
+  "status": "UNVERIFIABLE",
+  "error": "curl rc=28"
+ },
+ "CVE-2026-70488": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "707efeaed7992dd9896d5928559458f228b9a539",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-70489": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "c4ae8c86786fed521960466f6d8eef8af22c2946",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-70491": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "c05de13b4fca1ac8a17153782b46b3d0aacf491c",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-70492": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "bc600d3f085802c45aa8f38c30e6e8c986bde6cc",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "src/lib/components/chat/Messages/Markdown/KatexRenderer.svelte",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-70493": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "3ab2026262ef6f09810e4d235c5f9a9cb903e595",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "backend/requirements.txt",
+    "modified"
+   ],
+   [
+    "pyproject.toml",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-70494": {
+  "status": "OK",
+  "repo": "open-webui/open-webui",
+  "commit": "915ef7d0798d3175819cedbb2f62d7bf0db78c98",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-71433": {
+  "status": "OK",
+  "repo": "langchain-ai/langgraph",
+  "commit": "66ebe1a0da921e73f0f9f879ba105d314c079f7c",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-71554": {
+  "status": "OK",
+  "repo": "python-hyper/h2",
+  "commit": "292a40829feefda98c8509dcdbbb4a57af9bd6a6",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-71852": {
+  "status": "OK",
+  "repo": "py-pdf/pypdf",
+  "commit": "51cb6acf9e8a35b77e90b4d87d28fe3e1416d7d7",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-71870": {
+  "status": "OK",
+  "repo": "py-pdf/pypdf",
+  "commit": "afba8080e19d29a3c256a742b340995e695b35aa",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-73228": {
+  "status": "OK",
+  "repo": "encode/django-rest-framework",
+  "commit": "2912dc98042f78e27636551fc22eeaf10f725fdd",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-73229": {
+  "status": "OK",
+  "repo": "encode/django-rest-framework",
+  "commit": "71f81946906e52f9dc8e5d22a0f3d2afa50c455e",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-73417": {
+  "status": "OK",
+  "repo": "jupyterlab/jupyterlab",
+  "commit": "be9303f5bcd5308eaeae953c5a3c903046682c2c",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "docs/source/extension/extension_dev.md",
+    "modified"
+   ],
+   [
+    "docs/source/user/extensions.md",
+    "modified"
+   ],
+   [
+    "packages/imageviewer-extension/schema/plugin.json",
+    "modified"
+   ],
+   [
+    "packages/imageviewer/src/widget.ts",
+    "modified"
+   ],
+   [
+    "packages/imageviewer/test/widget.spec.ts",
+    "modified"
+   ],
+   [
+    "packages/notebook-extension/schema/tracker.json",
+    "modified"
+   ],
+   [
+    "packages/notebook-extension/src/index.ts",
+    "modified"
+   ],
+   [
+    "pyproject.toml",
+    "modified"
+   ],
+   [
+    "scripts/ci_script.sh",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-73498": {
+  "status": "CORPUS_ERROR",
+  "repo": "sooperset/mcp-atlassian",
+  "commit": "b041733473f95119dd539542a43c280737a8e460",
+  "mismatches": [
+   [
+    "tests/unit/confluence/test_client.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/confluence/test_search.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/jira/test_attachments.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/jira/test_client.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/jira/test_search.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/servers/test_confluence_server.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/servers/test_dependencies.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/servers/test_main_server.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/servers/test_mcp_protocol.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/utils/test_oauth.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/utils/test_oauth_setup.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/utils/test_ssrf_adapter.py",
+    "added",
+    "vuln=False(exp False) fixed=False(exp True)"
+   ],
+   [
+    "tests/unit/utils/test_urls.py",
+    "modified",
+    "vuln=False(exp True) fixed=False(exp True)"
+   ]
+  ],
+  "nonpy": [
+   [
+    "pyproject.toml",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-73568": {
+  "status": "OK",
+  "repo": "libp2p/py-libp2p",
+  "commit": "146ea87d1a20cc7dacf684ecf7c204543be04b37",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-84310": {
+  "status": "OK",
+  "repo": "py-pdf/pypdf",
+  "commit": "d91ab705fd81ed1a9cec175c6958600dea1a4942",
+  "mismatches": [],
+  "nonpy": []
+ },
+ "CVE-2026-84366": {
+  "status": "OK",
+  "repo": "scrapy/scrapy",
+  "commit": "9523e1ec8c41fde265a26d14563d178b6f1ad04b",
+  "mismatches": [],
+  "nonpy": [
+   [
+    "docs/news.rst",
+    "modified"
+   ]
+  ]
+ },
+ "CVE-2026-9335": {
+  "status": "OK",
+  "repo": "keras-team/keras",
+  "commit": "23370f16b0ab9a200f7550a34e54a3ceab74ba0e",
+  "mismatches": [],
+  "nonpy": []
+ }
+}

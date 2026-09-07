@@ -33,9 +33,39 @@ def norm_eol(b: bytes) -> bytes:
     return b.replace(b"\r\n", b"\n")
 
 
+_TOKEN_CACHE = {"token": None}
+
+
+def get_github_token() -> str:
+    """从 git credential fill 读 GitHub token（提升 API 配额到 5000/h，避免 60/h 限流）。"""
+    if _TOKEN_CACHE["token"] is not None:
+        return _TOKEN_CACHE["token"]
+    token = ""
+    try:
+        r = subprocess.run(["git", "credential", "fill"],
+                           input="protocol=https\nhost=github.com\n\n",
+                           capture_output=True, text=True, encoding="utf-8")
+        for line in r.stdout.splitlines():
+            if line.startswith("password="):
+                token = line.split("=", 1)[1]
+    except Exception:
+        token = ""
+    _TOKEN_CACHE["token"] = token
+    return token
+
+
+def _curl_auth(timeout: int) -> list:
+    """构造 curl 命令，带 token（若有）。"""
+    cmd = ["curl", "-sS", "--max-time", str(timeout)]
+    token = get_github_token()
+    if token:
+        cmd += ["-H", f"Authorization: token {token}"]
+    return cmd
+
+
 def curl_json(url: str, timeout: int = 40) -> dict:
     try:
-        r = subprocess.run(["curl", "-sS", "--max-time", str(timeout), url],
+        r = subprocess.run(_curl_auth(timeout) + [url],
                            capture_output=True, text=True, encoding="utf-8")
     except Exception as ex:
         return {"_error": f"curl 失败: {ex}"}
