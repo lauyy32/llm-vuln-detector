@@ -154,9 +154,21 @@ patch size 是**严重且可完全分离配对样本的潜在混淆**（注：�
 6. **CPG-path-scoped** = 仅列**探索性消融**（full patch vs CPG-path-scoped representation，
    回答"CPG 裁剪到底帮助还是损害判断"），**不得作为 real 主臂**。
 
-**主 estimand（提前写死）**：
-> 在确认性合格样本中，real 与 partial 的**配对判定差异**（paired judgement difference）。
-> placebo 与 shuffled 是辅助对照，不与主比较拥有同等解释权重。
+**主 estimand（2026-09-07 第十一轮改写；提前写死）**：
+
+> **pairwise sufficiency discrimination rate** = 正确区分的配对数 / 全部有效配对数。
+> 单个配对"正确区分"定义：**real → benign 且 partial → vulnerable**。报 exact 95% CI。
+
+**三个分解指标**（分别报告）：①real acceptance rate（充分补丁判 benign）；②partial rejection
+rate（不充分补丁判 vulnerable）；③abstain rate（两臂分别）。
+
+**否决"partial 单臂失败率作唯一主 estimand"**：它奖励"永远判 vulnerable"的保守模型——partial
+全对（false-accept=0）但 real 全错，模型显然不会做补丁验证，单臂失败率却显示满分。
+
+统计层次：主估计 = pairwise discrimination rate + exact CI；次要估计 = partial false-accept rate /
+real false-reject rate；配对响应变化 = McNemar exact（辅助非唯一裁决）；placebo = 操纵检验；
+cluster/leave-one-repo-out = 稳健性。这样即使 n 小功效不足，仍做估计型负面结果，不把"不显著"写成
+"无能力"。placebo 与 shuffled 是辅助对照，不与主比较共享解释权重。
 
 **超大/复合提交处置（预注册）**：
 - 预注册 token 上限；超限样本进 oversized/composite 分层，**不截断、不按 CPG 路径裁剪**；
