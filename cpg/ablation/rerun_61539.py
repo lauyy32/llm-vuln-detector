@@ -37,6 +37,7 @@ def worker(version: str):
     from cpg.ablation.cpg_eval import build_cpg_slices_text
     from cpg.ablation.run_ablation import _load_sample_code
     from cpg.ablation.scorers import DetectionContext, LocalLLMScorer
+    from cpg.ablation.upstream_manifest import read_meta
 
     cve = "CVE-2026-61539"
     src_root = REPO / ("cpg/corpus_pairs" if version == "v1" else "cpg/corpus-v2") / cve
@@ -51,36 +52,21 @@ def worker(version: str):
             shutil.rmtree(dst)
         shutil.copytree(src_root / side, dst)
 
-    # 2) 建库（单例，快）
-    rc = config.run(
-        [str(config.codeql_binary()), "database", "create",
-         config.win_path(corpus_db), "--language=python",
-         f"--source-root={config.win_path(corpus_src)}", "--overwrite"],
-        env, config.DB_CREATE_TIMEOUT,
-    )
-    if rc != 0:
-        return {"version": version, "error": f"db create failed rc={rc}"}
+    # 2) meta 从 read_meta 读真实 CWE（61539 = CWE-95 Eval Injection，非 SSRF）
+    meta_full = read_meta(cve)
+    cwe = config.normalize_cwe((meta_full.get("cwes") or [None])[0])
+    meta = {"cve_id": cve, "cwe": cwe,
+            "summary": (meta_full.get("summary") or "")[:200]}
 
-    # 3) cwe-918 (SSRF) 查询——61539 是 CWE-918
-    ql = config.QUERIES_DIR / "cwe-918.ql"
-    bqrs = config.WORK_DIR / "cwe-918.bqrs"
-    csv_out = config.WORK_DIR / "cwe-918.csv"
-    rc = config.run(
-        [str(config.codeql_binary()), "query", "run", config.win_path(ql),
-         f"--database={config.win_path(corpus_db)}",
-         f"--search-path={config.win_path(config.CODEQL_QUERIES_DIR)}",
-         f"--output={config.win_path(bqrs)}", "--ram=3000", "--threads=8"],
-        env, config.EXTRACT_TAINT_TIMEOUT,
-    )
-    if rc != 0:
-        return {"version": version, "error": f"query run failed rc={rc}"}
-    taint_rows = _decode_bqrs(bqrs, csv_out, env)
+    # 3) taint_rows：CWE-95 不在 CWE_TAINT_QUERIES 覆盖(022/089/078/094/918/079)，
+    #    历史 6 个 taint CSV 均无 61539 行（grep 全 0，已核验），且 v2 新增为 eval 修复
+    #    （json.loads/ast.literal_eval，非 taint sink）→ taint 恒空（CPG 表示失败）。
+    #    不重跑 6 个慢查询（历史 CSV 已证明空）；如未来加 CWE-95 查询须作新协议修订。
+    taint_rows: list = []
 
     # 4) 生成两份 prompt
     scorer = LocalLLMScorer(model="qwen2.5-coder:7b", seed=None)
-    meta = {"cve_id": cve, "cwe": "CWE-918",
-            "summary": "xinference llama3 tool parser SSRF"}
-    results = {"version": version, "taint_total": len(taint_rows), "prompts": {}}
+    results = {"version": version, "cwe": cwe, "taint_total": len(taint_rows), "prompts": {}}
     for side in ("vuln", "fixed"):
         prefix = f"{cve}_{side}"
         rows_side = [r for r in taint_rows
