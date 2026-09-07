@@ -1,0 +1,13 @@
+{
+  "protocol_version": "1",
+  "generated_at": "2026-09-07",
+  "reason_code": "EMPTY_FIXED_SOURCE",
+  "note": "fixed 侧 .py 文件数为 0（空源码），配对判别无意义，须从配对度量剔除。v10 重跑曾因这 3 例的 fixed 空→LocalLLM 平凡判 benign 制造假成功，产生假 p=0.031。",
+  "empty_source_cves": [
+    "CVE-2026-53500",
+    "CVE-2026-59224",
+    "CVE-2026-70485"
+  ],
+  "evidence": "docs/D1-语料缺口与可复现性说明.md §2 + cpg/ablation/raw_prompt审计.md（3 例 D 类空 CPG 切片）",
+  "scope": "仅 D1(85) 集；74 主集无空源样本"
+}

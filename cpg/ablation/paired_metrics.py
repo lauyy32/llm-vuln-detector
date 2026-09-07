@@ -107,6 +107,12 @@ def paired_metrics(flags: dict[tuple[str, str], bool], cves: list[str]) -> dict:
             neither += 1
     n_total = correct + inverted + both + neither
     n_disc = correct + inverted
+    one_sided = binom_sf(correct, n_disc)
+    # 双侧 exact McNemar = 2 * min(P(X<=b), P(X>=b))；b=correct
+    if n_disc:
+        two_sided = min(1.0, 2 * min(one_sided, 1 - binom_sf(correct + 1, n_disc)))
+    else:
+        two_sided = 1.0
     return {
         "correct": correct,
         "inverted": inverted,
@@ -116,7 +122,8 @@ def paired_metrics(flags: dict[tuple[str, str], bool], cves: list[str]) -> dict:
         "n_discordant": n_disc,
         "discrimination_rate": correct / n_total if n_total else 0.0,
         "net_discrimination": (correct - inverted) / n_total if n_total else 0.0,
-        "p_value_exact": binom_sf(correct, n_disc),
+        "p_value_exact": one_sided,
+        "p_two_sided": two_sided,
         "correct_ids": correct_ids,
         "inverted_ids": inverted_ids,
     }
@@ -129,8 +136,15 @@ def paired_metrics(flags: dict[tuple[str, str], bool], cves: list[str]) -> dict:
 # abstain → False → 落入"非 vuln"侧（lenient 映射）。lenient 仅用于历史可比；
 # 一切判别成功计数须用 strict（fixed 端显式 benign），见 strict_recompute.py 与 P1-13 §5。
 def load_results_csv(path: Path, mode: str) -> dict[str, dict]:
-    """返回 {scorer: {(cve, version): pred_is_vuln}}（lenient 映射，见模块头申报）"""
+    """返回 {scorers: {(cve,version): pred_is_vuln}, raw: {(cve,version): pred_str},
+    truth: {(cve,version): truth_is_vuln}}。
+
+    lenient 映射（predicted=="vulnerable" 布尔化，abstain→False）仅用于历史可比；
+    raw 保留原始字符串，供 strict 三分类（clean= fixed 显式 benign；abstain-assisted=
+    fixed 显式 abstain）区分。
+    """
     per_scorer: dict[str, dict[tuple[str, str], bool]] = {}
+    raw_scorer: dict[str, dict[tuple[str, str], str]] = {}
     truth: dict[tuple[str, str], bool] = {}
     with path.open(encoding="utf-8") as fh:
         for row in csv.DictReader(fh):
@@ -138,8 +152,9 @@ def load_results_csv(path: Path, mode: str) -> dict[str, dict]:
                 continue
             key = (row["sample_id"], row["version"])
             per_scorer.setdefault(row["scorer"], {})[key] = row["predicted"] == VULN
+            raw_scorer.setdefault(row["scorer"], {})[key] = row["predicted"]
             truth[key] = row["truth"] == VULN
-    return {"scorers": per_scorer, "truth": truth}
+    return {"scorers": per_scorer, "raw": raw_scorer, "truth": truth}
 
 
 def load_b2_json(path: Path, form: str) -> dict[str, dict]:
@@ -221,6 +236,7 @@ def self_test() -> int:
 # --------------------------------------------------------------------------
 def evaluate(bundle: dict, exclude: set = frozenset()) -> list[dict]:
     truth = bundle["truth"]
+    raw = bundle.get("raw", {})
     # 机器强制排除（2026-09-07）：任一侧源缺失的 CVE（如 D1 的 53500/59224/70485 fixed 空）
     # 会在配对度量中制造"空 fixed→平凡判 benign"的假成功，须在统计层剔除，不能只靠文档散文。
     cves = sorted({c for c, _ in truth} - set(exclude))
@@ -231,27 +247,58 @@ def evaluate(bundle: dict, exclude: set = frozenset()) -> list[dict]:
         c = confusion(pairs)
         m = basic_metrics(c)
         pm = paired_metrics(preds, cves)
-        rows.append({"scorer": name, **c, **m, "paired": pm})
+        # strict 三分类（Codex P0-3）：clean = fixed 端显式 benign；abstain-assisted =
+        # fixed 端显式 abstain（lenient 下被当"非 vuln"计为成功，须分开，不能混称判别成功）
+        raw_preds = raw.get(name, {})
+        clean_ids, abstain_ids = [], []
+        for cve in cves:
+            pv = raw_preds.get((cve, "vuln"))
+            pf = raw_preds.get((cve, "fixed"))
+            if pv == VULN and pf == "benign":
+                clean_ids.append(cve)
+            elif pv == VULN and pf == "abstain":
+                abstain_ids.append(cve)
+        rows.append({"scorer": name, **c, **m, "paired": pm,
+                     "strict": {"clean": clean_ids, "abstain_assisted": abstain_ids}})
     return rows
 
 
-def detect_empty_source(corpus_pairs: Path) -> set:
-    """扫描 corpus_pairs，返回 vuln 或 fixed 任一侧 .py 文件数为 0 的 CVE 集合。
+def detect_empty_source(corpus_pairs: Path, cves) -> set:
+    """由数据集成员驱动（非遍历已存在目录）：凡 corpus 目录缺失或任一侧 .py=0 都剔除。
 
-    用于 --exclude-empty-source：任一侧源缺失的 CVE 无法配对，须从配对度量剔除
-    （否则空 fixed→平凡判 benign 制造假成功，见 D1 的 53500/59224/70485）。
+    必须从 CVE 成员出发，不能遍历 corpus_pairs.iterdir()——后者在新克隆里看不到
+    未入库的目录，会漏判（53500/59224/70485 等 17 例未跟踪目录即此类），导致
+    同一脚本在本机与干净克隆产生不同排除集合、不同分母。
     """
     empty = set()
-    if not corpus_pairs.is_dir():
-        return empty
-    for d in sorted(corpus_pairs.iterdir()):
-        if not d.is_dir():
-            continue
-        nv = sum(1 for _, _, fs in os.walk(d / "vuln") for f in fs if f.endswith(".py"))
-        nf = sum(1 for _, _, fs in os.walk(d / "fixed") for f in fs if f.endswith(".py"))
+    for c in cves:
+        vdir = corpus_pairs / c / "vuln"
+        fdir = corpus_pairs / c / "fixed"
+        nv = sum(1 for _, _, fs in os.walk(vdir) for f in fs if f.endswith(".py")) \
+            if vdir.is_dir() else 0
+        nf = sum(1 for _, _, fs in os.walk(fdir) for f in fs if f.endswith(".py")) \
+            if fdir.is_dir() else 0
         if nv == 0 or nf == 0:
-            empty.add(d.name)
+            empty.add(c)
     return empty
+
+
+EMPTY_SOURCE_MANIFEST = Path(__file__).resolve().parent / "empty_source_manifest.json"
+
+
+def load_empty_source_manifest() -> set:
+    """读 tracked 的 empty-source manifest，返回空源 CVE 集合。
+
+    这是主排除的权威来源（本机/干净克隆一致）。manifest 不存在时返回空集，
+    由调用方决定是否 fallback 运行时扫描。
+    """
+    if not EMPTY_SOURCE_MANIFEST.exists():
+        return set()
+    try:
+        data = json.loads(EMPTY_SOURCE_MANIFEST.read_text(encoding="utf-8"))
+        return set(data.get("empty_source_cves", []))
+    except Exception:
+        return set()
 
 
 def render(rows: list[dict], markdown: bool) -> str:
@@ -270,11 +317,17 @@ def render(rows: list[dict], markdown: bool) -> str:
     else:
         for r in rows:
             p = r["paired"]
+            st = r.get("strict", {})
+            clean = st.get("clean", [])
+            abstain = st.get("abstain_assisted", [])
             out.append(
                 f"{r['scorer']:34s} F1={r['f1']:.3f} P={r['precision']:.3f} R={r['recall']:.3f} "
                 f"BA={r['ba']:.3f} MCC={r['mcc']:+.3f} || 配对: 成功={p['correct']:2d} "
                 f"反向={p['inverted']:2d} 双标={p['both_flagged']:2d} 双漏={p['neither_flagged']:2d} "
-                f"判别率={p['discrimination_rate']:.3f} p={p['p_value_exact']:.4f}"
+                f"判别率={p['discrimination_rate']:.3f} p单侧={p['p_value_exact']:.4f} p双侧={p['p_two_sided']:.4f}"
+            )
+            out.append(
+                f"    strict: clean={len(clean)} {clean} | abstain-assisted={len(abstain)} {abstain}"
             )
     return "\n".join(out)
 
@@ -290,9 +343,13 @@ def main() -> None:
     ap.add_argument("--check", action="store_true", help="统计契约违例则退出码非零（CI/评审用）")
     ap.add_argument("--self-test", action="store_true", help="跑内置统计契约自测后退出")
     ap.add_argument("--json-out", type=Path)
-    ap.add_argument("--exclude", default="", help="逗号分隔的 CVE，从配对度量剔除")
-    ap.add_argument("--exclude-empty-source", action="store_true",
-                    help="自动剔除 corpus_pairs 中 vuln/fixed 任一侧 .py 为 0 的 CVE")
+    ap.add_argument("--exclude", default="", help="逗号分隔的 CVE，从配对度量剔除（仅敏感性分析）")
+    ap.add_argument("--exclude-empty-source", dest="exclude_empty_source",
+                    action="store_true", default=True,
+                    help="自动剔除任一侧 .py 为 0 或目录缺失的 CVE（默认开启，主结果必须用默认）")
+    ap.add_argument("--no-exclude-empty-source", dest="exclude_empty_source",
+                    action="store_false",
+                    help="关闭空源排除（仅诊断/敏感性分析，主结果禁用）")
     ap.add_argument("--corpus-pairs", type=Path,
                     default=Path(__file__).resolve().parents[1] / "corpus_pairs",
                     help="corpus_pairs 路径（--exclude-empty-source 用）")
@@ -315,10 +372,15 @@ def main() -> None:
 
     exclude = {x.strip() for x in args.exclude.split(",") if x.strip()}
     if args.exclude_empty_source:
-        es = detect_empty_source(args.corpus_pairs)
+        # 权威来源 = tracked manifest（本机/干净克隆一致）。缺失即拒绝运行（fail-closed），
+        # 不做运行时 corpus 扫描——后者在干净克隆里会把 17 例未入库目录误判为空源。
+        es = load_empty_source_manifest()
+        if not es:
+            print("[ERROR] empty_source_manifest.json 缺失或为空，主结果拒绝运行；"
+                  "用 --no-exclude-empty-source 做敏感性分析须显式声明", file=sys.stderr)
+            sys.exit(2)
         exclude |= es
-        if es:
-            print(f"[排除空源] {sorted(es)}")
+        print(f"[排除空源(manifest)] {sorted(es)}")
     if exclude:
         print(f"[机器排除] 共 {len(exclude)} 例: {sorted(exclude)}")
 
