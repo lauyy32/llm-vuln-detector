@@ -16,6 +16,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 8,
+    "executed": 8
+   },
+   "added": {
+    "expected": 2,
+    "executed": 2
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     ".gitignore",
@@ -45,6 +67,28 @@
   "commit": "9867df45c456dd1077a6243bb56219f66e288150",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-13769": {
@@ -53,6 +97,28 @@
   "commit": "68811b5ad5cd74d06e944e073ee17bf889babf13",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     ".changes/next-release/bugfix-iam-84710.json",
@@ -66,6 +132,28 @@
   "commit": "ab1bbebc097d674c1cdd4bd75a8f313be18473bf",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 4,
+    "executed": 4
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "src/aws-api-mcp-server/CHANGELOG.md",
@@ -91,6 +179,28 @@
   "commit": "3c4b4ee6b8730e6313a82c743ac37dbcc1c21cdb",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-45019": {
@@ -115,6 +225,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 7,
+    "executed": 7
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGELOG.md",
@@ -180,6 +312,28 @@
   "commit": "4cb4a3d01122ffaec9feaae768a5814092f6f9b5",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-48710": {
@@ -188,6 +342,28 @@
   "commit": "764dab0dcfb9033d75442d7a359645c9f94648c6",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-48782": {
@@ -196,6 +372,28 @@
   "commit": "1add06179ba4de259f7ab977620b697b7209f7e4",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-49257": {
@@ -204,6 +402,28 @@
   "commit": "1c7d3f9cd384854bf72c127d230bdb32299475ad",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 9,
+    "executed": 9
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     ".env.example",
@@ -269,6 +489,28 @@
   "commit": "992e602015b5e9a3fd297e18047cff9d85094c95",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "airflow-core/docs/security/security_model.rst",
@@ -282,6 +524,28 @@
   "commit": "016ccbe1c095a3eed7967737ac1d4df2754f5d96",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-49852": {
@@ -290,6 +554,28 @@
   "commit": "86d00910b2b2d2d07503fee9b572906daefab7f1",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 4,
+    "executed": 4
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-50180": {
@@ -298,6 +584,28 @@
   "commit": "00b7dd7b79c5d03c94be284cf3459d98195ebfba",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-50181": {
@@ -306,6 +614,28 @@
   "commit": "56e2756ecab70a70a7e6edbee2f2187b8484683e",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-50558": {
@@ -314,6 +644,28 @@
   "commit": "a040afb5db32c7e80b5e8a2f9b2164cf911cfa62",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-52869": {
@@ -322,6 +674,28 @@
   "commit": "1abcca2408a6b50e10ec601181f63f9978705c00",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 6,
+    "executed": 6
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-53500": {
@@ -361,6 +735,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 0,
+    "executed": 0
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "docs/configuration.rst",
@@ -374,6 +770,28 @@
   "commit": "3b986d13677b30fe6651c8c72ebb25957ac0a40d",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-53503": {
@@ -388,6 +806,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "thumbor/ext/filters/_convolution.c",
@@ -401,6 +841,28 @@
   "commit": "3f38fe1610d20168e91f76d432212de30727eb2e",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "docs/convolution.rst",
@@ -414,6 +876,28 @@
   "commit": "2c716119de986cfc68c7071af52a98187e006023",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-53598": {
@@ -422,6 +906,28 @@
   "commit": "88ac9948d7d37995edbb2f6d36913436626c39e1",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "README.md",
@@ -607,6 +1113,28 @@
   "commit": "7c5b92eec5c7c0210c0c8134351ced77d2800ae0",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 4,
+    "executed": 4
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "docs/source/installation/environments.rst",
@@ -624,6 +1152,28 @@
   "commit": "4479555ae3f9d56d7657d6179a5bac3123eb4e2b",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54284": {
@@ -632,6 +1182,28 @@
   "commit": "939b129e24c0ad5d51368b1aa72fffcaca76f06f",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54338": {
@@ -646,6 +1218,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54446": {
@@ -654,6 +1248,28 @@
   "commit": "fbbb1d5ff88eb5400ec933a84e75601ebee48927",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 1,
+    "executed": 1
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     ".env.example",
@@ -679,6 +1295,28 @@
   "commit": "0abbc838bae3394fe7491dad7009670d4e3b6cf8",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 5,
+    "executed": 5
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     ".github/workflows/clickhouse-tests.yml",
@@ -816,6 +1454,28 @@
   "commit": "1c1e861c9f241ce082b86bef6bedc7da9b676294",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "docs/userguide/credentials.rst",
@@ -829,6 +1489,28 @@
   "commit": "af05b45cd90944b726949fd650ab9d19f1abafc3",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54567": {
@@ -837,6 +1519,28 @@
   "commit": "5ded76092429c6eb8a4af941b14fbde40a38fff4",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGES.rst",
@@ -860,6 +1564,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 2,
+    "executed": 2
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGES.rst",
@@ -873,6 +1599,28 @@
   "commit": "a96d7a9667f38e45d812614852ee3915d1c0ae45",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54635": {
@@ -881,6 +1629,28 @@
   "commit": "854222b7ee68d3fb7b4d6d899d200f388483bd86",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54654": {
@@ -889,6 +1659,28 @@
   "commit": "b73abb5cd703a50471b8950bbd3bd0b82ad71de7",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54706": {
@@ -897,6 +1689,28 @@
   "commit": "48f31cfac077fcc9c04c67c2a6dbf87d956f5eec",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 1,
+    "executed": 1
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54707": {
@@ -905,6 +1719,28 @@
   "commit": "a090e97193efc91fbeac9dace7793ea568b83cf5",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54727": {
@@ -913,6 +1749,28 @@
   "commit": "98aff324b7d8500ff75a8ca9ac087ee636be4716",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-54770": {
@@ -927,6 +1785,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 4,
+    "executed": 4
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGES.txt",
@@ -940,6 +1820,28 @@
   "commit": "8f3b85afd02b692c4bc974b5176e12fb277ea801",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGELOG.md",
@@ -957,6 +1859,28 @@
   "commit": "b6b2608ae3af6de40695b4e40f71847485aa0b49",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-55211": {
@@ -965,6 +1889,28 @@
   "commit": "1619750bce28e39c4f378d2fb6d28b72380a12aa",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "src/lib/irap_import_ascii.cpp",
@@ -978,6 +1924,28 @@
   "commit": "a585c037c8307b7aae815de193b7fe1c4c44994b",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-55404": {
@@ -986,6 +1954,28 @@
   "commit": "6fc85f617a5850307fd5b258477070e6ee177796",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "README.md",
@@ -999,6 +1989,28 @@
   "commit": "746a69f86443eb0b6a47f77db3cfe727c21f92b3",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 5,
+    "executed": 5
+   },
+   "added": {
+    "expected": 1,
+    "executed": 1
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGELOG.md",
@@ -1012,6 +2024,28 @@
   "commit": "746a69f86443eb0b6a47f77db3cfe727c21f92b3",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 5,
+    "executed": 5
+   },
+   "added": {
+    "expected": 1,
+    "executed": 1
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGELOG.md",
@@ -1025,6 +2059,28 @@
   "commit": "41443a18f9e6403a072de69098a279c23e2d943c",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-59215": {
@@ -1033,6 +2089,28 @@
   "commit": "a66477b7104c5d141ce7bffaea424b43e7666ef1",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-59224": {
@@ -1047,6 +2125,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 0,
+    "executed": 0
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-59820": {
@@ -1055,6 +2155,28 @@
   "commit": "6a15adcd64137d37f73dee76dfe7481f8c2d9196",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-59881": {
@@ -1063,6 +2185,28 @@
   "commit": "47fb6ae354d4fa22048f4dbe7dbf82b625f0a2f6",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 7,
+    "executed": 7
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGES/12976.bugfix.rst",
@@ -1080,6 +2224,28 @@
   "commit": "e60c691cb91addb8fcefa2f537e85ede6fb1e886",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 5,
+    "executed": 5
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-59890": {
@@ -1088,6 +2254,28 @@
   "commit": "dd9f436a36486b4cb8a4c70a2321548b0be09b8f",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "newsfragments/+ghsa-h35f-9h28-mq5c.bugfix.rst",
@@ -1101,6 +2289,28 @@
   "commit": "d1d80602741f77ec78e5a04ce4719244cf32352e",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 1,
+    "executed": 1
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGELOG",
@@ -1114,6 +2324,28 @@
   "commit": "53ff44b53e27cff78259acc1af015506fea60f63",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGELOG",
@@ -1127,6 +2359,28 @@
   "commit": "87581ad6cf752fe3da2090c59058261d2d00a427",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 4,
+    "executed": 4
+   },
+   "added": {
+    "expected": 1,
+    "executed": 1
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     ".github/workflows/publish.yaml",
@@ -1177,6 +2431,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 0,
+    "executed": 0
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-61632": {
@@ -1185,6 +2461,28 @@
   "commit": "edce35586d11a1ef78bb187bc60497fe6dbf3b64",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "docs/src/markdown/extensions/b64.md",
@@ -1198,6 +2496,28 @@
   "commit": "1a05b7b139ef504bf2be89bf37918abe104fb95c",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-62677": {
@@ -1206,6 +2526,28 @@
   "commit": "7ca0cca3c9a65c04c489edf68f0e080424a26868",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-63632": {
@@ -1214,6 +2556,28 @@
   "commit": "e9c74f596eaa0250f89e52a54160a25bbcb25b66",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "onnx/version_converter/adapters/gemm_6_7.h",
@@ -1237,6 +2601,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 4,
+    "executed": 4
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "docs/src/markdown/about/changelog.md",
@@ -1250,6 +2636,28 @@
   "commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 17,
+    "executed": 17
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-67425": {
@@ -1264,6 +2672,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 20,
+    "executed": 20
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-67428": {
@@ -1272,6 +2702,28 @@
   "commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 17,
+    "executed": 17
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-67435": {
@@ -1280,6 +2732,28 @@
   "commit": "6573ff9347e541200305d278d2663d2e54e052ff",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGELOG.md",
@@ -1297,6 +2771,28 @@
   "commit": "7faad0dcedfb4c0a364aa1067c0080fd6fdf8dca",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "news/3259.bugfix",
@@ -1310,6 +2806,28 @@
   "commit": "6ae358f0983c3f4d6f67692b2f8e65dc8e091c98",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 3,
+    "executed": 3
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGES/13016.bugfix.rst",
@@ -1333,6 +2851,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "CHANGELOG.rst",
@@ -1358,6 +2898,28 @@
   "commit": "bef63a2ae915571d50d2722a635e8bfa753d7877",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-70483": {
@@ -1366,6 +2928,28 @@
   "commit": "4f93c3e36c1734342a32c312bdb0516c66d8e93c",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-70485": {
@@ -1380,14 +2964,64 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 0,
+    "executed": 0
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-70486": {
-  "status": "OK",
+  "status": "CORPUS_ERROR",
   "repo": "open-webui/open-webui",
   "commit": "65a5fad7b97db99d490d81f4e0860282c3a4543c",
-  "mismatches": [],
+  "mismatches": [
+   [
+    "EXTRA",
+    "corpus-extra",
+    "corpus 多出 20 个 .py 不属于 upstream 投影: ['backend/open_webui/__init__.py', 'backend/open_webui/config.py', 'backend/open_webui/constants.py', 'backend/open_webui/env.py', 'backend/open_webui/events.py']"
+   ]
+  ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 0,
+    "executed": 0
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "src/lib/components/chat/FileNav/FilePreview.svelte",
@@ -1401,6 +3035,28 @@
   "commit": "305880f2e2aeb2dda2f4b2a18a20bdcd558f7134",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-70488": {
@@ -1409,6 +3065,28 @@
   "commit": "707efeaed7992dd9896d5928559458f228b9a539",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-70489": {
@@ -1417,6 +3095,28 @@
   "commit": "c4ae8c86786fed521960466f6d8eef8af22c2946",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-70491": {
@@ -1425,14 +3125,64 @@
   "commit": "c05de13b4fca1ac8a17153782b46b3d0aacf491c",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-70492": {
-  "status": "OK",
+  "status": "CORPUS_ERROR",
   "repo": "open-webui/open-webui",
   "commit": "bc600d3f085802c45aa8f38c30e6e8c986bde6cc",
-  "mismatches": [],
+  "mismatches": [
+   [
+    "EXTRA",
+    "corpus-extra",
+    "corpus 多出 20 个 .py 不属于 upstream 投影: ['backend/open_webui/__init__.py', 'backend/open_webui/config.py', 'backend/open_webui/constants.py', 'backend/open_webui/env.py', 'backend/open_webui/events.py']"
+   ]
+  ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 0,
+    "executed": 0
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "src/lib/components/chat/Messages/Markdown/KatexRenderer.svelte",
@@ -1446,6 +3196,28 @@
   "commit": "3ab2026262ef6f09810e4d235c5f9a9cb903e595",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "backend/requirements.txt",
@@ -1463,6 +3235,28 @@
   "commit": "915ef7d0798d3175819cedbb2f62d7bf0db78c98",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-71433": {
@@ -1471,6 +3265,28 @@
   "commit": "66ebe1a0da921e73f0f9f879ba105d314c079f7c",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 6,
+    "executed": 6
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-71554": {
@@ -1479,6 +3295,28 @@
   "commit": "292a40829feefda98c8509dcdbbb4a57af9bd6a6",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 1,
+    "executed": 1
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-71852": {
@@ -1487,6 +3325,28 @@
   "commit": "51cb6acf9e8a35b77e90b4d87d28fe3e1416d7d7",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-71870": {
@@ -1495,6 +3355,28 @@
   "commit": "afba8080e19d29a3c256a742b340995e695b35aa",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-73228": {
@@ -1503,6 +3385,28 @@
   "commit": "2912dc98042f78e27636551fc22eeaf10f725fdd",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-73229": {
@@ -1511,6 +3415,28 @@
   "commit": "71f81946906e52f9dc8e5d22a0f3d2afa50c455e",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-73417": {
@@ -1519,6 +3445,28 @@
   "commit": "be9303f5bcd5308eaeae953c5a3c903046682c2c",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 5,
+    "executed": 5
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "docs/source/extension/extension_dev.md",
@@ -1630,6 +3578,28 @@
    ]
   ],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 19,
+    "executed": 19
+   },
+   "added": {
+    "expected": 1,
+    "executed": 1
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "pyproject.toml",
@@ -1643,6 +3613,28 @@
   "commit": "146ea87d1a20cc7dacf684ecf7c204543be04b37",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-84310": {
@@ -1651,6 +3643,28 @@
   "commit": "d91ab705fd81ed1a9cec175c6958600dea1a4942",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 5,
+    "executed": 5
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  },
  "CVE-2026-84366": {
@@ -1659,6 +3673,28 @@
   "commit": "9523e1ec8c41fde265a26d14563d178b6f1ad04b",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": [
    [
     "docs/news.rst",
@@ -1672,6 +3708,28 @@
   "commit": "23370f16b0ab9a200f7550a34e54a3ceab74ba0e",
   "mismatches": [],
   "content_mismatches": [],
+  "content_checks_by_status": {
+   "modified": {
+    "expected": 2,
+    "executed": 2
+   },
+   "added": {
+    "expected": 0,
+    "executed": 0
+   },
+   "removed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "renamed": {
+    "expected": 0,
+    "executed": 0
+   },
+   "copied": {
+    "expected": 0,
+    "executed": 0
+   }
+  },
   "nonpy": []
  }
 }

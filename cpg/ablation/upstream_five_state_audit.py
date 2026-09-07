@@ -77,6 +77,21 @@ def audit_one(cve, cache_dir):
     content_mismatches = []
     parents = [p["sha"] for p in d.get("parents", [])]
     parent_sha = parents[0] if len(parents) == 1 else None
+    # 内容核验覆盖分母（Codex 门禁 1 完整版）：五态全部 expected==executed 才可声称内容级可信
+    checks = {k: [0, 0] for k in ("modified", "added", "removed", "renamed", "copied")}
+
+    def check_blob(fn, side, upstream_sha, label):
+        """核 corpus 侧 blob == upstream blob（归一化行尾）。"""
+        p = CORPUS / cve / side / fn
+        if not p.exists():
+            return
+        local = p.read_bytes()
+        r = curl_raw(raw_url(repo, upstream_sha, fn))
+        if r["status"] == 200 and norm_eol(local) != norm_eol(r["body"]):
+            content_mismatches.append((fn, f"{side}-blob≠{label}"))
+
+    upstream_py = {f["filename"] for f in d["files"] if f["filename"].endswith(".py")}
+
     for f in d["files"]:
         fn = f["filename"]
         st = f.get("status", "")
@@ -87,44 +102,69 @@ def audit_one(cve, cache_dir):
         f_ex = file_exists(cve, "fixed", fn)
         if st == "modified":
             exp_v, exp_f = True, True
+            if v_ex != exp_v or f_ex != exp_f:
+                mismatches.append((fn, st, f"vuln={v_ex}(exp {exp_v}) fixed={f_ex}(exp {exp_f})"))
+                continue
+            checks["modified"][0] += 1
+            if parent_sha:
+                check_blob(fn, "vuln", parent_sha, "parent")
+            check_blob(fn, "fixed", sha, "fix")
+            checks["modified"][1] += 1
         elif st == "added":
             exp_v, exp_f = False, True
+            if v_ex != exp_v or f_ex != exp_f:
+                mismatches.append((fn, st, f"vuln={v_ex}(exp {exp_v}) fixed={f_ex}(exp {exp_f})"))
+                continue
+            checks["added"][0] += 1
+            check_blob(fn, "fixed", sha, "fix")
+            checks["added"][1] += 1
         elif st == "removed":
             exp_v, exp_f = True, False
+            if v_ex != exp_v or f_ex != exp_f:
+                mismatches.append((fn, st, f"vuln={v_ex}(exp {exp_v}) fixed={f_ex}(exp {exp_f})"))
+                continue
+            checks["removed"][0] += 1
+            if parent_sha:
+                check_blob(fn, "vuln", parent_sha, "parent")
+                checks["removed"][1] += 1
         elif st == "renamed":
-            # previous_filename 应在 vuln 存在，new 在 fixed 存在
             prev = f.get("previous_filename")
-            if prev:
-                exp_v = file_exists(cve, "vuln", prev)
-            else:
-                exp_v = None
+            exp_v = file_exists(cve, "vuln", prev) if prev else None
             exp_f = True
-            if exp_v is False or not f_ex:
+            if (prev and exp_v is False) or not f_ex:
                 mismatches.append((fn, st, f"vuln_prev={exp_v} fixed={f_ex}"))
-            continue
+                continue
+            checks["renamed"][0] += 1
+            if prev and parent_sha:
+                check_blob(prev, "vuln", parent_sha, "parent-old")
+            check_blob(fn, "fixed", sha, "fix")
+            checks["renamed"][1] += 1
         elif st == "copied":
-            # copied：原路径保留、新路径在 fix 出现（罕见，单独记录不计 mismatch）
-            nonpy.append((fn, "copied"))
-            continue
+            # 原路径保留、新路径在 fix 出现
+            src = f.get("previous_filename")
+            if not f_ex:
+                mismatches.append((fn, st, f"fixed={f_ex}"))
+                continue
+            checks["copied"][0] += 1
+            check_blob(fn, "fixed", sha, "fix")
+            if src:
+                check_blob(src, "vuln", sha, "fix-src") if parent_sha else None
+            checks["copied"][1] += 1
         else:
             continue  # 未知态单独记录
-        if v_ex != exp_v or f_ex != exp_f:
-            mismatches.append((fn, st, f"vuln={v_ex}(exp {exp_v}) fixed={f_ex}(exp {exp_f})"))
-            continue
-        # 内容核验（Codex 门禁 1）：modified 且两侧都存在时，比对 blob 内容（归一化行尾）
-        if st == "modified" and v_ex and f_ex and parent_sha:
-            v_bytes = (CORPUS / cve / "vuln" / fn).read_bytes()
-            f_bytes = (CORPUS / cve / "fixed" / fn).read_bytes()
-            p_raw = curl_raw(raw_url(repo, parent_sha, fn))
-            x_raw = curl_raw(raw_url(repo, sha, fn))
-            if p_raw["status"] == 200 and norm_eol(v_bytes) != norm_eol(p_raw["body"]):
-                content_mismatches.append((fn, "vuln-blob≠upstream-parent"))
-            if x_raw["status"] == 200 and norm_eol(f_bytes) != norm_eol(x_raw["body"]):
-                content_mismatches.append((fn, "fixed-blob≠upstream-fix"))
+
+    # 反向检测：corpus 多出、不属于 upstream 投影的 .py 文件
+    corpus_py = corpus_py_files(meta)
+    extra = sorted(corpus_py - upstream_py)
+    if extra:
+        mismatches.append(("EXTRA", "corpus-extra",
+                           f"corpus 多出 {len(extra)} 个 .py 不属于 upstream 投影: {extra[:5]}"))
 
     status = "OK" if (not mismatches and not content_mismatches) else "CORPUS_ERROR"
     return {"status": status, "repo": repo, "commit": sha,
             "mismatches": mismatches, "content_mismatches": content_mismatches,
+            "content_checks_by_status": {k: {"expected": v[0], "executed": v[1]}
+                                         for k, v in checks.items()},
             "nonpy": nonpy}
 
 
