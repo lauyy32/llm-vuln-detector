@@ -11,6 +11,7 @@ fail-closed：任何缺失/不符即非零退出。
 """
 import csv as csv_module
 import glob, json, math, os, subprocess, sys
+from pathlib import Path
 
 CLAIMS = 'cpg/ablation/.work/claims.json'
 OUT = 'cpg/ablation/.work/strict_recompute_out.json'
@@ -33,7 +34,19 @@ def main() -> int:
     claims = json.load(open(CLAIMS, encoding='utf-8'))['claims']
     ok = True
 
-    # 0) 重复 claim ID
+    # 0) 语料完整性 fail-closed（2026-09-07）：五态审计存在未解决 CORPUS_ERROR 时，
+    #    拒绝冻结 canonical claims（PROVISIONAL），防"语料缺陷地基上的数字被写死"。
+    audit_path = Path('cpg/ablation/.work/upstream_five_state.json')
+    if audit_path.exists():
+        audit = json.load(open(audit_path, encoding='utf-8'))
+        errs = [c for c, r in audit.items() if r['status'] == 'CORPUS_ERROR']
+        if errs:
+            ok = fail(f"语料错误未解决 {len(errs)} 例，拒绝冻结 canonical claims: "
+                      f"{sorted(errs)[:6]}")
+    else:
+        ok = fail("upstream_five_state.json 缺失，无法确认语料完整性，拒绝冻结")
+
+    # 0b) 重复 claim ID
     ids = [c['id'] for c in claims]
     if len(ids) != len(set(ids)):
         ok = fail(f'重复 claim ID: {[i for i in ids if ids.count(i) > 1]}')
