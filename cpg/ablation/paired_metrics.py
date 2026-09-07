@@ -45,6 +45,7 @@ import argparse
 import csv
 import json
 import math
+import os
 import random
 import sys
 from pathlib import Path
@@ -218,17 +219,39 @@ def self_test() -> int:
 # --------------------------------------------------------------------------
 # 输出
 # --------------------------------------------------------------------------
-def evaluate(bundle: dict) -> list[dict]:
+def evaluate(bundle: dict, exclude: set = frozenset()) -> list[dict]:
     truth = bundle["truth"]
-    cves = sorted({c for c, _ in truth})
+    # 机器强制排除（2026-09-07）：任一侧源缺失的 CVE（如 D1 的 53500/59224/70485 fixed 空）
+    # 会在配对度量中制造"空 fixed→平凡判 benign"的假成功，须在统计层剔除，不能只靠文档散文。
+    cves = sorted({c for c, _ in truth} - set(exclude))
     rows = []
     for name, preds in bundle["scorers"].items():
-        pairs = [(truth[k], preds.get(k, False)) for k in truth]
+        pairs = [(truth[k], preds.get(k, False)) for k in truth
+                 if k[0] not in exclude]
         c = confusion(pairs)
         m = basic_metrics(c)
         pm = paired_metrics(preds, cves)
         rows.append({"scorer": name, **c, **m, "paired": pm})
     return rows
+
+
+def detect_empty_source(corpus_pairs: Path) -> set:
+    """扫描 corpus_pairs，返回 vuln 或 fixed 任一侧 .py 文件数为 0 的 CVE 集合。
+
+    用于 --exclude-empty-source：任一侧源缺失的 CVE 无法配对，须从配对度量剔除
+    （否则空 fixed→平凡判 benign 制造假成功，见 D1 的 53500/59224/70485）。
+    """
+    empty = set()
+    if not corpus_pairs.is_dir():
+        return empty
+    for d in sorted(corpus_pairs.iterdir()):
+        if not d.is_dir():
+            continue
+        nv = sum(1 for _, _, fs in os.walk(d / "vuln") for f in fs if f.endswith(".py"))
+        nf = sum(1 for _, _, fs in os.walk(d / "fixed") for f in fs if f.endswith(".py"))
+        if nv == 0 or nf == 0:
+            empty.add(d.name)
+    return empty
 
 
 def render(rows: list[dict], markdown: bool) -> str:
@@ -267,6 +290,12 @@ def main() -> None:
     ap.add_argument("--check", action="store_true", help="统计契约违例则退出码非零（CI/评审用）")
     ap.add_argument("--self-test", action="store_true", help="跑内置统计契约自测后退出")
     ap.add_argument("--json-out", type=Path)
+    ap.add_argument("--exclude", default="", help="逗号分隔的 CVE，从配对度量剔除")
+    ap.add_argument("--exclude-empty-source", action="store_true",
+                    help="自动剔除 corpus_pairs 中 vuln/fixed 任一侧 .py 为 0 的 CVE")
+    ap.add_argument("--corpus-pairs", type=Path,
+                    default=Path(__file__).resolve().parents[1] / "corpus_pairs",
+                    help="corpus_pairs 路径（--exclude-empty-source 用）")
     args = ap.parse_args()
 
     if args.self_test:
@@ -284,7 +313,16 @@ def main() -> None:
     if not args.no_trivial:
         add_trivial_baselines(bundle)
 
-    rows = evaluate(bundle)
+    exclude = {x.strip() for x in args.exclude.split(",") if x.strip()}
+    if args.exclude_empty_source:
+        es = detect_empty_source(args.corpus_pairs)
+        exclude |= es
+        if es:
+            print(f"[排除空源] {sorted(es)}")
+    if exclude:
+        print(f"[机器排除] 共 {len(exclude)} 例: {sorted(exclude)}")
+
+    rows = evaluate(bundle, exclude)
     print(f"== {header} | {len(bundle['truth'])} 版本 / {len(bundle['truth']) // 2} CVE\n")
     print(render(rows, args.markdown))
 
