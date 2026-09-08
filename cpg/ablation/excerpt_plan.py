@@ -216,8 +216,12 @@ def build_pair_selection_plan(
                     token_estimate=len(content) // 4,
                 ))
 
-    # 3) 预算分配：按 (有 changed hunk 优先, 完整相对路径) 排序，累计到 max_chars
-    #    每块只取完整行；达预算后舍弃剩余块（不截半行）
+    # 3) 预算分配：按 (有 changed hunk 优先, 完整相对路径) 排序，累计到 max_chars。
+    #    cost 含 FILE marker 开销（render_side 会加 marker，须计入预算），每块只取完整行；
+    #    达预算后舍弃剩余块（不截半行）。
+    def marker_len(b: BlockPlan) -> int:
+        return len(f"# ===== FILE: {b.path} (L{b.lo}-L{b.hi}) =====\n")
+
     def block_priority(b: BlockPlan) -> tuple:
         is_hunk = b.reason.startswith("changed_hunk_window")
         return (0 if is_hunk else 1, b.path, b.side)
@@ -227,29 +231,29 @@ def build_pair_selection_plan(
     total = 0
     for b in sorted_blocks:
         if not _is_complete_line(b.content):
-            # 不完整行块（不应发生，防御）
             continue
-        if total + len(b.content) > max_chars and selected:
-            # 达预算，舍弃剩余块（不截半行）
+        cost = len(b.content) + marker_len(b)
+        if total + cost > max_chars and selected:
             continue
-        if len(b.content) > max_chars and not selected:
-            # 单块超预算：截到完整行边界
+        if cost > max_chars and not selected:
+            # 单块超预算：截 content 到完整行边界（预留 marker 空间）
+            budget = max_chars - marker_len(b)
             lines = b.content.splitlines(keepends=True)
             acc = ""
             for ln in lines:
-                if total + len(ln) > max_chars:
+                if len(acc) + len(ln) > budget:
                     break
                 acc += ln
-                total += len(ln)
             if acc:
                 b.content = acc
                 b.hi = b.lo + acc.count("\n") - 1
                 b.content_sha = _sha256_bytes(acc.encode("utf-8"))
                 b.token_estimate = len(acc) // 4
                 selected.append(b)
+                total += len(acc) + marker_len(b)
             continue
         selected.append(b)
-        total += len(b.content)
+        total += cost
 
     plan.blocks = selected
     plan.changed_hunks = changed_hunks

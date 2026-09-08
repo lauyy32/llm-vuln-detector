@@ -1,0 +1,273 @@
+# -*- coding: utf-8 -*-
+"""通用批量实验 runner（Code plan 第7阶段）。
+
+状态机：CREATED → INPUTS_FROZEN → RUNNING → COMPLETE → VERIFIED；任何失败 → FAILED。
+子命令：prepare / verify-inputs / invoke / verify-results / summarize。
+
+- 只接受 --protocol / --canonical-manifest / --run-dir（不接受人工 --exclude-cves）；
+- prepare 生成全部 prompt 并冻结 SHA + 固定 seed 打乱调用顺序写入 run_schedule；
+- 全部 prompt 冻结后才可 invoke；运行期间不打印单项 verdict；
+- resume 支持，但唯一键 (sample_id, side, arm, repeat) 重复即失败；
+- 结果完成后再 summarize，不边看结果边改。
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import random
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from cpg.ablation import excerpt_plan  # noqa: E402
+from cpg.ablation import prompt_renderer  # noqa: E402
+from cpg.ablation.model_client import ModelClient, MODEL, MODEL_DIGEST, NUM_CTX, NUM_PREDICT, TEMPERATURE, TOP_P, SEED  # noqa: E402
+
+STATES = ("CREATED", "INPUTS_FROZEN", "RUNNING", "COMPLETE", "VERIFIED", "FAILED")
+
+
+def _sha256_text(s: str) -> str:
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()
+
+
+def _read_state(run_dir: Path) -> str:
+    p = run_dir / "state.json"
+    if not p.exists():
+        return "CREATED"
+    return json.loads(p.read_text(encoding="utf-8")).get("state", "CREATED")
+
+
+def _write_state(run_dir: Path, state: str, extra: dict | None = None):
+    run_dir.mkdir(parents=True, exist_ok=True)
+    d = {"state": state}
+    if extra:
+        d.update(extra)
+    (run_dir / "state.json").write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _fail(run_dir: Path, msg: str):
+    _write_state(run_dir, "FAILED", {"error": msg})
+    print(f"[FAIL] {msg}")
+    return 1
+
+
+def load_canonical(manifest_path: Path) -> dict:
+    return json.loads(manifest_path.read_text(encoding="utf-8"))
+
+
+def prepare(args) -> int:
+    """生成 82×2 prompt + 冻结 SHA + run_schedule。CREATED → INPUTS_FROZEN。"""
+    run_dir = args.run_dir
+    if _read_state(run_dir) not in ("CREATED", "FAILED"):
+        return _fail(run_dir, f"prepare 要求 CREATED，当前 {_read_state(run_dir)}")
+    manifest = load_canonical(args.canonical_manifest)
+    if manifest.get("errors"):
+        return _fail(run_dir, f"canonical manifest 有验证错误: {manifest['errors'][:3]}")
+    eligible = [s for s in manifest["samples"] if s.get("eligible")]
+    if len(eligible) != manifest.get("eligible_total"):
+        return _fail(run_dir, f"eligible 计数不符 {len(eligible)} != {manifest['eligible_total']}")
+
+    # 协议：冻结摘录策略 + 模型参数
+    protocol = {
+        "model": MODEL, "model_digest": MODEL_DIGEST,
+        "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT,
+        "temperature": TEMPERATURE, "top_p": TOP_P, "seed": SEED,
+        "summary": False, "excerpt_hunk_window": 20, "excerpt_head_lines": 100,
+        "max_code_chars": 8000,
+    }
+
+    prompts_dir = run_dir / "prompts"
+    prompts_dir.mkdir(parents=True, exist_ok=True)
+    prompt_manifest = []
+    for s in eligible:
+        cve = s["sample_id"]
+        pm_path = ROOT / s["source_path"] / "pair_manifest.json"
+        pm = json.loads(pm_path.read_text(encoding="utf-8"))
+        repo_dir = ROOT / "cpg/corpus_raw" / pm["repo_slug"].replace("/", "__")
+        spec = type("S", (), {"sample_id": cve})()
+        plan = excerpt_plan.build_pair_selection_plan(
+            spec, pm, repo_dir,
+            max_chars=protocol["max_code_chars"],
+            head_lines=protocol["excerpt_head_lines"],
+            hunk_window=protocol["excerpt_hunk_window"],
+        )
+        for side in ("vuln", "fixed"):
+            code_text = excerpt_plan.render_side(plan, side)
+            prompt = prompt_renderer.render_prompt(
+                {"cve_id": cve, "cwe": (s.get("cwes") or [None])[0] if isinstance(s.get("cwes"), list) else None},
+                code_text, None, summary=protocol["summary"],
+                max_code_chars=protocol["max_code_chars"],
+            )
+            sha = _sha256_text(prompt)
+            pout = prompts_dir / f"{cve}_{side}.prompt.txt"
+            pout.write_text(prompt, encoding="utf-8")
+            prompt_manifest.append({
+                "sample_id": cve, "side": side, "arm": "real",
+                "prompt_path": str(pout.relative_to(run_dir)),
+                "prompt_sha256": sha,
+                "selection_plan_sha256": plan.plan_sha(),
+                "source_tree_sha256": s.get(f"{side}_tree_sha256_lf"),
+                "hunk_coverage": plan.hunk_coverage,
+            })
+
+    # 固定 seed 打乱调用顺序（vuln/fixed 交错）
+    rng = random.Random(SEED)
+    order = prompt_manifest[:]
+    rng.shuffle(order)
+    run_schedule = [{"sample_id": p["sample_id"], "side": p["side"], "arm": p["arm"]}
+                    for p in order]
+
+    (run_dir / "prompt_manifest.jsonl").write_text(
+        "\n".join(json.dumps(p, ensure_ascii=False) for p in prompt_manifest) + "\n",
+        encoding="utf-8")
+    (run_dir / "run_schedule.json").write_text(
+        json.dumps(run_schedule, ensure_ascii=False, indent=2), encoding="utf-8")
+    (run_dir / "protocol.json").write_text(
+        json.dumps(protocol, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    _write_state(run_dir, "INPUTS_FROZEN", {"n_prompts": len(prompt_manifest)})
+    print(f"[prepare] {len(prompt_manifest)} 份 prompt 冻结，schedule 已写入")
+    return 0
+
+
+def verify_inputs(args) -> int:
+    """验证输入工件：prompt SHA 一致 + 无摘要泄漏 + fence 正确。"""
+    run_dir = args.run_dir
+    if _read_state(run_dir) != "INPUTS_FROZEN":
+        return _fail(run_dir, f"verify-inputs 要求 INPUTS_FROZEN，当前 {_read_state(run_dir)}")
+    manifest = []
+    for line in (run_dir / "prompt_manifest.jsonl").read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            manifest.append(json.loads(line))
+    errors = []
+    for p in manifest:
+        prompt = (run_dir / p["prompt_path"]).read_text(encoding="utf-8")
+        if _sha256_text(prompt) != p["prompt_sha256"]:
+            errors.append(f"{p['sample_id']}/{p['side']} prompt SHA 漂移")
+        if "公告摘要" in prompt:
+            errors.append(f"{p['sample_id']}/{p['side']} 含公告摘要泄漏")
+        if prompt.count("```") != 2:
+            errors.append(f"{p['sample_id']}/{p['side']} fence 数 != 2")
+    if errors:
+        return _fail(run_dir, f"verify-inputs {len(errors)} 错误: {errors[:3]}")
+    print(f"[verify-inputs] PASS {len(manifest)} 份 prompt 验证通过")
+    return 0
+
+
+def invoke(args) -> int:
+    """调用模型。INPUTS_FROZEN → RUNNING → COMPLETE。"""
+    run_dir = args.run_dir
+    if _read_state(run_dir) != "INPUTS_FROZEN":
+        return _fail(run_dir, f"invoke 要求 INPUTS_FROZEN，当前 {_read_state(run_dir)}")
+
+    client = ModelClient()
+    client.verify_digest()  # 不一致抛异常
+
+    schedule = json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))
+    # 索引 prompt_manifest
+    pmap = {}
+    for line in (run_dir / "prompt_manifest.jsonl").read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            p = json.loads(line)
+            pmap[(p["sample_id"], p["side"])] = p
+
+    _write_state(run_dir, "RUNNING")
+    results_path = run_dir / "results.jsonl"
+    seen = set()
+    # 支持 resume：跳过已存在的唯一键；重复（非跳过）则失败
+    done = set()
+    if results_path.exists():
+        for line in results_path.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                r = json.loads(line)
+                done.add((r["sample_id"], r["side"], r["arm"], r["repeat"]))
+
+    with open(results_path, "a", encoding="utf-8") as f:
+        for item in schedule:
+            key = (item["sample_id"], item["side"], item["arm"], 0)
+            if key in done:
+                continue
+            if key in seen:
+                return _fail(run_dir, f"唯一键重复: {key}")
+            seen.add(key)
+            p = pmap[(item["sample_id"], item["side"])]
+            prompt = (run_dir / p["prompt_path"]).read_text(encoding="utf-8")
+            rec = client.call(prompt, prompt_renderer.SYSTEM,
+                              sample_id=item["sample_id"], side=item["side"],
+                              arm=item["arm"], repeat=0, extra={
+                                  "prompt_path": p["prompt_path"],
+                                  "prompt_sha256": p["prompt_sha256"],
+                                  "selection_plan_sha256": p["selection_plan_sha256"],
+                                  "source_tree_sha256": p["source_tree_sha256"],
+                              })
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            f.flush()  # 写失败会抛异常中止
+
+    _write_state(run_dir, "COMPLETE")
+    print(f"[invoke] 完成 {len(seen)} 次调用")
+    return 0
+
+
+def verify_results(args) -> int:
+    """验证结果完整性。COMPLETE → VERIFIED。"""
+    run_dir = args.run_dir
+    if _read_state(run_dir) != "COMPLETE":
+        return _fail(run_dir, f"verify-results 要求 COMPLETE，当前 {_read_state(run_dir)}")
+    schedule = json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))
+    results = []
+    for line in (run_dir / "results.jsonl").read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            results.append(json.loads(line))
+    got = {(r["sample_id"], r["side"]) for r in results}
+    expected = {(s["sample_id"], s["side"]) for s in schedule}
+    if got != expected:
+        missing = expected - got
+        return _fail(run_dir, f"结果不完整，缺 {len(missing)} 项: {list(missing)[:3]}")
+    _write_state(run_dir, "VERIFIED", {"n_results": len(results)})
+    print(f"[verify-results] PASS {len(results)} 项结果完整")
+    return 0
+
+
+def summarize(args) -> int:
+    """聚合统计（只读，不改状态）。"""
+    run_dir = args.run_dir
+    if _read_state(run_dir) not in ("COMPLETE", "VERIFIED"):
+        return _fail(run_dir, f"summarize 要求 COMPLETE/VERIFIED，当前 {_read_state(run_dir)}")
+    results = []
+    for line in (run_dir / "results.jsonl").read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            results.append(json.loads(line))
+    by_pair = {}
+    for r in results:
+        by_pair.setdefault(r["sample_id"], {})[r["side"]] = r["verdict"]
+    strict = sum(1 for cve, d in by_pair.items()
+                 if d.get("vuln") == "vulnerable" and d.get("fixed") == "benign")
+    n = len(by_pair)
+    summary = {"n_pairs": n, "strict_success": strict,
+               "rate": round(strict / n, 4) if n else None}
+    (run_dir / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[summarize] strict_success={strict}/{n}")
+    return 0
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("command", choices=["prepare", "verify-inputs", "invoke", "verify-results", "summarize"])
+    ap.add_argument("--protocol", type=Path)
+    ap.add_argument("--canonical-manifest", type=Path,
+                    default=ROOT / "cpg/ablation/artifacts/canonical_corpus_manifest.json")
+    ap.add_argument("--run-dir", required=True, type=Path)
+    args = ap.parse_args()
+
+    fn = {"prepare": prepare, "verify-inputs": verify_inputs, "invoke": invoke,
+          "verify-results": verify_results, "summarize": summarize}[args.command]
+    try:
+        return fn(args)
+    except Exception as e:
+        return _fail(args.run_dir, f"{args.command} 异常: {e}")
+
+
+if __name__ == "__main__":
+    sys.exit(main())
