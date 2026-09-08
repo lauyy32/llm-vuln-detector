@@ -18,6 +18,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -124,9 +125,9 @@ def worker(version: str):
             "has_utils": "utils.py" in code_text or "utils" in code_text,
             "code_text_chars": len(code_text),
             "cpg_slices_chars": len(cpg_slices),
-            # 关键 hunk 是否进入 prompt（Codex：不能只凭文件名判 FULL；精确匹配危险 eval，
-            #    不能把 ast.literal_eval( 误判成 eval(）
-            "hunk_eval_call": "eval(model_output" in code_text,
+            # 关键 hunk 是否进入 prompt（Codex：不能只凭文件名判 FULL）。
+            # 危险 eval 用负向后行断言排除属性调用，避免把 ast.literal_eval( 误判成 eval(。
+            "hunk_eval_call": bool(re.search(r"(?<![\w.])eval\s*\(", code_text)),
             "hunk_json_loads": "json.loads" in code_text,
             "hunk_ast_literal_eval": "ast.literal_eval" in code_text,
         }

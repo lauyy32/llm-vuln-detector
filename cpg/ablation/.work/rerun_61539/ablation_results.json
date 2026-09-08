@@ -1,0 +1,53 @@
+{
+ "digest_verified": true,
+ "variants": {
+  "A_v2_orig": [
+   {
+    "rep": 0,
+    "verdict": "benign",
+    "confidence": 1.0,
+    "rationale": "No untrusted input reaches a modelled sink.",
+    "prompt_eval_count": 2111
+   },
+   {
+    "rep": 1,
+    "verdict": "benign",
+    "confidence": 1.0,
+    "rationale": "No untrusted input reaches a modelled sink.",
+    "prompt_eval_count": 2111
+   }
+  ],
+  "B_v2_no_utils": [
+   {
+    "rep": 0,
+    "verdict": "vulnerable",
+    "confidence": 1.0,
+    "rationale": "The use of eval() to parse untrusted input is a known security risk.",
+    "prompt_eval_count": 1500
+   },
+   {
+    "rep": 1,
+    "verdict": "vulnerable",
+    "confidence": 1.0,
+    "rationale": "The use of eval() to parse untrusted input is a known security risk.",
+    "prompt_eval_count": 1500
+   }
+  ],
+  "C_v1_add_utils": [
+   {
+    "rep": 0,
+    "verdict": "abstain",
+    "confidence": 0.0,
+    "rationale": "代码中没有使用 eval() 函数，因此不存在数据流型漏洞。",
+    "prompt_eval_count": 2323
+   },
+   {
+    "rep": 1,
+    "verdict": "abstain",
+    "confidence": 0.0,
+    "rationale": "代码中没有使用 eval() 函数，因此不存在数据流型漏洞。",
+    "prompt_eval_count": 2323
+   }
+  ]
+ }
+}
