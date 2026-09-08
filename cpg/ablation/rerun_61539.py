@@ -52,11 +52,12 @@ def worker(version: str):
             shutil.rmtree(dst)
         shutil.copytree(src_root / side, dst)
 
-    # 2) meta 从 read_meta 读真实 CWE（61539 = CWE-95 Eval Injection，非 SSRF）
+    # 2) meta 从 read_meta 读真实 CWE（61539 = CWE-95 Eval Injection，非 SSRF）。
+    #    ⚠️ summary 必须置空：历史主结果默认 --with-summary 不注入（摘要描述漏洞位置/成因，
+    #    构成标签泄漏）。上轮错误注入摘要导致 prompt 与历史不等价、模型判 abstain。
     meta_full = read_meta(cve)
     cwe = config.normalize_cwe((meta_full.get("cwes") or [None])[0])
-    meta = {"cve_id": cve, "cwe": cwe,
-            "summary": (meta_full.get("summary") or "")[:200]}
+    meta = {"cve_id": cve, "cwe": cwe, "summary": ""}
 
     # 3) 建库（单例，快；DB 已存在则复用，避免重复重建）
     if not corpus_db.exists():
@@ -123,8 +124,9 @@ def worker(version: str):
             "has_utils": "utils.py" in code_text or "utils" in code_text,
             "code_text_chars": len(code_text),
             "cpg_slices_chars": len(cpg_slices),
-            # 关键 hunk 是否进入 prompt（Codex：不能只凭文件名判 FULL）
-            "hunk_eval_call": "eval(" in code_text,
+            # 关键 hunk 是否进入 prompt（Codex：不能只凭文件名判 FULL；精确匹配危险 eval，
+            #    不能把 ast.literal_eval( 误判成 eval(）
+            "hunk_eval_call": "eval(model_output" in code_text,
             "hunk_json_loads": "json.loads" in code_text,
             "hunk_ast_literal_eval": "ast.literal_eval" in code_text,
         }

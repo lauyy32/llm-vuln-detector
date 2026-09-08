@@ -7,56 +7,56 @@
    "query": "taint",
    "cwe": "CWE-022",
    "rc": 0,
-   "secs": 14.5,
+   "secs": 10.4,
    "rows": 0
   },
   {
    "query": "tarslip",
    "cwe": "CWE-022",
    "rc": 0,
-   "secs": 14.0,
+   "secs": 9.7,
    "rows": 0
   },
   {
    "query": "cwe-089",
    "cwe": "CWE-089",
    "rc": 0,
-   "secs": 14.3,
+   "secs": 9.9,
    "rows": 0
   },
   {
    "query": "cwe-078",
    "cwe": "CWE-078",
    "rc": 0,
-   "secs": 13.3,
+   "secs": 10.0,
    "rows": 0
   },
   {
    "query": "cwe-094",
    "cwe": "CWE-094",
    "rc": 0,
-   "secs": 13.4,
+   "secs": 10.2,
    "rows": 0
   },
   {
    "query": "cwe-918",
    "cwe": "CWE-918",
    "rc": 0,
-   "secs": 11.5,
+   "secs": 10.4,
    "rows": 0
   },
   {
    "query": "cwe-079",
    "cwe": "CWE-079",
    "rc": 0,
-   "secs": 10.0,
+   "secs": 9.9,
    "rows": 0
   }
  ],
  "prompts": {
   "vuln": {
-   "prompt_sha256": "35ea8354a48810e54e97dd6d4a6fecc7c6c6a1d99fbb12a9e2f36459f5fe536d",
-   "prompt_chars": 8392,
+   "prompt_sha256": "18a7ddbecf4e47f15fb33ace16e0cb0df7c601fd8dbe302d58bbd6141412562b",
+   "prompt_chars": 8289,
    "taint_rows": 0,
    "has_llama3_tool_parser": true,
    "has_utils": true,
@@ -67,8 +67,8 @@
    "hunk_ast_literal_eval": false
   },
   "fixed": {
-   "prompt_sha256": "5abe81b5ca57439fc1260f1f4ccb545a0b7edff71a282c7b4cda8810ff4c9579",
-   "prompt_chars": 8392,
+   "prompt_sha256": "1091d124d6c94ddd4ca4a1929e701b0ea3960512f254f6398cdffe032ff5fd23",
+   "prompt_chars": 8289,
    "taint_rows": 0,
    "has_llama3_tool_parser": true,
    "has_utils": false,

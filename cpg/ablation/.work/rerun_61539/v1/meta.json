@@ -7,56 +7,56 @@
    "query": "taint",
    "cwe": "CWE-022",
    "rc": 0,
-   "secs": 10.4,
+   "secs": 15.7,
    "rows": 0
   },
   {
    "query": "tarslip",
    "cwe": "CWE-022",
    "rc": 0,
-   "secs": 11.9,
+   "secs": 9.7,
    "rows": 0
   },
   {
    "query": "cwe-089",
    "cwe": "CWE-089",
    "rc": 0,
-   "secs": 13.8,
+   "secs": 9.8,
    "rows": 0
   },
   {
    "query": "cwe-078",
    "cwe": "CWE-078",
    "rc": 0,
-   "secs": 13.5,
+   "secs": 10.2,
    "rows": 0
   },
   {
    "query": "cwe-094",
    "cwe": "CWE-094",
    "rc": 0,
-   "secs": 13.9,
+   "secs": 10.0,
    "rows": 0
   },
   {
    "query": "cwe-918",
    "cwe": "CWE-918",
    "rc": 0,
-   "secs": 15.5,
+   "secs": 11.0,
    "rows": 0
   },
   {
    "query": "cwe-079",
    "cwe": "CWE-079",
    "rc": 0,
-   "secs": 13.8,
+   "secs": 10.1,
    "rows": 0
   }
  ],
  "prompts": {
   "vuln": {
-   "prompt_sha256": "2358cce1218d705fb4563265710fc21dafffee5ce2e90027f4e9f3959a6fdbe7",
-   "prompt_chars": 6533,
+   "prompt_sha256": "313f4f49f373e41dcd46ed2dcb994ada6b398057675bb5f0fffa3cefc8c731f8",
+   "prompt_chars": 6430,
    "taint_rows": 0,
    "has_llama3_tool_parser": true,
    "has_utils": true,
@@ -67,8 +67,8 @@
    "hunk_ast_literal_eval": false
   },
   "fixed": {
-   "prompt_sha256": "52b5f6c3c9d959643754b37d7eead1cb4ac44cfeb03f871e62732bf131fef6b3",
-   "prompt_chars": 3019,
+   "prompt_sha256": "e11dcd9fcaede98171894d8470d74be0de02ba705d8218819ac083ed19720d13",
+   "prompt_chars": 2916,
    "taint_rows": 0,
    "has_llama3_tool_parser": false,
    "has_utils": true,

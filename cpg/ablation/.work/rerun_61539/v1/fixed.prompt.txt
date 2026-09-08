@@ -1,7 +1,6 @@
 # 审计任务
 - CVE: CVE-2026-61539
 - 目标 CWE: CWE-095
-- 公告摘要: Xinference vulnerable to remote code execution via unsafe `eval()` in Llama3 tool-call parsing
 
 # 目标代码（节选）
 ```
