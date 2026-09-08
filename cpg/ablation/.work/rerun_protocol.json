@@ -47,5 +47,31 @@
   "5 看模型输出前完成 prompt 验收",
   "6 同环境跑 v1 与 v2 两侧",
   "7 报告 source→cpg→prompt→prediction 四层变化"
+ ],
+ "amendments": [
+  {
+   "amendment_id": "A1",
+   "date": "2026-09-08",
+   "reason": "上轮误注入公告摘要(构成标签泄漏)，prompt 与历史不等价，结论作废；改为无摘要等价复验",
+   "changes": "summary 置空；v1-vuln SHA=313f4f49、v1-fixed SHA=e11dcd9f 与历史逐字节一致"
+  },
+  {
+   "amendment_id": "A2",
+   "date": "2026-09-08",
+   "reason": "冻结完整推理参数与模型指纹",
+   "changes": "model digest=dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364(完整64位)；num_ctx=32768；num_predict=1024；temp=0；top_p=1.0；repeat=2；调用前校验实际 digest"
+  },
+  {
+   "amendment_id": "A3",
+   "date": "2026-09-08",
+   "reason": "纠正查询集合表述：原写 ast/cfg/dfg/taint 四查询，实际只执行 taint 查询集合",
+   "changes": "实际 7 个 taint 查询(taint/tarslip/cwe-089/cwe-078/cwe-094/cwe-918/cwe-079)×v1/v2=14 次执行，全 rc=0 rows=0，机器汇总 taint_total=0"
+  },
+  {
+   "amendment_id": "A4",
+   "date": "2026-09-08",
+   "reason": "上下文不鲁棒性 2x2 消融(机制分析，不改主实验 prompt)",
+   "changes": "A(v2 原样)=benign、B(v2 去 utils.py)=vulnerable、C(v1 加 utils.py)=abstain；危险 eval 位置/上下文逐字不变，仅增删 license 样板即翻转判定"
+  }
  ]
 }
