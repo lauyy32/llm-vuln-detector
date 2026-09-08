@@ -21,6 +21,8 @@ from pathlib import Path
 
 from . import config
 
+ROOT = Path(__file__).resolve().parents[2]
+
 
 def _rmtree_manual(path) -> None:
     """递归删除目录，绕过沙箱对 ``shutil.rmtree`` 的安全拦截。
@@ -235,3 +237,144 @@ def build_corpus_db(rows: list[dict], skip_baseline: bool = False, force_rebuild
                 print("[warn] corpus baseline analyze failed/empty; "
                       "CodeQLBaselineScorer will be skipped for this run")
     return CORPUS_DB, staged, all_taint, sarif_path
+
+
+# ---------------------------------------------------------------------------
+# 第3阶段（2026-09-08）：精确 staging + 绑定 SHA 的缓存契约，替换上面的合并不删/仅凭存在复用。
+# ---------------------------------------------------------------------------
+
+# 查询结果四态（Code plan）：必须显式区分，query 失败不得伪装成 0 行。
+QUERY_SUCCESS_WITH_ROWS = "SUCCESS_WITH_ROWS"
+QUERY_SUCCESS_ZERO_ROWS = "SUCCESS_ZERO_ROWS"
+QUERY_UNSUPPORTED_CWE = "UNSUPPORTED_CWE"
+QUERY_FAILED = "QUERY_FAILED"
+
+
+def _sha256_bytes(b: bytes) -> str:
+    import hashlib
+    return hashlib.sha256(b).hexdigest()
+
+
+def tree_sha_lf(dirpath: Path) -> str:
+    """目录树哈希（LF 规范化内容），跨平台可复算。"""
+    if not dirpath.is_dir():
+        return ""
+    parts = []
+    for p in sorted(dirpath.rglob("*")):
+        if p.is_file():
+            rel = p.relative_to(dirpath).as_posix()
+            data = p.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+            parts.append(rel + ":" + _sha256_bytes(data))
+    return _sha256_bytes("\n".join(parts).encode("utf-8"))
+
+
+def stage_exact_snapshot(canonical_manifest: dict, run_root: Path) -> dict:
+    """从 canonical manifest 的 source_path 显式复制到 run-specific 空目录。
+
+    - run_root 是新的空目录，逐样本 copytree 到**不存在**的目标（不会合并残留）；
+    - 复制后重算树哈希并与 manifest 比对，任一不符即抛异常；
+    - 缺任一 side 直接抛异常（不 continue）；
+    - 返回 staged manifest（含每样本 prefix/source_tree_sha + 整体 SHA）。
+    """
+    corpus_src = run_root / "corpus_src"
+    corpus_src.mkdir(parents=True, exist_ok=True)
+    staged = []
+    for s in canonical_manifest.get("samples", []):
+        if not s.get("eligible"):
+            continue
+        cve = s["sample_id"]
+        src_root = ROOT / s["source_path"]
+        for version in ("vuln", "fixed"):
+            src = src_root / version
+            if not src.is_dir():
+                raise RuntimeError(f"{cve}/{version} 源码目录缺失: {src}")
+            dst = corpus_src / f"{cve}_{version}"
+            if dst.exists():
+                raise RuntimeError(f"staging 目录已存在（非空 run_root）: {dst}")
+            shutil.copytree(src, dst)
+            ts = tree_sha_lf(dst)
+            expected = s.get(f"{version}_tree_sha256_lf")
+            if ts != expected:
+                raise RuntimeError(f"{cve}/{version} 树哈希漂移: {ts[:12]} != {expected[:12]}")
+        staged.append({
+            "cve": cve,
+            "prefix_vuln": f"{cve}_vuln",
+            "prefix_fixed": f"{cve}_fixed",
+            "vuln_tree_sha": s["vuln_tree_sha256_lf"],
+            "fixed_tree_sha": s["fixed_tree_sha256_lf"],
+        })
+    staged_sha = _sha256_bytes(json.dumps(staged, sort_keys=True, ensure_ascii=False).encode("utf-8"))
+    return {"corpus_src": corpus_src, "samples": staged, "staged_manifest_sha256": staged_sha}
+
+
+def query_set_sha(query_files: list[Path]) -> str:
+    """所有 query 文件内容 SHA 的确定性集合哈希。"""
+    parts = []
+    for q in sorted(query_files, key=lambda p: p.as_posix()):
+        parts.append(q.as_posix() + ":" + _sha256_bytes(q.read_bytes()))
+    return _sha256_bytes("\n".join(parts).encode("utf-8"))
+
+
+def codeql_identity() -> str:
+    """CodeQL 完整版本标识。"""
+    r = config.run(
+        [str(config.codeql_binary()), "version"],
+        config.make_env(config.DEFAULT_JAVA_HOME), 60,
+    )
+    return "unknown"
+
+
+def build_or_reuse_db(staged_manifest_sha: str, query_set_sha: str, codeql_id: str,
+                      run_root: Path, query_files: list[Path], db: Path) -> dict:
+    """建库 + 跑 taint 查询，cache key 绑定输入 SHA，不匹配禁止复用。
+
+    cache key = sha256(staged_manifest_sha + query_set_sha + codeql_id)。
+    每个查询记录 rc/status/rows/bqrs_sha/csv_sha/command/duration。
+    """
+    cache_key = _sha256_bytes(
+        (staged_manifest_sha + query_set_sha + codeql_id).encode("utf-8"))
+    cache_marker = run_root / ".db_cache_key"
+    if cache_marker.exists() and cache_marker.read_text().strip() == cache_key and _db_ready(db):
+        print(f"[info] reuse DB cache (key={cache_key[:12]})")
+        return {"cache_hit": True, "cache_key": cache_key, "db": db, "queries": []}
+
+    env = config.make_env(config.DEFAULT_JAVA_HOME)
+    rc = config.run(
+        [str(config.codeql_binary()), "database", "create",
+         config.win_path(db), "--language=python",
+         f"--source-root={config.win_path(run_root / 'corpus_src')}", "--overwrite"],
+        env, DB_TIMEOUT,
+    )
+    if rc != 0:
+        raise RuntimeError(f"corpus database create failed (exit {rc})")
+
+    query_log = []
+    all_taint = []
+    for ql in query_files:
+        qbase = ql.stem
+        bqrs = run_root / f"{qbase}.bqrs"
+        csv_out = run_root / f"{qbase}.csv"
+        cmd = [str(config.codeql_binary()), "query", "run", config.win_path(ql),
+               f"--database={config.win_path(db)}",
+               f"--search-path={config.win_path(config.CODEQL_QUERIES_DIR)}",
+               f"--output={config.win_path(bqrs)}", "--ram=3000", "--threads=8"]
+        import time
+        t0 = time.time()
+        rc = config.run(cmd, env, config.EXTRACT_TAINT_TIMEOUT)
+        dur = round(time.time() - t0, 1)
+        if rc != 0:
+            query_log.append({"query": qbase, "rc": rc, "status": QUERY_FAILED,
+                              "rows": 0, "duration_s": dur})
+            continue
+        rows = _decode_bqrs(bqrs, csv_out, env)
+        status = QUERY_SUCCESS_WITH_ROWS if rows else QUERY_SUCCESS_ZERO_ROWS
+        all_taint.extend(rows)
+        query_log.append({
+            "query": qbase, "rc": 0, "status": status, "rows": len(rows),
+            "bqrs_sha": _sha256_bytes(bqrs.read_bytes()) if bqrs.exists() else None,
+            "csv_sha": _sha256_bytes(csv_out.read_bytes()) if csv_out.exists() else None,
+            "command": " ".join(cmd), "duration_s": dur,
+        })
+    cache_marker.write_text(cache_key)
+    return {"cache_hit": False, "cache_key": cache_key, "db": db,
+            "queries": query_log, "taint_rows": all_taint}
