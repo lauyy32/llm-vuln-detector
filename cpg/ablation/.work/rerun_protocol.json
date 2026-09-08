@@ -78,7 +78,14 @@
    "amendment_id": "A5",
    "date": "2026-09-08",
    "reason": "A4 作废：消融脚本 rebuild() 丢失审计任务头部/目标代码标题/代码围栏，B/C 格式被破坏，结果不可用于机制主张(Codex 核验)",
-   "changes": "修正 split/rebuild 保留 prefix/head/tail 全字节(v1_orig/v2_orig 与原 prompt 逐字节相等，围栏数=2 断言)。重跑 4 变体(repeat=3)：v1_orig=vulnerable、v1_add_utils=abstain、v2_orig=benign、v2_no_utils=abstain。正确格式下增删 utils 块都从确定判定翻成 abstain；上版 B→vulnerable 是格式破坏假象。修正 hunk 检测排除注释行，v2-fixed 危险 eval=False(仅注释含 eval 字样)。"
+   "changes": "修正 split/rebuild 保留 prefix/head/tail 全字节(v1_orig/v2_orig 与原 prompt 逐字节相等，围栏数=2 断言)。重跑 4 变体(repeat=3)：v1_orig=vulnerable、v1_add_utils=abstain、v2_orig=benign、v2_no_utils=abstain。正确格式下增删 utils 块都从确定判定翻成 abstain；上版 B→vulnerable 是格式破坏假象。修正 hunk 检测排除注释行，v2-fixed 危险 eval=False(仅注释含 eval 字样)。",
+   "status": "SUPERSEDED_BY_A6"
+  },
+  {
+   "amendment_id": "A6",
+   "date": "2026-09-08",
+   "reason": "A5 消融仍无效：v1_add_utils 把 utils 块追加到已截断的 test_utils.py 后形成代码粘连(\"choices\": [# ===== FILE: utils.py...)；v1_add_utils 9344 字符违反 8000 摘录契约；v2_no_utils 删除块后未用释放预算回填，非同一摘录器的反事实；utils.py L1-100 非纯 license(仅约13行license，其余 import/常量/实现)。",
+   "changes": "A5 输出保留作审计记录；因内部代码粘连、预算违规及反事实未重新经过摘录器，其机制性解释作废。61539 仅作为发现型 pilot，不进入 CR-1 估计样本。此后不再为 61539 增加 A7/A8。"
   }
  ]
 }

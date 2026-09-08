@@ -162,5 +162,7 @@
     "hunk_ast_literal_eval": true
    }
   }
- }
+ },
+ "_status": "INVALID_STALE",
+ "_note": "本文件含带公告摘要的旧 prompt SHA，与 v1/v2 meta.json 的无摘要新 SHA 漂移；须由工件聚合器重建，禁止手工改数字"
 }

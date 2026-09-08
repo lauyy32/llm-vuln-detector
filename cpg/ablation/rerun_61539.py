@@ -29,6 +29,15 @@ OUT_ROOT = REPO / "cpg/ablation/.work/rerun_61539"
 TMP_DATA_ROOT = Path("C:/Users/lenovo/cpg_db_61539_rerun")
 
 
+def _has_danger_eval(code: str) -> bool:
+    """检测危险 eval() 调用：排除注释行与属性调用（ast.literal_eval 等）。"""
+    for line in code.splitlines():
+        code_part = line.split("#", 1)[0]
+        if re.search(r"(?<![\w.])eval\s*\(", code_part):
+            return True
+    return False
+
+
 def worker(version: str):
     """在独立 DATA_ROOT 下生成 v1 或 v2 的两份 prompt（vuln/fixed）。"""
     os.environ["CPG_DATA_ROOT"] = str(TMP_DATA_ROOT / version)
@@ -125,14 +134,7 @@ def worker(version: str):
             "has_utils": "utils.py" in code_text or "utils" in code_text,
             "code_text_chars": len(code_text),
             "cpg_slices_chars": len(cpg_slices),
-            # 关键 hunk 是否进入 prompt。危险 eval 检测须排除注释行与属性调用：
-            #   负向后行断言排除 ast.literal_eval(；逐行去掉 # 注释避免把"# Unlike eval()"误判。
-            def _has_danger_eval(code):
-                for line in code.splitlines():
-                    code_part = line.split("#", 1)[0]
-                    if re.search(r"(?<![\w.])eval\s*\(", code_part):
-                        return True
-                return False
+            # 关键 hunk 是否进入 prompt。危险 eval 检测排除注释行与属性调用。
             "hunk_eval_call": _has_danger_eval(code_text),
             "hunk_json_loads": "json.loads" in code_text,
             "hunk_ast_literal_eval": "ast.literal_eval" in code_text,

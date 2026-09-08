@@ -362,7 +362,8 @@ def main() -> int:
                      "路径=" if delta_zero else "路径≠",
                      ce_s, str(sample["token_estimate"])))
 
-    hdr = f"{'CVE':<17} {'repo':<24} {'commit':<11} {'PyP':>3} {'PyC':>3} {'P\\C/C\\P':>7} {'路径':<5} {'内容':<5} {'tok':>6}"
+    pc_label = "P\\C/C\\P"
+    hdr = f"{'CVE':<17} {'repo':<24} {'commit':<11} {'PyP':>3} {'PyC':>3} {pc_label:>7} {'路径':<5} {'内容':<5} {'tok':>6}"
     print(hdr)
     print("-" * len(hdr))
     for r in rows:
