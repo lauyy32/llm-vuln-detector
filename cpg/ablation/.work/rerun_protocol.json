@@ -71,7 +71,14 @@
    "amendment_id": "A4",
    "date": "2026-09-08",
    "reason": "上下文不鲁棒性 2x2 消融(机制分析，不改主实验 prompt)",
-   "changes": "A(v2 原样)=benign、B(v2 去 utils.py)=vulnerable、C(v1 加 utils.py)=abstain；危险 eval 位置/上下文逐字不变，仅增删 license 样板即翻转判定"
+   "changes": "A(v2 原样)=benign、B(v2 去 utils.py)=vulnerable、C(v1 加 utils.py)=abstain；危险 eval 位置/上下文逐字不变，仅增删 license 样板即翻转判定",
+   "status": "SUPERSEDED_BY_A5"
+  },
+  {
+   "amendment_id": "A5",
+   "date": "2026-09-08",
+   "reason": "A4 作废：消融脚本 rebuild() 丢失审计任务头部/目标代码标题/代码围栏，B/C 格式被破坏，结果不可用于机制主张(Codex 核验)",
+   "changes": "修正 split/rebuild 保留 prefix/head/tail 全字节(v1_orig/v2_orig 与原 prompt 逐字节相等，围栏数=2 断言)。重跑 4 变体(repeat=3)：v1_orig=vulnerable、v1_add_utils=abstain、v2_orig=benign、v2_no_utils=abstain。正确格式下增删 utils 块都从确定判定翻成 abstain；上版 B→vulnerable 是格式破坏假象。修正 hunk 检测排除注释行，v2-fixed 危险 eval=False(仅注释含 eval 字样)。"
   }
  ]
 }
