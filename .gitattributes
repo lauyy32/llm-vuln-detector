@@ -1,0 +1,9 @@
+# 冻结文本文件换行为 LF，保证树哈希跨平台可复算（core.autocrlf 不再影响）。
+*.py   text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.md   text eol=lf
+*.ql   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.txt  text eol=lf

@@ -1,0 +1,2983 @@
+{
+  "schema_version": "corpus-v3/1",
+  "generator": "rebuild_corpus.py",
+  "generator_sha256": "0002c9e8122aefbfc79451b1b81d4b85cbaebda6958288f07af5ced3357104c9",
+  "python_version": "3.13.14",
+  "git_version": "git version 2.55.0.windows.3",
+  "dataset": "cpg\\dataset_d1.jsonl",
+  "eligible_total": 82,
+  "samples": [
+    {
+      "sample_id": "CVE-2026-10692",
+      "repo_slug": "johnhuang316/code-index-mcp",
+      "parent_commit": "c45e9396f8ddc0054fd2619809136c75864ad126",
+      "fix_commit": "25bc02fac74051ddae15ce79e952f00211b1ea6b",
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "Code Index MCP is vulnerable to Uncontrolled Resource Consumption",
+      "vuln_tree_sha256_lf": "3f463a7b30aac35ae97093f9f01b77f7bb1f9298aa14cf7d355c922c374446e5",
+      "fixed_tree_sha256_lf": "79fd973e9046aea32d149449e7e8cab6f460af14f2f8f5e5c5429d1f93b6173c",
+      "files": [
+        {
+          "path": "src/code_index_mcp/search/ag.py",
+          "status": "M",
+          "vuln_sha": "d7cf61b0b01a8aa140246edd1a2975ccc8d0cc8ca4779362abe5579d606707f0",
+          "fixed_sha": "669cc36f6d39044c08cc7b13c3d584563216469331811446745e26e4b2eef5c2"
+        },
+        {
+          "path": "src/code_index_mcp/search/base.py",
+          "status": "M",
+          "vuln_sha": "4d95a49dd1a177690cca911954026459a9865ab3cc77bd7d05832941d84b2285",
+          "fixed_sha": "9e2c291a0eb59fcf47419e6d7d396f23ef651e7866fd81d409cc1d73b41e5b39"
+        },
+        {
+          "path": "src/code_index_mcp/search/basic.py",
+          "status": "M",
+          "vuln_sha": "c616d1b2ce76ff142bff9876a10ba33c0fdfb1e8d179734f2fd3d276f8310d27",
+          "fixed_sha": "a17b433b5923b17ef523b947b47a89ec11230724be868be0699c0e62f97d17ac"
+        },
+        {
+          "path": "src/code_index_mcp/search/grep.py",
+          "status": "M",
+          "vuln_sha": "c4edead1e1c3ee53e282ee5589a63a971ac890581bf817439bf4333c8f847c09",
+          "fixed_sha": "2f9b7caeeb623dcb42933cafc1cd652d7e180a03a32503fa0544b61d9f2a1e18"
+        },
+        {
+          "path": "src/code_index_mcp/search/ripgrep.py",
+          "status": "M",
+          "vuln_sha": "205a6ccc5f5c792b2c2d31035563ba3786bcc976fa1183cf866100573d9012a7",
+          "fixed_sha": "f5a98c942e3a682a2eac073323caad09df5ffe99d284248dbf106ba4a5637929"
+        },
+        {
+          "path": "src/code_index_mcp/search/ugrep.py",
+          "status": "M",
+          "vuln_sha": "1133120efc026ce0482c953cc53d77f600a0c0d7c1b90cd57640e63bdd838b26",
+          "fixed_sha": "44c792f0279f51e36eed7d6efc381aebcf4cffcf0c54536378fabfd347ec7454"
+        },
+        {
+          "path": "src/code_index_mcp/server.py",
+          "status": "M",
+          "vuln_sha": "0747b04ac7dbed6fcd0a62a2cad18ff51f21be26e3f1f23bb21fd9909aeb386d",
+          "fixed_sha": "799d96ae9d29fcca5d0c0de266794634e2a7e6999f94557b50a90b0bd499bc48"
+        },
+        {
+          "path": "src/code_index_mcp/services/search_service.py",
+          "status": "M",
+          "vuln_sha": "de52d97ed70ff60a7a75a976d3666e34a91d72dcc4e2896f1dd58f8577af7f11",
+          "fixed_sha": "33f8514904b139a0e482b6d902d8686412c0c530e6a1b6398409b264c1abc3db"
+        },
+        {
+          "path": "src/code_index_mcp/utils/validation.py",
+          "status": "M",
+          "vuln_sha": "1e2d7848a5af3142d1b889da735c6f01b865c269ddefcf6618944e9c81122827",
+          "fixed_sha": "161bf7e83777ecd1d71835ca4a31d7fca112b590c681f940504bb62fe7fab996"
+        },
+        {
+          "path": "tests/search/test_search_filters.py",
+          "status": "M",
+          "vuln_sha": "b4017de4318cfe48bba2ab6e7dfec179a7d6dabbf23bc66f3f4f10f3a1e44299",
+          "fixed_sha": "8d26dc9d982dae758132114e11292e1f309918296af0d71ac7f42183b5c31d82"
+        },
+        {
+          "path": "tests/search/test_search_service_regex_mode.py",
+          "status": "A",
+          "fixed_sha": "8e8b8c13ca2a034e6074f8b79c4782f599c294b634846b328be807ff7d74e44a"
+        },
+        {
+          "path": "tests/test_server_search_code_advanced_signature.py",
+          "status": "A",
+          "fixed_sha": "26921d0a62b93e9ed04d1be68830481978faa2975b9902a563e785edcf7140c5"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-12482",
+      "repo_slug": "keras-team/keras",
+      "parent_commit": "19796fab16d003cea4516cb8a58640609f04a515",
+      "fix_commit": "9867df45c456dd1077a6243bb56219f66e288150",
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "Keras: tar extraction permits symlink-based path traversal",
+      "vuln_tree_sha256_lf": "46a906ead697330454443c29be83c5f932bf5a4be0f37df5f82692da8461b620",
+      "fixed_tree_sha256_lf": "43ce0f0bcdbdeafd57c63a17014069f48877050e360183890f9ef23893d824e5",
+      "files": [
+        {
+          "path": "keras/src/utils/file_utils.py",
+          "status": "M",
+          "vuln_sha": "592aa9e68520de6b40f2daa3966f15c4aaf97b65ecc2de8ae15eae140814c2e5",
+          "fixed_sha": "a0a8391d53ac4f8432004125cd2ae15ce46054d5c5c3912dee8814b558735854"
+        },
+        {
+          "path": "keras/src/utils/file_utils_test.py",
+          "status": "M",
+          "vuln_sha": "cf208a1db5a7d9d2f36ac1563646881bcd9791d1fee998e25cbcd589aaafdc11",
+          "fixed_sha": "864502522de1a4d5e5629410f6c0a6a7356242ea6ccc65019455ec7097b59964"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-13769",
+      "repo_slug": "aws/aws-cli",
+      "parent_commit": "e0799fde3c5e3138163e488e42bd3df7a0aa158f",
+      "fix_commit": "68811b5ad5cd74d06e944e073ee17bf889babf13",
+      "cwes": [
+        "CWE-732"
+      ],
+      "summary": "AWS CLI: Overly permissive File Permissions",
+      "vuln_tree_sha256_lf": "7d501eded24ccca41781372ed61424709f9ff63cb67a1a1a6da1120b7aeb9f97",
+      "fixed_tree_sha256_lf": "e5d140dc0e5d9e5a97b9d4d86c0878f4d04b8783bdfe93effd19b1dd033b3057",
+      "files": [
+        {
+          "path": "awscli/customizations/iamvirtmfa.py",
+          "status": "M",
+          "vuln_sha": "c68436b617bed03eadea678990cd4563b03d29329aa5ed91095d9add50258d5e",
+          "fixed_sha": "b3b3e98830cbde85a0525dff848a615ca6eb2f53d46c054c4eff2c407d43efb7"
+        },
+        {
+          "path": "tests/functional/iam/test_create_virtual_mfa_device.py",
+          "status": "M",
+          "vuln_sha": "bd447555de054fccf2e177d6975fa155e2e41b520b9d93278c8b0a690616078e",
+          "fixed_sha": "0b2785b2ef8ea4b9277dc3dcfa95d70050231945d47efb98b712f7401da2fc01"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-16584",
+      "repo_slug": "awslabs/mcp",
+      "parent_commit": "70d8c4cb82601a0e48328e34bf7a81b5a6fba073",
+      "fix_commit": "ab1bbebc097d674c1cdd4bd75a8f313be18473bf",
+      "cwes": [
+        "CWE-455"
+      ],
+      "summary": "AWS API MCP Server Security Policy Bypass via Startup Initialization Failure",
+      "vuln_tree_sha256_lf": "969cbeee5edf9a12d91c73d5ce1604ee19d382af538f2ac416439fd3b0f8a69e",
+      "fixed_tree_sha256_lf": "4a77314c7df7fd0fabc90a2eb7d20429d052e10d1b1ea77bb98591d8ab7ffd3c",
+      "files": [
+        {
+          "path": "src/aws-api-mcp-server/awslabs/aws_api_mcp_server/__init__.py",
+          "status": "M",
+          "vuln_sha": "5ef50c8bc5eec27d0793e9a367916d6a6d5732039ddbbf20819d376de35a4340",
+          "fixed_sha": "cae9e7e6624fda55d58ba3694b2a3fd50ca2b7d4737ba6817f0f4dad11d71d80"
+        },
+        {
+          "path": "src/aws-api-mcp-server/awslabs/aws_api_mcp_server/server.py",
+          "status": "M",
+          "vuln_sha": "8811115824d6e9079133742818a3b24a261c12161a2bcbc4cde2db99f6dff52a",
+          "fixed_sha": "2d446dfe9d93b59697247c36352eeb1c3c4dc97c1cf9c3e58f9cb4f4a503ecd3"
+        },
+        {
+          "path": "src/aws-api-mcp-server/tests/test_security_policy.py",
+          "status": "M",
+          "vuln_sha": "8794cc047889c35b70b11dcab194032425b6e7f4e4bd0ca5ebe02127718f6c58",
+          "fixed_sha": "9d6f3097c288b3de2e6e00c027cc57838ba982b8311921052302c772eacac23b"
+        },
+        {
+          "path": "src/aws-api-mcp-server/tests/test_server.py",
+          "status": "M",
+          "vuln_sha": "65d7e865873ee19f615a863222d18d9923bc11d2922e7d25744ef0ff21cff3a3",
+          "fixed_sha": "7c13be995f71b9935a2ca1a4cf462bd99857e7dfa9a601409bf6407bc0595825"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-16796",
+      "repo_slug": "aws/bedrock-agentcore-sdk-python",
+      "parent_commit": "986801f10f3a8e2482d81f5c50330109355921e3",
+      "fix_commit": "3c4b4ee6b8730e6313a82c743ac37dbcc1c21cdb",
+      "cwes": [
+        "CWE-88"
+      ],
+      "summary": "AWS Bedrock AgentCore: Improper neutralization of argument delimiters in the Python SDK install_packages()",
+      "vuln_tree_sha256_lf": "545bdbd894e48260be04ffe0743ee3950cc71b222f07da705e1dcbc804ae2b4e",
+      "fixed_tree_sha256_lf": "41a2acd26a8dd773499c64d4c8e84f775d6a5f5d8ae39de447f0c22b404d1fc8",
+      "files": [
+        {
+          "path": "src/bedrock_agentcore/tools/code_interpreter_client.py",
+          "status": "M",
+          "vuln_sha": "4b5d1b8f3dbed8da60cdb8d7a010d2c92224045560a3f52c478184a6d1adf7f3",
+          "fixed_sha": "19236693156d94c2c5c40148357c1cb3e532eaf18e1d47ad0fc166c47d850c49"
+        },
+        {
+          "path": "tests/bedrock_agentcore/tools/test_code_interpreter_client.py",
+          "status": "M",
+          "vuln_sha": "7c442c470b7023cd0265c1c10512a241fba5119914a292aaafad90283aab0084",
+          "fixed_sha": "a43ff2941470747677eac7f73f123f1cd33438065046b107ea4004d603cc150a"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "repo_slug": "Chainlit/chainlit",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Chainlist has SSRF via MCP SSE and streamable-http transports that allows unauthenticated internal network access",
+      "vuln_tree_sha256_lf": "c55926639a1b7a7f5112fff97f0825264a391ba535d8ae00beb5454f7fffed2f",
+      "fixed_tree_sha256_lf": "4086a0542173cf30c5040d927371b689cc16f65569a2aafe3610f9b95455f927",
+      "files": [
+        {
+          "path": "backend/chainlit/config.py",
+          "status": "M",
+          "vuln_sha": "5cae1fac5e2efd1be59dfb31742f780d07c1cb4856cb67c1eda8658e40688282",
+          "fixed_sha": "b52a02d9049eb5494a2032682ddd4684d94ae88719b85b9f5f275c20ebf583c7"
+        },
+        {
+          "path": "backend/chainlit/mcp.py",
+          "status": "M",
+          "vuln_sha": "ee7719177ab6256306d25c815aba24ca83b99fc9c0f9c09d9967b7d42c39a4ea",
+          "fixed_sha": "4d0965e253b500f1403ac8c81bc3d6eae144df515d51b0915ec30906823061ff"
+        },
+        {
+          "path": "backend/chainlit/server.py",
+          "status": "M",
+          "vuln_sha": "ff4869493d041a88845f562660cc545863ea9211fbc9d61d6266b0dafdfca9d3",
+          "fixed_sha": "042daf093270c1c4c61c31447e16381ead3b53f5533e655b08354a5881e495af"
+        },
+        {
+          "path": "backend/chainlit/session.py",
+          "status": "M",
+          "vuln_sha": "9ad60095fc229f17cf42b65de056ee3f1baa6b0a183bec83b9ea1f399fce2115",
+          "fixed_sha": "0276d129a58133c12f49836c5db1d717b3df1f4dd3af5631556d89181fcec089"
+        },
+        {
+          "path": "backend/chainlit/types.py",
+          "status": "M",
+          "vuln_sha": "dd4860fec8bb2aaceb841777aac956f83a73fde4c8f0cdf3f84774f20fd4a463",
+          "fixed_sha": "2f9a644eabb7de370c6a1caae02d05e251b84f789edda4851149bc1fd2b0b94d"
+        },
+        {
+          "path": "backend/chainlit/version.py",
+          "status": "M",
+          "vuln_sha": "0587df9fb1dbc5287d6fb309f1c532d219e32ceb1248e48514a5ea135d68323e",
+          "fixed_sha": "91ba7cbf9c5410fe3c83a48750e19f79b9408783fec411a28890e90148a0e598"
+        },
+        {
+          "path": "backend/tests/test_config.py",
+          "status": "M",
+          "vuln_sha": "edd739636f7f4e665c7f5438311195e35a544a5ef54dada6c8ef06406f5d48b4",
+          "fixed_sha": "6d67288c6abb21e70ad385d2e108c17558111cdf409ce98870ba8255e4e26ea3"
+        },
+        {
+          "path": "backend/tests/test_mcp.py",
+          "status": "M",
+          "vuln_sha": "1a6ff07554ca92a3ee358382d90c332fad5ee0950f3fb5d4aec087b41b77cf57",
+          "fixed_sha": "a3d7f2adaa3d09fc27b54bfdfe39e8c23311e68272f7ec39d63dda45dab7979a"
+        },
+        {
+          "path": "backend/tests/test_session.py",
+          "status": "M",
+          "vuln_sha": "6f38bcfd82b7a78cf540060129ea99abe554acfdbb1e144059dfb209cdda7972",
+          "fixed_sha": "11fc048992801b9970afbe30a996692cb1850902f783de77121f65c3347f1d79"
+        },
+        {
+          "path": "cypress/e2e/config_overrides/main.py",
+          "status": "M",
+          "vuln_sha": "e716e0b49c496ee0162619e5b2d998730a87852b91aa41638bde1b125bd205d9",
+          "fixed_sha": "96ab6ae9908e27a84ae18bfdc9ee2d5aa93404778226bc0be762c8f5c0fca7fd"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-48782",
+      "repo_slug": "pydantic/pydantic-ai",
+      "parent_commit": "1d1ecb8680cdf7fa392152a240770e1b5c642374",
+      "fix_commit": "1add06179ba4de259f7ab977620b697b7209f7e4",
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "pydantic-ai: SSRF blocklist bypass via IPv4-compatible, SIIT/IVI, and local NAT64 IPv6 addresses (incomplete fix of CVE-2026-46678)",
+      "vuln_tree_sha256_lf": "a00654a6c43551e1084990ed6db025deded580b64f3fe932131bdafd3f29c6ae",
+      "fixed_tree_sha256_lf": "f06776064350e0a34bdb1b37c9ed3a10c8498a6fd141fd1d7745c20e0da7cae3",
+      "files": [
+        {
+          "path": "pydantic_ai_slim/pydantic_ai/_ssrf.py",
+          "status": "M",
+          "vuln_sha": "e55c12601c599ea4b7bd648e1931cdafe352532d6fd16466cc30a02dd604a56e",
+          "fixed_sha": "17ca16586d2b24a0e61410ad261062650623da91a7ef074c4065f145e55c0b56"
+        },
+        {
+          "path": "tests/test_ssrf.py",
+          "status": "M",
+          "vuln_sha": "a5eb2f9f299f8ab2d59163d2f9f1c6eb7e045d7b4c21d25dd600936880b12683",
+          "fixed_sha": "9d1348f52e9b03d318930d0ab296fdaa14d854c1521eb10fe41f5ae8b6cf9227"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-49296",
+      "repo_slug": "apache/airflow",
+      "parent_commit": "e893ec65ea199b0be606baa16196c50b0e952c1b",
+      "fix_commit": "992e602015b5e9a3fd297e18047cff9d85094c95",
+      "cwes": [
+        "CWE-639"
+      ],
+      "summary": "apache-airflow DAG source authorization bypass exposes co-located DAG source",
+      "vuln_tree_sha256_lf": "3f2171255576d0a2b4cdd03ebff4ce903c213e9ba59194e7fcca3943fd9a7fa1",
+      "fixed_tree_sha256_lf": "79bc23d941df194987d71c115c4e3b491faf55b80731e7cd302a3c2a2ac2f3cd",
+      "files": [
+        {
+          "path": "airflow-core/src/airflow/api_fastapi/core_api/routes/public/dag_sources.py",
+          "status": "M",
+          "vuln_sha": "25cc69dac737c3692a784fecca652230667c71925be50499c968f76af78fee90",
+          "fixed_sha": "9ca86f593524dbbde28d9adb245c85cc16d7bb4b38d1c9a15846fb630b5205c0"
+        },
+        {
+          "path": "airflow-core/tests/unit/api_fastapi/core_api/routes/public/test_dag_sources.py",
+          "status": "M",
+          "vuln_sha": "2987c3c51973989faff154cba06dedf71e1888ad2a3fb320c6b96ecbe6b7421a",
+          "fixed_sha": "486c30421ca73c8190498c8251208b0ebb46aa187d653ae0a0a6755f2eef7576"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-49471",
+      "repo_slug": "oraios/serena",
+      "parent_commit": "9c19d5f7f8c2e32e274ff7a6fca865ae0c1d0d09",
+      "fix_commit": "016ccbe1c095a3eed7967737ac1d4df2754f5d96",
+      "cwes": [
+        "CWE-306",
+        "CWE-352"
+      ],
+      "summary": "Serena: Unauthenticated Flask dashboard on fixed port enables DNS rebinding → memory poisoning → RCE",
+      "vuln_tree_sha256_lf": "eee4720d222f726f9641fdb0ca900214cacd90df74b4346ee4daf5be8e7b0e36",
+      "fixed_tree_sha256_lf": "0a3d81939ddac0c82571594d598d8e1b6ccb06f016bb46ee0bd461a6c803e02b",
+      "files": [
+        {
+          "path": "src/serena/dashboard.py",
+          "status": "M",
+          "vuln_sha": "3fa3559ee731033ffbc5177c22e7d658bf49ffed64c91eab3c4c12d811baa7fa",
+          "fixed_sha": "7180b41f373d54ebe258ab5d0e313535e82e3fedf06a09c926e6061eda1e07d5"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-49852",
+      "repo_slug": "authlib/joserfc",
+      "parent_commit": "1e5b94da589c695f54abd9f1a0ad822dcffe0305",
+      "fix_commit": "86d00910b2b2d2d07503fee9b572906daefab7f1",
+      "cwes": [
+        "CWE-287",
+        "CWE-326",
+        "CWE-1391"
+      ],
+      "summary": "joserfc: HS256/HS384/HS512 verify accepts empty/nil HMAC key (cross-language sibling of CVE-2026-45363)",
+      "vuln_tree_sha256_lf": "f5036c27bfffc354e5719b5969892dc45aff051628008b79ec5b5c795d3f202b",
+      "fixed_tree_sha256_lf": "d20cb3b10cc384acf83b619f1c4c8ed17ab4b6e8c637f17a0f16e38da87995a6",
+      "files": [
+        {
+          "path": "src/joserfc/_rfc7518/jws_algs.py",
+          "status": "M",
+          "vuln_sha": "5b70ff88aec3c465600198bf6bc6952bba53be9ebd03e7d9465ed1ad70c626ba",
+          "fixed_sha": "b4bb2c52c91bb56d83492985d892271d04ca072e550b0d640b290f20b4a31905"
+        },
+        {
+          "path": "src/joserfc/_rfc7518/oct_key.py",
+          "status": "M",
+          "vuln_sha": "dbf99c02e1056ab723e8f514991b96bb3478d793540f26cdfbdd0b14f9bcbb76",
+          "fixed_sha": "0205b8fd40a4bac2001714777e7f57145fd73f7db2ee08a05a5c82bc7cf95256"
+        },
+        {
+          "path": "tests/jwk/test_oct_key.py",
+          "status": "M",
+          "vuln_sha": "43a355699eeeab573973f7ad3322c2b7954eb02bd35734ef2e0402266afa8753",
+          "fixed_sha": "587bd3cf73699c03b401a1b5c95376fe971765114010f33a7398972b418591b5"
+        },
+        {
+          "path": "tests/jws/test_compact.py",
+          "status": "M",
+          "vuln_sha": "705868220dc4afdd8328a15d3d3d87a202d8fcec8d5e924577dffde49f8cacb1",
+          "fixed_sha": "f1601341b3443f0bf70a70e47a6edc74be017f88e42ed482de8c4089bf5e4e25"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-50180",
+      "repo_slug": "langroid/langroid",
+      "parent_commit": "56e2756ecab70a70a7e6edbee2f2187b8484683e",
+      "fix_commit": "00b7dd7b79c5d03c94be284cf3459d98195ebfba",
+      "cwes": [
+        "CWE-22",
+        "CWE-89"
+      ],
+      "summary": "Langroid: SQLChatAgent _validate_query blocklist misses pg_read_file family enabling arbitrary file read",
+      "vuln_tree_sha256_lf": "904499e3805e9ad9b1ba4e6bfa4a1924c4535b6d0e0c30fbe8199f08b4943233",
+      "fixed_tree_sha256_lf": "1927a73177b1dd8122477908ef22e153d35967519508c058aa0323653bbe4982",
+      "files": [
+        {
+          "path": "langroid/agent/special/sql/sql_chat_agent.py",
+          "status": "M",
+          "vuln_sha": "e4b24a050273791ff5ba588376c5069e92eec22ddc568cde9db074c6595f535e",
+          "fixed_sha": "0e514699d4fa2135415bf39fc0ec2618a31f9fc339b15303c43a825820499a55"
+        },
+        {
+          "path": "tests/main/sql_chat/test_sql_chat_security.py",
+          "status": "M",
+          "vuln_sha": "ef65e81427d81c986f65815f1bf3ee947b43ed2875717a79a71f71ed4eb616e4",
+          "fixed_sha": "9a03ce277a13e5063c5139ded6a587c71af13c18fbbe1075af8866226e860206"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-50181",
+      "repo_slug": "langroid/langroid",
+      "parent_commit": "fee670d502ed6d82b8414388bd137a315830331f",
+      "fix_commit": "56e2756ecab70a70a7e6edbee2f2187b8484683e",
+      "cwes": [
+        "CWE-22",
+        "CWE-23"
+      ],
+      "summary": "Langroid: Path traversal in the file tools allows read/write outside configured current directory",
+      "vuln_tree_sha256_lf": "10f5b647c1684e3651d77dd7d92f7c9c61f19b4ebba00103720b4f9e99531ae9",
+      "fixed_tree_sha256_lf": "62ac27f3711fe1745f1b6f011a11b6c0a480ee8f7f64acd7c3055a82fa8f9891",
+      "files": [
+        {
+          "path": "langroid/agent/tools/file_tools.py",
+          "status": "M",
+          "vuln_sha": "e971df6d091ec5d1dc07cd07ba97352132de7a3f33d9348b5c95e77e2c29a86f",
+          "fixed_sha": "a45d1bc58bbb7d0b42988449be778ed132912b71800ea239fe9e1133843ab939"
+        },
+        {
+          "path": "langroid/utils/system.py",
+          "status": "M",
+          "vuln_sha": "ab7409b5349aa48c0d7bc30c84610cd37c20c4f2e66620f8effb05d692b1e772",
+          "fixed_sha": "2fd9fe6b63ee0665e2dda1a71685297b8c874b155f248fc66b3a9a320fbc82b4"
+        },
+        {
+          "path": "tests/main/test_file_tools.py",
+          "status": "M",
+          "vuln_sha": "864b6df951bf7017ef49744d3ca51027a317d916dd0f363477e72285c17896ba",
+          "fixed_sha": "dd014295e683bf82fe088e5421b80384761ae196cc77641c94d5230f7126a900"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-50558",
+      "repo_slug": "brightio/penelope",
+      "parent_commit": "ef417fff6cfb2ab02f3303949fe60a4f163d0ed5",
+      "fix_commit": "a040afb5db32c7e80b5e8a2f9b2164cf911cfa62",
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "Penelope unsafe tar extraction allows arbitrary local file write via crafted session archive",
+      "vuln_tree_sha256_lf": "490f4f827b095926e9c8bab2807b7b2020adb997fb6128e84c631536430ca210",
+      "fixed_tree_sha256_lf": "2ed053ce2c44b269aa4485d22030cb2ca2fae0175e84fd884dd644d91e61b4fd",
+      "files": [
+        {
+          "path": "penelope.py",
+          "status": "M",
+          "vuln_sha": "957bdf3977e66cf21f13bbe87ff62ce79baf338d96ec6dae9ece4dbe901a04a8",
+          "fixed_sha": "c84ff758f2fae7e65e9d51b50836e42b3ebc7f691906120d9c524ea00947a1d6"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-52869",
+      "repo_slug": "modelcontextprotocol/python-sdk",
+      "parent_commit": "9773a3f75edab3157253c8e612db1bc338cb9a1b",
+      "fix_commit": "1abcca2408a6b50e10ec601181f63f9978705c00",
+      "cwes": [
+        "CWE-639"
+      ],
+      "summary": "MCP Python SDK: HTTP transports serve session requests without verifying the authenticated principal",
+      "vuln_tree_sha256_lf": "aba376760a09698ef835fa7eda1824d65ca0e412188ade0c08c01773d630184f",
+      "fixed_tree_sha256_lf": "c35761eb4dc131d781a5486aaf79c89016f28d81e900356700947de400921da0",
+      "files": [
+        {
+          "path": "examples/servers/simple-auth/mcp_simple_auth/auth_server.py",
+          "status": "M",
+          "vuln_sha": "c85ebc99892efacceb166670ea8010af79dd8f79fada9d99490c694cd8f95e0b",
+          "fixed_sha": "6fe0ce9e43a7175d47342602a89da2e7122437d414931fae39e986be246379f3"
+        },
+        {
+          "path": "examples/servers/simple-auth/mcp_simple_auth/simple_auth_provider.py",
+          "status": "M",
+          "vuln_sha": "66aea359e4d8099a3999845ef896d0483b7711b5cc5d32de84a3107ce9776a02",
+          "fixed_sha": "f7e6dbd63870d4be2370f6b9debbb2fc49e036f42bc6634ce6d38ee0ac75858a"
+        },
+        {
+          "path": "examples/servers/simple-auth/mcp_simple_auth/token_verifier.py",
+          "status": "M",
+          "vuln_sha": "7e4d8ef8fdbbd383616f9dd8c109ebabc1384fa2996cfce1a947bfe17f62b74b",
+          "fixed_sha": "4ce3c674ea452744a6cf7240c63926bd7ed9914c2c41077659a11cb1b37ec66a"
+        },
+        {
+          "path": "src/mcp/server/auth/provider.py",
+          "status": "M",
+          "vuln_sha": "8ada75d2433a4c671018bff3314569436f052b7a7eabfcc52b95770893681c11",
+          "fixed_sha": "32c497b64bc8f3ecdeac33376405c397bd3ad2f8cf44463768cb6f2b5473a007"
+        },
+        {
+          "path": "src/mcp/server/fastmcp/server.py",
+          "status": "M",
+          "vuln_sha": "abd25bd81df8a0308eeba90cde1b728307d852c7efe0abb9e0a5c6acf5b7b9b7",
+          "fixed_sha": "6feed1a5c112acf1cf3f35e887463b54920c695484bcfeea29f86b6f4c2e0127"
+        },
+        {
+          "path": "tests/server/fastmcp/auth/test_auth_integration.py",
+          "status": "M",
+          "vuln_sha": "29b81d464766cf045b4f8b141fcc8bd7bb5661e1050196f6323dbf24c8da3d3c",
+          "fixed_sha": "6561c1e1ffbbbb338c3e65ffa42134a4735207b22fc2c707e69501be258d9f83"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-53500",
+      "repo_slug": "thumbor/thumbor",
+      "parent_commit": "8b6250998baaf807d7a912e2e23dc25248d64f16",
+      "fix_commit": "68876715350c6c8f49c324e5515e64908830aed7",
+      "cwes": [
+        "CWE-1333"
+      ],
+      "summary": "Thumbor treats ALLOWED_SOURCES string patterns as unescaped regex, allowing hostname bypass via wildcard dot",
+      "vuln_tree_sha256_lf": "0fb51a576f18ca8e02be41291f41322b1721eb074cffbc2a97520f6efc0e4e8e",
+      "fixed_tree_sha256_lf": "1666599e94abe00505fa022172f7bb9a37b4d54b91422ca4e66ea873e7c9bbd2",
+      "files": [
+        {
+          "path": "tests/loaders/test_http_loader.py",
+          "status": "M",
+          "vuln_sha": "021e202e477986539c9a769dc558ca83e8d7634bbd4ac1d3e2463c8b4756194b",
+          "fixed_sha": "dfd0e8e4f57c981da41991479c4a0bc4874355bff4fc968afcf6e356580a38fb"
+        },
+        {
+          "path": "tests/test_server.py",
+          "status": "M",
+          "vuln_sha": "6df6377c15da7d45b1dab6bcd9fdf480d018599c3d3268214148c01bc221ac62",
+          "fixed_sha": "003b47ba12785a1b372c61d71cb0416697c070eee60d4e8ed9e0fb735201d762"
+        },
+        {
+          "path": "thumbor/config.py",
+          "status": "M",
+          "vuln_sha": "0768c80b4629c766d1ee9426d1e5ee2441bb8c158349311bbacd41f44f4c2452",
+          "fixed_sha": "12aeeae16f339d79074ea49eb0abb21431952fcc5daa463566633b0703841dc0"
+        },
+        {
+          "path": "thumbor/loaders/__init__.py",
+          "status": "M",
+          "vuln_sha": "7c62f5ea904a0258432c3ed6393a37d318f531d3d6e6bcfb8f3ac0251343f628",
+          "fixed_sha": "9456b8279523fb5cbf7707cfc0b57d83350727eba409ea3d3e70e701c14e2b9b"
+        },
+        {
+          "path": "thumbor/loaders/http_loader.py",
+          "status": "M",
+          "vuln_sha": "286602e3d16a541865dc7259f275afe83aef9840476319d215ba16baab341240",
+          "fixed_sha": "75ed58280d14f446399c86b8f354d8fc7217ea1abcbee775b17f219fdcba5c27"
+        },
+        {
+          "path": "thumbor/server.py",
+          "status": "M",
+          "vuln_sha": "e8a559919158a2f39831c7a666cd1db42024c12d02e42ba1a7787e818a633707",
+          "fixed_sha": "a9133c0f95469a2bd7828936f1e02565e4aa351bb7404dd4e252aefac761435c"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-53502",
+      "repo_slug": "thumbor/thumbor",
+      "parent_commit": "471ef279700e9f79941d451acf88abe1601df875",
+      "fix_commit": "3b986d13677b30fe6651c8c72ebb25957ac0a40d",
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "Thumbor has path traversal via post-validation URL decoding bypass in file_loader",
+      "vuln_tree_sha256_lf": "814107d5dfe6eeae36ac9bb6fa371fb413c8cb632d3adc7a4245e34c7dfe5343",
+      "fixed_tree_sha256_lf": "4dae635381809f2945eef4efd7abb72f72ad5e2b060292544e9b0ffcc233ead3",
+      "files": [
+        {
+          "path": "tests/loaders/test_file_loader.py",
+          "status": "M",
+          "vuln_sha": "ef667ecc1e89171b648435edd2946eef983973007ee9e23916b993541c41aa0a",
+          "fixed_sha": "cdcdb6b443cdefe9831b7dbcba6257556295ba5839078a215525db55d6e9df49"
+        },
+        {
+          "path": "thumbor/loaders/file_loader.py",
+          "status": "M",
+          "vuln_sha": "d612a17cc6fcb8f7bbe8fcabdb37821eb47d3b4f3eabcc228e419f2549274d10",
+          "fixed_sha": "b37f2ac556959fde2b8198cbe789fc8350c6381d4740d5d4e8515ad8de9d9e8f"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-53503",
+      "repo_slug": "thumbor/thumbor",
+      "parent_commit": "2c716119de986cfc68c7071af52a98187e006023",
+      "fix_commit": "447e192e3fb92e64c12e5354a56a4a7133f69d73",
+      "cwes": [
+        "CWE-20",
+        "CWE-369"
+      ],
+      "summary": "Thumbor convolution filter allows divide-by-zero in C extension leading to remote DoS",
+      "vuln_tree_sha256_lf": "82b43544400fe78b9892cfc8c6fe9bd2c9c26d77b8b5a425500e3f1d0f4695ae",
+      "fixed_tree_sha256_lf": "d10641306d0c6dd987d5a9c01d0c9e0704df4376322bafa53f7f722d57269e18",
+      "files": [
+        {
+          "path": "tests/filters/test_convolution.py",
+          "status": "M",
+          "vuln_sha": "091290b182f8204669a7df36e81cd56d4ad288194e8fd13d9c561d051e26bc08",
+          "fixed_sha": "e500e45297f2464d523f2d0c196ff50b74e5fd036032f47a0200d50bfb3fe9e5"
+        },
+        {
+          "path": "thumbor/filters/convolution.py",
+          "status": "M",
+          "vuln_sha": "d9f4cd687cc780c643aa7e2391a155ed07e4a4de27ecc1549f7f1b97b0e20567",
+          "fixed_sha": "faef74753e9edd25f47bc7126aefb14d372c6dbb094a51fd6e8545833138cc28"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-53504",
+      "repo_slug": "thumbor/thumbor",
+      "parent_commit": "447e192e3fb92e64c12e5354a56a4a7133f69d73",
+      "fix_commit": "3f38fe1610d20168e91f76d432212de30727eb2e",
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "Thumbor has Regex Denial of Service (ReDoS) in `convolution` filter",
+      "vuln_tree_sha256_lf": "d10641306d0c6dd987d5a9c01d0c9e0704df4376322bafa53f7f722d57269e18",
+      "fixed_tree_sha256_lf": "4f1343a5dcdeddefeeac945dbe4577bf87a319f06269ec63109b7ef7b3e4d9e5",
+      "files": [
+        {
+          "path": "tests/filters/test_convolution.py",
+          "status": "M",
+          "vuln_sha": "e500e45297f2464d523f2d0c196ff50b74e5fd036032f47a0200d50bfb3fe9e5",
+          "fixed_sha": "7b65794114d94972f7b2c8d40cc00642340e8cb347e570f1066247c4f8bf64bb"
+        },
+        {
+          "path": "thumbor/filters/convolution.py",
+          "status": "M",
+          "vuln_sha": "faef74753e9edd25f47bc7126aefb14d372c6dbb094a51fd6e8545833138cc28",
+          "fixed_sha": "c6f68c6f39e00dbe521485c47636f2d8f3042c8aadfaf54e58f65649fb10ec8d"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-53505",
+      "repo_slug": "thumbor/thumbor",
+      "parent_commit": "e3ae3e2500537b4d735df4144129a649374bb70b",
+      "fix_commit": "2c716119de986cfc68c7071af52a98187e006023",
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "Thumbor proportion filter allows unbounded post-transform resize leading to remote DoS",
+      "vuln_tree_sha256_lf": "61ac1e1fdbba4c2ac02809791f6d18592137ec56d28edd7277d6d5bd3262299e",
+      "fixed_tree_sha256_lf": "4d93986c78cd76de6cfc8d25d3f831444c0094a57ebc8211f83eff3813692225",
+      "files": [
+        {
+          "path": "tests/filters/test_proportion.py",
+          "status": "M",
+          "vuln_sha": "66fe0677d2a41c89cc698335d40409be4a47992e7ffaa0ddf6f8ae46883f3d7c",
+          "fixed_sha": "08bf4ec52b9e83870658b548cb318335e6d515e4fb75ac57ef90a638a112ea17"
+        },
+        {
+          "path": "thumbor/filters/proportion.py",
+          "status": "M",
+          "vuln_sha": "5cfbce6c92617a172a3a656e7696c771bda3767338e040d9cc51424289a37d5e",
+          "fixed_sha": "ef968787756a72b1e542b9cd87e501c2f36379e647b5abea1ad9edec14e728bb"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "repo_slug": "microsoft/prompty",
+      "parent_commit": "90171a7738f9ff5a186416381cbfad9077cdf637",
+      "fix_commit": "88ac9948d7d37995edbb2f6d36913436626c39e1",
+      "cwes": [
+        "CWE-22",
+        "CWE-200"
+      ],
+      "summary": "Prompty: Arbitrary file read via file reference expansion",
+      "vuln_tree_sha256_lf": "592f3022f28ab4151195cd2b1fcf536e9acaead070fbb52dd1de77a0ccb30d53",
+      "fixed_tree_sha256_lf": "dc2660254a6fdb3bfad5f3436622ef4dbe95322e072fdcfcaacb33d348d15371",
+      "files": [
+        {
+          "path": "runtime/python/prompty/prompty/_version.py",
+          "status": "M",
+          "vuln_sha": "14a30c5836a80b80468e1b51261d0a0d6d2f7d725e40f2aaddb2510f3a0cda19",
+          "fixed_sha": "f2c0161e9159316585d085ea0f911b9ccae4b1716af730d28392345c435d9c22"
+        },
+        {
+          "path": "runtime/python/prompty/prompty/core/loader.py",
+          "status": "M",
+          "vuln_sha": "ce88c2c1996e47dcbee5863b6e46ef3d1db263b2a846f57e69686cdfa8323272",
+          "fixed_sha": "8b1bef303e9299f2929d1c870a34af283ad3e06c0fd2f609f2d3bbab9555e926"
+        },
+        {
+          "path": "runtime/python/prompty/tests/test_loader.py",
+          "status": "M",
+          "vuln_sha": "ecd622b4dc7a2f06a1ad8d967dc331d7a3c42d4bca3f9be622901d7b7d3cba81",
+          "fixed_sha": "733e748c42c936d6e324581f19d70990751f20dd5bd82573b3dacc9ffc7e4f28"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54254",
+      "repo_slug": "Cyberdrop-DL/cyberdrop-dl",
+      "parent_commit": "1e72dc9b7379cd669a7aa74fb2660b8c78591d0b",
+      "fix_commit": "4479555ae3f9d56d7657d6179a5bac3123eb4e2b",
+      "cwes": [
+        "CWE-20",
+        "CWE-200"
+      ],
+      "summary": "Pixeldrain API key shared with unverified thirdparty sites",
+      "vuln_tree_sha256_lf": "c3afe9ce102399f2b3dc59e1452b890604bde40d36bbcda53d5bf1941a0446f8",
+      "fixed_tree_sha256_lf": "31406bb6b06980e0b2477b819d5b7cca81fdc149da5f13db3b645b8aac982068",
+      "files": [
+        {
+          "path": "cyberdrop_dl/crawlers/pixeldrain.py",
+          "status": "M",
+          "vuln_sha": "6bf95842df875bce717526c2e647384effc310d2f30a4835d901f3760b05607b",
+          "fixed_sha": "1ce394abb538a85d8c68407efdb1e47465fdd909bfa6101d4d2800469c1134c5"
+        },
+        {
+          "path": "tests/crawlers/test_cases/pixeldrain.py",
+          "status": "M",
+          "vuln_sha": "08f6ee70dc30db3b95a15cfe494b56a482e7531f0f10bb3d780cd4db4ea2a02a",
+          "fixed_sha": "c945465beab7dd987510021bdc1cb21e5665b6dc1c4c18c068412e5d01a0e906"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54284",
+      "repo_slug": "andialbrecht/sqlparse",
+      "parent_commit": "c923da9c5a8e8403dd32efc2171b60a177444d43",
+      "fix_commit": "939b129e24c0ad5d51368b1aa72fffcaca76f06f",
+      "cwes": [
+        "CWE-407",
+        "CWE-1333"
+      ],
+      "summary": "sqlparse: TokenList.__init__ materializes O(subtree) value per group, causing CPU DoS before depth/token caps trigger",
+      "vuln_tree_sha256_lf": "9c9ecfc79305feb00d696277c3b9c7d06ecdaf8338baca8c309d1a15256a6b82",
+      "fixed_tree_sha256_lf": "6697bca9b3bfa9ed3a1ca92ec2b572b1d021d2b4f0ccd38fb453fd10cd772fad",
+      "files": [
+        {
+          "path": "sqlparse/sql.py",
+          "status": "M",
+          "vuln_sha": "dc88a84d81b752f59771bfd3280fdf44078fae8a8f8371bac584c0634185c383",
+          "fixed_sha": "68a5e5d9dbaad634a9b91e98b08c0f7af092d62d00c4d2574f424b496fe22d71"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54338",
+      "repo_slug": "jupyterhub/jupyterhub",
+      "parent_commit": "808cb08df195dd48f96e85356197500d6468e064",
+      "fix_commit": "d6dc595f84b7509969686da31d87d6d69e7fce0a",
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "JupyterHub has Unauthenticated Denial of Service via Unbounded Username Logging on Failed Login",
+      "vuln_tree_sha256_lf": "81928fdee653a7edef6c58b5c06a1fac81a4a4cee5cff2f3780be693e7a0a3c0",
+      "fixed_tree_sha256_lf": "6ca3e0ecefb7d48cf858eba6e0fbf5a15670a1dd3a79bf58169acb5115483b46",
+      "files": [
+        {
+          "path": "jupyterhub/auth.py",
+          "status": "M",
+          "vuln_sha": "7010e7149caa0944a016b66280421c402c291bc7cc7d893c65e46f277449fc55",
+          "fixed_sha": "b70b8b0c25196647cdd1a859337042446c307af263b363d53d7fdcd17781952e"
+        },
+        {
+          "path": "jupyterhub/handlers/base.py",
+          "status": "M",
+          "vuln_sha": "826000b0a46bcde3226bcb159d09e4a6bbe786c6c7936556355e5792fe26b788",
+          "fixed_sha": "1b8a1bc61c8690f78fa0eff7612bd5c9fb7781e4975ad318a1c0d174e8b262c3"
+        },
+        {
+          "path": "jupyterhub/handlers/login.py",
+          "status": "M",
+          "vuln_sha": "24fdacb70ece8c9c31d783e43ecb2714f1fb07db935bbbf0dca65a5d3d4d977b",
+          "fixed_sha": "ae1ceabfcc1cd2d247347f3fe122e6787f8eeccfb936ebbe176b8586f74203c8"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54446",
+      "repo_slug": "Labs64/NetLicensing-MCP",
+      "parent_commit": "e826d695df5a08d250dc88e9d8843ff0042ce35a",
+      "fix_commit": "fbbb1d5ff88eb5400ec933a84e75601ebee48927",
+      "cwes": [
+        "CWE-306"
+      ],
+      "summary": "NetLicensing-MCP: Unauthenticated Use of Server-Side NetLicensing API Key in HTTP Mode",
+      "vuln_tree_sha256_lf": "5fef9203b270526e45b94fbf7373a45433bd2cacce0151c8074b74125a616393",
+      "fixed_tree_sha256_lf": "ac3c07cd9933364d974666e5648121e6a163516fb70d66c2beb1aadaf0950ddd",
+      "files": [
+        {
+          "path": "src/netlicensing_mcp/safety.py",
+          "status": "M",
+          "vuln_sha": "c80958e58a084c8d9090dd5f1ab1b315c1aca266b0e7330db81f8623cf541c74",
+          "fixed_sha": "2947c0d673b95f25d5cd6285339d46deb6187ef5eb399037d09f71f18b5420a3"
+        },
+        {
+          "path": "src/netlicensing_mcp/server.py",
+          "status": "M",
+          "vuln_sha": "a80d15becf798db2677666357853fd2e34c3cdc1b9c33485c63c967ac18c10bd",
+          "fixed_sha": "22caf4209fc157251203792e11a9de5a6d86dc44d34f26efcb5a15388ee0d7d1"
+        },
+        {
+          "path": "tests/test_auth_middleware.py",
+          "status": "A",
+          "fixed_sha": "f3e9194a3e3ecad4d936d3c981140db1503cfed334c33d302a7f6275066ec26d"
+        },
+        {
+          "path": "tests/test_safety_tokens.py",
+          "status": "M",
+          "vuln_sha": "52a8bd531497565ebf349e032b0505e5a3f99e76e9cde84d859d3fb713677288",
+          "fixed_sha": "9a788d0cd47eafc8355e5bc007e3eff488a58cd21b39cfa261ab52cdb33449aa"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54457",
+      "repo_slug": "tensorzero/tensorzero",
+      "parent_commit": "61761d5afca5899534697db9a20e9cc0e0bc17f8",
+      "fix_commit": "0abbc838bae3394fe7491dad7009670d4e3b6cf8",
+      "cwes": [
+        "CWE-552",
+        "CWE-918"
+      ],
+      "summary": "TensorZero Gateway: Arbitrary file read and SSRF in internal object storage endpoint",
+      "vuln_tree_sha256_lf": "10003a64a0a98fae196e5bde7065e839a20d936cd7948b39559b73fadce8faa6",
+      "fixed_tree_sha256_lf": "1eae5c4409210b53770d4ca433d78951f17b22c9faeb670dbfe4b8b2529bca94",
+      "files": [
+        {
+          "path": "crates/tensorzero-python/tests/conftest.py",
+          "status": "M",
+          "vuln_sha": "cd844b3760c3d2a605c423e98d808f30639988d22e9e85a556f4e39070ce003f",
+          "fixed_sha": "78e0cd54b42ec81bd08f8315c858f7cedc129d96e2e044bfc77e8e9422e04eaf"
+        },
+        {
+          "path": "crates/tensorzero-python/tests/test_client.py",
+          "status": "M",
+          "vuln_sha": "aa06631403d4654bcf2cc158916cf3869a45c008ebf0f0f3cf0b6b83b11b8824",
+          "fixed_sha": "47010fd06213a9911266e61e6fa511afb2677d1204e3f70c9da26dfb0c3c87da"
+        },
+        {
+          "path": "crates/tensorzero-python/tests/test_openai_compatibility.py",
+          "status": "M",
+          "vuln_sha": "e03dfa381dfcd4844fd76aafc1a57e668247a7e7cf6c183f99be17ef0569b4a7",
+          "fixed_sha": "0eeec562529348930b5b99f0593992d23b36afa6d63a74b4030c99466b4c08d5"
+        },
+        {
+          "path": "crates/tensorzero-python/tests/test_openai_patch.py",
+          "status": "M",
+          "vuln_sha": "c44c7b94f805c2312162df062e5eb66180125e01165527777ea24d7b569f1aca",
+          "fixed_sha": "92616e160e3d82b1b16295a2b311b7aff06c210fe4ce400b00f74128cdc55e86"
+        },
+        {
+          "path": "crates/tensorzero-python/tests/test_stored_inferences_v1.py",
+          "status": "M",
+          "vuln_sha": "96136f9961c2938544ebfed1310cc87a771e6dcc8aa2d974fa31b3387d0d1046",
+          "fixed_sha": "dcdf4e469e1a79677c8a9b4879bcccea10c638331a161462397c068d182a2ce8"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54548",
+      "repo_slug": "siemens/kas",
+      "parent_commit": "32dae8f2875d404c0ce2e8483d91902793ada173",
+      "fix_commit": "1c1e861c9f241ce082b86bef6bedc7da9b676294",
+      "cwes": [
+        "CWE-295"
+      ],
+      "summary": "kas Persistently Disables SSH Host Key Checking",
+      "vuln_tree_sha256_lf": "9b1dac4a37b572941b7b9cec58d030a52083ac705da3cd1b107d8bb2fb80dcd1",
+      "fixed_tree_sha256_lf": "da73f6f891a20fef53504dc2fd642aa5858fb052ace0b4e02addda9bf70725c9",
+      "files": [
+        {
+          "path": "kas/libcmds.py",
+          "status": "M",
+          "vuln_sha": "caf68213815904c46eaeaf1c47e5dbf37a708c517b2c02e0a58862d3b818d1ea",
+          "fixed_sha": "83025c637ed750113848489169ad447722688f1f08d4dd1a577528aff3d072f4"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54553",
+      "repo_slug": "jowilf/starlette-admin",
+      "parent_commit": "eb2b3ec33174f4f28f0997670e9ae1da8b09fdbd",
+      "fix_commit": "af05b45cd90944b726949fd650ab9d19f1abafc3",
+      "cwes": [
+        "CWE-200",
+        "CWE-248",
+        "CWE-602",
+        "CWE-639"
+      ],
+      "summary": "Starlette-Admin's unvalidated `order_by` parameter allows ordering by hidden columns (info-exposure oracle) and HTTP 500 DoS",
+      "vuln_tree_sha256_lf": "27ba22fff25a29ff36a43f7b5aa3c45bb9a79a13dc46e35356a0c8131ed0119b",
+      "fixed_tree_sha256_lf": "85588fa3d4310b7a38859076b97c08ced9c4aa636ea8dc4c0df87cc87287c487",
+      "files": [
+        {
+          "path": "starlette_admin/views.py",
+          "status": "M",
+          "vuln_sha": "b604064a76f483921a36ac0bf7fcef3fb54f89c79032b7159826e1c38fff7c88",
+          "fixed_sha": "131dadd8e45c34aa2a9ad0062bdb4401221daa2156af9c1469f27605dd940ab4"
+        },
+        {
+          "path": "tests/sqla/test_sync_engine.py",
+          "status": "M",
+          "vuln_sha": "4708cdf3ec3892b3c6af8b4dc963879db5b1fe695c70bb73c934f91dbb86a49b",
+          "fixed_sha": "515ff4762db2e6a096bec8b0370ed0367688e196ac2caa900f5c48785c4b96fa"
+        },
+        {
+          "path": "tests/test_views.py",
+          "status": "M",
+          "vuln_sha": "45cb64bd95d5639c7f7aa3a18331dd49b8427210cdcb058f21922669f826aa9b",
+          "fixed_sha": "311a620820e05e4251e44b0c0a95b9ac530d4b4c083146a0d834450ca7cb0abf"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54567",
+      "repo_slug": "jugmac00/flask-reuploaded",
+      "parent_commit": "17509f0bf9436566085a10ad49946c5e5022d3c1",
+      "fix_commit": "5ded76092429c6eb8a4af941b14fbde40a38fff4",
+      "cwes": [
+        "CWE-178",
+        "CWE-434"
+      ],
+      "summary": "Flask-Reuploaded: Extension-denylist bypass via case-folding asymmetry in name-override path (incomplete-fix variant of CVE-2026-27641)",
+      "vuln_tree_sha256_lf": "67908630bb2b55c2b5845c07290924c5d61479bf0bd897750d1ab6e2ab1c235b",
+      "fixed_tree_sha256_lf": "6b5880770b275105fff4d480fd8e9eef5f46bb7d90296841c2bacb7690dbd812",
+      "files": [
+        {
+          "path": "src/flask_uploads/flask_uploads.py",
+          "status": "M",
+          "vuln_sha": "92f1b34d24e14cbcff20222c14984b2c4dc0cde40f07a2b3598502e88adec422",
+          "fixed_sha": "426d2a4ced452bf7fcf8eac58b6877f750b32ecb7a63a39fca725371d6751e64"
+        },
+        {
+          "path": "tests/test_flask_reuploaded.py",
+          "status": "M",
+          "vuln_sha": "5928d638a9238385016b786f9737882542bd724d4cdcfa1819e11460eb1c4aad",
+          "fixed_sha": "74604fb87819d42dc13934c0f29a99a510bf5e3d8ebf8925f723f98c2858ee36"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54569",
+      "repo_slug": "senaite/senaite.core",
+      "parent_commit": "3195f890fe591c0e962294edc013f77826209c5c",
+      "fix_commit": "a24d65e99a17ac43c5374ed9f0a60d0fe60d2f74",
+      "cwes": [
+        "CWE-95",
+        "CWE-862"
+      ],
+      "summary": "senaite.core Vulnerable to Eval Injection and Missing Authorization",
+      "vuln_tree_sha256_lf": "16195055198d16f2ff20aad4d4c4c6222fb200bc8a492d000795a24dc5ea8779",
+      "fixed_tree_sha256_lf": "e711a45414cc84eb99ca58eaefd14307e48b8cec28fe4595bc5a144029dbf968",
+      "files": [
+        {
+          "path": "src/bika/lims/jsonapi/__init__.py",
+          "status": "M",
+          "vuln_sha": "1fdaef57dde6c3e54aab05b15f8cd3a0b79279b4824abb0bee360a5078faf731",
+          "fixed_sha": "26c44888c2a017cec5500797031802bdf0f9d997f5421cb81413e8b1906c4e77"
+        },
+        {
+          "path": "src/senaite/core/browser/fields/parsing.py",
+          "status": "A",
+          "fixed_sha": "cf1753d1e36632b587d345b1dd752daddc785f57252bae874cae95bd89f0e013"
+        },
+        {
+          "path": "src/senaite/core/browser/fields/record.py",
+          "status": "M",
+          "vuln_sha": "d547d65555f929545e0a434a91300df485d2a0215053460c3e1a622909005e8b",
+          "fixed_sha": "802ffb2d20774194fcf73b8c2b643d80c08cf4548db75fac27f135c8c260234f"
+        },
+        {
+          "path": "src/senaite/core/browser/fields/records.py",
+          "status": "M",
+          "vuln_sha": "a4fde50c7248a7a90a509b2a948bead2a6f25f2ecc940e239478d4adec28f5dd",
+          "fixed_sha": "c0fcb7e413cdd0a2deb03bf0c0875ade286dfcc9114d88b92f7356e3760c8a07"
+        },
+        {
+          "path": "src/senaite/core/tests/test_record_parsing.py",
+          "status": "A",
+          "fixed_sha": "169151e98a7a8f48b07d7175e017a2d6e18157d6333857eda5ab0f214d1a268b"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "repo_slug": "termux/proot-distro",
+      "parent_commit": "f5ff24beef945fcfe04831a913602169c17e97f6",
+      "fix_commit": "a96d7a9667f38e45d812614852ee3915d1c0ae45",
+      "cwes": [
+        "CWE-61"
+      ],
+      "summary": "`proot-distro install` has a Symlink Escape (Arbitrary Host File Write) via Malicious Tar Archive",
+      "vuln_tree_sha256_lf": "c1471f2bc2bdba4626fa80287985112f2004b7c58a59b711e1702a3a9d810c0a",
+      "fixed_tree_sha256_lf": "caf1ff4144419af6554d73869980d2d0c3d01cd88d1f26e3d34bb0eae6d968a3",
+      "files": [
+        {
+          "path": "proot_distro/commands/restore.py",
+          "status": "M",
+          "vuln_sha": "72846d1b7b3d499163c1717f55645bbbcac744a481becf24e99c616277407bac",
+          "fixed_sha": "0a068eab76fb14d9b6613c001ddd4f70db21e956d1e78d0f688ddc0ba9aa515c"
+        },
+        {
+          "path": "proot_distro/helpers/build_engine/copy_step.py",
+          "status": "M",
+          "vuln_sha": "221e15d91200d811c2fa056370a193029583a2166c288b0764d371d332031419",
+          "fixed_sha": "f70c4748544c622f2bc356dfdaed785c73cf175e43e226c8141ca3b124b5eaa1"
+        },
+        {
+          "path": "proot_distro/helpers/tar_extract.py",
+          "status": "M",
+          "vuln_sha": "92c2008291c38bcbe054f9ff28fe8aab2d0663366229ef82e1dafee0a0639e83",
+          "fixed_sha": "7fe2515d0b549d3f1459cd264c58c8f5d06e1b6154fefb3488121e09d38ca932"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54635",
+      "repo_slug": "nessshon/tonapi",
+      "parent_commit": "e46c4a4b907cbb1f290ef73af299b5020ec9de71",
+      "fix_commit": "854222b7ee68d3fb7b4d6d899d200f388483bd86",
+      "cwes": [
+        "CWE-287"
+      ],
+      "summary": "pytonapi has a Webhook Custom Path Authentication Bypass",
+      "vuln_tree_sha256_lf": "a7e025f1076706b24e948c846f39adcf531aeda6bc6d7821259ecfe30cfe4894",
+      "fixed_tree_sha256_lf": "fbabf2eb9ee4cca058529cdd548cdcd40b9bab37e94b021aefa7edeed5923e4b",
+      "files": [
+        {
+          "path": "pytonapi/webhook/dispatcher.py",
+          "status": "M",
+          "vuln_sha": "e9f88fc427ec2cab0dd7b5b6dd0f962aae811c188a71b40e9b45fc52f8d62926",
+          "fixed_sha": "e674a68ab54c78addd8534675c3edc453297e6425b6b06b047c54c906fffc53a"
+        },
+        {
+          "path": "tests/webhook/test_dispatcher.py",
+          "status": "M",
+          "vuln_sha": "396f7fda36a4e4a1f4003b2cf8fcd03ca7658e32f3bc8411dc4a2d24c56171f4",
+          "fixed_sha": "1cd676ff979e9c08d0c1d97954f219e866f8cc28c0b94c59d3cde6d08f31c519"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54654",
+      "repo_slug": "koxudaxi/datamodel-code-generator",
+      "parent_commit": "bcfdf30660ac4a17ea54400351c9aa4f3391f60e",
+      "fix_commit": "b73abb5cd703a50471b8950bbd3bd0b82ad71de7",
+      "cwes": [
+        "CWE-94",
+        "CWE-1336"
+      ],
+      "summary": "`datamodel-code-generator` vulnerable to code injection via unescaped carriage return in `--extra-template-data` `comment` field",
+      "vuln_tree_sha256_lf": "6e6805250ff6cab6362fbf14534fcc8c667029a535e63fdba2e58192b4c31468",
+      "fixed_tree_sha256_lf": "601f79178e01a038ad92da9667f254a0ce54bde47560296533fab5138d6b0d41",
+      "files": [
+        {
+          "path": "src/datamodel_code_generator/model/base.py",
+          "status": "M",
+          "vuln_sha": "7787b9ec0486fb8a371a271a3432a7c67176a317f54163a066afc5661bdf00d0",
+          "fixed_sha": "6cea7eefee6cd01fdca573a03db483b428ab27927b66e131fc519b0146adbecd"
+        },
+        {
+          "path": "tests/main/test_main_general.py",
+          "status": "M",
+          "vuln_sha": "1736d0b3fed268f028dd5199d084da2ac3ae771694d6432324232591f96b902b",
+          "fixed_sha": "c7e5555bf1c370600c2bbd9120726769f68907b2fab2344dc59b0680814ce4a9"
+        },
+        {
+          "path": "tests/model/test_base.py",
+          "status": "M",
+          "vuln_sha": "aeb77dd7a9ef5b4bd3f97cdd1104767b2e8bd52aae31a65749b33e87a91c33d8",
+          "fixed_sha": "c513df5129c2f66d007797455bafa3c6f4ade809aae1c493f3a55a9cd99bcf48"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "repo_slug": "onionshare/onionshare",
+      "parent_commit": "8cc75e1d7e88bd31f7276733449d412bf71c8999",
+      "fix_commit": "48f31cfac077fcc9c04c67c2a6dbf87d956f5eec",
+      "cwes": [
+        "CWE-59"
+      ],
+      "summary": "OnionShare follows symlinks in shared directories, allowing unintended disclosure of local files",
+      "vuln_tree_sha256_lf": "3bef3a0715e96015c721a88d8e6553a5a12821eaebe6b50f6e093f00f5ba6275",
+      "fixed_tree_sha256_lf": "34795c8ef954eed3bf7048510e62851c59a23c81dd18c40221b50103f808e73b",
+      "files": [
+        {
+          "path": "cli/onionshare_cli/web/send_base_mode.py",
+          "status": "M",
+          "vuln_sha": "77759e21b8347513b1c4e182596e771baf6da69bac3dbfb8f72be8720479d168",
+          "fixed_sha": "fa9b8d21ab52d2f9025e215d7e7709e7ab68014478be2eb53c57f094662fdd1a"
+        },
+        {
+          "path": "cli/onionshare_cli/web/share_mode.py",
+          "status": "M",
+          "vuln_sha": "7c025d248626fe40526210256563172349fcdb34b8e4e572155b903585aa4297",
+          "fixed_sha": "79ec1034506015d40fa8e9ceb5ee797dcf6e7d5df3605f4c297e7954f27ba0fa"
+        },
+        {
+          "path": "cli/tests/test_cli_web_symlink.py",
+          "status": "A",
+          "fixed_sha": "e8da8d13213b4d6e994c265c4e482f8a5bc8e006ab0aaba559c1d379cc8036a8"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "repo_slug": "onionshare/onionshare",
+      "parent_commit": "8cc75e1d7e88bd31f7276733449d412bf71c8999",
+      "fix_commit": "a090e97193efc91fbeac9dace7793ea568b83cf5",
+      "cwes": [
+        "CWE-863"
+      ],
+      "summary": "OnionShare Receive mode writes uploaded files even when file uploads are disabled",
+      "vuln_tree_sha256_lf": "eeed20dd95542a59b40cefa6a044bea5c532f7c2718bce7df22bc265b23c90ce",
+      "fixed_tree_sha256_lf": "3870b41e4e02525ed2e946de1770328b5d28d25b30df2b234debb4cad91f4528",
+      "files": [
+        {
+          "path": "cli/onionshare_cli/web/receive_mode.py",
+          "status": "M",
+          "vuln_sha": "6d2a30951628abd61761fd21627f1d0875e29f8b3cca6a57fa3d7c62ac379bc3",
+          "fixed_sha": "5f65a6d4c5b69d0313a34979ce3429c5d0f58d95be0cbb36b2874d0f73a56f7d"
+        },
+        {
+          "path": "desktop/tests/test_gui_receive.py",
+          "status": "M",
+          "vuln_sha": "32a347be709027f7df3133556917d67c858920f6188f43a9e2ccf88f4fb185a7",
+          "fixed_sha": "49aae89b4b1e31dcd8b5dd9351963a484f54aabc36f5e96ced4326d4901e7e35"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54727",
+      "repo_slug": "termux/proot-distro",
+      "parent_commit": "d6dff97aee4736e5940820c832866feb48c82428",
+      "fix_commit": "98aff324b7d8500ff75a8ca9ac087ee636be4716",
+      "cwes": [
+        "CWE-668"
+      ],
+      "summary": "proot-distro has a Container Isolation Bypass via Crafted Restore Archive",
+      "vuln_tree_sha256_lf": "c662876c3bc60fe0eff765667eb144ef062fd1ee88a48ec1bfb48efa6e11935e",
+      "fixed_tree_sha256_lf": "0b4d6583bac11fc11ab66a5af32bf364ae17a9110e351110ce3946618fc6d9cc",
+      "files": [
+        {
+          "path": "proot_distro/commands/help/pages.py",
+          "status": "M",
+          "vuln_sha": "111ae0d6d230d69c120cf1f573675b529f9f9aa0e2eb1749f68266c754b8f8a9",
+          "fixed_sha": "1a5de0ec2546193f5d45b10376e0191bab069818c9d2f0fd3d818b1276ddb8b2"
+        },
+        {
+          "path": "proot_distro/commands/restore.py",
+          "status": "M",
+          "vuln_sha": "0a068eab76fb14d9b6613c001ddd4f70db21e956d1e78d0f688ddc0ba9aa515c",
+          "fixed_sha": "e65d1829c49f2fcf29f36ecc4377448ea37cb66e99d5576b20054af5ac6a857f"
+        },
+        {
+          "path": "tests/security/test_restore_dest_path.py",
+          "status": "M",
+          "vuln_sha": "1855001a9bc4b8f6315a18ad4c3189a52b229b67193b6904dfad652d748f5f93",
+          "fixed_sha": "ce6332ab6ec647e7a1cbb58845500ac20e5bc59f777e471805dac00ff6f5f3f4"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54770",
+      "repo_slug": "Pylons/webob",
+      "parent_commit": "54c1133c79e48940776a272f4500530e1cc3232a",
+      "fix_commit": "ff89560643fb252751b4db8806a283b5377f1f07",
+      "cwes": [
+        "CWE-601"
+      ],
+      "summary": "WebOb: Open redirect in Location header normalization via leading C0 control / space characters",
+      "vuln_tree_sha256_lf": "140d7fa6d04157f812ffa438fc45a147fb0fad0cd6114956cf122208cbf74f83",
+      "fixed_tree_sha256_lf": "cdbf06cb6ad2f4a758b167c3502c705d6a548b5e20893b89d30df6cd2fcf755b",
+      "files": [
+        {
+          "path": "src/webob/exc.py",
+          "status": "M",
+          "vuln_sha": "122317a44ade6c4fefc3143cc0bbeb033498efb1fb51ec485887be280e230b32",
+          "fixed_sha": "967d200d67bfca0753605daf00031a195e219d467aebb17313ec5abb61ba2fcf"
+        },
+        {
+          "path": "src/webob/request.py",
+          "status": "M",
+          "vuln_sha": "891a765b31651a436c411b5b3d88601c7b22c57121ec78b2904237432d5223c2",
+          "fixed_sha": "e5c79bc05eef5d1d9d027fcad3c47be76fc98a76e489baa3415b7859ef59b7e7"
+        },
+        {
+          "path": "src/webob/response.py",
+          "status": "M",
+          "vuln_sha": "cc47d99c6b99b13a9270a1211919e179166291fe22948d85f43b1b7f3708b614",
+          "fixed_sha": "eb5487cedad02aa709fa69fea2ca0634ff7a79678106dfc45c78e27e27da7517"
+        },
+        {
+          "path": "src/webob/util.py",
+          "status": "M",
+          "vuln_sha": "4c70121172f9f02be364e5e323a2a8c2d26319bc0288f9761776322f43faf49b",
+          "fixed_sha": "cfd6594d0af4b696ec64c88757b4e146d1b94c39d85c054432607a9d3ca0193f"
+        },
+        {
+          "path": "tests/test_util.py",
+          "status": "M",
+          "vuln_sha": "f4623604d2b0627aeec91691f27b1852315d3ff10ac0c496993455b54a676fa7",
+          "fixed_sha": "d3b4a90ce50f3921f9444b053de7a97b032c875f47115d4541336b6982308c69"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-54785",
+      "repo_slug": "eLyiN/gemini-bridge",
+      "parent_commit": "bb3ad9e44dba04092abc2e2a8af83223f10402db",
+      "fix_commit": "8f3b85afd02b692c4bc974b5176e12fb277ea801",
+      "cwes": [
+        "CWE-22",
+        "CWE-200"
+      ],
+      "summary": "gemini-bridge vulnerable to arbitrary local file read via consult_gemini_with_files inline mode",
+      "vuln_tree_sha256_lf": "c8603ded5d7fb290d669f05f7fa2211e7933415ecaac40498f1a0651d1bc0a96",
+      "fixed_tree_sha256_lf": "4ace5f407dc8de76b27186a180dce21d77f3ced0e0d8d6f3877d298f2217d557",
+      "files": [
+        {
+          "path": "src/__init__.py",
+          "status": "M",
+          "vuln_sha": "96ca578ad31e74c51c3613012b819651e0101015af84817ea1a3880c05706eb7",
+          "fixed_sha": "a0a8104102cfbe2d874fc755f46b98223a9cc305df2c1086d159f8ad24384280"
+        },
+        {
+          "path": "src/mcp_server.py",
+          "status": "M",
+          "vuln_sha": "1896bde7c8cca3aba2a97603869920d3df662cd8042039151d66a3da564908d4",
+          "fixed_sha": "a69317bb41a72ecc9d2ac34e7c6c016bda6f232ef81e4f6b6d81458203711430"
+        },
+        {
+          "path": "tests/test_mcp_server.py",
+          "status": "M",
+          "vuln_sha": "ecaf3b2930c8f38573aedf96895343cbbe6b341f61634096b2d6842d82c9684c",
+          "fixed_sha": "a5ed55992ffbdfa6a92865ab6c1d70cd1038b3ff78f7aa4e5877864bf7a1ee14"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-55099",
+      "repo_slug": "collective/icalendar",
+      "parent_commit": "f5494e36780693f25259e3641fc660666b97a129",
+      "fix_commit": "b6b2608ae3af6de40695b4e40f71847485aa0b49",
+      "cwes": [
+        "CWE-400",
+        "CWE-407"
+      ],
+      "summary": "icalendar has Algorithmic Complexity in Equality",
+      "vuln_tree_sha256_lf": "82b8313a695b3123e94d0895fafeb506de366d4eea12b632769c8657bb9fe9d5",
+      "fixed_tree_sha256_lf": "d223a22ed6b5f863dfb105a36e03aac6007cd761e2002d6d62d7d75b052c0c36",
+      "files": [
+        {
+          "path": "src/icalendar/cal/component.py",
+          "status": "M",
+          "vuln_sha": "e4de41c7e78eace53308edc221d04a909069db0b20c2aec72428cddbdaf3f039",
+          "fixed_sha": "bea20829b090108435f632891075395a39967df140ea3b73038476dbc7f2060c"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-55403",
+      "repo_slug": "koxudaxi/datamodel-code-generator",
+      "parent_commit": "25c8b7e497419eb20b230fa3318c04f9bebc5a6f",
+      "fix_commit": "a585c037c8307b7aae815de193b7fe1c4c44994b",
+      "cwes": [
+        "CWE-200",
+        "CWE-601"
+      ],
+      "summary": "datamodel-code-generator: Authorization / request headers leaked to cross-origin redirect target when fetching remote schemas",
+      "vuln_tree_sha256_lf": "922d8bd1a55615af1b4efff71e3da6df1d6195e0011c8b493d1938245ecfbe13",
+      "fixed_tree_sha256_lf": "fa9193506ca17e46affdbbb2a2c8bb781c4601a6fe2f20f36e444f68b02dcb3e",
+      "files": [
+        {
+          "path": "src/datamodel_code_generator/http.py",
+          "status": "M",
+          "vuln_sha": "bb45f76af57937e79d1dfbb5688ffe70fe058748bbf9b227ef8ad271cb14bd82",
+          "fixed_sha": "45dd3555776d376d3e837d54e1acdd6cbfd3fb9aea60d9f5e103e556a740f695"
+        },
+        {
+          "path": "tests/test_http.py",
+          "status": "M",
+          "vuln_sha": "8f6cadfc5bfd2cfe2b44b2496626ad2e84f2ad57a164635e16867fb3eb9e9566",
+          "fixed_sha": "a35c14cf7d34911b365c4b6b9cd6f684c83d591d9db652d2c1f5b7f1dce5d413"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-55404",
+      "repo_slug": "yt-dlp/yt-dlp",
+      "parent_commit": "d298693b1b266d198e8eeecb90ea17c4a031268f",
+      "fix_commit": "6fc85f617a5850307fd5b258477070e6ee177796",
+      "cwes": [
+        "CWE-74"
+      ],
+      "summary": "yt-dlp: Downstream command injection via improper sanitization of yt-dlp --write-link output",
+      "vuln_tree_sha256_lf": "cd83bdd9acdc82b7b413df38e7e9b43c9ea5f5b771c010481888a96a44dbb5a3",
+      "fixed_tree_sha256_lf": "336e569cc8900409a9879cd8499443c64c3be65b3611432a04c392a6853e2f8a",
+      "files": [
+        {
+          "path": "test/test_YoutubeDL.py",
+          "status": "M",
+          "vuln_sha": "cd8aa53d0d374367b16ad36febaec3583e8827fb9a3e04f2776abd2a8b8fa5ff",
+          "fixed_sha": "3ac41e77db4b37b6b55f1f8c5cae62d89a5f77b542be5912985b027a3f8bc780"
+        },
+        {
+          "path": "yt_dlp/YoutubeDL.py",
+          "status": "M",
+          "vuln_sha": "9cc63c652c4c70948fa15bdbb9502d7282d1d14fb46e534459f7d7e5154121fd",
+          "fixed_sha": "000dfc4eec2307d24072445985a51e70c31eedfe7cbd13e547adca88d5d64eec"
+        },
+        {
+          "path": "yt_dlp/options.py",
+          "status": "M",
+          "vuln_sha": "748376ca6ef2479d316e8059a6774f582ac3720ed7af6ab5cb05c9d4aeb95fec",
+          "fixed_sha": "b76f9d6870047987cca7ef8f4bb69a062e76719993eeab98818f375ef5cd730e"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-55618",
+      "repo_slug": "GOVCERT-LU/eml_parser",
+      "parent_commit": "c18bbb2b9d802d9ec46695ee734fa0f377fc314c",
+      "fix_commit": "746a69f86443eb0b6a47f77db3cfe727c21f92b3",
+      "cwes": [
+        "CWE-116"
+      ],
+      "summary": "eml_parser has a URL extraction bypass via HTML entities in URLs",
+      "vuln_tree_sha256_lf": "f81cbaa6d22c77e38374b7ecf44ba77904608b139fe9a0652e3d8a3f88f19af1",
+      "fixed_tree_sha256_lf": "0e05db6976d533dc3b92466af2ed4ad723a00279c2cab91ca1e906857fac771a",
+      "files": [
+        {
+          "path": "eml_parser/parser.py",
+          "status": "M",
+          "vuln_sha": "507f829eff51d5695ed553b49aebcd2fa84bd81ba91a3ea977932f5feb0ab381",
+          "fixed_sha": "dbd7971e152bbe1b1b25c4664d18484400f13edb912eb6a04846a98f31ac5a7a"
+        },
+        {
+          "path": "eml_parser/regexes.py",
+          "status": "M",
+          "vuln_sha": "c3b5eabd8b8ab2888e316ee96a85db902b8834fb9ccca2b369bba565aba3cecf",
+          "fixed_sha": "4cfe698d4e19b5a23527779bbdf3d1653687641436f7e1056b2c1932a2a0aba7"
+        },
+        {
+          "path": "eml_parser/routing.py",
+          "status": "M",
+          "vuln_sha": "5f64e464e1783fb05f7ff388f78b6ae52f35685a1492ae4821cc7c17b6700017",
+          "fixed_sha": "f586f80918309368f73beecffbc882a96309990b6cfc06c5d756c1b195d0c301"
+        },
+        {
+          "path": "tests/test_emlparser.py",
+          "status": "M",
+          "vuln_sha": "5e32421bba31ae5a4bacdb856afd1a586bc411b6202160a5952b002575ad106a",
+          "fixed_sha": "8a46c99610c1fc267c1130e53d7f1dbd2b2d35a8cc31b7542a4510d565ae0d67"
+        },
+        {
+          "path": "tests/test_pathological_headers.py",
+          "status": "A",
+          "fixed_sha": "1769bd4d81804f247ad16f1f811ef4ddc0a9946f11934f9912a9ca7f7918f531"
+        },
+        {
+          "path": "tests/test_routing.py",
+          "status": "M",
+          "vuln_sha": "894adfed1ed9b0d70762e71855bf8df9c41069fca504d8e4fc24b6bf20829bda",
+          "fixed_sha": "bc83def659541736229fb17f0a2b08830441b6cbc67da9a5a6208181fe503b25"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-57516",
+      "repo_slug": "ray-project/ray",
+      "parent_commit": "a6416a64596db70e3de2404342b7f51ebdb8b5a1",
+      "fix_commit": "41443a18f9e6403a072de69098a279c23e2d943c",
+      "cwes": [
+        "CWE-94",
+        "CWE-502"
+      ],
+      "summary": "Ray: Arbitrary code execution via ray.data.read_webdataset default decoder: pickle.loads(value) and torch.load(weights_only=False)",
+      "vuln_tree_sha256_lf": "f2869e35fd1f36a49302e099d203999b16633950e57cd25644a33dfc539ffef3",
+      "fixed_tree_sha256_lf": "c86b2078d6626f47b1c51f3fbe75fbedc717781ccf2104927de349cabde70a2c",
+      "files": [
+        {
+          "path": "python/ray/data/_internal/datasource/webdataset_datasource.py",
+          "status": "M",
+          "vuln_sha": "db451173907ebe24864fbf7c99a9b1b2f755d7ad26e907cf00f3dc42817513e8",
+          "fixed_sha": "10f8c859a8e05a91937e899fdd5d627b44ff4ab892f59a802dad0a74eaeac333"
+        },
+        {
+          "path": "python/ray/data/tests/datasource/test_webdataset.py",
+          "status": "M",
+          "vuln_sha": "e07f4db815746446ff9748b18b466c5a6e90cb897a002275083f1ad390df0ca3",
+          "fixed_sha": "7c50af8cef013417cf40fefd350879ae9576c07ca6d10c94a85edadaa5115ef7"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-59215",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "7b1aa749eb0590a387ab51a12ff126868f7216a0",
+      "fix_commit": "a66477b7104c5d141ce7bffaea424b43e7666ef1",
+      "cwes": [
+        "CWE-639"
+      ],
+      "summary": "Open WebUI: Private channel messages can be disclosed through cross-channel thread parent_id binding",
+      "vuln_tree_sha256_lf": "16ffa1461982b9aac425141bd6c8b18958cd533966b6e6486ac3a7de48359406",
+      "fixed_tree_sha256_lf": "b7c3b23d59394c54e1a7561b3499c9c90e0bda0ef9fac980ce6e433256a0de3d",
+      "files": [
+        {
+          "path": "backend/open_webui/models/messages.py",
+          "status": "M",
+          "vuln_sha": "180273fd1ab59b1615ae9ab705b4bc74496d1c915978d65a41997e610009f3fa",
+          "fixed_sha": "e8a8e6aa123f3d0e71d7998c1ba71f8f38e8e8ad3c9f9e7dd2cb98c1f6826236"
+        },
+        {
+          "path": "backend/open_webui/routers/channels.py",
+          "status": "M",
+          "vuln_sha": "38045d3a45d7fcfec8b5c68731d6331c5cd847ba475fc8b8c99a8e450829d621",
+          "fixed_sha": "f0852da3a37f2b81bdd2f44c7557f9a745af13cefab69ea1c4030b0baa472f3b"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-59224",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "8b35ce924b120ac7c6eec0eb6119243f23c6202b",
+      "fix_commit": "5f3a628a8d291bb5d33e1a0b0c89fb62a2927934",
+      "cwes": [
+        "CWE-287",
+        "CWE-290"
+      ],
+      "summary": "Open WebUI: Terminal proxy forwards a spoofable, integrity-unbound user identity to the upstream (X-User-Id header and ws_terminal session_id query injection)",
+      "vuln_tree_sha256_lf": "b14d76d85f3fcd61a7f57d89f6c05fa38d3a83a5ae1162f738bff8808ced352a",
+      "fixed_tree_sha256_lf": "764702af3a04bc27ede9ac8cdeca3c31f11fc87b7a834ba0ab0b87dbe1809481",
+      "files": [
+        {
+          "path": "backend/open_webui/routers/terminals.py",
+          "status": "M",
+          "vuln_sha": "c400cfb70fac5e0ac817f924f5c5ce0037bed5c65f0ce1dfe75f66c612a4e609",
+          "fixed_sha": "93a90b87e7f7aa5434859ddd94b2c809af836c59153b454fd06e0325fe3953c5"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-59820",
+      "repo_slug": "BerriAI/litellm",
+      "parent_commit": "e828a91eeefbc2e6e5fe7a34ddd40a5201216b15",
+      "fix_commit": "6a15adcd64137d37f73dee76dfe7481f8c2d9196",
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "LiteLLM: Arbitrary file write via path traversal in Skills archive extraction",
+      "vuln_tree_sha256_lf": "147682e48c841afdde73ee29a6324691fb23c5f1415e72580a1efce6b7ff9cdf",
+      "fixed_tree_sha256_lf": "002184056379573bf77bba772168a3fb513d6c821806c9823fd9fd938b811dac",
+      "files": [
+        {
+          "path": "litellm/llms/litellm_proxy/skills/prompt_injection.py",
+          "status": "M",
+          "vuln_sha": "f6677c2db8b6529c83bba69b81b9a6efd0061b83e3471d9c555c6b977b7878f2",
+          "fixed_sha": "e8872fd0a8809597878c234aa82cb8dd2842f14a237167b87c80b8dd9ade865e"
+        },
+        {
+          "path": "litellm/llms/litellm_proxy/skills/sandbox_executor.py",
+          "status": "M",
+          "vuln_sha": "4ecf9513a98a398d7143450b1799b34ae912affca5e332c160e1bb6fb4d026d2",
+          "fixed_sha": "4bc28e9aa815082235790875307afd26ff83febc38757196ba39e6ed0d9d1595"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-59881",
+      "repo_slug": "aio-libs/aiohttp",
+      "parent_commit": "c5293938af13b3efbcd77619d34501cbaa255c2a",
+      "fix_commit": "47fb6ae354d4fa22048f4dbe7dbf82b625f0a2f6",
+      "cwes": [
+        "CWE-20"
+      ],
+      "summary": "AIOHTTP: WebSocket client accepts compressed frames without negotiated permessage-deflate",
+      "vuln_tree_sha256_lf": "7087885a2084d25e6ddfc5c81f86595b6d5cc3ec9f9ae96b56ae30ccf8dfe4d0",
+      "fixed_tree_sha256_lf": "cfd71a5b571fb5c095b1566c624e0765903df1bfe04cfa67d3484db151096e08",
+      "files": [
+        {
+          "path": "aiohttp/_websocket/reader_py.py",
+          "status": "M",
+          "vuln_sha": "bdfed8e8907a8692c4d7b390dfd2213bbd206bf0d715892c7efe393399f5c0e5",
+          "fixed_sha": "bc31c588147c0e147bb8de70055efa6b97f01122d9fa1232f7e26e24e0397bf9"
+        },
+        {
+          "path": "aiohttp/client.py",
+          "status": "M",
+          "vuln_sha": "3f368b00a80f332b5c03be73d592048d30734d647753bc13eba7f7f0e293c262",
+          "fixed_sha": "4c19b709f0cf57f809e5370f597531d43888a37617beabfb11c8be146b46d45f"
+        },
+        {
+          "path": "tests/autobahn/test_autobahn.py",
+          "status": "M",
+          "vuln_sha": "16a31a9279a994351214b5bc9e93144b61986cf328c266770f1ca18846888f8a",
+          "fixed_sha": "40c755fb2d583774772c6bd575851b9a238f24ffd90544c805dea096973d630c"
+        },
+        {
+          "path": "tests/test_benchmarks_http_websocket.py",
+          "status": "M",
+          "vuln_sha": "fa4d0c627992441d7cefdbb0d00f06369ea5373e432970fe8ef87f67490da258",
+          "fixed_sha": "218aa8f3dd20ba422d6655430503e6d7dc19fbcec8fbe8f18030e6bc9bddf2f3"
+        },
+        {
+          "path": "tests/test_client_ws_functional.py",
+          "status": "M",
+          "vuln_sha": "99648fcbf07e7611be942f9d3710d8a5e3a20672dc440e9c4953b33f59e82231",
+          "fixed_sha": "07caf2b2e6608954b949fde3b40b598bc3ae0b418a064b6b3624f9022aa7b462"
+        },
+        {
+          "path": "tests/test_websocket_parser.py",
+          "status": "M",
+          "vuln_sha": "9c62c7295c5e844906d411c829ad487562a8033850bb40a141eea65ffd3ec22c",
+          "fixed_sha": "8a00ec557ddb8e8be618c14f8e645bf4b8ad6b6b8a7da48aef4690f3f213c228"
+        },
+        {
+          "path": "tests/test_websocket_writer.py",
+          "status": "M",
+          "vuln_sha": "5a9dcc921f4bafd5f5c51d2d34f77ea1ed8c26bc20e9c6fd23975108e52f2bfd",
+          "fixed_sha": "afdab7211e8e9ca42223cd9e74876e96eda50b8ddb349be31aad8abedbd75fac"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-59886",
+      "repo_slug": "pyasn1/pyasn1",
+      "parent_commit": "af65c3b92e9deeae50db4de390982dd970d87f98",
+      "fix_commit": "e60c691cb91addb8fcefa2f537e85ede6fb1e886",
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "pyasn1: Uncontrolled resource consumption when converting decoded REAL values",
+      "vuln_tree_sha256_lf": "280b58f9b60a1c29f38a01e206efba9e84aaed9e64065832d2e9ed60f1efd137",
+      "fixed_tree_sha256_lf": "1d4cbd744a3737c2e2dda8123fb8d24fa70481f71dee95042399b370d37143ae",
+      "files": [
+        {
+          "path": "pyasn1/type/univ.py",
+          "status": "M",
+          "vuln_sha": "067bb6807740f3851730bb606f82d76c72394d8c3e90a96396c27b76427c29f2",
+          "fixed_sha": "9b025b1fbe2f713f274887da492ff8684244cddd8ca95ea4a87628152a7298f3"
+        },
+        {
+          "path": "tests/codec/ber/test_decoder.py",
+          "status": "M",
+          "vuln_sha": "704ded440162ee3972840f096cc3a71cc678251b9dccac0363a850769c646759",
+          "fixed_sha": "5d1f21f5f25b22b9db372b41881eb852d5fcf8e1f6a053c330e7a4db21a7a118"
+        },
+        {
+          "path": "tests/codec/cer/test_decoder.py",
+          "status": "M",
+          "vuln_sha": "4ca500d7be614867054d4d90f040cd3416163bf9e1da56a62654385402f46e7d",
+          "fixed_sha": "334234f5a4cf6b53be946a5701c95be2afd350b9d5e2964facef679a7387b4ef"
+        },
+        {
+          "path": "tests/codec/der/test_decoder.py",
+          "status": "M",
+          "vuln_sha": "e8eac1685ac75d648dddd5007e052f422201f9b1af46132565ff3ddc27fca63f",
+          "fixed_sha": "ce877971e11bd83e6ea398d13156c3d33aafd13b2057c7e5b0a8965d52164fe4"
+        },
+        {
+          "path": "tests/type/test_univ.py",
+          "status": "M",
+          "vuln_sha": "4578418df3f3c1bbde75c1ffc71fdfb60b68d8f6efc19187929c927c74ca8ca6",
+          "fixed_sha": "5abb7746e5db01a63f369e5b427978c7383ba55945d7b3b06e77b7e8bceaf882"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "repo_slug": "pypa/setuptools",
+      "parent_commit": "84ed5913724df5a12dc804e1d5efe12508e706d2",
+      "fix_commit": "dd9f436a36486b4cb8a4c70a2321548b0be09b8f",
+      "cwes": [
+        "CWE-176",
+        "CWE-697"
+      ],
+      "summary": "setuptools: MANIFEST.in exclusion bypass in sdist via Unicode normalization collision (NFC/NFD) on macOS APFS/HFS+",
+      "vuln_tree_sha256_lf": "263bd3e1bee5ab1ed7872244cd1a8b69e85c6ae0d9103ed5dcce68ba35f15623",
+      "fixed_tree_sha256_lf": "c07f45bba2c6d14da2da24a4cd9d4bda27b0eb0dae18df7d1cbfd526eba6af3c",
+      "files": [
+        {
+          "path": "setuptools/command/egg_info.py",
+          "status": "M",
+          "vuln_sha": "ff2658273e42acb874698793d865c1a7a6e31746b442062fa03477b8174a2597",
+          "fixed_sha": "75fde7317f70bedfe7ab2ac596aa16fc79e869e04dc429d6ee36377459ef1ddd"
+        },
+        {
+          "path": "setuptools/tests/test_manifest.py",
+          "status": "M",
+          "vuln_sha": "78c83ae69200e760e2cc1ea6a64b5253e6fc0a3c1a3424b931280bfd5d4bac52",
+          "fixed_sha": "c0abd33f1aab4c90098e3b78789d37ad7888653280ef15e88316a3e6e166868a"
+        },
+        {
+          "path": "setuptools/unicode_utils.py",
+          "status": "M",
+          "vuln_sha": "ba430687ca44030e85fc4cdbf8ae43ddcfb4efc46003f19c174a16ea5838952b",
+          "fixed_sha": "0e400678e34254f1f7e8ef29a85515473e9df98699ea4d4314098ee414721d52"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-59893",
+      "repo_slug": "andialbrecht/sqlparse",
+      "parent_commit": "ef2012a5eeb491e604dea2b00d516904a3830c87",
+      "fix_commit": "d1d80602741f77ec78e5a04ce4719244cf32352e",
+      "cwes": [
+        "CWE-1333"
+      ],
+      "summary": "sqlparse: Inefficient Regex Handling of Dollar-Quoted SQL Literals Leads to ReDoS (Denial of Service)",
+      "vuln_tree_sha256_lf": "2753891150d7b147c0ae5317bb5604c29999ad613807c02df4676d7cb158c32e",
+      "fixed_tree_sha256_lf": "02f678b0f22cf631f19b1429d84e7d25cdf6dc013ed48fd01345c0c12f1d4fbe",
+      "files": [
+        {
+          "path": "benchmarks/bench_dollar_quote_redos.py",
+          "status": "A",
+          "fixed_sha": "7a9add85b2e635bae87c413e24c302737bf5a947ab94ae2cd8f3147bfa53c937"
+        },
+        {
+          "path": "sqlparse/keywords.py",
+          "status": "M",
+          "vuln_sha": "3097be87790866587765bef3b924b5ee8113d613c48507527480400974113b1f",
+          "fixed_sha": "ab1ac69d7864b02d3ca0ff7b7785e8e062efbb50edbca24fb97110586f8d51d5"
+        },
+        {
+          "path": "sqlparse/lexer.py",
+          "status": "M",
+          "vuln_sha": "d3ecae37a657adb8b3929471622b7c359e8dd254173596d31a2b479505ca0a86",
+          "fixed_sha": "3da866a32446cc4e790b11e2414303c1e796a5481056e4a38d165344d14b864a"
+        },
+        {
+          "path": "sqlparse/utils.py",
+          "status": "M",
+          "vuln_sha": "6ca1646add4aa39c1f1083e10ff16f651301186f4e26dbfd7502c1a192a76e87",
+          "fixed_sha": "c486381ccc18cdfd53ee64329d5697e70668c18e04b9c45e5bbba710354803fb"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-59939",
+      "repo_slug": "httplib2/httplib2",
+      "parent_commit": "a99a11fba8d5fa3bb9c47827e5cbfd641dfb88d3",
+      "fix_commit": "87581ad6cf752fe3da2090c59058261d2d00a427",
+      "cwes": [
+        "CWE-400",
+        "CWE-409",
+        "CWE-770"
+      ],
+      "summary": "httplib2: Decompression Bomb Denial of Service via Unbounded gzip/deflate Response Handling",
+      "vuln_tree_sha256_lf": "c75546dabeb6a81bbe07628a869e2e61c27d0708a60e5f40e30a5b192914a7fb",
+      "fixed_tree_sha256_lf": "50d78641bb47076ce7ef05e4fd25ccd525660a77aeacd47aa76d3652b843b5b8",
+      "files": [
+        {
+          "path": "httplib2/__init__.py",
+          "status": "M",
+          "vuln_sha": "90171fb1fa28c2fd9e8d8a8fddf0f25528873ca2fa24a84bfb606eda7a49e7fa",
+          "fixed_sha": "4438fa63aac1cbfc23c3d6519c1e29480822bf1411abff9d0edbbc06ed76dfa1"
+        },
+        {
+          "path": "httplib2/decode.py",
+          "status": "A",
+          "fixed_sha": "7fe6b9735a86de38b24a4cc719fe39509de5f4293e0a3c8a413a79a780e041e9"
+        },
+        {
+          "path": "setup.py",
+          "status": "M",
+          "vuln_sha": "88b41f311a83b812428e484f6315c3c83f53d1b564fa67f3de076c9aa0d3bff6",
+          "fixed_sha": "8b82c584bd73397936b4fcd72f7c178cf7b33e95ea687d92007d899847fff1a5"
+        },
+        {
+          "path": "tests/__init__.py",
+          "status": "M",
+          "vuln_sha": "318d7edaee7720d8f4f2e5d5d2b2382d7d94ef7ea7ddf2a1321af646b957930f",
+          "fixed_sha": "285e0129efc70bfdda47562c4ad0346245cadded51a6f4fd7a7ca537f5ffc069"
+        },
+        {
+          "path": "tests/test_encoding.py",
+          "status": "M",
+          "vuln_sha": "7d6dcde18d2e3999e76d73faf7fd2e5ea4a33cf118bf9502a58f40f3420ca59a",
+          "fixed_sha": "1ffb484bcbaca29776428c8e6e482bf4885811913e062a35409c3d7e77834c20"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-61539",
+      "repo_slug": "xorbitsai/inference",
+      "parent_commit": "4cefcaa1e63d7e29d26bcd4be96cb267da113871",
+      "fix_commit": "1b3d220f342ce68d34cec4586d9409d457dadc42",
+      "cwes": [
+        "CWE-95"
+      ],
+      "summary": "Xinference vulnerable to remote code execution via unsafe `eval()` in Llama3 tool-call parsing",
+      "vuln_tree_sha256_lf": "7a0454ee2b48f0899de8c0f9ca5659167ebee3a685beaa25f0c25ee6ae6aaf43",
+      "fixed_tree_sha256_lf": "0a1e58d4616d0c3d8c12d709b7730fd3c2e6a87d1718924f910c6202b35b04bb",
+      "files": [
+        {
+          "path": "xinference/model/llm/tests/test_utils.py",
+          "status": "M",
+          "vuln_sha": "139a2896901ad80e1330ab3c3749bb3b7b5334ed9e0032a363317cd8f51c5e22",
+          "fixed_sha": "38c168658c356b12b56d6b97af2cded974f60043ca0fd0b312f1e4918f0b18e4"
+        },
+        {
+          "path": "xinference/model/llm/tool_parsers/llama3_tool_parser.py",
+          "status": "M",
+          "vuln_sha": "bc10f7f546f685ad025d108eb46bbdee2f1e37267fd9c0d2853df2ab12bc5b9a",
+          "fixed_sha": "4e09cd7602e0e8186c47b92f1562a97b44a3a9325fab718ec64cf5c2f5ea2d6a"
+        },
+        {
+          "path": "xinference/model/llm/tool_parsers/tests/test_llama3_tool_parser.py",
+          "status": "M",
+          "vuln_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "fixed_sha": "a56c14681016264e9d28cc5ce39156d6de8decc018813d44c37c9d64eb405bdd"
+        },
+        {
+          "path": "xinference/model/llm/utils.py",
+          "status": "M",
+          "vuln_sha": "065ce760825e43d5fce3ab46c133581b604c212912db4c18fa1a0593196fd1a0",
+          "fixed_sha": "f023380a387d6b5a41a16d52e8b995f65e744431e2c479b8891e101e86b7946e"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-61632",
+      "repo_slug": "facelessuser/pymdown-extensions",
+      "parent_commit": "9fb9643c84c46386d77eef1a18929330620e3111",
+      "fix_commit": "edce35586d11a1ef78bb187bc60497fe6dbf3b64",
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "PyMdown Extensions: Path traversal in the b64 extension lets <img src> read files outside base_path",
+      "vuln_tree_sha256_lf": "658f1ad4e59b7f054e46bf236b61c8e9f82295664ca3e667c07f0e094c3dccba",
+      "fixed_tree_sha256_lf": "4266d0ee88c208c2ae7df903cb499482eda1b03dc5014f64a15a1cf416f90028",
+      "files": [
+        {
+          "path": "pymdownx/b64.py",
+          "status": "M",
+          "vuln_sha": "f110e3336e863bd85676401f68d593d50e2ab6784f8d4737079d018074387894",
+          "fixed_sha": "de4441f821b615297e419c3c2db9f71542bea850b8a47771862b0a48a22bd440"
+        },
+        {
+          "path": "tests/test_extensions/test_b64.py",
+          "status": "M",
+          "vuln_sha": "3f83e8502f7a7a2b2751f747b49cc3d25e266239db5230176cbf4485f3868781",
+          "fixed_sha": "cf65ee85d6329735a79ddecdf28004c0974969f309114e068ba636c032fce654"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-62676",
+      "repo_slug": "omnigent-ai/omnigent",
+      "parent_commit": "7ca0cca3c9a65c04c489edf68f0e080424a26868",
+      "fix_commit": "1a05b7b139ef504bf2be89bf37918abe104fb95c",
+      "cwes": [
+        "CWE-184"
+      ],
+      "summary": "Omnigent Guardrail policy bypass: shell-command parser fails open in policies/builtins/_shell.py",
+      "vuln_tree_sha256_lf": "34c9c77bf7feb03ad4154408492f52d8aa4187416d7a46aa62343ab6bc367047",
+      "fixed_tree_sha256_lf": "58e5c881626c8a58952a6195b5bcd4b1a6964f2f2a70876d56432e8fe2f2a351",
+      "files": [
+        {
+          "path": "omnigent/policies/builtins/_shell.py",
+          "status": "M",
+          "vuln_sha": "7dd7c5dc1cc58ca08963196a97611831bd916fe856ba7c82525ec91bce499640",
+          "fixed_sha": "b934477fc227dd2b959761c1e11c39840a428d77d0bd319c84d52267d2fa4388"
+        },
+        {
+          "path": "tests/policies/builtins/test_github.py",
+          "status": "M",
+          "vuln_sha": "e50e40987de1f24fc8d8eff53509d5d4da56d92dc285bda284335f6c3417886c",
+          "fixed_sha": "3a44a80379eb0d2583129386deb8b4cafebf5eae9ae3be6d5036c2c0439dd493"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-62677",
+      "repo_slug": "omnigent-ai/omnigent",
+      "parent_commit": "b18dab9dff4f3b7e01e7359984d7af51caf8b88c",
+      "fix_commit": "7ca0cca3c9a65c04c489edf68f0e080424a26868",
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "Omnigent: Unvalidated os_env.cwd in agent bundle yields arbitrary host filesystem access on runners without OMNIGENT_RUNNER_WORKSPACE",
+      "vuln_tree_sha256_lf": "114c439de589f5fdf7ad4221c733c05dbc03c5a05557c5ba518f5cf09b7ae941",
+      "fixed_tree_sha256_lf": "9c45c7e9206c919f2d4939bde9f8e0279e94e7cbb74219c3355d8d620c17f7a7",
+      "files": [
+        {
+          "path": "omnigent/server/bundles.py",
+          "status": "M",
+          "vuln_sha": "c6779e498805954b2c51513a2ea18c42c41ba0100c7c8c099fc2a96eb8051e90",
+          "fixed_sha": "6e29f7d25c93a09715ddf9e13e903e9f821b926635526ad4c589fcf2d748eb4c"
+        },
+        {
+          "path": "tests/server/test_bundles.py",
+          "status": "M",
+          "vuln_sha": "4e8ced3e47ba2c5aed68f3763a5374bb0617374d5873c6abcf9e7ff79254bc1e",
+          "fixed_sha": "91bb8ec3abedac9ea57e102aedbc89e00a76124f93936cb6cd73166ef2806fd3"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-63632",
+      "repo_slug": "onnx/onnx",
+      "parent_commit": "af48b3891a00dd31b98c3566b0e73b804de222ff",
+      "fix_commit": "e9c74f596eaa0250f89e52a54160a25bbcb25b66",
+      "cwes": [
+        "CWE-125"
+      ],
+      "summary": "ONNX: Heap-Buffer-Overflow READ in Gemm Version Converter Adapter via Undersized Input Shape",
+      "vuln_tree_sha256_lf": "1b471366ef4261c1d300f5cf23aa9c32e0dc7eb866f61a2f9d1accc8533cf7f7",
+      "fixed_tree_sha256_lf": "f85bf8e91a6a31a7d0381cfcaeee1619719333a7a22c92fecdd5cb517dbdac53",
+      "files": [
+        {
+          "path": "onnx/test/version_converter_test.py",
+          "status": "M",
+          "vuln_sha": "eeed8cd26541f54c8cba888e9029a8bb950d24ed86a950ebf3132600b58e05f1",
+          "fixed_sha": "5f9f09d6bf9f48e8e482fe7295a2c5b0813279ddfc3e32358061e509b2351c64"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-67422",
+      "repo_slug": "facelessuser/pymdown-extensions",
+      "parent_commit": "6d0097b85a52468e7cd8eaceaa192ff3348c41e0",
+      "fix_commit": "c68498598d7b13011bb4571350b6e3612a4ce44b",
+      "cwes": [
+        "CWE-1333"
+      ],
+      "summary": "pymdown-extensions: exponential-backtracking ReDoS in caret, tilde, betterem, and magiclink inline processors",
+      "vuln_tree_sha256_lf": "093f3b17c0dafafa3f8135e8a8737ade4bc8ec357961414739c669dad8783de6",
+      "fixed_tree_sha256_lf": "2e596732a537a2d746e1ebfbb323ea224e9a336e60e54c9a9fa8360174f143b0",
+      "files": [
+        {
+          "path": "pymdownx/__meta__.py",
+          "status": "M",
+          "vuln_sha": "de772c3f00ac7cdbcef7cd7e4b373a63a0ce0698cb49ccab2df8c1f8783f89ae",
+          "fixed_sha": "e24e3c63516e34719d6c194427233dbf3e45921d1e5b64b0237684ae799134df"
+        },
+        {
+          "path": "pymdownx/betterem.py",
+          "status": "M",
+          "vuln_sha": "3b33dd9b61dfebf6b8b6b4c60e8b3f8da3c966bd5dfb949cfa730bb7079ed6e2",
+          "fixed_sha": "6ed003988919ae3394d97fb3e7de02408969f98b0ba3a6755b9f55e074f0cce8"
+        },
+        {
+          "path": "pymdownx/caret.py",
+          "status": "M",
+          "vuln_sha": "efe67c192ad134378d32983cce5bfefdea008f422a83dcaa6c0d65dbd247e3ce",
+          "fixed_sha": "427d35dd75c57985bb8e28543dfce2a317df9f8d05580a67b9ddee6fce6a01e6"
+        },
+        {
+          "path": "pymdownx/magiclink.py",
+          "status": "M",
+          "vuln_sha": "014f1ac54a36d1e1ffcc559318365b7d3311f280de55bbedb9bd629a43cde624",
+          "fixed_sha": "e9f793def943e90c1f3ef14e9a48c6fc3f8ee002700773fcf203002a78f8f134"
+        },
+        {
+          "path": "pymdownx/tilde.py",
+          "status": "M",
+          "vuln_sha": "37f2dd32d86e840c067f39fde3df15a6e7b1bcc4829eff289c717661d9fc5ced",
+          "fixed_sha": "704787eda3900f6095d7fe13f4416f77940ad97ae0511cdaf6d360a66f1386e9"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "repo_slug": "flytohub/flyto-core",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Flyto2 Core: Guarded HTTP modules follow redirects into internal space without per-hop SSRF revalidation",
+      "vuln_tree_sha256_lf": "2a0c623840362c22a80e77f759d1d795b4534b412c0c63c2b40e8e3508142d62",
+      "fixed_tree_sha256_lf": "aa4d26de3f0bd017d87a70f4c15b72ba7d8d9ad69d55de809378305882afb7af",
+      "files": [
+        {
+          "path": "src/core/modules/atomic/ai/vision_analyze.py",
+          "status": "M",
+          "vuln_sha": "5d0f0941d077667b9798db0aa07ec83ac25505d3d0a5d65f614cf30c9c84e0dc",
+          "fixed_sha": "6811f78cd231d702214a5b2c1feb6d4a761b65a7f3e06ab42678579ef2a29d61"
+        },
+        {
+          "path": "src/core/modules/atomic/browser/proxy_rotate.py",
+          "status": "M",
+          "vuln_sha": "5639e86d30b59d74644e4b7932a6a3018c2c9af925399f107d2e1c35b0a5c273",
+          "fixed_sha": "ca8e65f26f7af82cc915694afcb70433143d104c9953d8dcab69e2ec2f47aebf"
+        },
+        {
+          "path": "src/core/modules/atomic/communication/slack_send.py",
+          "status": "M",
+          "vuln_sha": "536c87660def52b69a04128d01e3634415e0651799052753ad820f6fe320e224",
+          "fixed_sha": "684c143bebf35807f5fdad0718f1f1a2631cb278c883a51ec5e7f38418c4ae9e"
+        },
+        {
+          "path": "src/core/modules/atomic/graphql/mutation.py",
+          "status": "M",
+          "vuln_sha": "fa55eac580099b690b4c9a222273606c37c4244fa9b06cb99811a1d846ca19c8",
+          "fixed_sha": "6932d8bd528399d9d4f8d1ab0e39f0f50c47e85f403ebfa83c4f2e5aac31d55a"
+        },
+        {
+          "path": "src/core/modules/atomic/graphql/query.py",
+          "status": "M",
+          "vuln_sha": "54f6267a57bf25b965c2fb56c4dacb563ee883eaccb0b1fffc32854f8a32ad8e",
+          "fixed_sha": "7af443f187843145c059420745932646c0e422c336c412379b6ec2f08e90138f"
+        },
+        {
+          "path": "src/core/modules/atomic/http/batch.py",
+          "status": "M",
+          "vuln_sha": "18384088fea0d6a13ab5f65897c5b8c45bf1e0ff02c4a3e1e241ffd73111d774",
+          "fixed_sha": "66b9e7e8f92fd8811251e4174ed40e7080dae0792aa4635c45255642124c5946"
+        },
+        {
+          "path": "src/core/modules/atomic/http/get.py",
+          "status": "M",
+          "vuln_sha": "f2b62ff23fe0be9c6c5f47874bd73ba14008f154bc4ba9d809e0baee85966d9b",
+          "fixed_sha": "69d14a024850b12cb78f756ac7a5e2a94d6a89fb5aeb5fafa5d5269404338bec"
+        },
+        {
+          "path": "src/core/modules/atomic/http/request.py",
+          "status": "M",
+          "vuln_sha": "61c1b89c4756bebe5df23b39635b93bc130b4c70a186c65b6b7ed7a756ffe496",
+          "fixed_sha": "075a2ecea434084ae84e7a45ad94e5bde7f9a378e3228b1a5d94aee848d1cd98"
+        },
+        {
+          "path": "src/core/modules/atomic/monitor/http_check.py",
+          "status": "M",
+          "vuln_sha": "1c2eb55c56184a22c8ef83f4a7a03d472673bd5eccf720e36d118ff10b4f98b3",
+          "fixed_sha": "0ebe51aff97540f9140aa50f4a7914cb429e475987e377ae9134ade0d32ed540"
+        },
+        {
+          "path": "src/core/modules/atomic/verify/visual_diff.py",
+          "status": "M",
+          "vuln_sha": "d8e919b346eff5b0f7ee6b581ea03a0a66e39d84f9e23b5e4748b1625c583b8a",
+          "fixed_sha": "76d5691d0ff8d5625bd9993680297d554d24dcdd931a8b08de7828599444d024"
+        },
+        {
+          "path": "src/core/modules/third_party/communication/messaging/discord.py",
+          "status": "M",
+          "vuln_sha": "f4e53ca423282bf38985d806db5057149eb9d5c9d4a8087bf6fe694211ff0a70",
+          "fixed_sha": "30a8a3b75d482bc55f1d87f9d4755f373c2a429cb712783e9fdfd29ec3bee660"
+        },
+        {
+          "path": "src/core/modules/third_party/communication/messaging/slack.py",
+          "status": "M",
+          "vuln_sha": "212a74cdefe79b7a76e1eab0d0d7c1ce9c2017cea1dc8fa335a62d41e2792a49",
+          "fixed_sha": "6e29d3660795ad1de8edf7113ab3d6cc76adba361dadaffb668fd7c0d4e4609d"
+        },
+        {
+          "path": "src/core/modules/third_party/communication/messaging/teams.py",
+          "status": "M",
+          "vuln_sha": "91e5ce1af7af3c990a9aed0bf828350689ce7ccc96c5b1e57bcd5cd618392924",
+          "fixed_sha": "5a9cb98a454c16923a7e0651cda0a2c7d3dff07715e1dd45ab3d619df93492c9"
+        },
+        {
+          "path": "src/core/modules/third_party/developer/http/requests.py",
+          "status": "M",
+          "vuln_sha": "90d4c3c8e58fb1a390411f766ea1f7b7b98130cf4148f8922315c93c41661387",
+          "fixed_sha": "88da0918ca262748b2928e785526cb9a1bb347cb1ab8af7a38b8a9dca142248a"
+        },
+        {
+          "path": "src/core/utils.py",
+          "status": "M",
+          "vuln_sha": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac",
+          "fixed_sha": "b7958c0d038c0ff450e04ed84c5d6b74a3ff5585d485329e476de757683b9ab0"
+        },
+        {
+          "path": "src/core/verification_service.py",
+          "status": "M",
+          "vuln_sha": "951ef7401f3f499f2f971a7885bba63c8471a110440f66ab271be978f353841d",
+          "fixed_sha": "8dfd992ec8eba26c57a6b34efa51e32ad74b5c5abf6afbd7304328a416bcf6a5"
+        },
+        {
+          "path": "tests/test_verification_service.py",
+          "status": "M",
+          "vuln_sha": "58fcf57af120d0cc5abfbc77261c25ab5f6ff84a1e5a4df643fc8ce1fa861fa6",
+          "fixed_sha": "55a9755d5b28fb90445ad8c7e554919b1d026bfaa8dc5d3643821705a8ca1e45"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "repo_slug": "flytohub/flyto-core",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "cwes": [
+        "CWE-201",
+        "CWE-522"
+      ],
+      "summary": "Flyto2 Core: LLM/API keys leak to an attacker-controlled base_url",
+      "vuln_tree_sha256_lf": "cfb3aa1a466a7c17597b8f0b47158471876b85c0c41bcd1bfb50e9ef78d4a082",
+      "fixed_tree_sha256_lf": "1905ef56d9058ec199a2695393d5f931831e279969d0cf45813458bec709efad",
+      "files": [
+        {
+          "path": "src/core/engine/variable_resolver.py",
+          "status": "M",
+          "vuln_sha": "295b098407fad2d859bc67e6f16b97ab05c30b56623e78a8687932c6f24f8a6b",
+          "fixed_sha": "71fccca46396f97117570251344ed210420cba613ebb69ae376062d84c9449d8"
+        },
+        {
+          "path": "src/core/module_policy.py",
+          "status": "M",
+          "vuln_sha": "d976c3d9fb969a18c8d4965d8358da374004f22b988edfe7565381d18d999315",
+          "fixed_sha": "328549f546ca8704b4c908a62829340a59fc5ec517f12f0e6024d9f89343d816"
+        },
+        {
+          "path": "src/core/modules/atomic/ai/model.py",
+          "status": "M",
+          "vuln_sha": "e1de8336202dff7a67bea86f6427b3224b3c6400360e50edfe8f28ecfb89424f",
+          "fixed_sha": "db31abdb75d2b2e952e4d597eb74841f4fad852ad1745fb248ef82ca82909e2c"
+        },
+        {
+          "path": "src/core/modules/atomic/browser/pagination.py",
+          "status": "M",
+          "vuln_sha": "7f14b707f9b9f0407be631ab5188f0d23244a1243421dff57074fbbd0ef499cd",
+          "fixed_sha": "22c7bb7d26ea551244b4a4e8f6129f55556cc4e186527bfbdfaf5e84c9b11fa6"
+        },
+        {
+          "path": "src/core/modules/atomic/document/excel_write.py",
+          "status": "M",
+          "vuln_sha": "02b829d907222a590ec332d6465f1d205dec20a152eb2adbcb2935f6145e7ec8",
+          "fixed_sha": "95662680bc96af9483ea932d411ea4dcb88ce2c749695a7f4ee63fd934c9038b"
+        },
+        {
+          "path": "src/core/modules/atomic/document/pdf_fill_form.py",
+          "status": "M",
+          "vuln_sha": "64f958588739acadce28d576ca4750d129f67fe75f857f12824302f6e5b72ee8",
+          "fixed_sha": "b31aece674dab2bde8012c2799ee6adce580087e20a4f22d7887eb0e00a55f1c"
+        },
+        {
+          "path": "src/core/modules/atomic/document/pdf_to_word.py",
+          "status": "M",
+          "vuln_sha": "61ec53ffe348f2eb9817421b69a349e48b49f2147d4aa1d971e7da50f6977813",
+          "fixed_sha": "306b4c7da849258c36666dccd56b1c80b9491b40f343e2460cb4cd5738eda349"
+        },
+        {
+          "path": "src/core/modules/atomic/document/word_to_pdf.py",
+          "status": "M",
+          "vuln_sha": "a9673a8b43afdbd5dc0668694157923e9819bd299edfd9fa3d692252c4e0bfb7",
+          "fixed_sha": "790defd8eea0e813630dec1e646b28371cc96f442b5c57ff064dd0a73364423c"
+        },
+        {
+          "path": "src/core/modules/atomic/image/compress.py",
+          "status": "M",
+          "vuln_sha": "eb7128c64c6c21498e960a8c15c4cd3f196692b7b28322ba46052f3257c6252c",
+          "fixed_sha": "534d17d5031d2c6d2ed8bd6009d3c7d9838ad564d7ea103d80f832cdf28c5523"
+        },
+        {
+          "path": "src/core/modules/atomic/image/convert.py",
+          "status": "M",
+          "vuln_sha": "db35ea78827cdf851870303c51d1132dea54eb827710c5b708419e927d8cb984",
+          "fixed_sha": "a1f50589a5015808f035a2efe3d5c320fda9bfb6288730197111c68bd2625a6a"
+        },
+        {
+          "path": "src/core/modules/atomic/image/crop.py",
+          "status": "M",
+          "vuln_sha": "20f43017eeb69b8c2c61585394a8c11787ce73c58506032f774e81e5e8337086",
+          "fixed_sha": "10f6ac4a62e199b7b67792721947f18e1f60bac82ec5ac0609d38415d3e0d63d"
+        },
+        {
+          "path": "src/core/modules/atomic/image/download.py",
+          "status": "M",
+          "vuln_sha": "38e7d1440eab0dafe7f78e656262310ef9e94ec6017d400aeb9fc528c32ec513",
+          "fixed_sha": "d397af17be670dc2ef165712af5626f8bd1ad5b636a64a5adb3198c9c3738e07"
+        },
+        {
+          "path": "src/core/modules/atomic/image/qrcode_generate.py",
+          "status": "M",
+          "vuln_sha": "82a95c64d9226dc66a039359098e6d209021a61597edf7ef281d5226db4e4001",
+          "fixed_sha": "4ca8777c3a8334d7190c41fe813843dd7087b6ed832e9ba47e3cde16065e6015"
+        },
+        {
+          "path": "src/core/modules/atomic/image/resize.py",
+          "status": "M",
+          "vuln_sha": "02f74357a8cba4ebf702ea3cdfb8cc1b358164ae14c5e98d1ca97a204af5bba0",
+          "fixed_sha": "3084026e79a1397c3d3e091aebcc806211017da3909ec254f7fcff016dfcd699"
+        },
+        {
+          "path": "src/core/modules/atomic/image/rotate.py",
+          "status": "M",
+          "vuln_sha": "99e68fe885e92c87866d389eb45813cfa4f97e3ae22e8dd30448d6f1a96ec104",
+          "fixed_sha": "10056001ebe4a3b8e6942636dc13ea807c55791cb45bc8633f2578d0c1ff6816"
+        },
+        {
+          "path": "src/core/modules/atomic/image/watermark.py",
+          "status": "M",
+          "vuln_sha": "005f4002c35e3f437c0ae7eca9b58bdda6306be1534814efffd84ead40ebe564",
+          "fixed_sha": "b381754ff1dd4d6dfd65e3f3a5eee1f6f51fc157405ea06e749a91b1202598b5"
+        },
+        {
+          "path": "src/core/modules/atomic/llm/agent.py",
+          "status": "M",
+          "vuln_sha": "20b2441bf3abb2d5b7d3bca8fae3c3c57f7dbbec8912ca20d030992ffdcc33c9",
+          "fixed_sha": "dfc33a68966dd5eaa62dd6047c9b3ccffea5ffe0d6e311eebcf7626f367c019c"
+        },
+        {
+          "path": "src/core/modules/atomic/llm/chat.py",
+          "status": "M",
+          "vuln_sha": "5b1d430aeaa32c68f89893b59361eb90637c112f4169d42c3997633d36245c55",
+          "fixed_sha": "53c79d26e2efe74229a44945e81308f528266ca5473daf43c0fb48000abd688f"
+        },
+        {
+          "path": "src/core/modules/atomic/vector/connector.py",
+          "status": "M",
+          "vuln_sha": "acf90374417b794d626e32bd06dae7de5fd98e1e250f8f8349df85cabbd55512",
+          "fixed_sha": "e171bcd091891520012e8042e7709bc6b0d1ddd77c0c23e2309c8c1c794edba1"
+        },
+        {
+          "path": "src/core/utils.py",
+          "status": "M",
+          "vuln_sha": "0b97f43d43178e6718effc1c1a7c541db4d5a2ac6ac1cd679a05dffec87dfb43",
+          "fixed_sha": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac"
+        },
+        {
+          "path": "tests/modules/test_new_modules.py",
+          "status": "M",
+          "vuln_sha": "8b4dd2c0372d9a2266072be5f2c591b66a6624ed8778c85c09ccb9e5e8c241c8",
+          "fixed_sha": "27d25f2da38ed04bcce4602e804c2c98b9d6ef88cba04ae877cb9cab1d336503"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-67435",
+      "repo_slug": "Linuxfabrik/lib",
+      "parent_commit": "dda087b0154718d8e9921959e4d2b148e65b5c58",
+      "fix_commit": "6573ff9347e541200305d278d2663d2e54e052ff",
+      "cwes": [
+        "CWE-200",
+        "CWE-918"
+      ],
+      "summary": "linuxfabrik-lib: fetch() forwards credential headers across a cross-origin redirect",
+      "vuln_tree_sha256_lf": "c5166c2dbac24fbda6f8837e8da4e6e031fa4de5b690ce4da3cbcfda30d7306d",
+      "fixed_tree_sha256_lf": "21f6587ad8349985a5c70e7a8bfe9867d757f52e7a9fd3079959d2a1cf2abc00",
+      "files": [
+        {
+          "path": "url.py",
+          "status": "M",
+          "vuln_sha": "e1ff2f276cf4567e32bef9b6e9e55ec5a81aac8f9c0789bf2e1b37f27a00d097",
+          "fixed_sha": "8e8e505831b39be2374abc54c78415629bf16f9dfcaf335bedc5d0a2cf91c3e5"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-69243",
+      "repo_slug": "aio-libs/aiohttp",
+      "parent_commit": "c852173947406e2eca65957535ff17d3a4035a03",
+      "fix_commit": "6ae358f0983c3f4d6f67692b2f8e65dc8e091c98",
+      "cwes": [
+        "CWE-444"
+      ],
+      "summary": "AIOHTTP: HTTP request smuggling via WebSocket upgrade",
+      "vuln_tree_sha256_lf": "3307b91ba73ee59df410e43db32a4685c8be8bfc8253f5da3ed636317838ac24",
+      "fixed_tree_sha256_lf": "e6e635278be2303a2a4bf126d5bf7bca427205b0611dde3f61ff8f1bdc029ec2",
+      "files": [
+        {
+          "path": "aiohttp/http_parser.py",
+          "status": "M",
+          "vuln_sha": "149bf577c7562d0f61d4b88c4bebdaf3689beba3f19fa2fa82a5e504fa99a0c8",
+          "fixed_sha": "0c4a4f5a08f2357e3cbab33b8326dda406a7ff1869bb64bed6dcbcf07dc67b9b"
+        },
+        {
+          "path": "tests/test_http_parser.py",
+          "status": "M",
+          "vuln_sha": "bd74ace58de9e75bd5744540600aecf27bc31c48481e471986c7edfef7fd3711",
+          "fixed_sha": "676eb13947ec29fd50bfec5b1bc70de395e3338c426c2bcdb37809684f5b3cef"
+        },
+        {
+          "path": "tests/test_web_functional.py",
+          "status": "M",
+          "vuln_sha": "87a6a2c437fcdb64ddf73c88c262e910d179ac5f3986f2f7608783adceea8adb",
+          "fixed_sha": "eafbd7ee3c3ef3af34d8a388b7161f043e0414e5060b43a06d904744b6b1826c"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-69247",
+      "repo_slug": "pyca/cryptography",
+      "parent_commit": "d472f978470fbefa521b86d98b2ecccbbb4d1dd8",
+      "fix_commit": "53fccd93413a8d7f07d6d8999681f27b75cffa3f",
+      "cwes": [
+        "CWE-208",
+        "CWE-209"
+      ],
+      "summary": "cryptography: PKCS#7 EnvelopedData decryption exposes a Bleichenbacher oracle through distinguishable errors and timing",
+      "vuln_tree_sha256_lf": "0613d0183b84ccfca554c791a31a3097ba9b0222a10165a62e0ab51a7781c3b1",
+      "fixed_tree_sha256_lf": "b30c5eef5811669368ebd3ca0151f820f0266a6ca5cb23f060dffa758f9fbf4e",
+      "files": [
+        {
+          "path": "tests/doubles.py",
+          "status": "M",
+          "vuln_sha": "f36850005c28d91da8d89ed94de0ec07b4366b538edea059576141f6920c97b3",
+          "fixed_sha": "06d6e6a1b01fb61c0def61a788d71328299deee7c617c4788bf1af2851a475d0"
+        },
+        {
+          "path": "tests/hazmat/primitives/test_pkcs7.py",
+          "status": "M",
+          "vuln_sha": "8f299f65353b9deafcac2254d40d1ad0393bc8bf8d3dd10136969f6d3700c8ca",
+          "fixed_sha": "537ccf9098f6cbe4f71e7ec93f61b8476b85680f8ee8f10e33b4874418949a23"
+        },
+        {
+          "path": "tests/test_doubles.py",
+          "status": "M",
+          "vuln_sha": "c76ded8ed6b2cf58b2430648b7399e336884abd594056b55f5e5e530fdf3daa6",
+          "fixed_sha": "4c5db401889f12e15441ba40b1e374b4f24b5ae832d4c307f07510aab42736c8"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70479",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "df94268e892cbb66675170a6c78846aef23f6e89",
+      "fix_commit": "bef63a2ae915571d50d2722a635e8bfa753d7877",
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Open WebUI: SSRF into internal services via unvalidated sub-resource requests in the Playwright web loader",
+      "vuln_tree_sha256_lf": "db046bef78a6819255ded127da2da03d36f1b9bf1f9aaa918ab0d1ca4c8b5654",
+      "fixed_tree_sha256_lf": "7312b3269a060a48a395ae25dcb6dec0b13b5f2e31925a9664ad4520bc97f823",
+      "files": [
+        {
+          "path": "backend/open_webui/retrieval/web/utils.py",
+          "status": "M",
+          "vuln_sha": "211a4dbb951cc515de1f3659528bb6c0a94a1ed6edcea840cccb47f353d6d62c",
+          "fixed_sha": "c7387ef1a20119c546bb4f302cb74d11de5ab8516dc38f3ea5525c797fd0ffaa"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70483",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "1ac8ef7853bc9f90be75da3688ff8c84f7769178",
+      "fix_commit": "4f93c3e36c1734342a32c312bdb0516c66d8e93c",
+      "cwes": [
+        "CWE-862"
+      ],
+      "summary": "Open WebUI: Any authenticated user can cancel another user's chat generation via the chat delete endpoint",
+      "vuln_tree_sha256_lf": "3a410dbe9d29313bd686f9afe8ea1e90a537fb493db440cd370ce375022b46a5",
+      "fixed_tree_sha256_lf": "866766349af40f89b70d8c0f4adbb54b67c738a4fd77efc27c91e8822776ea36",
+      "files": [
+        {
+          "path": "backend/open_webui/routers/chats.py",
+          "status": "M",
+          "vuln_sha": "d7fa48da30307fa9565805f10fa096f22b330c34a2c9ecd607f2992193dca6f3",
+          "fixed_sha": "564d5170e7852fff2ae4c2197a90d6b906e60542fa83d63f1b22caa503994514"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70485",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "5c505c1119fec6170c1bc092ed162f86262a887e",
+      "fix_commit": "1717b493d83c86afa82aa8bc50139250852dd2f3",
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Open WebUI: Any authenticated user can reach internal services and cloud metadata via NAT64-encoded URLs",
+      "vuln_tree_sha256_lf": "7312b3269a060a48a395ae25dcb6dec0b13b5f2e31925a9664ad4520bc97f823",
+      "fixed_tree_sha256_lf": "c3170505621dd961e75a3ffea5530095101bc0f5ab53237467a30be262330bfb",
+      "files": [
+        {
+          "path": "backend/open_webui/retrieval/web/utils.py",
+          "status": "M",
+          "vuln_sha": "c7387ef1a20119c546bb4f302cb74d11de5ab8516dc38f3ea5525c797fd0ffaa",
+          "fixed_sha": "3aaa5bc1b4ea6ae571db0b4899ee7d6ff55c183c4f821225df4f3d8ca4645e4f"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70487",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "7801909d27b18331a9a2bc399e1d618ab99ba5bf",
+      "fix_commit": "305880f2e2aeb2dda2f4b2a18a20bdcd558f7134",
+      "cwes": [
+        "CWE-862"
+      ],
+      "summary": "Open WebUI: Cross-user file content disclosure via request-scoped direct model knowledge metadata",
+      "vuln_tree_sha256_lf": "bca2a166ac831642ea7330e6a43283411924fefc963f65b5506e6048ddbfa15a",
+      "fixed_tree_sha256_lf": "f569ff6b39e5066de16158699b96b9d99d3b69ed9bb2b9e9de9fff4149048442",
+      "files": [
+        {
+          "path": "backend/open_webui/main.py",
+          "status": "M",
+          "vuln_sha": "f588bb1e04cd40e0dfe1999242621b7b2ec7f768787c00d0333e72d0cf6681dc",
+          "fixed_sha": "3dd720321291af6385a3a66464812414365170089bce3be1df3a6277077bbed8"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70488",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "8710c448a993d4d15897b510b55a99b5c3b55bc2",
+      "fix_commit": "707efeaed7992dd9896d5928559458f228b9a539",
+      "cwes": [
+        "CWE-639",
+        "CWE-863"
+      ],
+      "summary": "Open WebUI: Deletion of directories and file embeddings in other knowledge bases via sync cleanup",
+      "vuln_tree_sha256_lf": "62c2cfd5e1cee653c5ba33ceaa239e6ea271363701b457cd5822055dbe21595e",
+      "fixed_tree_sha256_lf": "6ca90237d05c5b6a33c087015bf04b655292ef6bd1f35ac4b2e20823c654adea",
+      "files": [
+        {
+          "path": "backend/open_webui/routers/knowledge.py",
+          "status": "M",
+          "vuln_sha": "83ffc4590be57b9617c255377b12ba69b527b8109c30d6966791f4db6beb69ba",
+          "fixed_sha": "603675797d2b5251f2026764dd1fefa767dcbdd44ce8540e3a1597b4c6f53dba"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70489",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "48ee357156fd7f567ea13eb5ddba0a25701c0351",
+      "fix_commit": "c4ae8c86786fed521960466f6d8eef8af22c2946",
+      "cwes": [
+        "CWE-400",
+        "CWE-1333"
+      ],
+      "summary": "Open WebUI: Instance-wide stall via automation recurrence rules that force multi-second parsing",
+      "vuln_tree_sha256_lf": "7d33b7749b5cbf6a82810337a308b04738795e1729773ba1d68fe50508b11deb",
+      "fixed_tree_sha256_lf": "454f7388c892e51e919210b2343dae094bae01b80166d084aa9f846bc96464ea",
+      "files": [
+        {
+          "path": "backend/open_webui/utils/automations.py",
+          "status": "M",
+          "vuln_sha": "50492e0e3aa348d92551fd8d57242ab1da89d30745ea01de49daa6ffc5ea0430",
+          "fixed_sha": "c2b4c036ed284be9ff96633ccd94af4ecafa3633a8fc9de52a54b278034d0162"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70491",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "9562f1a67d4296bbbc5bb2163b5929be0ceb6545",
+      "fix_commit": "c05de13b4fca1ac8a17153782b46b3d0aacf491c",
+      "cwes": [
+        "CWE-200"
+      ],
+      "summary": "Open WebUI: Tool source code disclosed to read-only users via the tool list and get endpoints",
+      "vuln_tree_sha256_lf": "013e88facb04cb74d4a429b2879f4c015a7288fd01160d5d09230b15b2c1d001",
+      "fixed_tree_sha256_lf": "fa3528edfe024684fa49f651fc9ce17ec0d1bebad7203ec4201028e76a67aa93",
+      "files": [
+        {
+          "path": "backend/open_webui/routers/tools.py",
+          "status": "M",
+          "vuln_sha": "afb743361637214dfe4b35b6401b04b954968bf25e91eb78295768cca3fdcd2e",
+          "fixed_sha": "3b597edf0cbc6230138bfbc113f94686e3be5e446fb1c1078a842210e210a41f"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70493",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "147c3b6ac8b5e63b14933cd1e5fafb2c9804929a",
+      "fix_commit": "3ab2026262ef6f09810e4d235c5f9a9cb903e595",
+      "cwes": [
+        "CWE-1333"
+      ],
+      "summary": "Open WebUI: Any authenticated user can stall a worker via a knowledge-search pattern that backtracks catastrophically",
+      "vuln_tree_sha256_lf": "15193d8d10bc453512e455445b08523eb78b890a0ac5add6d86cc20a5c1744c2",
+      "fixed_tree_sha256_lf": "04ce936dcec9287d084f3bb84f980efb339f97c8091632c7f67f6ead5271e2d1",
+      "files": [
+        {
+          "path": "backend/open_webui/tools/knowledge_fs.py",
+          "status": "M",
+          "vuln_sha": "3c51e01c614febcf81438fb4bec21b579e4432d05555000701d8aaaf50a33152",
+          "fixed_sha": "58d6407038b96ca90e638023cd7931172f0bc0dcc838b035ad3ea3b8b6267327"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-70494",
+      "repo_slug": "open-webui/open-webui",
+      "parent_commit": "305880f2e2aeb2dda2f4b2a18a20bdcd558f7134",
+      "fix_commit": "915ef7d0798d3175819cedbb2f62d7bf0db78c98",
+      "cwes": [
+        "CWE-862",
+        "CWE-863"
+      ],
+      "summary": "Open WebUI: A folder write-collaborator can permanently delete the owner's chats by deleting a shared subfolder",
+      "vuln_tree_sha256_lf": "adbb2c32d43c909ae9fcc650296a02d83947b1a3d9414cd38111274dc4cfec86",
+      "fixed_tree_sha256_lf": "1f885bbbdbf9d80216734a2b2d5f692313c2559281303ad14944f787228de6b5",
+      "files": [
+        {
+          "path": "backend/open_webui/routers/folders.py",
+          "status": "M",
+          "vuln_sha": "2ea4257107872dfebfd24d5104fb92c48bb2998384a5274fbac7750e4de451aa",
+          "fixed_sha": "eb05e313bf15e5aaca1bc61f72ee53ac421739e25423024e8a973eb5627347e1"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-71433",
+      "repo_slug": "langchain-ai/langgraph",
+      "parent_commit": "41341457342327166d72fc11952ab28fb61ec0bf",
+      "fix_commit": "66ebe1a0da921e73f0f9f879ba105d314c079f7c",
+      "cwes": [
+        "CWE-200",
+        "CWE-863"
+      ],
+      "summary": "LangGraph: Namespace prefix matching crosses segment boundaries in Postgres and SQLite stores",
+      "vuln_tree_sha256_lf": "71997d2b77fc6116978e41e06d683772f994070009f50175942e4ce0172f7f62",
+      "fixed_tree_sha256_lf": "bf6931a630ea4d8984788938b9fad350b23e1510431670485144c9c1f4170ab4",
+      "files": [
+        {
+          "path": "libs/checkpoint-postgres/langgraph/store/postgres/base.py",
+          "status": "M",
+          "vuln_sha": "aca86cb164aa6de54502dc14f3572d354d49a5e45135ad96c14c5e3578cf9762",
+          "fixed_sha": "b9722a5c119f126528b50550250b8497a25a17b63b934be242ad18a4741e1878"
+        },
+        {
+          "path": "libs/checkpoint-postgres/tests/test_store.py",
+          "status": "M",
+          "vuln_sha": "d53ac8cb1302c65ba817df299bcd761aa791f8a5f588c4570fc64fbc9335c69c",
+          "fixed_sha": "9c9fc4856c2f76d61e3edd557e45eeab98a3a2cd850123d6b16ef68468d9ad06"
+        },
+        {
+          "path": "libs/checkpoint-sqlite/langgraph/store/sqlite/aio.py",
+          "status": "M",
+          "vuln_sha": "32d2bf1c66d3faa0f2dae8f7c2acd7e07d3860394f2f472f2ead46ff39d5e5da",
+          "fixed_sha": "9b10b315a803362a5cf310166996b6652be1b001cef7569bfa2e0d4b22579e11"
+        },
+        {
+          "path": "libs/checkpoint-sqlite/langgraph/store/sqlite/base.py",
+          "status": "M",
+          "vuln_sha": "83bb3c16066e5425689eb2c0f16485d7fc2f71e228b0544cda45d6d5ca43dc6d",
+          "fixed_sha": "2d3050b9806adffd983ef0151d36aaca0a3ffd2da3f647d527eac1bdcb85ec50"
+        },
+        {
+          "path": "libs/checkpoint-sqlite/tests/test_async_store.py",
+          "status": "M",
+          "vuln_sha": "e269de58524fca4e3950ee0fbf4d1a043e39924cede73bee9280e4e9458136ae",
+          "fixed_sha": "8c9330e1d97481833e423671e57bb8bf537c33467fa527032d9e1a4743f7eaa6"
+        },
+        {
+          "path": "libs/checkpoint-sqlite/tests/test_store.py",
+          "status": "M",
+          "vuln_sha": "86035b25e84f379fc47d823fca1be6d1bba1dfba24cf55bc47821a209467ac0b",
+          "fixed_sha": "b949891da10d270f0214d915c2d416437b170b3c4ac6b8983cab893ddb7a749b"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-71554",
+      "repo_slug": "python-hyper/h2",
+      "parent_commit": "04d3b87cbc1db020d28c7cfb44fe194558efbdde",
+      "fix_commit": "292a40829feefda98c8509dcdbbb4a57af9bd6a6",
+      "cwes": [
+        "CWE-444"
+      ],
+      "summary": "h2: Duplicate Host header could facilitate request smuggling",
+      "vuln_tree_sha256_lf": "ee48935de0984a698c57fb0d672c360a69e49d294ce5ca003258b5050980dcd2",
+      "fixed_tree_sha256_lf": "99fdb7f99987e36529f5d0614024ef097c0721e848b880745b1fa6da1cd0adfe",
+      "files": [
+        {
+          "path": "src/h2/utilities.py",
+          "status": "M",
+          "vuln_sha": "25e083517f83c26c762c15419b2e17299f3ab8471d5519fab589446a2c86bf02",
+          "fixed_sha": "6250a082e47953214db7fba7ca3259f4afcdf538bb3a9800404bbf6975dcf13d"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-71852",
+      "repo_slug": "py-pdf/pypdf",
+      "parent_commit": "afba8080e19d29a3c256a742b340995e695b35aa",
+      "fix_commit": "51cb6acf9e8a35b77e90b4d87d28fe3e1416d7d7",
+      "cwes": [
+        "CWE-834"
+      ],
+      "summary": "pypdf: Possible long runtimes/large memory usage for large CID font width ranges",
+      "vuln_tree_sha256_lf": "5bb5a9f4f1e55b329f75a575b609851c58ebdc0dd7e2f2272bba2ae258bddd8d",
+      "fixed_tree_sha256_lf": "15d093c5c8533c2b8b5799cf483e454b36c296bac17be2be20d93c9b658921ee",
+      "files": [
+        {
+          "path": "pypdf/_font.py",
+          "status": "M",
+          "vuln_sha": "d43e200d9659e2c874876154ab0c7b7e9f9087e00e4b09998df947b5c41da986",
+          "fixed_sha": "2f3e9a7d399f21827126d879aa5214b39b59ffba9853f90b8609a5349e12c2c4"
+        },
+        {
+          "path": "tests/test_font.py",
+          "status": "M",
+          "vuln_sha": "e7e9d4415c852f202b971beaf5dcea4a1d4acee5c62437ca9a6ae155b491e230",
+          "fixed_sha": "0f9b694d61cfa03faecf35df85edcd0cc634527f8b139d23bdc1b0d1cc0f3fad"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-71870",
+      "repo_slug": "py-pdf/pypdf",
+      "parent_commit": "aa2f37da35627e831d3c97a26d21224f48c1f1ca",
+      "fix_commit": "afba8080e19d29a3c256a742b340995e695b35aa",
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "pypdf: Possible large memory usage for large /ToUnicode streams",
+      "vuln_tree_sha256_lf": "e738073719b5d25cee6f2947998d1040330b9ff9760d9f5715565c2fc384b659",
+      "fixed_tree_sha256_lf": "adfbfd70ff1f99f785a110eb2d26f61ede325042f10eab3f2fc734e5526cbf86",
+      "files": [
+        {
+          "path": "pypdf/_cmap.py",
+          "status": "M",
+          "vuln_sha": "fe80ceb3a6355353542b3a533cd19e69f6bd98b5bfd053cf41161e3646bbec1c",
+          "fixed_sha": "03593fb49825f13533ce3ae07e07386c8b8b3b2cf6650d6b97feb78157894924"
+        },
+        {
+          "path": "tests/test_cmap.py",
+          "status": "M",
+          "vuln_sha": "9f16e512f7061b3b29c0476e7b558bfc7a069abb980222c6d821325ad67b0e03",
+          "fixed_sha": "667c108271c18e7af03e5c2b81dd551f39203cf917553414d54adcf420b0244c"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-73228",
+      "repo_slug": "encode/django-rest-framework",
+      "parent_commit": "71f81946906e52f9dc8e5d22a0f3d2afa50c455e",
+      "fix_commit": "2912dc98042f78e27636551fc22eeaf10f725fdd",
+      "cwes": [
+        "CWE-400",
+        "CWE-770"
+      ],
+      "summary": "Django REST framework: Potential bypass of Django `DATA_UPLOAD_MAX_MEMORY_SIZE` when parsing oversized JSON and urlencoded request bodies via DRF `request.data`",
+      "vuln_tree_sha256_lf": "b126b59c22ab9eb21e767a6cfaeaf3da4013e5fcfb2dc43b9f2773586215de46",
+      "fixed_tree_sha256_lf": "89d8f8fed32d85b8248674be9df960f18bd10be5d2a93aa9ba5e2c905059bbbd",
+      "files": [
+        {
+          "path": "rest_framework/request.py",
+          "status": "M",
+          "vuln_sha": "b9f83207297b10cc5d0371e12a98b21fa0f559ae9bff24065d7996389a504f83",
+          "fixed_sha": "4d8f0fb53989bfb3db68fb27f5e195c435a48547972f13e7cc3e5c0c5979272c"
+        },
+        {
+          "path": "tests/test_request.py",
+          "status": "M",
+          "vuln_sha": "407b9cdbb524bdb5930e34dc3c20a45a2aa858252a90aed7ce9a0fb1d5908e36",
+          "fixed_sha": "51e0bd2cf550a521ec4a11f7180e52837ebbcc8659fccd2c5aabde19a9411d89"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-73229",
+      "repo_slug": "encode/django-rest-framework",
+      "parent_commit": "22e231cf2f77b4cfe929de875d958b93916b1a8b",
+      "fix_commit": "71f81946906e52f9dc8e5d22a0f3d2afa50c455e",
+      "cwes": [
+        "CWE-200"
+      ],
+      "summary": "Django REST framework: AdminRenderer may disclose GET-protected data when rendering invalid write requests",
+      "vuln_tree_sha256_lf": "6ca1db71e266f44657a1db80a8f4834e0269116bd707861e04a59accac75a058",
+      "fixed_tree_sha256_lf": "351deb23f0ce97d732ec4646ef63131339230f226a4e66ca6cace9f2ea4121f4",
+      "files": [
+        {
+          "path": "rest_framework/renderers.py",
+          "status": "M",
+          "vuln_sha": "9f1005d0346a2668b35c4ca1568a8807b2aaeda9bd45d52dda1c66ae15e77add",
+          "fixed_sha": "e4a80606f84ab49b6826f3bb69e76be60f9ba3174e93b5c047615ad29d087c46"
+        },
+        {
+          "path": "tests/test_renderers.py",
+          "status": "M",
+          "vuln_sha": "68e15c97648cc263d9588af4a50073a8f094302f8ceb85e0023c1bdea86197dc",
+          "fixed_sha": "e498a61b786bd1a5063b472b540ff9354d3a95fbad18cf3240563358997f568c"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-73417",
+      "repo_slug": "jupyterlab/jupyterlab",
+      "parent_commit": "a555fe1dcb4a4d6b135236ae89319a9f303780d9",
+      "fix_commit": "be9303f5bcd5308eaeae953c5a3c903046682c2c",
+      "cwes": [
+        "CWE-79",
+        "CWE-116"
+      ],
+      "summary": "JupyterLab: Cross-site scripting (XSS) via crafted settings file (`overrides.json`)",
+      "vuln_tree_sha256_lf": "0857a5fa4833c5b6680fa6d524fd944db45854548b608a2b285f96846f132ddc",
+      "fixed_tree_sha256_lf": "178d528899392b051cc92e94a9c5ca69bbd63280063e414af2c24343154eeb3a",
+      "files": [
+        {
+          "path": "jupyterlab/extensions/manager.py",
+          "status": "M",
+          "vuln_sha": "3df531c252ede2549e367bbf62d7191e023a4ef2f7ced3f286568f24d23969e0",
+          "fixed_sha": "6c058fea187635cb337ed1ad19c43099cd506191a01a965ec49cca59d720b1ec"
+        },
+        {
+          "path": "jupyterlab/extensions/pypi.py",
+          "status": "M",
+          "vuln_sha": "f8f08b653d4f92edbdd007e949427b9f603e50543457c165e79738bb0b6a7147",
+          "fixed_sha": "7e62ac6daa749fcc2d2d85a8a664604159a12876395d94c72e99dfd703eed448"
+        },
+        {
+          "path": "jupyterlab/labapp.py",
+          "status": "M",
+          "vuln_sha": "f1fcf2cb8d529d7eccf5ded1fe58393112e412550c2a7b0f370ff6b3016a47ff",
+          "fixed_sha": "dd2590199f60938edb09dac62f1ef48e6039737b86e74428e19b1d3cff593707"
+        },
+        {
+          "path": "jupyterlab/tests/test_extensions.py",
+          "status": "M",
+          "vuln_sha": "5ff46d95dae952db7e67b7f43433091fb6ff45afbc210418407b59ee6e15ce72",
+          "fixed_sha": "97f1ef1f2656d052bf735bdb4fb37b7d98afecee64c269b496d239196471355d"
+        },
+        {
+          "path": "jupyterlab/tests/test_plugin_manager_handler.py",
+          "status": "M",
+          "vuln_sha": "0a7b63c89fa109f0779acd686e895991c9bdd32a819bd20ecd086c6252804e15",
+          "fixed_sha": "9f0bfde1509249f9d92311f4a78ca1bd959817d03546ed90d5a3e68dd4f513ab"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "repo_slug": "sooperset/mcp-atlassian",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "mcp-atlassian: Arbitrary file read via missing path validation in confluence_upload_attachment",
+      "vuln_tree_sha256_lf": "64506e4b06bc3fb5ff7d60c8ccbd5fa1c4f0bb5b066673e6ce70b4a08651ab15",
+      "fixed_tree_sha256_lf": "5a36125ca47753102687570523b1a19bcfbbf4d743cc0ec8275fc4158202934f",
+      "files": [
+        {
+          "path": "src/mcp_atlassian/confluence/attachments.py",
+          "status": "M",
+          "vuln_sha": "c3aa1c200e83f33c284c94c0bfc9e5eec3dd893f7b719e1a35d64d2a7961d08c",
+          "fixed_sha": "0f32292c7cd19f7075420ee7c0bbe3b7af6c6d682aa70e63a6d936ce1138ae03"
+        },
+        {
+          "path": "src/mcp_atlassian/confluence/client.py",
+          "status": "M",
+          "vuln_sha": "cae937d845a8baf33954253df67a8792691191a4318f5d21cafa62046a2e562f",
+          "fixed_sha": "01021188da49ff8ed09a2e6883c1ca8466983dfd19fc687ae378f5eea544e1dc"
+        },
+        {
+          "path": "src/mcp_atlassian/confluence/search.py",
+          "status": "M",
+          "vuln_sha": "7e672b8735d2732053c1c505d579c6a52cae2475dbc57d8b21f12159bb733c51",
+          "fixed_sha": "096c8d6f5d36b33138e8146abf12ac33376e3bc921abec40e43bfff6bcfa897a"
+        },
+        {
+          "path": "src/mcp_atlassian/jira/attachments.py",
+          "status": "M",
+          "vuln_sha": "a1458c94784e6fd3bd12558aeac37160aeedde8f58fc0cd5cc9df0bf0f71587f",
+          "fixed_sha": "ba6a14f2bba43951acbcb4aa7e783669a3ba5b4ea31de47d997044f87c48b34a"
+        },
+        {
+          "path": "src/mcp_atlassian/jira/client.py",
+          "status": "M",
+          "vuln_sha": "d01d46377998332c3f525978c9b7e1d55a974ff6d19d1c4ec2ba7c17ee89340e",
+          "fixed_sha": "5d36f2bb5f42d3311af3e704fe28f6ca072f5f34178e87f80f8f5c70d8963e90"
+        },
+        {
+          "path": "src/mcp_atlassian/jira/search.py",
+          "status": "M",
+          "vuln_sha": "20820cf739f78373ea329b4461eddfe896d5ff5fb29b19eb37a28fca24e0a1ca",
+          "fixed_sha": "98643a3649b8861f7c23f0fcbb0c237efaabb7dee6dc5733d90ca5437d2acfc1"
+        },
+        {
+          "path": "src/mcp_atlassian/servers/confluence.py",
+          "status": "M",
+          "vuln_sha": "aa5a53551fe1401ad03deda896fc384fcabed71ffcc7127fbc4205a5dc180ed5",
+          "fixed_sha": "1ff160d01b1d94e5ba1af53414058ae4b104377ef8e6368c0115b85dd642dd7d"
+        },
+        {
+          "path": "src/mcp_atlassian/servers/dependencies.py",
+          "status": "M",
+          "vuln_sha": "00a4ce1b15ce867b6cbdea218fbeaaf7d0248ee57e5e99bad247831c6611d37f",
+          "fixed_sha": "77e7d2dfc0506b772774ec7d3ad36b4248b6147ac0ad3dffbc4445d6b47d351c"
+        },
+        {
+          "path": "src/mcp_atlassian/servers/main.py",
+          "status": "M",
+          "vuln_sha": "76ad94a317255d84de6358718d05a0bffcde195fe53d99acd8333cc473b0df8e",
+          "fixed_sha": "ccda01e910c8e1aac5f0b5838196041b414b78788ae0c1a77e7fb8ceff80f37d"
+        },
+        {
+          "path": "src/mcp_atlassian/utils/oauth.py",
+          "status": "M",
+          "vuln_sha": "fa195c922f71a66e2c6ce5a1123438d27efb574079829febce84817e2527c786",
+          "fixed_sha": "f045f09640a6476f9e4abb2432b316565b4a2351336da8b30dfdcffcde12f27b"
+        },
+        {
+          "path": "src/mcp_atlassian/utils/oauth_setup.py",
+          "status": "M",
+          "vuln_sha": "631b50d48899027846299328ee76c2df119e5382700889e9a78b308672a6807c",
+          "fixed_sha": "dae71521da9925f01e67b04fe14a1d4ead4fe857f22e183447037ed2938d8053"
+        },
+        {
+          "path": "src/mcp_atlassian/utils/ssl.py",
+          "status": "M",
+          "vuln_sha": "66806709a3ee08d2c547ac3b2b8ca4313d64071b42f8a55b01351b897c4270de",
+          "fixed_sha": "bedbfa0aa3e50bb9dbdaeeef51e30c81ba10125e1351631861b41a0aa4a4fff0"
+        },
+        {
+          "path": "src/mcp_atlassian/utils/ssrf_adapter.py",
+          "status": "A",
+          "fixed_sha": "59b5f4247ca4dd63443c38b23a48ff1bdaf80365be874e008511541c2563b3d5"
+        },
+        {
+          "path": "src/mcp_atlassian/utils/urls.py",
+          "status": "M",
+          "vuln_sha": "5aa8db222ae3539493a58dba711de8160b60988ce50f45b0b5284e577fc6f1db",
+          "fixed_sha": "a10b981102f20c28c0db4ebb17371dd965314283b100148cf497265927c8680e"
+        },
+        {
+          "path": "tests/e2e/cloud/test_confluence_cloud_operations.py",
+          "status": "M",
+          "vuln_sha": "02d1080531325a04f08d9279a402c6a400955a01b8d34caf74584d64074f0116",
+          "fixed_sha": "ee806a0bf578b125f46afefc5e2a8df236bc27b9714f5624bc813752945bfef7"
+        },
+        {
+          "path": "tests/e2e/cloud/test_mcp_tools_cloud.py",
+          "status": "M",
+          "vuln_sha": "9c528ca07166e42ebc87c963a7e09c5797c267a7855b057dfd8a454ec349fa11",
+          "fixed_sha": "4a9175812d0457cfe2674ccee258f196b2f281f563c035e2384f8453ab047271"
+        },
+        {
+          "path": "tests/e2e/conftest.py",
+          "status": "M",
+          "vuln_sha": "6fce6abf34b9a565a79e1c57332497964c29cc3b3306424fb02ea2b162739c3e",
+          "fixed_sha": "e19d42b929a42c0edb4718a71c151d32ec7142e9d6b42668a52fb41ab32effce"
+        },
+        {
+          "path": "tests/e2e/test_confluence_dc_operations.py",
+          "status": "M",
+          "vuln_sha": "50591ad5758d4d4dd01c4c3b275c39a43cff888dc0b611410b01bb7782be3b68",
+          "fixed_sha": "ebb3b8f55f50f0837a28552942b77010dad327df8f7eeb0e1eec691d993a3c45"
+        },
+        {
+          "path": "tests/e2e/test_mcp_tools_dc.py",
+          "status": "M",
+          "vuln_sha": "aeb7f7af9b4b28042dc868107cee933e864db9ce011e02dcd9c54c0ae382c54d",
+          "fixed_sha": "8e091e7fbc899e3bfa405ef4d7c734caffad324200b3c3ce30401994298dc167"
+        },
+        {
+          "path": "tests/unit/confluence/test_attachments.py",
+          "status": "M",
+          "vuln_sha": "10f9ecdaaedb001653b2af1a55d5888e6f9426d1a34f1566f086cbea93549e38",
+          "fixed_sha": "3a12856df508681dc8c431c186f0dfe11d54f6de2ea028ad250881597b73a6e1"
+        },
+        {
+          "path": "tests/unit/confluence/test_client.py",
+          "status": "M",
+          "vuln_sha": "97d39d8af49b2103c091c60e9bd856c07e3f692fc70db8e7c0e73474c68a97fb",
+          "fixed_sha": "59a9a523ad032114b910eb6f2c69818299dbffc6aadc3ad3f9555a02ff0f628b"
+        },
+        {
+          "path": "tests/unit/confluence/test_search.py",
+          "status": "M",
+          "vuln_sha": "d05eeded83a049f806353e9c2bab51f4a47e601d14d9205175488e4652fbc69f",
+          "fixed_sha": "18813129214876483f59175de93b3fc53db0e023601fa8724103f435d691a5a3"
+        },
+        {
+          "path": "tests/unit/jira/test_attachments.py",
+          "status": "M",
+          "vuln_sha": "a555d29335fb1263d46bf3f558c42079ab615fc38231d79f507f0aecef283831",
+          "fixed_sha": "319eb06e1a204caa0a7357b36095c10eab867fa0a76a7721a7d855b4da9fa19a"
+        },
+        {
+          "path": "tests/unit/jira/test_client.py",
+          "status": "M",
+          "vuln_sha": "f7b591754f0cd1ca1ccc74dc0f23aa494db7728652f3481c5b46d0295e7d47f5",
+          "fixed_sha": "f2eae381312852e55d5873633b2ae02aed68af9c328241dbec7a5712eb3b485a"
+        },
+        {
+          "path": "tests/unit/jira/test_search.py",
+          "status": "M",
+          "vuln_sha": "c445d67b642c1c849a9eefb54b592e00bbc1841b727bbba5f8a93447377a5797",
+          "fixed_sha": "3cf9a758f00d0f7dcb173db785f15a54cbf38e36084f0d2e57edc3a43527e274"
+        },
+        {
+          "path": "tests/unit/servers/test_confluence_server.py",
+          "status": "M",
+          "vuln_sha": "3fe5e2c8662aa5998cd0b2ce84c0f69d23b7aeb2f2dbb99ee151ef959ab58926",
+          "fixed_sha": "e0ec862c2d5657b3cb95b7c926e7370ec07ec1ea0253424d2a4c10f69a5894e7"
+        },
+        {
+          "path": "tests/unit/servers/test_dependencies.py",
+          "status": "M",
+          "vuln_sha": "6f2fae162e51c2112586d668402cec6bd73c6f7d840c81d7bfcf3d578550671f",
+          "fixed_sha": "637528394808fe5892b5db7b28bedeed48deb4083cabb60476322ae3eeaa830a"
+        },
+        {
+          "path": "tests/unit/servers/test_main_server.py",
+          "status": "M",
+          "vuln_sha": "dc80611fa6248a862b2197b95c665137de1bd5cd91f88423819917a66144b793",
+          "fixed_sha": "f98e729dd597169f559e1bf867684802cfd35917560237e73f92125cd0fc3944"
+        },
+        {
+          "path": "tests/unit/servers/test_mcp_protocol.py",
+          "status": "M",
+          "vuln_sha": "da209af0df5383812d9a00fdadc3939a5402a9bce215757bee5cdc428bdc9e27",
+          "fixed_sha": "8579f800eede7c9ecc8267d2931eb32a94c19bb9f64c2267b567eeb2e9d823fd"
+        },
+        {
+          "path": "tests/unit/utils/test_oauth.py",
+          "status": "M",
+          "vuln_sha": "e20184ae71d7950b20525605b63f5d1f60aa8e7e681a3f3c13143473b89ecdf8",
+          "fixed_sha": "76b040cc706b287dcae72f72c2dc01b1f451a4eaf7c47f8194d160fa28f8856b"
+        },
+        {
+          "path": "tests/unit/utils/test_oauth_setup.py",
+          "status": "M",
+          "vuln_sha": "72570414e5d91f0c830c0a2810ba50ac206b360c38e1daadea0c4cbdc11f79c5",
+          "fixed_sha": "f79c94aade42a9e55645d689fec1e67a45da7ed925dd500ebb600d0c3c31162c"
+        },
+        {
+          "path": "tests/unit/utils/test_ssrf_adapter.py",
+          "status": "A",
+          "fixed_sha": "a241780782c678d1f62eb15e3d0f597ec4b6b27c7dfb39c0c066b0c8b4a102b5"
+        },
+        {
+          "path": "tests/unit/utils/test_urls.py",
+          "status": "M",
+          "vuln_sha": "f35edc088bfa0de9d0959b40f7205fa85c52ded6db43ee20796a8fbd0f3ba250",
+          "fixed_sha": "632b0a1f458819b381d889a6c2db626473c81e9ecd8afada64a87a7a8cbded13"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-73568",
+      "repo_slug": "libp2p/py-libp2p",
+      "parent_commit": "5c89d21a05631973c46bf8cfc73842d9cabe94ed",
+      "fix_commit": "146ea87d1a20cc7dacf684ecf7c204543be04b37",
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "libp2p: yamux connection DoS via oversized data frame",
+      "vuln_tree_sha256_lf": "d3b1c28811dc4e68df0d953571eeead1e9d6f5f4b62593be8b5c46deaefdf8c2",
+      "fixed_tree_sha256_lf": "ca14556c35007a2d007190362676cf4e156ab62c8a9869736a30d59a6cd98b65",
+      "files": [
+        {
+          "path": "libp2p/stream_muxer/yamux/yamux.py",
+          "status": "M",
+          "vuln_sha": "d6caaff6840ab9ba4a7beef36c0219bcbdcdc8c4d55e07c7a260c0b9f6dc7421",
+          "fixed_sha": "ddcbececd51fbb9b27982f6189e25917d4aab1f35dd4f22391ea1159fe8da666"
+        },
+        {
+          "path": "tests/core/stream_muxer/test_yamux.py",
+          "status": "M",
+          "vuln_sha": "7f13944b3c94478407641dce92d46ba9a1cb79044a79009f30a39173cf4b3006",
+          "fixed_sha": "ae23cfcc56bb77500dd59f63d195ac1bd22328cb47722dc4d9e3b80c2211b3ef"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-84310",
+      "repo_slug": "py-pdf/pypdf",
+      "parent_commit": "2b60c99973df8d7f959cd46658604d881be3de3a",
+      "fix_commit": "d91ab705fd81ed1a9cec175c6958600dea1a4942",
+      "cwes": [
+        "CWE-405",
+        "CWE-834"
+      ],
+      "summary": "pypdf: Possible long runtimes/large memory usage when retrieving outlines",
+      "vuln_tree_sha256_lf": "709eb539005db8a264f23b10b52372be11e985f5d4da2f9480c8486284788416",
+      "fixed_tree_sha256_lf": "feaffcd2498d6c3dd586dc7ff1c9169c8cb8e6dacdf7816ddf2dafb8f38a6754",
+      "files": [
+        {
+          "path": "pypdf/_doc_common.py",
+          "status": "M",
+          "vuln_sha": "c90fab1fdda2cc9a37a99f7cd2085bd60de7a857e0e1895f3683ab6acd8e000e",
+          "fixed_sha": "bf4aea0dd89b697f36ab3d863c88c5afe6164bd3e773c3432c5dcef439ff50ec"
+        },
+        {
+          "path": "pypdf/_page.py",
+          "status": "M",
+          "vuln_sha": "6c35bfce32a57648df8a7cb7aa1e1181ad35f98662a7f79bab32557972fd3f8c",
+          "fixed_sha": "954e26bbb0067fe22dba9b514797d7fcf068942fb2a511e1ec44e4ff8deba0f6"
+        },
+        {
+          "path": "pypdf/_utils.py",
+          "status": "M",
+          "vuln_sha": "8a67bbce944dc992a6d73a9a6f528610ed703a0c0c24baf8a661b9113fef54f4",
+          "fixed_sha": "c0a0c2167624e57cadbc71890457666abffcb719229f69d653436edc44b371a5"
+        },
+        {
+          "path": "tests/test_doc_common.py",
+          "status": "M",
+          "vuln_sha": "bdde9b13eeb42df6199cc790cde316e5b3d3c65a729843b3bc0cb856205a88f7",
+          "fixed_sha": "aa7e3aa7c67633770edb94184617cb29994d0488029357090570e049b2251fe9"
+        },
+        {
+          "path": "tests/test_text_extraction.py",
+          "status": "M",
+          "vuln_sha": "2e37504753153cec6ed54080687e3758b1c854e7da56ac2a1c8f04fd0584b803",
+          "fixed_sha": "e44cefb4f3135e88781d023f9a8b38d863fae9188e4e988a9b70ef46b8bf2e88"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-84366",
+      "repo_slug": "scrapy/scrapy",
+      "parent_commit": "5ccc8dbe8a735b322bacca16848ab9dfed839b99",
+      "fix_commit": "9523e1ec8c41fde265a26d14563d178b6f1ad04b",
+      "cwes": [
+        "CWE-319"
+      ],
+      "summary": "Scrapy: S3DownloadHandler sends signed S3 requests over plaintext HTTP by default",
+      "vuln_tree_sha256_lf": "52dc9abed5a79ed99db138b01f619d5fb6ee3e3f0f6d45c2f0482167a8794461",
+      "fixed_tree_sha256_lf": "15d3d74b452009ce02b815e2b5d0f2bfd2489d7a72f4bc44d60dd8fab48ccf9c",
+      "files": [
+        {
+          "path": "scrapy/core/downloader/handlers/s3.py",
+          "status": "M",
+          "vuln_sha": "652a2721d6563ac12e568accb6a3eb75e24d7bfbd18bdc9f7e18a70a74df0601",
+          "fixed_sha": "4ff380cd9ae5d4152d03222f9c3a732e8dc5610d289c1f1af4759613d46bfc11"
+        },
+        {
+          "path": "tests/test_downloader_handlers.py",
+          "status": "M",
+          "vuln_sha": "13151487ba3d5812390a0e686f075b99ff6e821fbb76d39792fb2f393042f32d",
+          "fixed_sha": "65aeb95faf34aee7dffa4f33558eda52af0f41e46d9a087935b6a54a6bb591a4"
+        }
+      ]
+    },
+    {
+      "sample_id": "CVE-2026-9335",
+      "repo_slug": "keras-team/keras",
+      "parent_commit": "ce31ac27182994b16eb7d7347d647bc16691aa8f",
+      "fix_commit": "23370f16b0ab9a200f7550a34e54a3ceab74ba0e",
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "Keras: HDF5 links can disclose local file contents",
+      "vuln_tree_sha256_lf": "f119093c736606feec20fed48a878104a588917a63c18c002d57c065cb2f0ac7",
+      "fixed_tree_sha256_lf": "17a6160f5933585036a23ea0b73697d032c28bdf6b89a326a60447f751b1340f",
+      "files": [
+        {
+          "path": "keras/src/saving/file_editor.py",
+          "status": "M",
+          "vuln_sha": "06c28103df78f1ea08cef429eebdad0f37b19e6dda0afdd398f97d3c6d125b7d",
+          "fixed_sha": "8c1cdde8cb5495a99c0a9e350e762cbe11417a600501969750d0afc5047f7fa2"
+        },
+        {
+          "path": "keras/src/saving/file_editor_test.py",
+          "status": "M",
+          "vuln_sha": "7b582db8273814fb56ad0a8f578e88811ef9a35d9d673f4ceba435c1661c0dff",
+          "fixed_sha": "acbe1dbc11a4a6c38418e19fbf3898b1d6518a9d8509a21528a4adf14d84cf30"
+        }
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "sample_id": "CVE-2026-70486",
+      "reason": "CROSS_LANGUAGE_OUT_OF_SCOPE"
+    },
+    {
+      "sample_id": "CVE-2026-70492",
+      "reason": "CROSS_LANGUAGE_OUT_OF_SCOPE"
+    },
+    {
+      "sample_id": "CVE-2026-53656",
+      "reason": "COMPOSITE_FIX_COMMIT",
+      "detail": "PARENT_COUNT=2"
+    }
+  ],
+  "n_rebuilt": 82,
+  "n_excluded": 3,
+  "n_failed": 0,
+  "failures": []
+}
