@@ -22,14 +22,7 @@ REPO = Path(__file__).resolve().parents[2]
 PROMPT_ROOT = REPO / "cpg/ablation/.work/rerun_61539"
 OUT = REPO / "cpg/ablation/.work/rerun_61539/llm_results.json"
 
-SYSTEM = (
-    "你是一名资深代码安全审计助手。给定目标 CWE 类型、目标源码节选与代码级上下文（CPG 污点切片），"
-    "判断目标代码是否可被利用（vulnerable）、无可证伪利用路径（benign）或信息不足（abstain）。"
-    "重要判断原则：污点切片只覆盖数据流型漏洞（路径穿越/SSRF/注入）；切片为空或标注 no flow 不代表目标"
-    "安全——鉴权缺失、请求走私、符号链接跟随、信息泄露、输入校验缺失等逻辑型漏洞不产生数据流。"
-    "请结合源码语义核查目标 CWE 对应的功能点是否缺失必要的安全控制（如越权检查、边界校验、"
-    "协议约束）。只输出严格 JSON，不要任何解释性文字。"
-)
+from cpg.ablation.prompt_renderer import SYSTEM  # 单一权威定义，不在此复制
 
 MODEL = "qwen2.5-coder:7b"
 MODEL_DIGEST = "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364"  # 完整 64 位

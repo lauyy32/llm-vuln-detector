@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 from . import config
+from .prompt_renderer import SYSTEM as _RENDER_SYSTEM
 
 # 注意：run_codeql_baseline 在 CodeQLBaselineScorer.score 内懒加载，避免与
 # codeql_baseline（又 import 本模块的 Verdict）形成循环依赖。
@@ -223,14 +224,7 @@ class LocalLLMScorer(Scorer):
             return False
 
     # ---- prompt 构造 ----
-    SYSTEM = (
-        "你是一名资深代码安全审计助手。给定目标 CWE 类型、目标源码节选与代码级上下文（CPG 污点切片），"
-        "判断目标代码是否可被利用（vulnerable）、无可证伪利用路径（benign）或信息不足（abstain）。"
-        "重要判断原则：污点切片只覆盖数据流型漏洞（路径穿越/SSRF/注入）；切片为空或标注 no flow 不代表目标"
-        "安全——鉴权缺失、请求走私、符号链接跟随、信息泄露、输入校验缺失等逻辑型漏洞不产生数据流。"
-        "请结合源码语义核查目标 CWE 对应的功能点是否缺失必要的安全控制（如越权检查、边界校验、"
-        "协议约束）。只输出严格 JSON，不要任何解释性文字。"
-    )
+    SYSTEM = _RENDER_SYSTEM  # 单一权威定义，见 prompt_renderer.SYSTEM
 
     def _build_prompt(self, ctx: DetectionContext) -> str:
         meta = ctx.advisory_meta or {}
