@@ -86,9 +86,10 @@ def prepare(args) -> int:
         pm_path = ROOT / s["source_path"] / "pair_manifest.json"
         pm = json.loads(pm_path.read_text(encoding="utf-8"))
         repo_dir = ROOT / "cpg/corpus_raw" / pm["repo_slug"].replace("/", "__")
+        source_dir = ROOT / s["source_path"]  # corpus-v3，干净克隆可复现
         spec = type("S", (), {"sample_id": cve})()
         plan = excerpt_plan.build_pair_selection_plan(
-            spec, pm, repo_dir,
+            spec, pm, repo_dir, source_dir=source_dir,
             max_chars=protocol["max_code_chars"],
             head_lines=protocol["excerpt_head_lines"],
             hunk_window=protocol["excerpt_hunk_window"],

@@ -92,11 +92,20 @@ def get_changed_hunks(repo_dir: Path, parent: str, fix: str, path: str) -> list[
     return hunks
 
 
-def _read_lines(repo_dir: Path, commit: str, path: str) -> list[str]:
-    r = subprocess.run(
-        ["git", "show", f"{commit}:{path}"],
-        cwd=str(repo_dir), capture_output=True,
-    )
+def _read_source_lines(source_dir: Path, version: str, path: str) -> list[str]:
+    """从 corpus-v3 源目录读文件内容（干净克隆无 corpus_raw 也可复现）。"""
+    p = source_dir / version / path
+    if not p.exists():
+        return []
+    return p.read_text(encoding="utf-8", errors="replace").splitlines()
+
+
+def _read_lines(source_dir, repo_dir, version, commit, path) -> list[str]:
+    """优先从 source_dir（corpus-v3）读，fallback 到 git show（repo_dir）。"""
+    if source_dir is not None:
+        return _read_source_lines(source_dir, version, path)
+    r = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=str(repo_dir),
+                       capture_output=True)
     if r.returncode != 0:
         return []
     return r.stdout.decode("utf-8", errors="replace").splitlines()
@@ -110,6 +119,7 @@ def build_pair_selection_plan(
     sample_spec,
     pair_manifest: dict,
     repo_dir: Path,
+    source_dir: Path | None = None,
     max_chars: int = 8000,
     head_lines: int = 100,
     hunk_window: int = 20,
@@ -118,7 +128,9 @@ def build_pair_selection_plan(
 
     - 文件顺序按完整相对路径排序；
     - 优先 changed-hunk 中心窗口（FULL 覆盖），剩余预算给文件头部（head_lines）；
-    - 只在完整行边界截取；达预算时缩小窗口/舍弃低优先块，绝不截半行。
+    - 只在完整行边界截取；达预算时缩小窗口/舍弃低优先块，绝不截半行；
+    - source_dir 提供时从 corpus-v3 读文件内容（干净克隆无 corpus_raw 也可复现），
+      否则 fallback 到 git show（repo_dir）。
     """
     plan = PairSelectionPlan(sample_id=sample_spec.sample_id, max_chars=max_chars)
     parent = pair_manifest["parent_commit"]
@@ -127,11 +139,14 @@ def build_pair_selection_plan(
     # 收集所有 .py 改动文件（按完整相对路径排序）
     files = sorted(pair_manifest.get("files", []), key=lambda f: f["path"])
 
-    # 1) 计算每个文件的 changed hunks（fix 侧）
+    # 1) 计算每个文件的 changed hunks（fix 侧）：优先读 pair_manifest 缓存（干净克隆
+    #    无 corpus_raw 也可复现），缺失时 fallback 到 git diff
     changed_hunks = {}
     for f in files:
-        hunks = get_changed_hunks(repo_dir, parent, fix, f["path"])
-        changed_hunks[f["path"]] = hunks
+        if "changed_hunks" in f:
+            changed_hunks[f["path"]] = [tuple(h) for h in f["changed_hunks"]]
+        else:
+            changed_hunks[f["path"]] = get_changed_hunks(repo_dir, parent, fix, f["path"])
 
     # 2) 为每个文件生成候选块（vuln/fixed 两侧配对窗口）
     #    逻辑：对每个文件，取 vuln(parent) 和 fixed(fix) 的对应行区间
@@ -155,7 +170,7 @@ def build_pair_selection_plan(
                     windows.append((w_lo, w_hi))
             for w_lo, w_hi in windows:
                 for side, commit in (("vuln", parent), ("fixed", fix)):
-                    lines = _read_lines(repo_dir, commit, path)
+                    lines = _read_lines(source_dir, repo_dir, side, commit, path)
                     lo_c = max(1, w_lo)
                     hi_c = min(len(lines), w_hi)
                     content = "\n".join(lines[lo_c - 1:hi_c]) + ("\n" if lines else "")
@@ -170,7 +185,7 @@ def build_pair_selection_plan(
         # 头部窗口（无 changed hunk 的 modified，或 added/deleted 的现有侧）
         if status in ("M", "T"):
             for side, commit in (("vuln", parent), ("fixed", fix)):
-                lines = _read_lines(repo_dir, commit, path)
+                lines = _read_lines(source_dir, repo_dir, side, commit, path)
                 hi_c = min(len(lines), head_lines)
                 content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
                 blocks.append(BlockPlan(
@@ -179,7 +194,7 @@ def build_pair_selection_plan(
                     token_estimate=len(content) // 4,
                 ))
         elif status == "A":
-            lines = _read_lines(repo_dir, fix, path)
+            lines = _read_lines(source_dir, repo_dir, "fixed", fix, path)
             hi_c = min(len(lines), head_lines)
             content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
             blocks.append(BlockPlan(
@@ -188,7 +203,7 @@ def build_pair_selection_plan(
                 token_estimate=len(content) // 4,
             ))
         elif status == "D":
-            lines = _read_lines(repo_dir, parent, path)
+            lines = _read_lines(source_dir, repo_dir, "vuln", parent, path)
             hi_c = min(len(lines), head_lines)
             content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
             blocks.append(BlockPlan(
@@ -198,7 +213,7 @@ def build_pair_selection_plan(
             ))
         # R/C：renamed/copied 也按现有侧取头部（简化，pair_manifest 已有 prev）
         elif status in ("R", "C"):
-            lines = _read_lines(repo_dir, fix, path)
+            lines = _read_lines(source_dir, repo_dir, "fixed", fix, path)
             hi_c = min(len(lines), head_lines)
             content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
             blocks.append(BlockPlan(
@@ -207,7 +222,7 @@ def build_pair_selection_plan(
                 token_estimate=len(content) // 4,
             ))
             if f.get("prev"):
-                lines = _read_lines(repo_dir, parent, f["prev"])
+                lines = _read_lines(source_dir, repo_dir, "vuln", parent, f["prev"])
                 hi_c = min(len(lines), head_lines)
                 content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
                 blocks.append(BlockPlan(

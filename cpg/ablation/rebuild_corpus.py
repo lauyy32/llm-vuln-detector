@@ -153,6 +153,39 @@ def read_blob_bytes(repo_slug: str, commit: str, path: str) -> bytes:
     return git_bytes(["show", f"{commit}:{path}"], cd)
 
 
+def _changed_hunks(repo_slug: str, parent: str, fix: str, path: str) -> list:
+    """git diff -U0 获取 fix 侧 added 行区间 [(lo,hi), ...]（1-based 含）。
+
+    缓存进 pair_manifest，使干净克隆生成 prompt 不依赖 corpus_raw（未 git 跟踪）。
+    """
+    cd = clone_dir(repo_slug)
+    out = git_text(["diff", "-U0", parent, fix, "--", path], cd)
+    if out is None:
+        return []
+    hunks = []
+    cur = None
+    for line in out.splitlines():
+        if line.startswith("@@"):
+            try:
+                plus = line.split("+", 1)[1].split(" ")[0]
+                cur = int(plus.split(",")[0])
+            except (IndexError, ValueError):
+                cur = None
+        elif line.startswith("+") and not line.startswith("+++"):
+            if cur is not None:
+                if hunks and hunks[-1][1] == cur - 1:
+                    hunks[-1] = (hunks[-1][0], cur)
+                else:
+                    hunks.append((cur, cur))
+                cur += 1
+        elif line.startswith("-") and not line.startswith("---"):
+            pass
+        else:
+            if cur is not None:
+                cur += 1
+    return hunks
+
+
 def sha256(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
@@ -201,7 +234,8 @@ def build_pair_in_staging(spec: SampleSpec, parent: str, staging_dir: Path) -> d
             (fixed_dir / path).parent.mkdir(parents=True, exist_ok=True)
             (vuln_dir / path).write_bytes(v)
             (fixed_dir / path).write_bytes(f)
-            rec.update(vuln_sha=sha256(v), fixed_sha=sha256(f))
+            rec.update(vuln_sha=sha256(v), fixed_sha=sha256(f),
+                       changed_hunks=_changed_hunks(spec.repo_slug, parent, spec.fix_commit, path))
         elif st == "A":
             f = read_blob_bytes(spec.repo_slug, spec.fix_commit, path)
             if f is None:
