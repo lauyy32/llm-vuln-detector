@@ -1,0 +1,63 @@
+{
+ "model": "qwen2.5-coder:7b",
+ "model_digest": "dae161e27b0e90dd1856",
+ "num_ctx": 32768,
+ "num_predict": 1024,
+ "temperature": 0,
+ "seed": null,
+ "top_p": 1.0,
+ "runs": [
+  {
+   "version": "v1",
+   "side": "vuln",
+   "prompt_sha256": "2358cce1218d705fb4563265710fc21dafffee5ce2e90027f4e9f3959a6fdbe7",
+   "prompt_eval_count": 1765,
+   "eval_count": 66,
+   "done_reason": "stop",
+   "secs": 12.7,
+   "verdict": "vulnerable",
+   "cwe": "CWE-095",
+   "confidence": 1.0,
+   "rationale": "The code uses `eval()` to parse untrusted input, which is a direct risk for remote code execution."
+  },
+  {
+   "version": "v1",
+   "side": "fixed",
+   "prompt_sha256": "52b5f6c3c9d959643754b37d7eead1cb4ac44cfeb03f871e62732bf131fef6b3",
+   "prompt_eval_count": 945,
+   "eval_count": 56,
+   "done_reason": "stop",
+   "secs": 3.9,
+   "verdict": "abstain",
+   "cwe": null,
+   "confidence": 0.0,
+   "rationale": "代码中没有发现与 CWE-095 相关的漏洞。"
+  },
+  {
+   "version": "v2",
+   "side": "vuln",
+   "prompt_sha256": "35ea8354a48810e54e97dd6d4a6fecc7c6c6a1d99fbb12a9e2f36459f5fe536d",
+   "prompt_eval_count": 2137,
+   "eval_count": 66,
+   "done_reason": "stop",
+   "secs": 5.6,
+   "verdict": "vulnerable",
+   "cwe": "CWE-095",
+   "confidence": 1.0,
+   "rationale": "The code uses `eval()` to parse untrusted input, which is a direct risk for remote code execution."
+  },
+  {
+   "version": "v2",
+   "side": "fixed",
+   "prompt_sha256": "5abe81b5ca57439fc1260f1f4ccb545a0b7edff71a282c7b4cda8810ff4c9579",
+   "prompt_eval_count": 2075,
+   "eval_count": 58,
+   "done_reason": "stop",
+   "secs": 5.5,
+   "verdict": "abstain",
+   "cwe": null,
+   "confidence": 0.0,
+   "rationale": "CPG 污点切片为空，无法确定是否存在数据流型漏洞。"
+  }
+ ]
+}

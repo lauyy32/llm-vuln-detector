@@ -58,15 +58,49 @@ def worker(version: str):
     meta = {"cve_id": cve, "cwe": cwe,
             "summary": (meta_full.get("summary") or "")[:200]}
 
-    # 3) taint_rows：CWE-95 不在 CWE_TAINT_QUERIES 覆盖(022/089/078/094/918/079)，
-    #    历史 6 个 taint CSV 均无 61539 行（grep 全 0，已核验），且 v2 新增为 eval 修复
-    #    （json.loads/ast.literal_eval，非 taint sink）→ taint 恒空（CPG 表示失败）。
-    #    不重跑 6 个慢查询（历史 CSV 已证明空）；如未来加 CWE-95 查询须作新协议修订。
-    taint_rows: list = []
+    # 3) 建库（单例，快；DB 已存在则复用，避免重复重建）
+    if not corpus_db.exists():
+        rc = config.run(
+            [str(config.codeql_binary()), "database", "create",
+             config.win_path(corpus_db), "--language=python",
+             f"--source-root={config.win_path(corpus_src)}", "--overwrite"],
+            env, config.DB_CREATE_TIMEOUT,
+        )
+        if rc != 0:
+            return {"version": version, "error": f"db create failed rc={rc}"}
+
+    # 4) 跑全部 6 个 taint 查询（原协议，不写死 taint=[]；v2 的 DB 内容已变须真查），
+    #    记录每个查询的 rc/耗时/行数
+    import time
+    all_taint = []
+    query_log = []
+    for _cwe, qbase in config.CWE_TAINT_QUERIES:
+        ql = config.QUERIES_DIR / f"{qbase}.ql"
+        if not ql.exists():
+            continue
+        bqrs = config.WORK_DIR / f"{qbase}.bqrs"
+        csv_out = config.WORK_DIR / f"{qbase}.csv"
+        t0 = time.time()
+        rc = config.run(
+            [str(config.codeql_binary()), "query", "run", config.win_path(ql),
+             f"--database={config.win_path(corpus_db)}",
+             f"--search-path={config.win_path(config.CODEQL_QUERIES_DIR)}",
+             f"--output={config.win_path(bqrs)}", "--ram=3000", "--threads=8"],
+            env, config.EXTRACT_TAINT_TIMEOUT,
+        )
+        dt = round(time.time() - t0, 1)
+        rows = []
+        if rc == 0:
+            rows = _decode_bqrs(bqrs, csv_out, env)
+            all_taint.extend(rows)
+        query_log.append({"query": qbase, "cwe": _cwe, "rc": rc,
+                          "secs": dt, "rows": len(rows)})
+    taint_rows = all_taint
 
     # 4) 生成两份 prompt
     scorer = LocalLLMScorer(model="qwen2.5-coder:7b", seed=None)
-    results = {"version": version, "cwe": cwe, "taint_total": len(taint_rows), "prompts": {}}
+    results = {"version": version, "cwe": cwe, "taint_total": len(taint_rows),
+               "query_log": query_log, "prompts": {}}
     for side in ("vuln", "fixed"):
         prefix = f"{cve}_{side}"
         rows_side = [r for r in taint_rows
@@ -89,6 +123,10 @@ def worker(version: str):
             "has_utils": "utils.py" in code_text or "utils" in code_text,
             "code_text_chars": len(code_text),
             "cpg_slices_chars": len(cpg_slices),
+            # 关键 hunk 是否进入 prompt（Codex：不能只凭文件名判 FULL）
+            "hunk_eval_call": "eval(" in code_text,
+            "hunk_json_loads": "json.loads" in code_text,
+            "hunk_ast_literal_eval": "ast.literal_eval" in code_text,
         }
     (OUT_ROOT / version / "meta.json").write_text(
         json.dumps(results, ensure_ascii=False, indent=1), encoding="utf-8")
