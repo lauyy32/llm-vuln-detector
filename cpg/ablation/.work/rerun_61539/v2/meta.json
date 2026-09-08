@@ -74,7 +74,7 @@
    "has_utils": false,
    "code_text_chars": 8014,
    "cpg_slices_chars": 64,
-   "hunk_eval_call": true,
+   "hunk_eval_call": false,
    "hunk_json_loads": true,
    "hunk_ast_literal_eval": true
   }
