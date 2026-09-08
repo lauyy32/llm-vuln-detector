@@ -34,24 +34,29 @@ def main() -> int:
     claims = json.load(open(CLAIMS, encoding='utf-8'))['claims']
     ok = True
 
-    # 0) corpus_gate（2026-09-07 拆两层）：规范数据集组成 = 77 v1 + 14 v2 + 2 排除
-    manifest_path = Path('cpg/ablation/.work/canonical_corpus_manifest.json')
+    # 0) corpus_gate（2026-09-08 第2阶段）：读 artifacts/canonical_corpus_manifest.json，
+    #    验证 eligible=82 + excluded=3 + 无验证错误（删除硬编码 77/14/2）
+    manifest_path = Path('cpg/ablation/artifacts/canonical_corpus_manifest.json')
     if manifest_path.exists():
         m = json.load(open(manifest_path, encoding='utf-8'))
-        n_v2 = sum(1 for s in m['samples'] if s['corpus_version'] == 'v2')
-        n_excl = sum(1 for s in m['samples'] if not s['eligible'])
-        n_v1 = sum(1 for s in m['samples'] if s['eligible'] and s['corpus_version'] == 'v1')
-        if n_v1 != 77 or n_v2 != 14 or n_excl != 2:
-            ok = fail(f"corpus_gate 恒等式不符: v1={n_v1} v2={n_v2} 排除={n_excl} "
-                      f"(期望 77/14/2)")
+        errs = m.get('errors', [])
+        n_elig = m.get('eligible_total')
+        n_excl = m.get('excluded_total')
+        if errs:
+            ok = fail(f"corpus_gate 验证错误 {len(errs)} 条: {errs[:5]}")
+        elif n_elig != 82 or n_excl != 3:
+            ok = fail(f"corpus_gate 恒等式不符: eligible={n_elig} excluded={n_excl} (期望 82/3)")
         else:
-            print("[corpus_gate] PASS: 77 v1 可继承 + 14 v2 已重建 + 2 跨语言排除")
+            print("[corpus_gate] PASS: 82 eligible + 3 excluded")
     else:
-        ok = fail("canonical_corpus_manifest.json 缺失，corpus_gate 无法运行")
+        ok = fail("artifacts/canonical_corpus_manifest.json 缺失，corpus_gate 无法运行")
 
-    # 0b) result_gate（PROVISIONAL）：14 例 v2 样本尚未重跑（CPG/prompt/结果未重新生成）
-    print("[result_gate] PROVISIONAL: 14 例 v2 样本尚未重跑（CPG/prompt/模型结果未重新生成），"
-          "历史结果仍为 PROVISIONAL，不得冻结头条数字")
+    # 0b) result_gate：PROVISIONAL → canonical 模式非零；--historical-only 仅 HISTORICAL_ONLY_PASS
+    historical_only = '--historical-only' in sys.argv
+    if historical_only:
+        print("[result_gate] HISTORICAL_ONLY_PASS（仅复算历史数字，非 canonical，不得称 canonical PASS）")
+    else:
+        ok = fail("[result_gate] PROVISIONAL：82 例尚未按统一协议重跑，canonical 模式拒绝冻结头条数字")
 
     # 0b) 重复 claim ID
     ids = [c['id'] for c in claims]

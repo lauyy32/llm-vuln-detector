@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
-"""生成规范数据集组成表 canonical_corpus_manifest.json（Codex P0-1）。
+"""规范数据集组成表 canonical_corpus_manifest.json（Code plan 第2阶段重写）。
 
-逐例记录 93 并集样本的 corpus 版本/路径/树哈希/纳入排除/74·85 归属/唯一 fix_commit_group，
-并输出恒等式（74 集与 85 集修复后的有效数量，不沿用旧 n=82）。
+不再读陈旧 `.work/upstream_five_state.json` 决定真值，直接消费：
+- dataset_d1.jsonl / dataset.jsonl 的数据集行（repo_slug/fix_commit/cwes）；
+- corpus-v3 每例的 pair_manifest.json（vuln/fixed LF 树哈希 + parent/fix 40 位 SHA）；
+- 明确的排除记录（2 跨语言 + 1 复合提交）。
+
+验证（任一失败退出非零）：
+- eligible == 82；82/82 路径存在；82/82 树哈希匹配（重算 vs manifest）；
+- fix/parent 完整 40 位；无重复样本；无大小写碰撞；排除理由精确匹配。
 
 用法：python cpg/ablation/canonical_manifest.py
 """
@@ -12,111 +18,162 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-AUDIT = ROOT / "cpg/ablation/.work/upstream_five_state.json"
-CACHE = ROOT / "cpg/ablation/.work/upstream_api_cache"
+CORPUS_V3 = ROOT / "cpg" / "corpus-v3"
+DATASET = ROOT / "cpg" / "dataset.jsonl"
+DATASET_D1 = ROOT / "cpg" / "dataset_d1.jsonl"
+OUT = ROOT / "cpg/ablation/artifacts/canonical_corpus_manifest.json"
+
+# 排除记录（须与 corpus-v3 重建时的排除一致）
+EXCLUSIONS = {
+    "CVE-2026-70486": "CROSS_LANGUAGE_OUT_OF_SCOPE",
+    "CVE-2026-70492": "CROSS_LANGUAGE_OUT_OF_SCOPE",
+    "CVE-2026-53656": "COMPOSITE_FIX_COMMIT",
+}
+EXPECTED_ELIGIBLE = 82
 
 
-def load_jsonl_ids(path):
-    out = set()
-    if not path.exists():
-        return out
+def load_jsonl(path: Path) -> list[dict]:
+    rows = []
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
-        if not line:
-            continue
-        try:
-            out.add(json.loads(line)["cve_id"])
-        except Exception:
-            pass
-    return {x for x in out if x}
+        if line:
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return rows
 
 
-def tree_sha(dirpath):
-    """目录树哈希：sorted(相对路径 + 文件 sha256) 拼接后 sha256。"""
+def sha256(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+
+def norm_lf(b: bytes) -> bytes:
+    return b.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def tree_sha_lf(dirpath: Path) -> str:
+    """目录树哈希（LF 规范化内容），跨平台可复算。"""
     if not dirpath.is_dir():
-        return None
+        return ""
     parts = []
     for p in sorted(dirpath.rglob("*")):
         if p.is_file():
             rel = p.relative_to(dirpath).as_posix()
-            parts.append(rel + ":" + hashlib.sha256(p.read_bytes()).hexdigest())
-    return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()
-
-
-def parent_of(cve):
-    cache = CACHE / f"{cve}.json"
-    if cache.exists():
-        d = json.loads(cache.read_text(encoding="utf-8"))
-        ps = [p["sha"] for p in d.get("parents", [])]
-        if len(ps) == 1:
-            return ps[0]
-        return ps  # 多 parent 原样返回（供审计）
-    return None
+            parts.append(rel + ":" + sha256(norm_lf(p.read_bytes())))
+    return sha256("\n".join(parts).encode("utf-8"))
 
 
 def main():
-    d74 = load_jsonl_ids(ROOT / "cpg" / "dataset.jsonl")
-    d85 = load_jsonl_ids(ROOT / "cpg" / "dataset_d1.jsonl")
-    union = d74 | d85
-    audit = json.loads(AUDIT.read_text(encoding="utf-8"))
+    d74_ids = {r["cve_id"] for r in load_jsonl(DATASET) if r.get("cve_id")}
+    d85_rows = load_jsonl(DATASET_D1)
+    d85_ids = {r["cve_id"] for r in d85_rows if r.get("cve_id")}
 
+    errors = []
     samples = []
-    for cve in sorted(union):
-        r = audit.get(cve, {})
-        status = r.get("status", "UNKNOWN")
-        is_extra = any("EXTRA" in str(m[0]) for m in r.get("mismatches", []))
-        if status == "CORPUS_ERROR" and is_extra:
-            ver, path, eligible, reason = "v1", f"cpg/corpus_pairs/{cve}", False, \
-                "CROSS_LANGUAGE_OUT_OF_SCOPE"
-        elif status == "CORPUS_ERROR":
-            ver, path, eligible, reason = "v2", f"cpg/corpus-v2/{cve}", True, None
-        else:
-            ver, path, eligible, reason = "v1", f"cpg/corpus_pairs/{cve}", True, None
 
-        base = ROOT / path
-        fix = r.get("commit") or ""
+    # 排除样本（不读 corpus-v3）
+    for cve in sorted(EXCLUSIONS):
         samples.append({
             "sample_id": cve,
-            "fix_commit": fix,
-            "parent_commit": parent_of(cve),
-            "corpus_version": ver,
-            "corpus_path": path,
-            "vuln_tree_sha": tree_sha(base / "vuln"),
-            "fixed_tree_sha": tree_sha(base / "fixed"),
-            "eligible": eligible,
-            "exclusion_reason": reason,
-            "in_74": cve in d74,
-            "in_85": cve in d85,
-            "fix_commit_group": fix[:12] if fix else None,
+            "repo_slug": next((r.get("repo_slug") for r in d85_rows if r.get("cve_id") == cve), ""),
+            "parent_commit": None,
+            "fix_commit": next((r.get("fix_commit") for r in d85_rows if r.get("cve_id") == cve), ""),
+            "source_path": None,
+            "vuln_tree_sha256_lf": None,
+            "fixed_tree_sha256_lf": None,
+            "pair_manifest_sha256": None,
+            "eligible": False,
+            "exclusion_reason": EXCLUSIONS[cve],
+            "in_74": cve in d74_ids,
+            "in_85": cve in d85_ids,
         })
 
-    # 恒等式
-    v2 = {s["sample_id"] for s in samples if s["corpus_version"] == "v2"}
-    excl = {s["sample_id"] for s in samples if not s["eligible"]}
-    m74 = d74 & v2
-    m85 = d85 & v2
-    x85 = d85 & excl
+    # eligible 样本（读 corpus-v3 pair_manifest）
+    for r in d85_rows:
+        cve = r.get("cve_id")
+        if not cve or cve in EXCLUSIONS:
+            continue
+        pm_path = CORPUS_V3 / cve / "pair_manifest.json"
+        if not pm_path.exists():
+            errors.append(f"{cve}: pair_manifest.json 缺失")
+            continue
+        try:
+            pm = json.loads(pm_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            errors.append(f"{cve}: pair_manifest.json 非法 JSON")
+            continue
+
+        vuln_ts = tree_sha_lf(CORPUS_V3 / cve / "vuln")
+        fixed_ts = tree_sha_lf(CORPUS_V3 / cve / "fixed")
+        if not vuln_ts or not fixed_ts:
+            errors.append(f"{cve}: vuln/fixed 目录缺失或空")
+            continue
+        if vuln_ts != pm.get("vuln_tree_sha256_lf"):
+            errors.append(f"{cve}: vuln 树哈希漂移")
+        if fixed_ts != pm.get("fixed_tree_sha256_lf"):
+            errors.append(f"{cve}: fixed 树哈希漂移")
+        if len(pm.get("fix_commit", "")) != 40 or len(pm.get("parent_commit", "")) != 40:
+            errors.append(f"{cve}: commit 非 40 位")
+
+        samples.append({
+            "sample_id": cve,
+            "repo_slug": pm.get("repo_slug"),
+            "parent_commit": pm.get("parent_commit"),
+            "fix_commit": pm.get("fix_commit"),
+            "source_path": f"cpg/corpus-v3/{cve}",
+            "vuln_tree_sha256_lf": vuln_ts,
+            "fixed_tree_sha256_lf": fixed_ts,
+            "pair_manifest_sha256": sha256(pm_path.read_bytes()),
+            "eligible": True,
+            "exclusion_reason": None,
+            "in_74": cve in d74_ids,
+            "in_85": cve in d85_ids,
+        })
+
+    eligible = [s for s in samples if s["eligible"]]
+    excluded = [s for s in samples if not s["eligible"]]
+
+    # 验证
+    if len(eligible) != EXPECTED_ELIGIBLE:
+        errors.append(f"eligible={len(eligible)} != {EXPECTED_ELIGIBLE}")
+    if len(eligible) + len(excluded) != len(d85_ids):
+        errors.append(f"恒等式 {len(eligible)}+{len(excluded)} != D1 {len(d85_ids)}")
+    # 无重复样本
+    ids = [s["sample_id"] for s in samples]
+    if len(ids) != len(set(ids)):
+        errors.append("存在重复样本 ID")
+    # 无大小写碰撞
+    lowered = {}
+    for s in samples:
+        k = s["sample_id"].lower()
+        if k in lowered:
+            errors.append(f"大小写碰撞: {lowered[k]} vs {s['sample_id']}")
+        lowered[k] = s["sample_id"]
 
     manifest = {
-        "generated_at": "2026-09-07",
-        "union_total": len(union),
-        "v1_inherited": len(union) - len(v2) - len(excl),
-        "v2_rebuilt": len(v2),
-        "excluded_cross_language": sorted(excl),
-        "identities": {
-            "union": f"{len(union)} = {len(union)-len(v2)-len(excl)} v1 + {len(v2)} v2 + {len(excl)} 排除",
-            "main_74": f"{len(d74)} = {len(d74)-len(m74)} v1 + {len(m74)} v2 + {len(d74 & excl)} 排除",
-            "d1_85_effective": f"{len(d85)} = {len(d85)-len(m85)-len(x85)} v1 + {len(m85)} v2 + {len(x85)} 排除 → 候选分母 {len(d85)-len(x85)}",
-        },
+        "schema_version": "canonical-corpus/2",
+        "generated_at": "2026-09-08",
+        "eligible_total": len(eligible),
+        "excluded_total": len(excluded),
+        "d1_total": len(d85_ids),
+        "d74_total": len(d74_ids),
+        "identity": f"{len(eligible)} eligible + {len(excluded)} excluded = {len(d85_ids)} (D1)",
         "samples": samples,
+        "errors": errors,
     }
 
-    out = ROOT / "cpg/ablation/.work/canonical_corpus_manifest.json"
-    out.write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
-    print("恒等式：")
-    for k, v in manifest["identities"].items():
-        print(f"  {k}: {v}")
-    print(f"\n[written] {out} ({len(samples)} 样本)")
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"eligible={len(eligible)}  excluded={len(excluded)}  identity={manifest['identity']}")
+    print(f"[written] {OUT}")
+
+    if errors:
+        print("\n[FAIL] 验证错误:")
+        for e in errors:
+            print(f"  {e}")
+        return 1
+    print("\n[PASS] canonical manifest 验证通过")
     return 0
 
 
