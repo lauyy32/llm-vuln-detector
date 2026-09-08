@@ -231,9 +231,8 @@ def build_pair_selection_plan(
                     token_estimate=len(content) // 4,
                 ))
 
-    # 3) 预算分配：按 (有 changed hunk 优先, 完整相对路径) 排序，累计到 max_chars。
-    #    cost 含 FILE marker 开销（render_side 会加 marker，须计入预算），每块只取完整行；
-    #    达预算后舍弃剩余块（不截半行）。
+    # 3) 预算分配：按文件单元（vuln+fixed 配对）分配，配对块一起进入或对称缩小，
+    #    避免一侧占满预算、另一侧被舍弃（导致单侧完全无代码）。
     def marker_len(b: BlockPlan) -> int:
         return len(f"# ===== FILE: {b.path} (L{b.lo}-L{b.hi}) =====\n")
 
@@ -242,21 +241,34 @@ def build_pair_selection_plan(
         return (0 if is_hunk else 1, b.path, b.side)
 
     sorted_blocks = sorted(blocks, key=block_priority)
+
+    # 配对分组：(path, reason) -> {side: block}
+    pairs: dict = {}
+    for b in sorted_blocks:
+        pairs.setdefault((b.path, b.reason), {})[b.side] = b
+
     selected: list[BlockPlan] = []
     total = 0
-    for b in sorted_blocks:
-        if not _is_complete_line(b.content):
+    pair_items = sorted(pairs.items(),
+                        key=lambda kv: block_priority(next(iter(kv[1].values()))))
+    for _key, pd in pair_items:
+        pair_cost = sum(len(b.content) + marker_len(b) for b in pd.values())
+        if total + pair_cost <= max_chars:
+            for b in pd.values():
+                selected.append(b)
+            total += pair_cost
             continue
-        cost = len(b.content) + marker_len(b)
-        if total + cost > max_chars and selected:
-            continue
-        if cost > max_chars and not selected:
-            # 单块超预算：截 content 到完整行边界（预留 marker 空间）
-            budget = max_chars - marker_len(b)
+        # 超预算：对称缩小每个 side 到剩余预算的均分（两侧都保留，不单侧舍弃）
+        n_sides = max(1, len(pd))
+        budget_per_side = max(0, (max_chars - total) // n_sides)
+        for b in pd.values():
+            avail = budget_per_side - marker_len(b)
+            if avail <= 0:
+                continue
             lines = b.content.splitlines(keepends=True)
             acc = ""
             for ln in lines:
-                if len(acc) + len(ln) > budget:
+                if len(acc) + len(ln) > avail:
                     break
                 acc += ln
             if acc:
@@ -266,9 +278,7 @@ def build_pair_selection_plan(
                 b.token_estimate = len(acc) // 4
                 selected.append(b)
                 total += len(acc) + marker_len(b)
-            continue
-        selected.append(b)
-        total += cost
+        break  # 预算用尽，剩余文件单元舍弃
 
     plan.blocks = selected
     plan.changed_hunks = changed_hunks

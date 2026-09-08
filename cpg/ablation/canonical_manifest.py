@@ -121,6 +121,7 @@ def main():
             "repo_slug": pm.get("repo_slug"),
             "parent_commit": pm.get("parent_commit"),
             "fix_commit": pm.get("fix_commit"),
+            "cwes": pm.get("cwes") or [],
             "source_path": f"cpg/corpus-v3/{cve}",
             "vuln_tree_sha256_lf": vuln_ts,
             "fixed_tree_sha256_lf": fixed_ts,
