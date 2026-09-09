@@ -59,6 +59,12 @@ def _sha256_text(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
+# 渲染器插入的结构性 code 围栏开头（与 prompt_renderer.render_prompt 内联一致）。
+# 用于 verify-inputs 的结构检查：不能数 ``` 总数（源代码 docstring 可能含 markdown
+# 代码块 ```python ... ```，会误报 fence 数 != 2）。
+CODE_START = "\n# 目标代码（节选）\n```\n"
+
+
 # 参与逐条比对的指纹键（git_commit 仅记录，不参与比对）
 FINGERPRINT_KEYS = ("representation_sha256", "prompt_renderer_sha256", "system_sha256")
 # canonical 表示额外冻结 cpg_eval（canonical 行序实现所在）
@@ -288,8 +294,9 @@ def verify_inputs(args) -> int:
             errors.append(f"{p['sample_id']}/{p['side']} prompt SHA 漂移")
         if "公告摘要" in prompt:
             errors.append(f"{p['sample_id']}/{p['side']} 含公告摘要泄漏")
-        if prompt.count("```") != 2:
-            errors.append(f"{p['sample_id']}/{p['side']} fence 数 != 2")
+        if prompt.count(CODE_START) != 1:
+            errors.append(f"{p['sample_id']}/{p['side']} code 围栏结构错误 "
+                          f"（CODE_START 出现 {prompt.count(CODE_START)} 次）")
     if errors:
         return _fail(run_dir, f"verify-inputs {len(errors)} 错误: {errors[:3]}")
     # 完整完整性校验（指纹 / schedule 集合 / 重复键 / prompt SHA）通过后才写

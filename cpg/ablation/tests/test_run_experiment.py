@@ -325,5 +325,29 @@ class TestResume(unittest.TestCase):
             self.assertIsNone(rows[0]["run_error"])
 
 
+class TestVerifyInputsFence(unittest.TestCase):
+    def test_verify_inputs_accepts_markdown_fence_in_code(self):
+        """含 markdown 代码块（```python ... ```）的 code_text 不得被 fence 检查误报。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1, locked=False)
+            p = rd / "prompts" / "CVE-T0_vuln.prompt.txt"
+            code = "# code\n```python\nx=1\n```\n"  # docstring 含 markdown 代码块
+            prompt = (f"# 审计任务\n- CVE: CVE-T0\n- 目标 CWE: CWE-022\n"
+                      + rex.CODE_START + code + "\n```\n"
+                      + "\n# 代码级上下文（CPG 污点切片）\n# CPG TAINT SLICE\n\n"
+                      + "\n# 输出要求\n{}")
+            p.write_text(prompt, encoding="utf-8")
+            # 更新 manifest 的 prompt_sha256 以匹配新 prompt
+            pm = json.loads((rd / "prompt_manifest.jsonl").read_text(
+                encoding="utf-8").splitlines()[0])
+            pm["prompt_sha256"] = rex._sha256_text(prompt)
+            (rd / "prompt_manifest.jsonl").write_text(json.dumps(pm) + "\n",
+                                                      encoding="utf-8")
+            rex._write_state(rd, "INPUTS_FROZEN")
+            rc = rex.verify_inputs(type("A", (), {"run_dir": rd})())
+            self.assertEqual(rc, 0, "含 markdown ``` 的 code_text 不应被 fence 检查误报")
+
+
 if __name__ == "__main__":
     unittest.main()
