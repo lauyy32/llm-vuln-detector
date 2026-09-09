@@ -139,12 +139,15 @@ def build_pair_selection_plan(
     # 收集所有 .py 改动文件（按完整相对路径排序）
     files = sorted(pair_manifest.get("files", []), key=lambda f: f["path"])
 
-    # 1) 计算每个文件的 changed hunks（fix 侧）：优先读 pair_manifest 缓存（干净克隆
-    #    无 corpus_raw 也可复现），缺失时 fallback 到 git diff
+    # 1) 计算每个文件的 changed hunks（fix 侧）：优先读 pair_manifest 缓存；
+    #    source_dir 模式（干净克隆）下，缺 changed_hunks 即报错，禁止 fallback corpus_raw
     changed_hunks = {}
     for f in files:
         if "changed_hunks" in f:
             changed_hunks[f["path"]] = [tuple(h) for h in f["changed_hunks"]]
+        elif source_dir is not None:
+            raise ValueError(
+                f"{f['path']} 缺 changed_hunks（source_dir 模式禁止 fallback corpus_raw）")
         else:
             changed_hunks[f["path"]] = get_changed_hunks(repo_dir, parent, fix, f["path"])
 

@@ -242,14 +242,17 @@ def build_pair_in_staging(spec: SampleSpec, parent: str, staging_dir: Path) -> d
                 return {"status": "UNEXPECTED_MISSING", "error": f"{path} blob 缺失"}
             (fixed_dir / path).parent.mkdir(parents=True, exist_ok=True)
             (fixed_dir / path).write_bytes(f)
-            rec.update(fixed_sha=sha256(f))
+            n_lines = len(f.decode("utf-8", errors="replace").splitlines())
+            # added：整个文件都是新增，changed_hunks 记为整文件（供覆盖检查）
+            rec.update(fixed_sha=sha256(f), changed_hunks=[[1, n_lines]])
         elif st == "D":
             v = read_blob_bytes(spec.repo_slug, parent, path)
             if v is None:
                 return {"status": "UNEXPECTED_MISSING", "error": f"{path} blob 缺失"}
             (vuln_dir / path).parent.mkdir(parents=True, exist_ok=True)
             (vuln_dir / path).write_bytes(v)
-            rec.update(vuln_sha=sha256(v))
+            # removed：fix 侧无 added 行
+            rec.update(vuln_sha=sha256(v), changed_hunks=[])
         elif st == "R":
             v = read_blob_bytes(spec.repo_slug, parent, prev) if prev else None
             f = read_blob_bytes(spec.repo_slug, spec.fix_commit, path)
@@ -259,7 +262,8 @@ def build_pair_in_staging(spec: SampleSpec, parent: str, staging_dir: Path) -> d
             (fixed_dir / path).parent.mkdir(parents=True, exist_ok=True)
             (vuln_dir / prev).write_bytes(v)
             (fixed_dir / path).write_bytes(f)
-            rec.update(prev=prev, vuln_sha=sha256(v), fixed_sha=sha256(f))
+            rec.update(prev=prev, vuln_sha=sha256(v), fixed_sha=sha256(f),
+                       changed_hunks=_changed_hunks(spec.repo_slug, parent, spec.fix_commit, path))
         elif st == "C":
             f = read_blob_bytes(spec.repo_slug, spec.fix_commit, path)
             if f is None:
@@ -271,7 +275,8 @@ def build_pair_in_staging(spec: SampleSpec, parent: str, staging_dir: Path) -> d
                 if v is not None:
                     (vuln_dir / prev).parent.mkdir(parents=True, exist_ok=True)
                     (vuln_dir / prev).write_bytes(v)
-            rec.update(prev=prev, fixed_sha=sha256(f))
+            rec.update(prev=prev, fixed_sha=sha256(f),
+                       changed_hunks=_changed_hunks(spec.repo_slug, parent, spec.fix_commit, path))
         else:
             return {"status": "UNKNOWN_STATUS", "error": f"status={st} path={path}"}
         files.append(rec)
