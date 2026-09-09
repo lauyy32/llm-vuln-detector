@@ -21,19 +21,20 @@ def main():
         pm = json.loads(pm_path.read_text(encoding="utf-8"))
         changed = False
         for f in pm.get("files", []):
-            if "changed_hunks" in f:
-                continue
             st = f.get("status")
             path = f.get("path")
+            # 总是重算（旧 list 格式 → 新 dict 格式 old_ranges/new_ranges）
             if st in ("M", "T", "R", "C"):
                 f["changed_hunks"] = _changed_hunks(
                     pm["repo_slug"], pm["parent_commit"], pm["fix_commit"], path)
             elif st == "A":
                 fp = V3 / pm["sample_id"] / "fixed" / path
                 n = len(fp.read_text(encoding="utf-8", errors="replace").splitlines()) if fp.exists() else 0
-                f["changed_hunks"] = [[1, n]] if n else []
+                f["changed_hunks"] = {"old_ranges": [], "new_ranges": [[1, n]] if n else []}
             elif st == "D":
-                f["changed_hunks"] = []
+                fp = V3 / pm["sample_id"] / "vuln" / path
+                n = len(fp.read_text(encoding="utf-8", errors="replace").splitlines()) if fp.exists() else 0
+                f["changed_hunks"] = {"old_ranges": [[1, n]] if n else [], "new_ranges": []}
             changed = True
             filled += 1
         if changed:

@@ -57,39 +57,39 @@ class PairSelectionPlan:
         return _sha256_bytes("\n".join(keys).encode("utf-8"))
 
 
-def get_changed_hunks(repo_dir: Path, parent: str, fix: str, path: str) -> list[tuple[int, int]]:
-    """git diff -U0 获取该文件 fix 侧相对 parent 的 added 行区间 [(lo, hi), ...]（1-based 含）。"""
+def get_changed_hunks(repo_dir: Path, parent: str, fix: str, path: str) -> dict:
+    """git diff -U0 获取 old/new 两侧行区间（fallback 用，返回 {"old_ranges","new_ranges"}）。"""
     r = subprocess.run(
         ["git", "diff", "-U0", parent, fix, "--", path],
         cwd=str(repo_dir), capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if r.returncode != 0:
-        return []
-    hunks = []
-    cur_lo = None
+        return {"old_ranges": [], "new_ranges": []}
+    old_ranges = []
+    new_ranges = []
     for line in r.stdout.splitlines():
-        if line.startswith("@@"):
-            # 解析 @@ -a,b +c,d @@ 里的 +c,d
-            try:
-                plus = line.split("+", 1)[1].split(" ")[0]
-                c = int(plus.split(",")[0])
-            except (IndexError, ValueError):
-                cur_lo = None
-                continue
-            cur_lo = c
-        elif line.startswith("+") and not line.startswith("+++"):
-            if cur_lo is not None:
-                if hunks and hunks[-1][1] == cur_lo - 1:
-                    hunks[-1] = (hunks[-1][0], cur_lo)
-                else:
-                    hunks.append((cur_lo, cur_lo))
-                cur_lo += 1
-        elif line.startswith("-") and not line.startswith("---"):
-            pass
-        else:
-            if cur_lo is not None:
-                cur_lo += 1
-    return hunks
+        if not line.startswith("@@"):
+            continue
+        try:
+            hdr = line.split("@@")[1].strip()
+            old_part, new_part = hdr.split()[:2]
+            old_lo, old_cnt = _parse_range(old_part)
+            new_lo, new_cnt = _parse_range(new_part)
+            if old_cnt > 0:
+                old_ranges.append([old_lo, old_lo + old_cnt - 1])
+            if new_cnt > 0:
+                new_ranges.append([new_lo, new_lo + new_cnt - 1])
+        except (ValueError, IndexError):
+            continue
+    return {"old_ranges": old_ranges, "new_ranges": new_ranges}
+
+
+def _parse_range(s: str):
+    s = s[1:] if s and s[0] in "-+" else s
+    if "," in s:
+        lo, cnt = s.split(",")
+        return int(lo), int(cnt)
+    return int(s), 1
 
 
 def _read_source_lines(source_dir: Path, version: str, path: str) -> list[str]:
@@ -139,41 +139,52 @@ def build_pair_selection_plan(
     # 收集所有 .py 改动文件（按完整相对路径排序）
     files = sorted(pair_manifest.get("files", []), key=lambda f: f["path"])
 
-    # 1) 计算每个文件的 changed hunks（fix 侧）：优先读 pair_manifest 缓存；
+    # 1) 计算每个文件的 changed hunks（old/new 双坐标）：优先读 pair_manifest 缓存；
     #    source_dir 模式（干净克隆）下，缺 changed_hunks 即报错，禁止 fallback corpus_raw
     changed_hunks = {}
     for f in files:
         if "changed_hunks" in f:
-            changed_hunks[f["path"]] = [tuple(h) for h in f["changed_hunks"]]
+            changed_hunks[f["path"]] = {
+                "old_ranges": [tuple(h) for h in f["changed_hunks"].get("old_ranges", [])],
+                "new_ranges": [tuple(h) for h in f["changed_hunks"].get("new_ranges", [])],
+            }
         elif source_dir is not None:
             raise ValueError(
                 f"{f['path']} 缺 changed_hunks（source_dir 模式禁止 fallback corpus_raw）")
         else:
             changed_hunks[f["path"]] = get_changed_hunks(repo_dir, parent, fix, f["path"])
 
-    # 2) 为每个文件生成候选块（vuln/fixed 两侧配对窗口）
-    #    逻辑：对每个文件，取 vuln(parent) 和 fixed(fix) 的对应行区间
+    # 2) 为每个文件生成候选块：vuln 侧用 old_ranges、fixed 侧用 new_ranges（配对窗口，
+    #    但坐标按侧对应）。
     blocks: list[BlockPlan] = []
     for f in files:
         path = f["path"]
         status = f.get("status")
         hunks = changed_hunks[path]
 
-        # changed-hunk 中心窗口：每个 hunk 单独 ±window，只合并重叠区间（不把远处的
-        # hunk 连成一个超大窗口，避免超预算被截断后丢掉真正的安全 hunk）。
+        # changed-hunk 中心窗口：每侧用各自坐标，每个 hunk 单独 ±window 只合并重叠。
         # hunk_window=None 表示禁用 hunk 窗口（退化为头 100 行旧策略）。
-        if hunk_window is not None and status in ("M", "T") and hunks:
-            windows = []
-            for h_lo, h_hi in sorted(hunks):
-                w_lo = max(1, h_lo - hunk_window)
-                w_hi = h_hi + hunk_window
-                if windows and w_lo <= windows[-1][1] + 1:
-                    windows[-1] = (windows[-1][0], max(windows[-1][1], w_hi))
-                else:
-                    windows.append((w_lo, w_hi))
-            for w_lo, w_hi in windows:
-                for side, commit in (("vuln", parent), ("fixed", fix)):
-                    lines = _read_lines(source_dir, repo_dir, side, commit, path)
+        has_any_hunk = bool(hunks.get("old_ranges") or hunks.get("new_ranges"))
+        if hunk_window is not None and status in ("M", "T") and has_any_hunk:
+            for side, commit in (("vuln", parent), ("fixed", fix)):
+                key = "old_ranges" if side == "vuln" else "new_ranges"
+                ranges = hunks.get(key, [])
+                if not ranges:
+                    # 纯插入/纯删除：该侧无对应坐标，用另一侧坐标作配对锚点
+                    other = "new_ranges" if side == "vuln" else "old_ranges"
+                    ranges = hunks.get(other, [])
+                if not ranges:
+                    continue
+                windows = []
+                for h_lo, h_hi in sorted(ranges):
+                    w_lo = max(1, h_lo - hunk_window)
+                    w_hi = h_hi + hunk_window
+                    if windows and w_lo <= windows[-1][1] + 1:
+                        windows[-1] = (windows[-1][0], max(windows[-1][1], w_hi))
+                    else:
+                        windows.append((w_lo, w_hi))
+                lines = _read_lines(source_dir, repo_dir, side, commit, path)
+                for w_lo, w_hi in windows:
                     lo_c = max(1, w_lo)
                     hi_c = min(len(lines), w_hi)
                     content = "\n".join(lines[lo_c - 1:hi_c]) + ("\n" if lines else "")
@@ -245,39 +256,33 @@ def build_pair_selection_plan(
 
     sorted_blocks = sorted(blocks, key=block_priority)
 
-    # 配对分组：(path, reason) -> {side: block}
-    pairs: dict = {}
+    # 按 path 分组（文件单元）：一个 path 的 vuln 块列表 + fixed 块列表。
+    # 不能用 (path, reason) 分组，因为 reason 含窗口坐标，vuln/fixed 的 old/new 坐标不同
+    # 会导致同一文件两侧被拆进不同 pair（文件集合不对称的根因）。
+    by_path: dict = {}
     for b in sorted_blocks:
-        pairs.setdefault((b.path, b.reason), {})[b.side] = b
+        by_path.setdefault(b.path, {"vuln": [], "fixed": []})[b.side].append(b)
 
     selected: list[BlockPlan] = []
     side_used = {"vuln": 0, "fixed": 0}
-    pair_items = sorted(pairs.items(),
-                        key=lambda kv: block_priority(next(iter(kv[1].values()))))
-    for _key, pd in pair_items:
-        for side, b in pd.items():
-            cost = len(b.content) + marker_len(b)
-            if side_used[side] + cost <= max_chars:
+    path_items = sorted(
+        by_path.items(),
+        key=lambda kv: block_priority(next(iter(kv[1]["vuln"] + kv[1]["fixed"]))))
+    for path, sd in path_items:
+        # 文件单元共同入选：两侧都必须能完整容纳（各自独立预算），否则该文件两侧都不进。
+        # 达预算时"舍弃完整低优先块"，绝不截半行（codex 语义）。
+        costs = {side: sum(len(b.content) + marker_len(b) for b in sd[side])
+                 for side in ("vuln", "fixed")}
+        can_fit = all(
+            (not sd[side]) or (side_used[side] + costs[side] <= max_chars)
+            for side in ("vuln", "fixed")
+        )
+        if not can_fit:
+            continue  # 该文件两侧都不进，保持集合一致
+        for side, bs in sd.items():
+            for b in bs:
                 selected.append(b)
-                side_used[side] += cost
-            else:
-                # 该侧超预算：缩到剩余预算的完整行边界（不影响另一侧）
-                avail = max_chars - side_used[side] - marker_len(b)
-                if avail <= 0:
-                    continue
-                lines = b.content.splitlines(keepends=True)
-                acc = ""
-                for ln in lines:
-                    if len(acc) + len(ln) > avail:
-                        break
-                    acc += ln
-                if acc:
-                    b.content = acc
-                    b.hi = b.lo + acc.count("\n") - 1
-                    b.content_sha = _sha256_bytes(acc.encode("utf-8"))
-                    b.token_estimate = len(acc) // 4
-                    selected.append(b)
-                    side_used[side] += len(acc) + marker_len(b)
+                side_used[side] += len(b.content) + marker_len(b)
 
     plan.blocks = selected
     plan.changed_hunks = changed_hunks
@@ -293,17 +298,21 @@ def _compute_coverage(files, changed_hunks, blocks) -> dict:
     coverage = {}
     for f in files:
         path = f["path"]
-        hunks = changed_hunks.get(path, [])
+        hunks = changed_hunks.get(path, {})
         if not hunks:
             continue
         coverage[path] = {}
         for side in ("vuln", "fixed"):
+            key = "old_ranges" if side == "vuln" else "new_ranges"
+            ranges = hunks.get(key, [])
+            if not ranges:
+                continue  # 该侧无对应 hunk（纯插入/删除），不记 coverage
             side_blocks = [b for b in blocks if b.path == path and b.side == side]
             covered = 0
-            for lo, hi in hunks:
+            for lo, hi in ranges:
                 if any(b.lo <= lo and hi <= b.hi for b in side_blocks):
                     covered += 1
-            if covered == len(hunks):
+            if covered == len(ranges):
                 coverage[path][side] = FULL
             elif covered > 0:
                 coverage[path][side] = PARTIAL

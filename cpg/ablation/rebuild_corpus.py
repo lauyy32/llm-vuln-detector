@@ -153,37 +153,44 @@ def read_blob_bytes(repo_slug: str, commit: str, path: str) -> bytes:
     return git_bytes(["show", f"{commit}:{path}"], cd)
 
 
-def _changed_hunks(repo_slug: str, parent: str, fix: str, path: str) -> list:
-    """git diff -U0 获取 fix 侧 added 行区间 [(lo,hi), ...]（1-based 含）。
+def _parse_hunk_range(s: str):
+    """解析 hunk header 的 -a,b / +c,d，返回 (start, count)。"""
+    s = s[1:] if s and s[0] in "-+" else s
+    if "," in s:
+        lo, cnt = s.split(",")
+        return int(lo), int(cnt)
+    return int(s), 1
 
-    缓存进 pair_manifest，使干净克隆生成 prompt 不依赖 corpus_raw（未 git 跟踪）。
+
+def _changed_hunks(repo_slug: str, parent: str, fix: str, path: str) -> dict:
+    """git diff -U0 获取 old/new 两侧行区间（1-based 含）。
+
+    返回 {"old_ranges": [[lo,hi],...], "new_ranges": [[lo,hi],...]}：
+    - old_ranges 用于 vuln(parent) 侧；new_ranges 用于 fixed(fix) 侧；
+    - 纯插入 → old 侧该 hunk 无区间；纯删除 → new 侧无区间；
+    - 缓存进 pair_manifest，使干净克隆生成 prompt 不依赖 corpus_raw。
     """
     cd = clone_dir(repo_slug)
     out = git_text(["diff", "-U0", parent, fix, "--", path], cd)
     if out is None:
-        return []
-    hunks = []
-    cur = None
+        return {"old_ranges": [], "new_ranges": []}
+    old_ranges = []
+    new_ranges = []
     for line in out.splitlines():
-        if line.startswith("@@"):
-            try:
-                plus = line.split("+", 1)[1].split(" ")[0]
-                cur = int(plus.split(",")[0])
-            except (IndexError, ValueError):
-                cur = None
-        elif line.startswith("+") and not line.startswith("+++"):
-            if cur is not None:
-                if hunks and hunks[-1][1] == cur - 1:
-                    hunks[-1] = (hunks[-1][0], cur)
-                else:
-                    hunks.append((cur, cur))
-                cur += 1
-        elif line.startswith("-") and not line.startswith("---"):
-            pass
-        else:
-            if cur is not None:
-                cur += 1
-    return hunks
+        if not line.startswith("@@"):
+            continue
+        try:
+            hdr = line.split("@@")[1].strip()
+            old_part, new_part = hdr.split()[:2]
+            old_lo, old_cnt = _parse_hunk_range(old_part)
+            new_lo, new_cnt = _parse_hunk_range(new_part)
+            if old_cnt > 0:
+                old_ranges.append([old_lo, old_lo + old_cnt - 1])
+            if new_cnt > 0:
+                new_ranges.append([new_lo, new_lo + new_cnt - 1])
+        except (ValueError, IndexError):
+            continue
+    return {"old_ranges": old_ranges, "new_ranges": new_ranges}
 
 
 def sha256(b: bytes) -> str:
@@ -243,16 +250,19 @@ def build_pair_in_staging(spec: SampleSpec, parent: str, staging_dir: Path) -> d
             (fixed_dir / path).parent.mkdir(parents=True, exist_ok=True)
             (fixed_dir / path).write_bytes(f)
             n_lines = len(f.decode("utf-8", errors="replace").splitlines())
-            # added：整个文件都是新增，changed_hunks 记为整文件（供覆盖检查）
-            rec.update(fixed_sha=sha256(f), changed_hunks=[[1, n_lines]])
+            # added：parent 侧无、fix 侧整文件（old_ranges 空、new_ranges 整文件）
+            rec.update(fixed_sha=sha256(f),
+                       changed_hunks={"old_ranges": [], "new_ranges": [[1, n_lines]]})
         elif st == "D":
             v = read_blob_bytes(spec.repo_slug, parent, path)
             if v is None:
                 return {"status": "UNEXPECTED_MISSING", "error": f"{path} blob 缺失"}
             (vuln_dir / path).parent.mkdir(parents=True, exist_ok=True)
             (vuln_dir / path).write_bytes(v)
-            # removed：fix 侧无 added 行
-            rec.update(vuln_sha=sha256(v), changed_hunks=[])
+            n_lines = len(v.decode("utf-8", errors="replace").splitlines())
+            # removed：parent 侧整文件、fix 侧无（old_ranges 整文件、new_ranges 空）
+            rec.update(vuln_sha=sha256(v),
+                       changed_hunks={"old_ranges": [[1, n_lines]], "new_ranges": []})
         elif st == "R":
             v = read_blob_bytes(spec.repo_slug, parent, prev) if prev else None
             f = read_blob_bytes(spec.repo_slug, spec.fix_commit, path)

@@ -30,9 +30,11 @@ class TestGetChangedHunks61539(unittest.TestCase):
             self.skipTest("corpus_raw 未就绪")
         hunks = get_changed_hunks(repo, "1b3d220f34^", "1b3d220f34",
                                   "xinference/model/llm/utils.py")
-        # 安全 hunk 在约 L754-765（Code plan 断言），不能只有 L1-15
-        self.assertTrue(any(lo >= 700 for lo, hi in hunks),
-                        f"安全 hunk 应出现在 L700+，实际 {hunks}")
+        # 安全 hunk 在约 L754-765（Code plan 断言），new_ranges 应含 L700+；old_ranges 含 753/755
+        self.assertTrue(any(lo >= 700 for lo, hi in hunks["new_ranges"]),
+                        f"安全 hunk 应出现在 new_ranges L700+，实际 {hunks}")
+        self.assertTrue(any(lo >= 700 for lo, hi in hunks["old_ranges"]),
+                        f"old_ranges 应含 L753/755，实际 {hunks}")
 
 
 class TestCoverage61539(unittest.TestCase):
