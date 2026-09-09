@@ -40,6 +40,7 @@ class BlockPlan:
     content: str         # 块内容（完整行）
     content_sha: str
     token_estimate: int
+    hunk_idx: int = -1   # 所属 hunk 序号（-1 = 非 hunk 块，如 head_window）
 
 
 @dataclass
@@ -47,8 +48,12 @@ class PairSelectionPlan:
     sample_id: str
     blocks: list[BlockPlan] = field(default_factory=list)
     hunk_coverage: dict = field(default_factory=dict)  # path -> FULL/PARTIAL/ABSENT
-    changed_hunks: dict = field(default_factory=dict)  # path -> [(lo,hi), ...]
+    changed_hunks: dict = field(default_factory=dict)  # path -> [hunk dict, ...]
     max_chars: int = 8000
+    # hunk 级：最小窗口（2 行）仍装不下的 (path, hunk_idx)，显式上报不静默丢弃
+    skipped_hunks: list = field(default_factory=list)
+    # 样本级：任一侧渲染为空 → UNREPRESENTABLE_BUDGET，须 exclude 且不产生空 prompt
+    unrepresentable: list = field(default_factory=list)
 
     def plan_sha(self) -> str:
         keys = sorted(
@@ -58,15 +63,17 @@ class PairSelectionPlan:
 
 
 def get_changed_hunks(repo_dir: Path, parent: str, fix: str, path: str) -> dict:
-    """git diff -U0 获取 old/new 两侧行区间（fallback 用，返回 {"old_ranges","new_ranges"}）。"""
+    """git diff -U0 获取逐 hunk 配对坐标（fallback 用，fail-closed）。
+
+    返回 {"hunks": [{"old_start","old_count","new_start","new_count"}, ...]}，保留 count=0。
+    """
     r = subprocess.run(
         ["git", "diff", "-U0", parent, fix, "--", path],
         cwd=str(repo_dir), capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if r.returncode != 0:
-        return {"old_ranges": [], "new_ranges": []}
-    old_ranges = []
-    new_ranges = []
+        raise RuntimeError(f"git diff 失败 rc={r.returncode}: {r.stderr[:200]}")
+    hunks = []
     for line in r.stdout.splitlines():
         if not line.startswith("@@"):
             continue
@@ -75,13 +82,11 @@ def get_changed_hunks(repo_dir: Path, parent: str, fix: str, path: str) -> dict:
             old_part, new_part = hdr.split()[:2]
             old_lo, old_cnt = _parse_range(old_part)
             new_lo, new_cnt = _parse_range(new_part)
-            if old_cnt > 0:
-                old_ranges.append([old_lo, old_lo + old_cnt - 1])
-            if new_cnt > 0:
-                new_ranges.append([new_lo, new_lo + new_cnt - 1])
-        except (ValueError, IndexError):
-            continue
-    return {"old_ranges": old_ranges, "new_ranges": new_ranges}
+        except (ValueError, IndexError) as e:
+            raise RuntimeError(f"hunk header 解析失败：{line!r}") from e
+        hunks.append({"old_start": old_lo, "old_count": old_cnt,
+                      "new_start": new_lo, "new_count": new_cnt})
+    return {"hunks": hunks}
 
 
 def _parse_range(s: str):
@@ -139,60 +144,45 @@ def build_pair_selection_plan(
     # 收集所有 .py 改动文件（按完整相对路径排序）
     files = sorted(pair_manifest.get("files", []), key=lambda f: f["path"])
 
-    # 1) 计算每个文件的 changed hunks（old/new 双坐标）：优先读 pair_manifest 缓存；
-    #    source_dir 模式（干净克隆）下，缺 changed_hunks 即报错，禁止 fallback corpus_raw
+    # 1) 计算每个文件的 changed hunks（逐 hunk 配对坐标，保留 count=0）：
+    #    优先读 pair_manifest 缓存；source_dir 模式下缺失即报错，禁止 fallback corpus_raw
     changed_hunks = {}
     for f in files:
         if "changed_hunks" in f:
-            changed_hunks[f["path"]] = {
-                "old_ranges": [tuple(h) for h in f["changed_hunks"].get("old_ranges", [])],
-                "new_ranges": [tuple(h) for h in f["changed_hunks"].get("new_ranges", [])],
-            }
+            changed_hunks[f["path"]] = list(f["changed_hunks"].get("hunks", []))
         elif source_dir is not None:
             raise ValueError(
                 f"{f['path']} 缺 changed_hunks（source_dir 模式禁止 fallback corpus_raw）")
         else:
-            changed_hunks[f["path"]] = get_changed_hunks(repo_dir, parent, fix, f["path"])
+            changed_hunks[f["path"]] = get_changed_hunks(
+                repo_dir, parent, fix, f["path"])["hunks"]
 
-    # 2) 为每个文件生成候选块：vuln 侧用 old_ranges、fixed 侧用 new_ranges（配对窗口，
-    #    但坐标按侧对应）。
+    # 2) 按 hunk 生成候选块：每条 hunk 一个 paired unit（同 hunk 的 vuln 块 + fixed 块），
+    #    零长度一侧（count=0）用 start±window 边界上下文，不复制另一侧绝对行号。
     blocks: list[BlockPlan] = []
     for f in files:
         path = f["path"]
         status = f.get("status")
-        hunks = changed_hunks[path]
+        hunk_list = changed_hunks[path]
 
-        # changed-hunk 中心窗口：每侧用各自坐标，每个 hunk 单独 ±window 只合并重叠。
         # hunk_window=None 表示禁用 hunk 窗口（退化为头 100 行旧策略）。
-        has_any_hunk = bool(hunks.get("old_ranges") or hunks.get("new_ranges"))
-        if hunk_window is not None and status in ("M", "T") and has_any_hunk:
-            for side, commit in (("vuln", parent), ("fixed", fix)):
-                key = "old_ranges" if side == "vuln" else "new_ranges"
-                ranges = hunks.get(key, [])
-                if not ranges:
-                    # 纯插入/纯删除：该侧无对应坐标，用另一侧坐标作配对锚点
-                    other = "new_ranges" if side == "vuln" else "old_ranges"
-                    ranges = hunks.get(other, [])
-                if not ranges:
-                    continue
-                windows = []
-                for h_lo, h_hi in sorted(ranges):
-                    w_lo = max(1, h_lo - hunk_window)
-                    w_hi = h_hi + hunk_window
-                    if windows and w_lo <= windows[-1][1] + 1:
-                        windows[-1] = (windows[-1][0], max(windows[-1][1], w_hi))
-                    else:
-                        windows.append((w_lo, w_hi))
-                lines = _read_lines(source_dir, repo_dir, side, commit, path)
-                for w_lo, w_hi in windows:
+        if hunk_window is not None and status in ("M", "T") and hunk_list:
+            for idx, h in enumerate(hunk_list):
+                for side, commit in (("vuln", parent), ("fixed", fix)):
+                    start, cnt = ((h["old_start"], h["old_count"]) if side == "vuln"
+                                  else (h["new_start"], h["new_count"]))
+                    w_lo = max(1, start - hunk_window)
+                    # 零长度一侧：边界上下文 start±window；非空：覆盖 [start, start+cnt-1]
+                    w_hi = (start + hunk_window) if cnt == 0 else (start + cnt - 1 + hunk_window)
+                    lines = _read_lines(source_dir, repo_dir, side, commit, path)
                     lo_c = max(1, w_lo)
                     hi_c = min(len(lines), w_hi)
                     content = "\n".join(lines[lo_c - 1:hi_c]) + ("\n" if lines else "")
                     blocks.append(BlockPlan(
                         path=path, side=side, lo=lo_c, hi=hi_c,
-                        reason=f"changed_hunk_window:{w_lo}-{w_hi}",
+                        reason=f"changed_hunk_window:h{idx}:{w_lo}-{w_hi}",
                         content=content, content_sha=_sha256_bytes(content.encode("utf-8")),
-                        token_estimate=len(content) // 4,
+                        token_estimate=len(content) // 4, hunk_idx=idx,
                     ))
             continue
 
@@ -245,68 +235,112 @@ def build_pair_selection_plan(
                     token_estimate=len(content) // 4,
                 ))
 
-    # 3) 预算分配：每侧独立 max_chars 预算（vuln/fixed 各自 <= 8000，历史每份 prompt 独立），
-    #    但文件/窗口保持配对（同一文件集、同一窗口策略、同一优先级遍历）。
+    # 3) 预算分配：按 hunk unit（path, hunk_idx）成对分配（每侧独立 max_chars 预算）；
+    #    超预算时按同一 hunk 单元逐级对称缩小窗口（hunk_window → 10 → 5 → 2），
+    #    **绝不静默丢弃整个文件**（那会造成双侧空输入、路径对称但无信息）；
+    #    最小窗口仍装不下 → 记入 unrepresentable（UNREPRESENTABLE_BUDGET，须显式上报）。
     def marker_len(b: BlockPlan) -> int:
         return len(f"# ===== FILE: {b.path} (L{b.lo}-L{b.hi}) =====\n")
 
     def block_priority(b: BlockPlan) -> tuple:
-        is_hunk = b.reason.startswith("changed_hunk_window")
-        return (0 if is_hunk else 1, b.path, b.side)
+        return (0 if b.hunk_idx >= 0 else 1, b.path, b.hunk_idx, b.side)
 
-    sorted_blocks = sorted(blocks, key=block_priority)
+    def make_block(path_, side, h, w, commit, hidx):
+        start, cnt = ((h["old_start"], h["old_count"]) if side == "vuln"
+                      else (h["new_start"], h["new_count"]))
+        w_lo = max(1, start - w)
+        w_hi = (start + w) if cnt == 0 else (start + cnt - 1 + w)
+        lines = _read_lines(source_dir, repo_dir, side, commit, path_)
+        lo_c = max(1, w_lo)
+        hi_c = min(len(lines), w_hi)
+        content = "\n".join(lines[lo_c - 1:hi_c]) + ("\n" if lines else "")
+        return BlockPlan(path=path_, side=side, lo=lo_c, hi=hi_c,
+                         reason=f"changed_hunk_window:h{hidx}:{w_lo}-{w_hi}",
+                         content=content,
+                         content_sha=_sha256_bytes(content.encode("utf-8")),
+                         token_estimate=len(content) // 4, hunk_idx=hidx)
 
-    # 按 path 分组（文件单元）：一个 path 的 vuln 块列表 + fixed 块列表。
-    # 不能用 (path, reason) 分组，因为 reason 含窗口坐标，vuln/fixed 的 old/new 坐标不同
-    # 会导致同一文件两侧被拆进不同 pair（文件集合不对称的根因）。
-    by_path: dict = {}
-    for b in sorted_blocks:
-        by_path.setdefault(b.path, {"vuln": [], "fixed": []})[b.side].append(b)
+    # hunk 信息映射（缩小窗口时重建块用）
+    hunk_map: dict = {}
+    for f in files:
+        for idx, h in enumerate(changed_hunks[f["path"]]):
+            hunk_map[(f["path"], idx)] = h
+
+    # 按 hunk unit 分组
+    units: dict = {}
+    for b in sorted(blocks, key=block_priority):
+        units.setdefault((b.path, b.hunk_idx), {})[b.side] = b
 
     selected: list[BlockPlan] = []
     side_used = {"vuln": 0, "fixed": 0}
-    path_items = sorted(
-        by_path.items(),
-        key=lambda kv: block_priority(next(iter(kv[1]["vuln"] + kv[1]["fixed"]))))
-    for path, sd in path_items:
-        # 文件单元共同入选：两侧都必须能完整容纳（各自独立预算），否则该文件两侧都不进。
-        # 达预算时"舍弃完整低优先块"，绝不截半行（codex 语义）。
-        costs = {side: sum(len(b.content) + marker_len(b) for b in sd[side])
-                 for side in ("vuln", "fixed")}
-        can_fit = all(
-            (not sd[side]) or (side_used[side] + costs[side] <= max_chars)
-            for side in ("vuln", "fixed")
-        )
-        if not can_fit:
-            continue  # 该文件两侧都不进，保持集合一致
-        for side, bs in sd.items():
-            for b in bs:
-                selected.append(b)
-                side_used[side] += len(b.content) + marker_len(b)
+    unrepr: list = []
+    shrink_steps = ([hunk_window] if hunk_window is not None else []) + [10, 5, 2]
+    unit_items = sorted(units.items(),
+                        key=lambda kv: block_priority(next(iter(kv[1].values()))))
+    for (path, hidx), pd in unit_items:
+        placed = False
+        for w in shrink_steps:
+            cand: dict = {}
+            ok = True
+            for side in ("vuln", "fixed"):
+                b0 = pd.get(side)
+                if b0 is None:
+                    continue
+                if hidx >= 0 and w == hunk_window:
+                    cand[side] = b0  # 复用已生成的原窗口块
+                elif hidx >= 0 and (path, hidx) in hunk_map:
+                    commit = parent if side == "vuln" else fix
+                    cand[side] = make_block(path, side, hunk_map[(path, hidx)], w,
+                                            commit, hidx)
+                else:
+                    cand[side] = b0  # 非 hunk 块（head_window），不可缩小
+                cost = len(cand[side].content) + marker_len(cand[side])
+                if side_used[side] + cost > max_chars:
+                    ok = False
+                    break
+            if ok:
+                for side, b in cand.items():
+                    selected.append(b)
+                    side_used[side] += len(b.content) + marker_len(b)
+                placed = True
+                break
+        if not placed:
+            unrepr.append((path, hidx))
 
     plan.blocks = selected
+    plan.skipped_hunks = unrepr
+    # 样本级：任一侧渲染无内容才算 UNREPRESENTABLE_BUDGET（不得产生空 prompt）
+    rv = render_side(plan, "vuln").strip()
+    rf = render_side(plan, "fixed").strip()
+    plan.unrepresentable = (sorted({p for p, _ in unrepr})
+                            if (not rv or not rf) else [])
     plan.changed_hunks = changed_hunks
     plan.hunk_coverage = _compute_coverage(files, changed_hunks, selected)
     return plan
 
 
 def _compute_coverage(files, changed_hunks, blocks) -> dict:
-    """按侧计算每个文件的 hunk 覆盖 → {path: {side: FULL/PARTIAL/ABSENT}}。
+    """按 hunk × side 计算覆盖 → {path: {side: FULL/PARTIAL/ABSENT}}。
 
-    每侧独立判断（不再 any() 把任一侧覆盖算 FULL）。
+    逐 hunk 用该侧自身区间（old 给 vuln、new 给 fixed）；count=0 的一侧无区间，跳过。
     """
     coverage = {}
     for f in files:
         path = f["path"]
-        hunks = changed_hunks.get(path, {})
-        if not hunks:
+        hunk_list = changed_hunks.get(path, [])
+        if not hunk_list:
             continue
         coverage[path] = {}
         for side in ("vuln", "fixed"):
-            key = "old_ranges" if side == "vuln" else "new_ranges"
-            ranges = hunks.get(key, [])
+            ranges = []
+            for h in hunk_list:
+                start, cnt = ((h["old_start"], h["old_count"]) if side == "vuln"
+                              else (h["new_start"], h["new_count"]))
+                if cnt == 0:
+                    continue
+                ranges.append((start, start + cnt - 1))
             if not ranges:
-                continue  # 该侧无对应 hunk（纯插入/删除），不记 coverage
+                continue  # 该侧无区间（纯插入/纯删除）
             side_blocks = [b for b in blocks if b.path == path and b.side == side]
             covered = 0
             for lo, hi in ranges:

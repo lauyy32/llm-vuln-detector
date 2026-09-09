@@ -28,13 +28,17 @@ class TestGetChangedHunks61539(unittest.TestCase):
         repo = ROOT / "cpg/corpus_raw/xorbitsai__inference"
         if not repo.exists():
             self.skipTest("corpus_raw 未就绪")
-        hunks = get_changed_hunks(repo, "1b3d220f34^", "1b3d220f34",
-                                  "xinference/model/llm/utils.py")
-        # 安全 hunk 在约 L754-765（Code plan 断言），new_ranges 应含 L700+；old_ranges 含 753/755
-        self.assertTrue(any(lo >= 700 for lo, hi in hunks["new_ranges"]),
-                        f"安全 hunk 应出现在 new_ranges L700+，实际 {hunks}")
-        self.assertTrue(any(lo >= 700 for lo, hi in hunks["old_ranges"]),
-                        f"old_ranges 应含 L753/755，实际 {hunks}")
+        h = get_changed_hunks(repo, "1b3d220f34^", "1b3d220f34",
+                              "xinference/model/llm/utils.py")["hunks"]
+        # 安全 hunk 在约 L754-765（Code plan 断言）：new 侧应有 L700+ 起点
+        self.assertTrue(any(x["new_start"] >= 700 for x in h),
+                        f"安全 hunk 应出现在 new 侧 L700+，实际 {h}")
+        # old 侧应含 L753/755
+        self.assertTrue(any(x["old_start"] >= 700 for x in h),
+                        f"old 侧应含 L753/755，实际 {h}")
+        # 纯插入 hunk 的零长度锚点必须保留（old_count=0）
+        self.assertTrue(any(x["old_count"] == 0 and x["new_count"] == 1 for x in h),
+                        f"应保留纯插入的 old_count=0 锚点，实际 {h}")
 
 
 class TestCoverage61539(unittest.TestCase):

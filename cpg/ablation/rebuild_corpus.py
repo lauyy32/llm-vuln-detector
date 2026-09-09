@@ -163,19 +163,19 @@ def _parse_hunk_range(s: str):
 
 
 def _changed_hunks(repo_slug: str, parent: str, fix: str, path: str) -> dict:
-    """git diff -U0 获取 old/new 两侧行区间（1-based 含）。
+    """git diff -U0 获取逐 hunk 配对坐标（fail-closed）。
 
-    返回 {"old_ranges": [[lo,hi],...], "new_ranges": [[lo,hi],...]}：
-    - old_ranges 用于 vuln(parent) 侧；new_ranges 用于 fixed(fix) 侧；
-    - 纯插入 → old 侧该 hunk 无区间；纯删除 → new 侧无区间；
-    - 缓存进 pair_manifest，使干净克隆生成 prompt 不依赖 corpus_raw。
+    返回 {"hunks": [{"old_start","old_count","new_start","new_count"}, ...]}：
+    - **保留 count=0**：纯插入 old_count=0、纯删除 new_count=0，零长度一侧的边界锚点
+      （如 `@@ -14,0 +15 @@` 的 old 第 14 行之后）不再丢失；
+    - 两个独立列表会丢失"第几个 old hunk 对应第几个 new hunk"，故改为逐 hunk 对象数组；
+    - git diff 失败或 hunk header 解析失败一律抛错，禁止退化为"无 hunk"。
     """
     cd = clone_dir(repo_slug)
     out = git_text(["diff", "-U0", parent, fix, "--", path], cd)
     if out is None:
-        return {"old_ranges": [], "new_ranges": []}
-    old_ranges = []
-    new_ranges = []
+        raise RuntimeError(f"git diff 失败（fail-closed）: {path}")
+    hunks = []
     for line in out.splitlines():
         if not line.startswith("@@"):
             continue
@@ -184,13 +184,11 @@ def _changed_hunks(repo_slug: str, parent: str, fix: str, path: str) -> dict:
             old_part, new_part = hdr.split()[:2]
             old_lo, old_cnt = _parse_hunk_range(old_part)
             new_lo, new_cnt = _parse_hunk_range(new_part)
-            if old_cnt > 0:
-                old_ranges.append([old_lo, old_lo + old_cnt - 1])
-            if new_cnt > 0:
-                new_ranges.append([new_lo, new_lo + new_cnt - 1])
-        except (ValueError, IndexError):
-            continue
-    return {"old_ranges": old_ranges, "new_ranges": new_ranges}
+        except (ValueError, IndexError) as e:
+            raise RuntimeError(f"hunk header 解析失败（fail-closed）: {line!r}") from e
+        hunks.append({"old_start": old_lo, "old_count": old_cnt,
+                      "new_start": new_lo, "new_count": new_cnt})
+    return {"hunks": hunks}
 
 
 def sha256(b: bytes) -> str:
@@ -250,9 +248,9 @@ def build_pair_in_staging(spec: SampleSpec, parent: str, staging_dir: Path) -> d
             (fixed_dir / path).parent.mkdir(parents=True, exist_ok=True)
             (fixed_dir / path).write_bytes(f)
             n_lines = len(f.decode("utf-8", errors="replace").splitlines())
-            # added：parent 侧无、fix 侧整文件（old_ranges 空、new_ranges 整文件）
-            rec.update(fixed_sha=sha256(f),
-                       changed_hunks={"old_ranges": [], "new_ranges": [[1, n_lines]]})
+            # added：parent 侧无（old_count=0）、fix 侧整文件
+            rec.update(fixed_sha=sha256(f), changed_hunks={"hunks": [
+                {"old_start": 0, "old_count": 0, "new_start": 1, "new_count": n_lines}]})
         elif st == "D":
             v = read_blob_bytes(spec.repo_slug, parent, path)
             if v is None:
@@ -260,9 +258,9 @@ def build_pair_in_staging(spec: SampleSpec, parent: str, staging_dir: Path) -> d
             (vuln_dir / path).parent.mkdir(parents=True, exist_ok=True)
             (vuln_dir / path).write_bytes(v)
             n_lines = len(v.decode("utf-8", errors="replace").splitlines())
-            # removed：parent 侧整文件、fix 侧无（old_ranges 整文件、new_ranges 空）
-            rec.update(vuln_sha=sha256(v),
-                       changed_hunks={"old_ranges": [[1, n_lines]], "new_ranges": []})
+            # removed：parent 侧整文件、fix 侧无（new_count=0）
+            rec.update(vuln_sha=sha256(v), changed_hunks={"hunks": [
+                {"old_start": 1, "old_count": n_lines, "new_start": 0, "new_count": 0}]})
         elif st == "R":
             v = read_blob_bytes(spec.repo_slug, parent, prev) if prev else None
             f = read_blob_bytes(spec.repo_slug, spec.fix_commit, path)

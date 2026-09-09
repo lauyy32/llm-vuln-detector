@@ -30,11 +30,13 @@ def main():
             elif st == "A":
                 fp = V3 / pm["sample_id"] / "fixed" / path
                 n = len(fp.read_text(encoding="utf-8", errors="replace").splitlines()) if fp.exists() else 0
-                f["changed_hunks"] = {"old_ranges": [], "new_ranges": [[1, n]] if n else []}
+                f["changed_hunks"] = {"hunks": [
+                    {"old_start": 0, "old_count": 0, "new_start": 1, "new_count": n}]}
             elif st == "D":
                 fp = V3 / pm["sample_id"] / "vuln" / path
                 n = len(fp.read_text(encoding="utf-8", errors="replace").splitlines()) if fp.exists() else 0
-                f["changed_hunks"] = {"old_ranges": [[1, n]] if n else [], "new_ranges": []}
+                f["changed_hunks"] = {"hunks": [
+                    {"old_start": 1, "old_count": n, "new_start": 0, "new_count": 0}]}
             changed = True
             filled += 1
         if changed:
