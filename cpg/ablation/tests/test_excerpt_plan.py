@@ -46,9 +46,9 @@ class TestCoverage61539(unittest.TestCase):
         # 用头 100 行窗口（hunk_window=None 禁用 hunk 窗口），安全 hunk L754 应 ABSENT
         plan = build_pair_selection_plan(spec, pm, repo, max_chars=8000,
                                          head_lines=100, hunk_window=None)
-        cov = plan.hunk_coverage.get("xinference/model/llm/utils.py")
-        self.assertIn(cov, (ABSENT, PARTIAL),
-                      f"头 100 行窗口应漏掉 L754 安全 hunk，实际 {cov}")
+        cov = plan.hunk_coverage.get("xinference/model/llm/utils.py", {})
+        self.assertIn(cov.get("fixed"), (ABSENT, PARTIAL),
+                      f"头 100 行窗口应漏掉 L754 安全 hunk（fixed 侧），实际 {cov}")
 
     def test_hunk_window_covers_hunk(self):
         repo = ROOT / "cpg/corpus_raw/xorbitsai__inference"
@@ -60,8 +60,9 @@ class TestCoverage61539(unittest.TestCase):
         # 预算足够大，hunk 中心窗口应 FULL 覆盖 L754（8000 预算下 PARTIAL 是预算挤占，非 bug）
         plan = build_pair_selection_plan(spec, pm, repo, max_chars=100000,
                                          head_lines=100, hunk_window=20)
-        cov = plan.hunk_coverage.get("xinference/model/llm/utils.py")
-        self.assertEqual(cov, FULL, f"hunk 中心窗口+大预算应 FULL 覆盖 L754，实际 {cov}")
+        cov = plan.hunk_coverage.get("xinference/model/llm/utils.py", {})
+        self.assertEqual(cov.get("fixed"), FULL,
+                         f"hunk 中心窗口+大预算应 FULL 覆盖 L754（fixed 侧），实际 {cov}")
 
 
 class TestBlockInvariants(unittest.TestCase):

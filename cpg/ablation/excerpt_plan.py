@@ -234,8 +234,8 @@ def build_pair_selection_plan(
                     token_estimate=len(content) // 4,
                 ))
 
-    # 3) 预算分配：按文件单元（vuln+fixed 配对）分配，配对块一起进入或对称缩小，
-    #    避免一侧占满预算、另一侧被舍弃（导致单侧完全无代码）。
+    # 3) 预算分配：每侧独立 max_chars 预算（vuln/fixed 各自 <= 8000，历史每份 prompt 独立），
+    #    但文件/窗口保持配对（同一文件集、同一窗口策略、同一优先级遍历）。
     def marker_len(b: BlockPlan) -> int:
         return len(f"# ===== FILE: {b.path} (L{b.lo}-L{b.hi}) =====\n")
 
@@ -251,65 +251,64 @@ def build_pair_selection_plan(
         pairs.setdefault((b.path, b.reason), {})[b.side] = b
 
     selected: list[BlockPlan] = []
-    total = 0
+    side_used = {"vuln": 0, "fixed": 0}
     pair_items = sorted(pairs.items(),
                         key=lambda kv: block_priority(next(iter(kv[1].values()))))
     for _key, pd in pair_items:
-        pair_cost = sum(len(b.content) + marker_len(b) for b in pd.values())
-        if total + pair_cost <= max_chars:
-            for b in pd.values():
+        for side, b in pd.items():
+            cost = len(b.content) + marker_len(b)
+            if side_used[side] + cost <= max_chars:
                 selected.append(b)
-            total += pair_cost
-            continue
-        # 超预算：对称缩小每个 side 到剩余预算的均分（两侧都保留，不单侧舍弃）
-        n_sides = max(1, len(pd))
-        budget_per_side = max(0, (max_chars - total) // n_sides)
-        for b in pd.values():
-            avail = budget_per_side - marker_len(b)
-            if avail <= 0:
-                continue
-            lines = b.content.splitlines(keepends=True)
-            acc = ""
-            for ln in lines:
-                if len(acc) + len(ln) > avail:
-                    break
-                acc += ln
-            if acc:
-                b.content = acc
-                b.hi = b.lo + acc.count("\n") - 1
-                b.content_sha = _sha256_bytes(acc.encode("utf-8"))
-                b.token_estimate = len(acc) // 4
-                selected.append(b)
-                total += len(acc) + marker_len(b)
-        break  # 预算用尽，剩余文件单元舍弃
+                side_used[side] += cost
+            else:
+                # 该侧超预算：缩到剩余预算的完整行边界（不影响另一侧）
+                avail = max_chars - side_used[side] - marker_len(b)
+                if avail <= 0:
+                    continue
+                lines = b.content.splitlines(keepends=True)
+                acc = ""
+                for ln in lines:
+                    if len(acc) + len(ln) > avail:
+                        break
+                    acc += ln
+                if acc:
+                    b.content = acc
+                    b.hi = b.lo + acc.count("\n") - 1
+                    b.content_sha = _sha256_bytes(acc.encode("utf-8"))
+                    b.token_estimate = len(acc) // 4
+                    selected.append(b)
+                    side_used[side] += len(acc) + marker_len(b)
 
     plan.blocks = selected
     plan.changed_hunks = changed_hunks
-    plan.hunk_coverage = _compute_coverage(files, changed_hunks, selected, head_lines, hunk_window)
+    plan.hunk_coverage = _compute_coverage(files, changed_hunks, selected)
     return plan
 
 
-def _compute_coverage(files, changed_hunks, blocks, head_lines, hunk_window) -> dict:
-    """对每个有 changed hunk 的文件，判断 hunk 是否进入摘录 → FULL/PARTIAL/ABSENT。"""
+def _compute_coverage(files, changed_hunks, blocks) -> dict:
+    """按侧计算每个文件的 hunk 覆盖 → {path: {side: FULL/PARTIAL/ABSENT}}。
+
+    每侧独立判断（不再 any() 把任一侧覆盖算 FULL）。
+    """
     coverage = {}
     for f in files:
         path = f["path"]
         hunks = changed_hunks.get(path, [])
         if not hunks:
             continue
-        # 该文件的块（两侧都要看）
-        file_blocks = [b for b in blocks if b.path == path]
-        covered = 0
-        for lo, hi in hunks:
-            in_any = any(b.lo <= lo and hi <= b.hi for b in file_blocks)
-            if in_any:
-                covered += 1
-        if covered == len(hunks):
-            coverage[path] = FULL
-        elif covered > 0:
-            coverage[path] = PARTIAL
-        else:
-            coverage[path] = ABSENT
+        coverage[path] = {}
+        for side in ("vuln", "fixed"):
+            side_blocks = [b for b in blocks if b.path == path and b.side == side]
+            covered = 0
+            for lo, hi in hunks:
+                if any(b.lo <= lo and hi <= b.hi for b in side_blocks):
+                    covered += 1
+            if covered == len(hunks):
+                coverage[path][side] = FULL
+            elif covered > 0:
+                coverage[path][side] = PARTIAL
+            else:
+                coverage[path][side] = ABSENT
     return coverage
 
 
