@@ -97,7 +97,7 @@ def classify_source(old_sha, new_sha):
     return "CHANGED"
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw", type=Path,
                     default=ROOT / "cpg/ablation/seeds/v10_d1_7b/raw_llm_responses.jsonl")
@@ -109,13 +109,15 @@ def main():
                     help="canonical_corpus_manifest.json（成员与排除原因的唯一权威）")
     ap.add_argument("--historical-source", type=Path,
                     default=ROOT / "cpg/ablation/artifacts/historical_v1_source_manifest.jsonl")
+    ap.add_argument("--expect-historical", type=int, default=170,
+                    help="历史记录数期望（真实为 170；测试可传 fixture 实际条数）")
     ap.add_argument("--out", type=Path,
                     default=ROOT / "cpg/ablation/artifacts/historical_prompt_equivalence.jsonl")
     ap.add_argument("--summary", type=Path,
                     default=ROOT / "cpg/ablation/artifacts/historical_prompt_equivalence_summary.json")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
-    index = load_historical_index(args.raw, args.results)
+    index = load_historical_index(args.raw, args.results, args.expect_historical)
 
     # canonical 是成员与排除原因的唯一权威；硬编码表降级为交叉断言
     cm = json.loads(args.canonical_manifest.read_text(encoding="utf-8"))
@@ -231,8 +233,9 @@ def main():
         comparisons.append(row)
 
     # 范围恒等式
-    if len(comparisons) + len(excluded_rows) != 170:
-        print(f"[FAIL] 范围恒等式失败: {len(comparisons)} + {len(excluded_rows)} != 170")
+    if len(comparisons) + len(excluded_rows) != args.expect_historical:
+        print(f"[FAIL] 范围恒等式失败: {len(comparisons)} + {len(excluded_rows)} "
+              f"!= {args.expect_historical}")
         return 2
     if len(excluded_rows) != 6:
         print(f"[FAIL] 排除记录应为 6，实际 {len(excluded_rows)}")
