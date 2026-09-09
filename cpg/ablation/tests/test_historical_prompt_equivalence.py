@@ -223,6 +223,119 @@ class TestEquivalenceGate(unittest.TestCase):
         self.assertEqual(s["unchanged_exact_match"], s["unchanged_total"])
         self.assertTrue(s["gate_pass"])
 
+    # ---- 缺口 4：canonical 树 SHA 合法性 fail-closed ----
+
+    def test_11_canonical_tree_sha_invalid_fails(self):
+        cm = json.loads(self.fx.canon.read_text(encoding="utf-8"))
+        for s in cm["samples"]:
+            if s["sample_id"] == "CVE-A":
+                s["vuln_tree_sha256_lf"] = ""  # 空 → 非法，必须独立失败
+        self.fx.canon.write_text(json.dumps(cm), encoding="utf-8")
+        self.assertEqual(heq.main(self.fx.argv()), 2)
+
+    def test_11b_canonical_tree_sha_not_hex_fails(self):
+        cm = json.loads(self.fx.canon.read_text(encoding="utf-8"))
+        for s in cm["samples"]:
+            if s["sample_id"] == "CVE-B":
+                s["fixed_tree_sha256_lf"] = "Z" * 64  # 非 hex → 非法
+        self.fx.canon.write_text(json.dumps(cm), encoding="utf-8")
+        self.assertEqual(heq.main(self.fx.argv()), 2)
+
+    # ---- 排除集合与 canonical 一致 ----
+
+    def test_12_excluded_set_mismatch_fails(self):
+        cm = json.loads(self.fx.canon.read_text(encoding="utf-8"))
+        for s in cm["samples"]:
+            if not s.get("eligible"):
+                s["sample_id"] = "CVE-NOT-IN-TABLE"
+        self.fx.canon.write_text(json.dumps(cm), encoding="utf-8")
+        self.assertEqual(heq.main(self.fx.argv()), 2)
+
+    # ---- canonical eligible × sides 集合与 regen 一致（不多不少） ----
+
+    def test_13_regen_missing_key_fails(self):
+        recs = [json.loads(l) for l in
+                self.fx.regen.read_text(encoding="utf-8").splitlines() if l.strip()]
+        recs = [r for r in recs
+                if not (r["sample_id"] == "CVE-A" and r["side"] == "vuln")]
+        self.fx.regen.write_text("\n".join(json.dumps(r) for r in recs) + "\n",
+                                 encoding="utf-8")
+        self.assertEqual(heq.main(self.fx.argv()), 2)
+
+    def test_14_regen_extra_key_fails(self):
+        recs = [json.loads(l) for l in
+                self.fx.regen.read_text(encoding="utf-8").splitlines() if l.strip()]
+        recs.append({"sample_id": "CVE-EXTRA", "side": "vuln", "arm": "real",
+                     "prompt_path": "../prompts/x.txt", "prompt_sha256": "0" * 64,
+                     "representation": "legacy-rq1-r0",
+                     "source_tree_sha256": "a" * 64, "cpg_bundle_sha256": "e" * 64})
+        self.fx.regen.write_text("\n".join(json.dumps(r) for r in recs) + "\n",
+                                 encoding="utf-8")
+        self.assertEqual(heq.main(self.fx.argv()), 2)
+
+    # ---- regen source_tree_sha 与 canonical 不符 ----
+
+    def test_15_regen_tree_sha_mismatch_fails(self):
+        recs = [json.loads(l) for l in
+                self.fx.regen.read_text(encoding="utf-8").splitlines() if l.strip()]
+        for r in recs:
+            if r["sample_id"] == "CVE-A" and r["side"] == "vuln":
+                r["source_tree_sha256"] = "f" * 64
+        self.fx.regen.write_text("\n".join(json.dumps(r) for r in recs) + "\n",
+                                 encoding="utf-8")
+        self.assertEqual(heq.main(self.fx.argv()), 2)
+
+    # ---- flow-block 顺序变化 → CPG_ORDER_ONLY（只解释，不抹平到全绿） ----
+
+    def test_16_flow_block_reorder_classified_cpg_order_only(self):
+        cve, side = "CVE-A", "vuln"
+        code = "code_CVE-A_vuln"
+        cpg_hist = "### CWE-022 流A\nl1\nl2\n### CWE-078 流B\nl3\n"
+        cpg_regen = "### CWE-078 流B\nl3\n### CWE-022 流A\nl1\nl2\n"
+        # 定位该 (cve, side) 在 raw/results 的行号
+        res = list(csv.DictReader(
+            self.fx.results.read_text(encoding="utf-8").splitlines()))
+        idx = next(i for i, r in enumerate(res)
+                   if r["sample_id"] == cve and r["version"] == side)
+        raw_rows = [json.loads(l) for l in
+                    self.fx.raw.read_text(encoding="utf-8").splitlines() if l.strip()]
+        raw_rows[idx]["prompt"] = mk_prompt(cve, "CWE-022", code=code, cpg=cpg_hist)
+        self.fx.raw.write_text("\n".join(json.dumps(r) for r in raw_rows) + "\n",
+                               encoding="utf-8")
+        # 改写 regen 该 (cve, side) 的 prompt 文件 + manifest sha
+        regen_prompt = mk_prompt(cve, "CWE-022", code=code, cpg=cpg_regen)
+        p = self.fx.prompts / f"{cve}_{side}.prompt.txt"
+        p.write_text(regen_prompt, encoding="utf-8")
+        recs = [json.loads(l) for l in
+                self.fx.regen.read_text(encoding="utf-8").splitlines() if l.strip()]
+        for r in recs:
+            if r["sample_id"] == cve and r["side"] == side:
+                r["prompt_sha256"] = sha(regen_prompt)
+        self.fx.regen.write_text("\n".join(json.dumps(r) for r in recs) + "\n",
+                                 encoding="utf-8")
+        # source UNCHANGED 但 prompt 不等价 → gate FAIL（不抹平）
+        rc = heq.main(self.fx.argv())
+        self.assertNotEqual(rc, 0)
+        rows = [json.loads(l) for l in
+                (Path(self._td.name) / "out.jsonl").read_text(encoding="utf-8").splitlines()
+                if l.strip()]
+        r = next(x for x in rows if x["sample_id"] == cve and x["side"] == side)
+        self.assertEqual(r["difference_type"], "CPG_ORDER_ONLY")
+        self.assertTrue(r["semantic_multiset_match"])
+        self.assertFalse(r["prompt_exact_match"])
+
+    # ---- 历史 source manifest 重复键 ----
+
+    def test_17_hist_source_duplicate_key_fails(self):
+        p = Path(self._td.name) / "hist_dup.jsonl"
+        row = {"sample_id": "CVE-A", "side": "vuln",
+               "tree_sha256_lf": self.fx.tree[("CVE-A", "vuln")]}
+        p.write_text("\n".join(json.dumps(row) for _ in range(2)) + "\n",
+                     encoding="utf-8")
+        argv = self.fx.argv()
+        argv[argv.index("--historical-source") + 1] = str(p)
+        self.assertEqual(heq.main(argv), 2)
+
 
 if __name__ == "__main__":
     unittest.main()

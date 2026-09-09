@@ -17,7 +17,9 @@ import argparse
 import csv
 import hashlib
 import json
+import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,6 +43,14 @@ def sha_text(value):
     if value is None:
         return None
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+_TREE_SHA_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+def valid_tree_sha(value):
+    """合法 tree SHA：非空、64 位小写 hex。canonical 的 eligible side 必须满足。"""
+    return isinstance(value, str) and _TREE_SHA_RE.fullmatch(value) is not None
 
 
 def load_historical_index(raw_path: Path, results_path: Path, expect: int = 170):
@@ -88,6 +98,27 @@ def split_prompt(prompt: str) -> dict:
     return {"code_text": code_text, "cpg_slices": cpg_text}
 
 
+def parse_flow_blocks(cpg_text):
+    """解析完整 flow block（以 '### CWE' 开头，至下一个块或结束）。
+
+    不能按"所有文本行排序"比较：那会把不同块的行重新拼配后误报等价。
+    """
+    if not cpg_text:
+        return []
+    blocks = []
+    cur = None
+    for line in cpg_text.splitlines(keepends=True):
+        if line.startswith("### "):
+            if cur is not None:
+                blocks.append(cur)
+            cur = line
+        elif cur is not None:
+            cur += line
+    if cur is not None:
+        blocks.append(cur)
+    return blocks
+
+
 def classify_source(old_sha, new_sha):
     """按 side 判定：无权威历史证据 → UNKNOWN（不得默认 unchanged）。"""
     if not old_sha:
@@ -131,6 +162,13 @@ def main(argv=None):
               f"表多={sorted(set(EXCLUDED) - set(canon_excl))} "
               f"canonical多={sorted(set(canon_excl) - set(EXCLUDED))}")
         return 2
+    # 缺口4：canonical 每个 eligible side 的树 SHA 必须合法 64 位 hex，缺失/非法即独立失败
+    for c in sorted(canon_elig):
+        for side in ("vuln", "fixed"):
+            v = canon_tree.get((c, side))
+            if not valid_tree_sha(v):
+                print(f"[FAIL] canonical 树 SHA 缺失/非法: {c}/{side} = {v!r}")
+                return 2
 
     # 历史源码证据（side 级；缺失即 UNKNOWN）
     hist_src = {}
@@ -138,7 +176,11 @@ def main(argv=None):
         for line in args.historical_source.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 r = json.loads(line)
-                hist_src[(r["sample_id"], r["side"])] = r.get("tree_sha256_lf")
+                key = (r["sample_id"], r["side"])
+                if key in hist_src:
+                    print(f"[FAIL] 历史 source manifest 重复键: {key}")
+                    return 2
+                hist_src[key] = r.get("tree_sha256_lf")
 
     # 重生成 manifest
     regen = {}
@@ -184,10 +226,11 @@ def main(argv=None):
         if actual != reg["prompt_sha256"]:
             print(f"[FAIL] 重生成 prompt SHA 漂移: {cve}/{side}")
             return 2
-        # regen 的 source_tree_sha 必须等于 canonical 对应 side 树哈希
+        # regen 的 source_tree_sha 必须等于 canonical 对应 side 树哈希（want_tree 已保证合法）
         want_tree = canon_tree.get((cve, side))
-        if want_tree and reg.get("source_tree_sha256") != want_tree:
-            print(f"[FAIL] regen source_tree_sha 与 canonical 不符: {cve}/{side}")
+        if reg.get("source_tree_sha256") != want_tree:
+            print(f"[FAIL] regen source_tree_sha 与 canonical 不符: {cve}/{side} "
+                  f"(regen={reg.get('source_tree_sha256')!r} want={want_tree!r})")
             return 2
         regen_prompt = ppath.read_text(encoding="utf-8")
         hs = split_prompt(h["prompt"])
@@ -222,8 +265,9 @@ def main(argv=None):
             row["difference_type"] = None
             row["semantic_multiset_match"] = True
         elif (hs["code_text"] == rs["code_text"]
-              and sorted((hs["cpg_slices"] or "").splitlines())
-                == sorted((rs["cpg_slices"] or "").splitlines())):
+              and Counter(parse_flow_blocks(hs["cpg_slices"]))
+                == Counter(parse_flow_blocks(rs["cpg_slices"]))):
+            # block 级多重集合相同 → 仅顺序不同（CodeQL 流顺序跨运行不稳定）
             row["difference_type"] = "CPG_ORDER_ONLY"
             row["semantic_multiset_match"] = True
         else:
@@ -237,8 +281,10 @@ def main(argv=None):
         print(f"[FAIL] 范围恒等式失败: {len(comparisons)} + {len(excluded_rows)} "
               f"!= {args.expect_historical}")
         return 2
-    if len(excluded_rows) != 6:
-        print(f"[FAIL] 排除记录应为 6，实际 {len(excluded_rows)}")
+    # 排除记录必须恰好 = canonical 排除 CVE 数 × 2 side（缺口3：不得隐式固定为 6）
+    expected_excluded = 2 * len(canon_excl)
+    if len(excluded_rows) != expected_excluded:
+        print(f"[FAIL] 排除记录应为 {expected_excluded}，实际 {len(excluded_rows)}")
         return 2
 
     gate_errors = []
@@ -249,7 +295,7 @@ def main(argv=None):
                 f"（层={r['mismatch_layer']}）")
     unchanged = [r for r in comparisons if r["source_status"] == "UNCHANGED"]
     summary = {
-        "historical_total": 170,
+        "historical_total": args.expect_historical,
         "eligible_prompt_total": len(comparisons),
         "excluded_historical_total": len(excluded_rows),
         "unchanged_total": len(unchanged),
