@@ -16,7 +16,7 @@ def _py_files():
     out = []
     for p in sorted(ABLATION.rglob("*.py")):
         parts = p.parts
-        if any(seg in (".venv", "__pycache__", "venv") for seg in parts):
+        if any(seg in (".venv", "__pycache__", "venv", ".work", "staging", "corpus_src") for seg in parts):
             continue
         if "site-packages" in parts:
             continue

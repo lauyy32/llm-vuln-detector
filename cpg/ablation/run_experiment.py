@@ -23,6 +23,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from cpg.ablation import excerpt_plan  # noqa: E402
 from cpg.ablation import prompt_renderer  # noqa: E402
+from cpg.ablation import config  # noqa: E402
+from cpg.ablation import corpus_db  # noqa: E402
+from cpg.ablation.cpg_eval import build_cpg_slices_text  # noqa: E402
 from cpg.ablation.model_client import ModelClient, MODEL, MODEL_DIGEST, NUM_CTX, NUM_PREDICT, TEMPERATURE, TOP_P, SEED  # noqa: E402
 
 STATES = ("CREATED", "INPUTS_FROZEN", "RUNNING", "COMPLETE", "VERIFIED", "FAILED")
@@ -80,6 +83,27 @@ def prepare(args) -> int:
 
     prompts_dir = run_dir / "prompts"
     prompts_dir.mkdir(parents=True, exist_ok=True)
+
+    # 接 CPG 链：stage 82 例 → 建库 → 跑 7 个 taint 查询（P0-2 修复，不再是纯源码）
+    staging_dir = run_dir / "staging"
+    staged = corpus_db.stage_exact_snapshot(manifest, staging_dir)
+    query_files = [config.QUERIES_DIR / f"{qbase}.ql"
+                   for _cwe, qbase in config.CWE_TAINT_QUERIES
+                   if (config.QUERIES_DIR / f"{qbase}.ql").exists()]
+    qsha = corpus_db.query_set_sha(query_files)
+    cid = corpus_db.codeql_identity()
+    db_path = staging_dir / "corpus_db"
+    bundle = corpus_db.build_or_reuse_db(
+        staged["staged_manifest_sha256"], qsha, cid, staging_dir, query_files, db_path)
+    taint_rows = bundle.get("taint_rows", [])
+    cpg_bundle_sha = bundle["cache_key"]
+    (run_dir / "cpg_bundle.json").write_text(
+        json.dumps({"cache_key": cpg_bundle_sha,
+                    "codeql_version": cid,
+                    "queries": bundle.get("queries", []),
+                    "n_taint_rows": len(taint_rows)},
+                   ensure_ascii=False, indent=2), encoding="utf-8")
+
     prompt_manifest = []
     for s in eligible:
         cve = s["sample_id"]
@@ -96,9 +120,13 @@ def prepare(args) -> int:
         )
         for side in ("vuln", "fixed"):
             code_text = excerpt_plan.render_side(plan, side)
+            # 按 prefix 过滤该样本该侧的 taint 行，生成 cpg_slices（空则显式 success-zero）
+            rows_side = [r for r in taint_rows
+                         if f"/{cve}_{side}/" in (r.get("abs_path") or "").replace("\\", "/")]
+            cpg_slices = build_cpg_slices_text(rows_side, code_text)
             prompt = prompt_renderer.render_prompt(
                 {"cve_id": cve, "cwe": (s.get("cwes") or [None])[0] if isinstance(s.get("cwes"), list) else None},
-                code_text, None, summary=protocol["summary"],
+                code_text, cpg_slices, summary=protocol["summary"],
                 max_code_chars=protocol["max_code_chars"],
             )
             sha = _sha256_text(prompt)
@@ -110,6 +138,9 @@ def prepare(args) -> int:
                 "prompt_sha256": sha,
                 "selection_plan_sha256": plan.plan_sha(),
                 "source_tree_sha256": s.get(f"{side}_tree_sha256_lf"),
+                "cpg_bundle_sha256": cpg_bundle_sha,
+                "cpg_taint_rows": len(rows_side),
+                "cpg_slices_chars": len(cpg_slices),
                 "hunk_coverage": plan.hunk_coverage,
             })
 

@@ -16,6 +16,7 @@
 """
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass
 
 from .excerpt_plan import BlockPlan, PairSelectionPlan, _sha256_bytes
@@ -113,33 +114,34 @@ class PerturbedPlan:
 
 def make_perturbed_plan(base_plan: PairSelectionPlan, condition: str,
                         template_index: int = 0) -> PairSelectionPlan:
-    """在 base_plan 上追加一个扰动块（C1/C2/C3），重新经过预算分配。
+    """在 base_plan 上追加扰动块（C1/C2/C3），重新经过预算分配。
 
-    C0 返回 base_plan 本身。扰动块追加到块列表末尾，token 数对齐。
+    - 深拷贝 base_plan（不原地修改，避免连续生成不同条件互相污染）；
+    - 扰动块应用到两侧（vuln + fixed 各一个，同一内容），确保扰动真实进入渲染。
+    C0 返回深拷贝的 base_plan 本身。
     """
+    new_plan = copy.deepcopy(base_plan)
     if condition == "C0":
-        return base_plan
+        return new_plan
     template = TEMPLATES[condition]
-    # 三套模板轮换（template_index 控制，避免单一模板特异性）
     if condition == "C3":
         perturb = _pad_code_to_target(template)
     else:
         perturb = _pad_to_target(template)
-    # 解析成 BlockPlan（path 用中性名，不含敏感词）
-    lines = perturb.splitlines(keepends=True)
-    content = "".join(lines)
-    block = BlockPlan(
-        path="third_party/notice.txt" if condition != "C3" else "third_party/helpers.py",
-        side="__perturb__",  # 渲染时应用到两侧
-        lo=1, hi=content.count("\n"),
-        reason=f"perturbation_{condition}",
-        content=content,
-        content_sha=_sha256_bytes(content.encode("utf-8")),
-        token_estimate=len(content) // 4,
-    )
-    new_blocks = list(base_plan.blocks) + [block]
-    base_plan.blocks = new_blocks
-    return base_plan
+    content = perturb
+    path = "third_party/notice.txt" if condition != "C3" else "third_party/helpers.py"
+    for side in ("vuln", "fixed"):
+        block = BlockPlan(
+            path=path,
+            side=side,  # 应用到具体侧，确保 render_side 可见
+            lo=1, hi=content.count("\n"),
+            reason=f"perturbation_{condition}",
+            content=content,
+            content_sha=_sha256_bytes(content.encode("utf-8")),
+            token_estimate=len(content) // 4,
+        )
+        new_plan.blocks.append(block)
+    return new_plan
 
 
 def render_condition(plan: PairSelectionPlan, side: str) -> str:

@@ -316,12 +316,13 @@ def query_set_sha(query_files: list[Path]) -> str:
 
 
 def codeql_identity() -> str:
-    """CodeQL 完整版本标识。"""
-    r = config.run(
-        [str(config.codeql_binary()), "version"],
-        config.make_env(config.DEFAULT_JAVA_HOME), 60,
-    )
-    return "unknown"
+    """CodeQL 完整版本标识（真实值，非 "unknown"）。"""
+    import subprocess as _sp
+    r = _sp.run([str(config.codeql_binary()), "version"],
+                capture_output=True, text=True, timeout=60)
+    if r.returncode != 0:
+        raise RuntimeError(f"codeql version failed: {r.stderr[:200]}")
+    return r.stdout.strip()
 
 
 def build_or_reuse_db(staged_manifest_sha: str, query_set_sha: str, codeql_id: str,
@@ -335,8 +336,22 @@ def build_or_reuse_db(staged_manifest_sha: str, query_set_sha: str, codeql_id: s
         (staged_manifest_sha + query_set_sha + codeql_id).encode("utf-8"))
     cache_marker = run_root / ".db_cache_key"
     if cache_marker.exists() and cache_marker.read_text().strip() == cache_key and _db_ready(db):
+        # cache hit：从 run_root 的 CSV 恢复完整 taint_rows + query_log（fail-closed 不丢行）
         print(f"[info] reuse DB cache (key={cache_key[:12]})")
-        return {"cache_hit": True, "cache_key": cache_key, "db": db, "queries": []}
+        all_taint = []
+        query_log = []
+        for ql in query_files:
+            csv_out = run_root / f"{ql.stem}.csv"
+            rows = _parse_taint_csv(csv_out)
+            all_taint.extend(rows)
+            query_log.append({
+                "query": ql.stem, "rc": 0,
+                "status": QUERY_SUCCESS_WITH_ROWS if rows else QUERY_SUCCESS_ZERO_ROWS,
+                "rows": len(rows),
+                "csv_sha": _sha256_bytes(csv_out.read_bytes()) if csv_out.exists() else None,
+            })
+        return {"cache_hit": True, "cache_key": cache_key, "db": db,
+                "queries": query_log, "taint_rows": all_taint}
 
     env = config.make_env(config.DEFAULT_JAVA_HOME)
     rc = config.run(
@@ -363,9 +378,8 @@ def build_or_reuse_db(staged_manifest_sha: str, query_set_sha: str, codeql_id: s
         rc = config.run(cmd, env, config.EXTRACT_TAINT_TIMEOUT)
         dur = round(time.time() - t0, 1)
         if rc != 0:
-            query_log.append({"query": qbase, "rc": rc, "status": QUERY_FAILED,
-                              "rows": 0, "duration_s": dur})
-            continue
+            raise RuntimeError(
+                f"query {qbase} failed (exit {rc})，整批失败（不伪装 0 行）")
         rows = _decode_bqrs(bqrs, csv_out, env)
         status = QUERY_SUCCESS_WITH_ROWS if rows else QUERY_SUCCESS_ZERO_ROWS
         all_taint.extend(rows)
