@@ -60,12 +60,15 @@ def preflight_legacy(side_root: Path, expected_tree_sha: str | None) -> None:
     """
     if not side_root.is_dir():
         raise RuntimeError(f"[legacy preflight] 源目录不存在: {side_root}")
-    if expected_tree_sha:
-        actual = tree_sha_lf(side_root)
-        if actual != expected_tree_sha:
-            raise RuntimeError(
-                f"[legacy preflight] 源树哈希漂移: {side_root} "
-                f"实际 {actual[:12]} != 期望 {expected_tree_sha[:12]}")
+    if not expected_tree_sha:
+        # 严格 fail-closed：canonical manifest 漏字段不得放行
+        raise RuntimeError(
+            f"[legacy preflight] expected_tree_sha 缺失（fail-closed）: {side_root}")
+    actual = tree_sha_lf(side_root)
+    if actual != expected_tree_sha:
+        raise RuntimeError(
+            f"[legacy preflight] 源树哈希漂移: {side_root} "
+            f"实际 {actual[:12]} != 期望 {expected_tree_sha[:12]}")
 
 
 def load_legacy_code_text(side_root: Path, taint_rows: list[dict],

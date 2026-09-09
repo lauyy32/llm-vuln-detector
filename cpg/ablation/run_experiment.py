@@ -26,6 +26,7 @@ from cpg.ablation import prompt_renderer  # noqa: E402
 from cpg.ablation import config  # noqa: E402
 from cpg.ablation import corpus_db  # noqa: E402
 from cpg.ablation.cpg_eval import build_cpg_slices_text  # noqa: E402
+from cpg.ablation import legacy_rq1_r0  # noqa: E402
 from cpg.ablation.legacy_rq1_r0 import (  # noqa: E402
     REPRESENTATION as LEGACY_REPR, MAX_CODE_CHARS, SUMMARY,
     load_legacy_code_text, preflight_legacy,
@@ -44,6 +45,22 @@ STATES = ("CREATED", "INPUTS_FROZEN", "RUNNING", "COMPLETE", "VERIFIED", "FAILED
 
 def _sha256_text(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
+
+
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def representation_fingerprints() -> dict:
+    """表示实现的指纹：同一 representation 名称下改代码会被检出。
+
+    至少冻结 legacy_rq1_r0.py、prompt_renderer.py 与 SYSTEM 文本。
+    """
+    return {
+        "representation_sha256": _file_sha256(Path(legacy_rq1_r0.__file__)),
+        "prompt_renderer_sha256": _file_sha256(Path(prompt_renderer.__file__)),
+        "system_sha256": _sha256_text(prompt_renderer.SYSTEM),
+    }
 
 
 def _read_state(run_dir: Path) -> str:
@@ -98,6 +115,7 @@ def prepare(args) -> int:
         "summary": SUMMARY,
         "max_code_chars": MAX_CODE_CHARS,
     }
+    protocol.update(representation_fingerprints())  # 绑实现 SHA，改代码即漂移
 
     prompts_dir = run_dir / "prompts"
     prompts_dir.mkdir(parents=True, exist_ok=True)
@@ -153,6 +171,9 @@ def prepare(args) -> int:
                 # legacy-rq1-r0 无结构化 selection plan，记录摘录内容 SHA 与表示版本
                 "representation": protocol["representation"],
                 "code_text_sha256": _sha256_text(code_text),
+                "representation_sha256": protocol["representation_sha256"],
+                "prompt_renderer_sha256": protocol["prompt_renderer_sha256"],
+                "system_sha256": protocol["system_sha256"],
                 "source_tree_sha256": s.get(f"{side}_tree_sha256_lf"),
                 "cpg_bundle_sha256": cpg_bundle_sha,
                 "cpg_taint_rows": len(rows_side),
@@ -209,6 +230,14 @@ def invoke(args) -> int:
     if _read_state(run_dir) != "INPUTS_FROZEN":
         return _fail(run_dir, f"invoke 要求 INPUTS_FROZEN，当前 {_read_state(run_dir)}")
 
+    # 复核表示实现指纹：同一 representation 名称下改代码必须被检出
+    prot = json.loads((run_dir / "protocol.json").read_text(encoding="utf-8"))
+    fp_now = representation_fingerprints()
+    for k, v in fp_now.items():
+        if prot.get(k) != v:
+            return _fail(run_dir, f"表示实现指纹漂移: {k} "
+                                  f"协议={prot.get(k)} 当前={v}")
+
     client = ModelClient()
     client.verify_digest()  # 不一致抛异常
 
@@ -246,7 +275,12 @@ def invoke(args) -> int:
                               arm=item["arm"], repeat=0, extra={
                                   "prompt_path": p["prompt_path"],
                                   "prompt_sha256": p["prompt_sha256"],
-                                  "selection_plan_sha256": p["selection_plan_sha256"],
+                                  # legacy-rq1-r0 无 selection plan；改用实现指纹
+                                  "representation": p.get("representation"),
+                                  "code_text_sha256": p.get("code_text_sha256"),
+                                  "representation_sha256": p.get("representation_sha256"),
+                                  "prompt_renderer_sha256": p.get("prompt_renderer_sha256"),
+                                  "system_sha256": p.get("system_sha256"),
                                   "source_tree_sha256": p["source_tree_sha256"],
                               })
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
