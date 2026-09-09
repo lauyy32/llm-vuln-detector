@@ -28,7 +28,8 @@ def _write_run_dir(rd: Path, n: int = 1, with_selection_plan: bool = False,
     for i in range(n):
         cve, side = f"CVE-T{i}", "vuln"
         p = rd / "prompts" / f"{cve}_{side}.prompt.txt"
-        p.write_text("prompt-body", encoding="utf-8")
+        # 含 2 个 fence：使 verify-inputs 基础检查通过，得以走到完整性校验
+        p.write_text("# 目标代码（节选）\n```\nx=1\n```\n", encoding="utf-8")
         rec = {
             "sample_id": cve, "side": side, "arm": "real",
             "prompt_path": str(p.relative_to(rd)),
@@ -133,6 +134,35 @@ class TestInvokeSchema(unittest.TestCase):
             self.assertEqual(rec["representation_sha256"], fp["representation_sha256"])
             self.assertEqual(rec["prompt_renderer_sha256"], fp["prompt_renderer_sha256"])
             self.assertEqual(rec["cpg_bundle_sha256"], "e" * 64)
+
+    def test_schedule_duplicate_blocked_before_any_call(self):
+        """重复 schedule 必须在任何模型调用前阻断，且不留部分结果。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=2)
+            sched = json.loads((rd / "run_schedule.json").read_text(encoding="utf-8"))
+            sched.append(dict(sched[0]))  # 制造重复
+            (rd / "run_schedule.json").write_text(json.dumps(sched), encoding="utf-8")
+            with mock.patch.object(rex, "ModelClient", FakeClient):
+                rc = rex.invoke(type("A", (), {"run_dir": rd})())
+            self.assertNotEqual(rc, 0, "schedule 重复必须在调用前阻断")
+            self.assertFalse((rd / "results.jsonl").exists(),
+                             "阻断时不得已写入任何模型结果")
+
+    def test_verify_inputs_requires_full_integrity(self):
+        """verify-inputs 必须在完整校验通过后才写 INPUTS_VERIFIED。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1)
+            # 破坏：schedule 与 manifest 集合不一致
+            sched = json.loads((rd / "run_schedule.json").read_text(encoding="utf-8"))
+            sched[0]["sample_id"] = "CVE-GHOST"
+            (rd / "run_schedule.json").write_text(json.dumps(sched), encoding="utf-8")
+            rex._write_state(rd, "INPUTS_FROZEN")
+            rc = rex.verify_inputs(type("A", (), {"run_dir": rd})())
+            self.assertNotEqual(rc, 0, "集合不一致时 verify-inputs 必须失败")
+            self.assertNotEqual(rex._read_state(rd), "INPUTS_VERIFIED",
+                                "不得在未通过完整校验时标记为已验证")
 
     def test_representation_hash_drift_blocks_invoke(self):
         with tempfile.TemporaryDirectory() as td:

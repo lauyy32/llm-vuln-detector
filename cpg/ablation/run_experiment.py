@@ -239,7 +239,11 @@ def verify_inputs(args) -> int:
             errors.append(f"{p['sample_id']}/{p['side']} fence 数 != 2")
     if errors:
         return _fail(run_dir, f"verify-inputs {len(errors)} 错误: {errors[:3]}")
-    # P0-1：verify-inputs 通过才进入 INPUTS_VERIFIED；invoke 只接受该状态
+    # 完整完整性校验（指纹 / schedule 集合 / 重复键 / prompt SHA）通过后才写
+    # INPUTS_VERIFIED，否则状态会在未全量验证时被错误标为"已验证"。
+    errs2 = _verify_inputs_integrity(run_dir)
+    if errs2:
+        return _fail(run_dir, f"verify-inputs 完整性校验失败（{len(errs2)} 项）: {errs2[:3]}")
     _write_state(run_dir, "INPUTS_VERIFIED", {"n_prompts": len(manifest)})
     print(f"[verify-inputs] PASS {len(manifest)} 份 prompt 验证通过 → INPUTS_VERIFIED")
     return 0
@@ -276,12 +280,17 @@ def _verify_inputs_integrity(run_dir: Path) -> list:
                 errors.append(f"{key} 指纹 {k} 与当前实现不一致")
             if prot.get(k) != v:
                 errors.append(f"{key} 指纹 {k} 与 protocol 不一致")
-    # schedule 与 manifest 集合必须一致
-    sched = {(s["sample_id"], s["side"], s.get("arm"))
-             for s in json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))}
-    if sched != seen:
+    # schedule 与 manifest 集合必须一致；重复项必须先于任何模型调用检出
+    # （不得先转 set，否则重复被去重，直到一次调用写入后才暴露）
+    sched_list = json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))
+    sched_keys = [(s["sample_id"], s["side"], s.get("arm")) for s in sched_list]
+    if len(sched_keys) != len(set(sched_keys)):
+        dup = [k for k in set(sched_keys) if sched_keys.count(k) > 1]
+        errors.append(f"run_schedule 存在重复键: {sorted(dup)[:3]}")
+    if set(sched_keys) != seen:
         errors.append(f"schedule 与 manifest 集合不一致: "
-                      f"sched-only={sorted(sched - seen)[:3]} manifest-only={sorted(seen - sched)[:3]}")
+                      f"sched-only={sorted(set(sched_keys) - seen)[:3]} "
+                      f"manifest-only={sorted(seen - set(sched_keys))[:3]}")
     return errors
 
 
