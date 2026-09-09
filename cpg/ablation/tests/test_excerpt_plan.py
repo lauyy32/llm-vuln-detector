@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 from cpg.ablation.excerpt_plan import (  # noqa: E402
     ABSENT, FULL, PARTIAL, build_pair_selection_plan, get_changed_hunks, render_side,
+    _read_lines, _read_source_lines,
 )
 
 
@@ -122,6 +123,37 @@ class TestBlockInvariants(unittest.TestCase):
         p1 = build_pair_selection_plan(spec, self._pm(), self.repo, max_chars=8000)
         p2 = build_pair_selection_plan(spec, self._pm(), self.repo, max_chars=8000)
         self.assertEqual(p1.plan_sha(), p2.plan_sha(), "相同输入 plan_sha 应一致")
+
+
+class TestReadLinesFailClosed(unittest.TestCase):
+    """P1：预期存在的文件缺失 / git show 失败必须抛错，不得伪装成空窗口。"""
+
+    def test_missing_expected_file_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            sd = Path(td) / "src"
+            sd.mkdir()
+            with self.assertRaises(RuntimeError):
+                _read_source_lines(sd, "vuln", "a.py", expect_exists=True)
+
+    def test_missing_file_ok_when_not_expected(self):
+        with tempfile.TemporaryDirectory() as td:
+            sd = Path(td) / "src"
+            sd.mkdir()
+            self.assertEqual(_read_source_lines(sd, "vuln", "a.py"), [])
+
+    def test_git_show_failure_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaises(RuntimeError):
+                _read_lines(None, Path(td), "vuln", "deadbeef", "x.py",
+                            expect_exists=True)
+
+    def test_existing_file_read_ok(self):
+        with tempfile.TemporaryDirectory() as td:
+            sd = Path(td) / "src"
+            (sd / "vuln").mkdir(parents=True)
+            (sd / "vuln" / "a.py").write_text("x=1\n", encoding="utf-8")
+            self.assertEqual(_read_source_lines(sd, "vuln", "a.py",
+                                                expect_exists=True), ["x=1"])
 
 
 if __name__ == "__main__":

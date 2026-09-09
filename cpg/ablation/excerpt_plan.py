@@ -97,21 +97,34 @@ def _parse_range(s: str):
     return int(s), 1
 
 
-def _read_source_lines(source_dir: Path, version: str, path: str) -> list[str]:
-    """从 corpus-v3 源目录读文件内容（干净克隆无 corpus_raw 也可复现）。"""
+def _read_source_lines(source_dir: Path, version: str, path: str,
+                       expect_exists: bool = False) -> list[str]:
+    """从 corpus-v3 源目录读文件内容（干净克隆无 corpus_raw 也可复现）。
+
+    expect_exists=True 时文件缺失即抛错，禁止把"语料文件异常"伪装成"空窗口"
+    （本项目曾发生 fixed 文件静默缺失，必须 fail-closed）。
+    """
     p = source_dir / version / path
     if not p.exists():
+        if expect_exists:
+            raise RuntimeError(
+                f"语料文件缺失（fail-closed）: {p} (side={version})")
         return []
     return p.read_text(encoding="utf-8", errors="replace").splitlines()
 
 
-def _read_lines(source_dir, repo_dir, version, commit, path) -> list[str]:
+def _read_lines(source_dir, repo_dir, version, commit, path,
+                expect_exists: bool = False) -> list[str]:
     """优先从 source_dir（corpus-v3）读，fallback 到 git show（repo_dir）。"""
     if source_dir is not None:
-        return _read_source_lines(source_dir, version, path)
+        return _read_source_lines(source_dir, version, path, expect_exists)
     r = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=str(repo_dir),
                        capture_output=True)
     if r.returncode != 0:
+        if expect_exists:
+            raise RuntimeError(
+                f"git show 失败（fail-closed）: {commit}:{path} "
+                f"stderr={r.stderr[:200]!r}")
         return []
     return r.stdout.decode("utf-8", errors="replace").splitlines()
 
@@ -174,7 +187,8 @@ def build_pair_selection_plan(
                     w_lo = max(1, start - hunk_window)
                     # 零长度一侧：边界上下文 start±window；非空：覆盖 [start, start+cnt-1]
                     w_hi = (start + hunk_window) if cnt == 0 else (start + cnt - 1 + hunk_window)
-                    lines = _read_lines(source_dir, repo_dir, side, commit, path)
+                    lines = _read_lines(source_dir, repo_dir, side, commit, path,
+                                       expect_exists=True)
                     lo_c = max(1, w_lo)
                     hi_c = min(len(lines), w_hi)
                     content = "\n".join(lines[lo_c - 1:hi_c]) + ("\n" if lines else "")
@@ -189,7 +203,8 @@ def build_pair_selection_plan(
         # 头部窗口（无 changed hunk 的 modified，或 added/deleted 的现有侧）
         if status in ("M", "T"):
             for side, commit in (("vuln", parent), ("fixed", fix)):
-                lines = _read_lines(source_dir, repo_dir, side, commit, path)
+                lines = _read_lines(source_dir, repo_dir, side, commit, path,
+                                    expect_exists=True)
                 hi_c = min(len(lines), head_lines)
                 content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
                 blocks.append(BlockPlan(
@@ -198,7 +213,8 @@ def build_pair_selection_plan(
                     token_estimate=len(content) // 4,
                 ))
         elif status == "A":
-            lines = _read_lines(source_dir, repo_dir, "fixed", fix, path)
+            lines = _read_lines(source_dir, repo_dir, "fixed", fix, path,
+                                expect_exists=True)
             hi_c = min(len(lines), head_lines)
             content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
             blocks.append(BlockPlan(
@@ -207,7 +223,8 @@ def build_pair_selection_plan(
                 token_estimate=len(content) // 4,
             ))
         elif status == "D":
-            lines = _read_lines(source_dir, repo_dir, "vuln", parent, path)
+            lines = _read_lines(source_dir, repo_dir, "vuln", parent, path,
+                                expect_exists=True)
             hi_c = min(len(lines), head_lines)
             content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
             blocks.append(BlockPlan(
@@ -217,7 +234,8 @@ def build_pair_selection_plan(
             ))
         # R/C：renamed/copied 也按现有侧取头部（简化，pair_manifest 已有 prev）
         elif status in ("R", "C"):
-            lines = _read_lines(source_dir, repo_dir, "fixed", fix, path)
+            lines = _read_lines(source_dir, repo_dir, "fixed", fix, path,
+                                expect_exists=True)
             hi_c = min(len(lines), head_lines)
             content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
             blocks.append(BlockPlan(
@@ -226,7 +244,8 @@ def build_pair_selection_plan(
                 token_estimate=len(content) // 4,
             ))
             if f.get("prev"):
-                lines = _read_lines(source_dir, repo_dir, "vuln", parent, f["prev"])
+                lines = _read_lines(source_dir, repo_dir, "vuln", parent, f["prev"],
+                                    expect_exists=True)
                 hi_c = min(len(lines), head_lines)
                 content = "\n".join(lines[:hi_c]) + ("\n" if lines else "")
                 blocks.append(BlockPlan(
@@ -250,7 +269,8 @@ def build_pair_selection_plan(
                       else (h["new_start"], h["new_count"]))
         w_lo = max(1, start - w)
         w_hi = (start + w) if cnt == 0 else (start + cnt - 1 + w)
-        lines = _read_lines(source_dir, repo_dir, side, commit, path_)
+        lines = _read_lines(source_dir, repo_dir, side, commit, path_,
+                            expect_exists=True)
         lo_c = max(1, w_lo)
         hi_c = min(len(lines), w_hi)
         content = "\n".join(lines[lo_c - 1:hi_c]) + ("\n" if lines else "")
