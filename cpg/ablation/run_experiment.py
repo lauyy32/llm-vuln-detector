@@ -15,9 +15,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import random
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -147,6 +149,57 @@ def _fail(run_dir: Path, msg: str):
     return 1
 
 
+def _reject(msg: str):
+    """非变异拒绝：状态机预条件不满足时只报错不改状态（P0-1）。
+
+    用于"当前状态不允许执行该命令"类拒绝，不得污染合法等待态
+    （如 INPUTS_LOCKED 等待 reviewer 签字、REVIEW_LOCKED 等待 invoke）。
+    """
+    print(f"[REJECT] {msg}")
+    return 1
+
+
+def _pid_alive(pid: int) -> bool:
+    """Windows 下检测进程是否存活（tasklist）。无法判断时保守返回 True（防并发优先）。"""
+    try:
+        r = subprocess.run(["tasklist", "/FI", f"PID eq {pid}", "/NH"],
+                           capture_output=True, text=True, timeout=10)
+        return str(pid) in r.stdout
+    except Exception:
+        return True
+
+
+def _acquire_lease(run_dir: Path) -> str | None:
+    """获取 invoke 独占租约（防并发）。返回错误消息，成功返回 None。
+
+    中断后残留的租约若 pid 已死则清理重建，否则拒绝并发（P0-2）。
+    """
+    lease_path = run_dir / "invoke.lease"
+    if lease_path.exists():
+        try:
+            lease = json.loads(lease_path.read_text(encoding="utf-8"))
+            pid = lease.get("pid")
+            if pid and _pid_alive(int(pid)):
+                return f"invoke 已有活跃租约（pid={pid}），拒绝并发"
+        except (json.JSONDecodeError, ValueError, OSError):
+            pass
+        try:
+            lease_path.unlink()  # 进程已死或文件损坏 → 清理
+        except OSError:
+            pass
+    lease_path.write_text(json.dumps({"pid": os.getpid(),
+                                      "started_at": time.time()}),
+                          encoding="utf-8")
+    return None
+
+
+def _release_lease(run_dir: Path) -> None:
+    try:
+        (run_dir / "invoke.lease").unlink()
+    except OSError:
+        pass
+
+
 def load_canonical(manifest_path: Path) -> dict:
     return json.loads(manifest_path.read_text(encoding="utf-8"))
 
@@ -155,7 +208,7 @@ def prepare(args) -> int:
     """生成 82×2 prompt + 冻结 SHA + run_schedule。CREATED → INPUTS_FROZEN。"""
     run_dir = args.run_dir
     if _read_state(run_dir) not in ("CREATED", "FAILED"):
-        return _fail(run_dir, f"prepare 要求 CREATED，当前 {_read_state(run_dir)}")
+        return _reject(f"prepare 要求 CREATED，当前 {_read_state(run_dir)}")
     manifest = load_canonical(args.canonical_manifest)
     if manifest.get("errors"):
         return _fail(run_dir, f"canonical manifest 有验证错误: {manifest['errors'][:3]}")
@@ -295,7 +348,7 @@ def verify_inputs(args) -> int:
     """验证输入工件：prompt SHA 一致 + 无摘要泄漏 + fence 正确。"""
     run_dir = args.run_dir
     if _read_state(run_dir) != "INPUTS_FROZEN":
-        return _fail(run_dir, f"verify-inputs 要求 INPUTS_FROZEN，当前 {_read_state(run_dir)}")
+        return _reject(f"verify-inputs 要求 INPUTS_FROZEN，当前 {_read_state(run_dir)}")
     manifest = []
     for line in (run_dir / "prompt_manifest.jsonl").read_text(encoding="utf-8").splitlines():
         if line.strip():
@@ -407,8 +460,8 @@ def lock_inputs(args) -> int:
     """生成 lock_request.json 并写 INPUTS_LOCKED（不自行签字，P0-2 第一阶段）。"""
     run_dir = args.run_dir
     if _read_state(run_dir) != "INPUTS_VERIFIED":
-        return _fail(run_dir, f"lock-inputs 要求 INPUTS_VERIFIED（须先跑 verify-inputs），"
-                              f"当前 {_read_state(run_dir)}")
+        return _reject(f"lock-inputs 要求 INPUTS_VERIFIED（须先跑 verify-inputs），"
+                       f"当前 {_read_state(run_dir)}")
     errs = _verify_inputs_integrity(run_dir)
     if errs:
         return _fail(run_dir, f"lock-inputs 完整性校验失败（{len(errs)} 项）: {errs[:3]}")
@@ -431,11 +484,11 @@ def approve_lock(args) -> int:
     """reviewer 签字：校验 lock_request 后生成 review_approval.json → REVIEW_LOCKED。"""
     run_dir = args.run_dir
     if _read_state(run_dir) != "INPUTS_LOCKED":
-        return _fail(run_dir, f"approve-lock 要求 INPUTS_LOCKED（须先跑 lock-inputs），"
-                              f"当前 {_read_state(run_dir)}")
+        return _reject(f"approve-lock 要求 INPUTS_LOCKED（须先跑 lock-inputs），"
+                       f"当前 {_read_state(run_dir)}")
     reviewer = getattr(args, "reviewer", None)
     if not reviewer:
-        return _fail(run_dir, "approve-lock 必须指定 --reviewer（签字人身份）")
+        return _reject("approve-lock 必须指定 --reviewer（签字人身份）")
     # 签字前复核 lock_request 本身（文件 SHA 未漂移 + schema 严格）
     errs = _verify_lock_request(run_dir)
     if errs:
@@ -522,11 +575,14 @@ def _verify_run_lock(run_dir: Path) -> list:
 
 
 def invoke(args) -> int:
-    """调用模型。REVIEW_LOCKED → RUNNING → COMPLETE（P0-1：须先 lock-inputs）。"""
+    """调用模型。REVIEW_LOCKED/RETRY_REQUIRED/RUNNING → RUNNING → COMPLETE/RETRY_REQUIRED。
+
+    RUNNING 表示上次进程被硬中断（断电/崩溃/终止），可 resume 续跑（P0-2）。
+    """
     run_dir = args.run_dir
-    if _read_state(run_dir) not in ("REVIEW_LOCKED", "RETRY_REQUIRED"):
-        return _fail(run_dir, f"invoke 要求 REVIEW_LOCKED 或 RETRY_REQUIRED，"
-                              f"当前 {_read_state(run_dir)}")
+    if _read_state(run_dir) not in ("REVIEW_LOCKED", "RETRY_REQUIRED", "RUNNING"):
+        return _reject(f"invoke 要求 REVIEW_LOCKED / RETRY_REQUIRED / RUNNING（中断恢复），"
+                       f"当前 {_read_state(run_dir)}")
 
     # P0-1：invoke 前复核 run_lock（绑定文件 SHA 未漂移）
     lock_errs = _verify_run_lock(run_dir)
@@ -541,6 +597,11 @@ def invoke(args) -> int:
     client = ModelClient()
     client.verify_digest()  # 不一致抛异常
 
+    # P0-2：获取独占租约（防并发）。中断后残留租约若 pid 已死则清理重建。
+    lease_err = _acquire_lease(run_dir)
+    if lease_err:
+        return _reject(lease_err)
+
     schedule = json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))
     # 索引 prompt_manifest
     pmap = {}
@@ -549,6 +610,14 @@ def invoke(args) -> int:
             p = json.loads(line)
             pmap[(p["sample_id"], p["side"])] = p
 
+    try:
+        return _run_invoke_loop(run_dir, client, schedule, pmap)
+    finally:
+        _release_lease(run_dir)
+
+
+def _run_invoke_loop(run_dir: Path, client, schedule: list, pmap: dict) -> int:
+    """执行调用循环（lease 已获取，由 invoke 的 finally 释放）。"""
     _write_state(run_dir, "RUNNING")
     results_path = run_dir / "results.jsonl"
     attempts_path = run_dir / "attempts.jsonl"
@@ -618,7 +687,14 @@ def verify_results(args) -> int:
     """严格验证结果完整性（fail-closed）。COMPLETE → VERIFIED。"""
     run_dir = args.run_dir
     if _read_state(run_dir) != "COMPLETE":
-        return _fail(run_dir, f"verify-results 要求 COMPLETE，当前 {_read_state(run_dir)}")
+        return _reject(f"verify-results 要求 COMPLETE，当前 {_read_state(run_dir)}")
+    # P0-3：verify-results 也须复核 RUN_LOCK 与输入完整性（结果被替换/输入漂移不得通过）
+    lock_errs = _verify_run_lock(run_dir)
+    if lock_errs:
+        return _fail(run_dir, f"verify-results run_lock 复核失败: {lock_errs[:3]}")
+    integ_errs = _verify_inputs_integrity(run_dir)
+    if integ_errs:
+        return _fail(run_dir, f"verify-results 输入完整性复核失败: {integ_errs[:3]}")
     schedule = json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))
     prot = json.loads((run_dir / "protocol.json").read_text(encoding="utf-8"))
     pmap = {}
@@ -692,6 +768,28 @@ def verify_results(args) -> int:
         if r.get("prompt_eval_count") is not None and \
                 r["prompt_eval_count"] > prot.get("num_ctx", 0):
             errors.append(f"{r['sample_id']}/{r['side']} prompt_eval_count 超 num_ctx")
+        # 结果内容哈希重算（P0-3：request/raw_response 哈希必须与内容一致，防伪造）
+        req = r.get("request") or {}
+        req_sha_recalc = _sha256_text(json.dumps(req, sort_keys=True))
+        if req_sha_recalc != r.get("request_sha256"):
+            errors.append(f"{r['sample_id']}/{r['side']} request_sha256 与 request 内容不符")
+        raw_text = r.get("raw_response_text")
+        if raw_text is None:
+            errors.append(f"{r['sample_id']}/{r['side']} 缺 raw_response_text（无法重算哈希）")
+        elif _sha256_text(raw_text) != r.get("raw_response_sha256"):
+            errors.append(f"{r['sample_id']}/{r['side']} raw_response_sha256 与原始响应不符")
+        # 核对 request 中的 prompt/system 与磁盘/SYSTEM 一致
+        p = pmap.get((r["sample_id"], r["side"]))
+        if p is not None:
+            disk_prompt = (run_dir / p["prompt_path"]).read_text(encoding="utf-8")
+            if req.get("prompt") != disk_prompt:
+                errors.append(f"{r['sample_id']}/{r['side']} request.prompt 与磁盘 prompt 不符")
+        if req.get("system") != prompt_renderer.SYSTEM:
+            errors.append(f"{r['sample_id']}/{r['side']} request.system 与 SYSTEM 不符")
+        # cpg_eval_sha256（canonical 表示时）
+        if prot.get("representation") == CANONICAL_REPR and \
+                r.get("cpg_eval_sha256") != prot.get("cpg_eval_sha256"):
+            errors.append(f"{r['sample_id']}/{r['side']} cpg_eval_sha256 漂移")
     # 集合必须与 schedule 完全一致
     got = {(r["sample_id"], r["side"]) for r in results}
     expected = {(s["sample_id"], s["side"]) for s in schedule}
@@ -711,7 +809,7 @@ def summarize(args) -> int:
     """聚合统计（只读，不改状态）。"""
     run_dir = args.run_dir
     if _read_state(run_dir) not in ("COMPLETE", "VERIFIED"):
-        return _fail(run_dir, f"summarize 要求 COMPLETE/VERIFIED，当前 {_read_state(run_dir)}")
+        return _reject(f"summarize 要求 COMPLETE/VERIFIED，当前 {_read_state(run_dir)}")
     results = []
     for line in (run_dir / "results.jsonl").read_text(encoding="utf-8").splitlines():
         if line.strip():

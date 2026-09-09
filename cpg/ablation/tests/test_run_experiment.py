@@ -109,12 +109,19 @@ class FakeClient:
 
     def call(self, prompt, system, **kw):
         ex = kw.get("extra") or {}
+        request = {"model": mc.MODEL, "prompt": prompt, "system": system,
+                   "stream": False,
+                   "options": {"num_ctx": mc.NUM_CTX, "num_predict": mc.NUM_PREDICT,
+                               "temperature": mc.TEMPERATURE, "top_p": mc.TOP_P,
+                               "seed": mc.SEED}}
+        raw_text = "{}"
         return {
             "schema_version": "model-call/1", "verdict": "benign",
             "parse_status": "OK", "sample_id": kw.get("sample_id"),
             "side": kw.get("side"), "arm": kw.get("arm"),
             "repeat": kw.get("repeat"), "run_error": None,
-            "raw_response": {}, "raw_response_sha256": "0" * 64,
+            "raw_response": {}, "raw_response_text": raw_text,
+            "raw_response_sha256": rex._sha256_text(raw_text),
             "prompt_sha256": ex.get("prompt_sha256"),
             "prompt_path": ex.get("prompt_path"),
             "representation": ex.get("representation"),
@@ -124,12 +131,11 @@ class FakeClient:
             "canonical_cpg_rows_sha256": ex.get("canonical_cpg_rows_sha256"),
             "representation_sha256": ex.get("representation_sha256"),
             "prompt_renderer_sha256": ex.get("prompt_renderer_sha256"),
+            "cpg_eval_sha256": ex.get("cpg_eval_sha256"),
             "system_sha256": ex.get("system_sha256"),
             "model_name": mc.MODEL, "model_digest": mc.MODEL_DIGEST,
-            "request": {"options": {"num_ctx": mc.NUM_CTX, "num_predict": mc.NUM_PREDICT,
-                                    "temperature": mc.TEMPERATURE, "top_p": mc.TOP_P,
-                                    "seed": mc.SEED}},
-            "request_sha256": "0" * 64,
+            "request": request,
+            "request_sha256": rex._sha256_text(json.dumps(request, sort_keys=True)),
             "prompt_eval_count": 100,
         }
 
@@ -227,6 +233,17 @@ class TestRunLock(unittest.TestCase):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
             self.assertNotEqual(rc, 0, "锁文件 SHA 漂移时 invoke 必须拒绝")
 
+    def test_reject_does_not_change_state(self):
+        """P0-1：状态机预条件拒绝不得污染状态（INPUTS_LOCKED 保持等待态）。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1, locked=False)
+            _write_lock_request(rd)  # INPUTS_LOCKED，无 approval
+            rc = rex.invoke(type("A", (), {"run_dir": rd})())
+            self.assertNotEqual(rc, 0)
+            self.assertEqual(rex._read_state(rd), "INPUTS_LOCKED",
+                             "预条件拒绝后状态不得被改成 FAILED")
+
 
 class TestInvokeSchema(unittest.TestCase):
     def test_invoke_accepts_legacy_manifest_without_selection_plan(self):
@@ -300,11 +317,19 @@ class TestVerifyResults(unittest.TestCase):
                 if r["sample_id"] == sample_id and r["side"] == side:
                     pm = r
                     break
+        disk_prompt = (rd / pm["prompt_path"]).read_text(encoding="utf-8")
+        request = {"model": prot["model"], "prompt": disk_prompt,
+                   "system": rex.prompt_renderer.SYSTEM, "stream": False,
+                   "options": {"num_ctx": prot["num_ctx"], "num_predict": prot["num_predict"],
+                               "temperature": prot["temperature"], "top_p": prot["top_p"],
+                               "seed": prot["seed"]}}
+        raw_text = "{}"
         rec = {
             "schema_version": "model-call/1", "verdict": "benign",
             "parse_status": "OK", "sample_id": sample_id, "side": side,
             "arm": "real", "repeat": 0, "run_error": None,
-            "raw_response": {}, "raw_response_sha256": "0" * 64,
+            "raw_response": {}, "raw_response_text": raw_text,
+            "raw_response_sha256": rex._sha256_text(raw_text),
             "prompt_sha256": pm["prompt_sha256"], "prompt_path": pm["prompt_path"],
             "representation": pm["representation"],
             "code_text_sha256": pm["code_text_sha256"],
@@ -313,12 +338,12 @@ class TestVerifyResults(unittest.TestCase):
             "canonical_cpg_rows_sha256": pm["canonical_cpg_rows_sha256"],
             "representation_sha256": pm["representation_sha256"],
             "prompt_renderer_sha256": pm["prompt_renderer_sha256"],
+            "cpg_eval_sha256": pm.get("cpg_eval_sha256"),
             "system_sha256": pm["system_sha256"],
             "model_name": prot["model"], "model_digest": prot["model_digest"],
-            "request": {"options": {"num_ctx": prot["num_ctx"], "num_predict": prot["num_predict"],
-                                    "temperature": prot["temperature"], "top_p": prot["top_p"],
-                                    "seed": prot["seed"]}},
-            "request_sha256": "0" * 64, "prompt_eval_count": 100,
+            "request": request,
+            "request_sha256": rex._sha256_text(json.dumps(request, sort_keys=True)),
+            "prompt_eval_count": 100,
         }
         if overrides:
             rec.update(overrides)
@@ -327,7 +352,7 @@ class TestVerifyResults(unittest.TestCase):
     def _setup(self) -> Path:
         self._td = tempfile.TemporaryDirectory()
         rd = Path(self._td.name)
-        _write_run_dir(rd, n=1, locked=False)
+        _write_run_dir(rd, n=1, locked=True)  # verify-results 复核 RUN_LOCK，须已锁
         rex._write_state(rd, "COMPLETE")
         rec = self._clean_record(rd, "CVE-T0", "vuln")
         (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
@@ -367,6 +392,29 @@ class TestVerifyResults(unittest.TestCase):
     def test_verify_rejects_model_digest_drift(self):
         rd = self._setup()
         rec = self._clean_record(rd, "CVE-T0", "vuln", overrides={"model_digest": "f" * 64})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+        self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
+
+    def test_verify_rejects_forged_request_sha(self):
+        """P0-3：伪造 request_sha256 必须被拒绝（重算与内容不符）。"""
+        rd = self._setup()
+        rec = self._clean_record(rd, "CVE-T0", "vuln", overrides={"request_sha256": "0" * 64})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+        self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
+
+    def test_verify_rejects_forged_raw_response_sha(self):
+        """P0-3：伪造 raw_response_sha256 必须被拒绝。"""
+        rd = self._setup()
+        rec = self._clean_record(rd, "CVE-T0", "vuln",
+                                 overrides={"raw_response_sha256": "0" * 64})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+        self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
+
+    def test_verify_rejects_tampered_raw_response_text(self):
+        """P0-3：raw_response_text 被篡改但 hash 未随之更新，必须拒绝。"""
+        rd = self._setup()
+        rec = self._clean_record(rd, "CVE-T0", "vuln",
+                                 overrides={"raw_response_text": "tampered"})
         (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
         self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
 
@@ -417,6 +465,27 @@ class TestResume(unittest.TestCase):
                              (rd / "attempts.jsonl").read_text(encoding="utf-8").splitlines()
                              if l.strip()]
                 self.assertEqual(len(attempts2), 2, "attempts 保留全部尝试（审计不丢失）")
+
+    def test_resume_after_keyboard_interrupt(self):
+        """P0-2：进程在 RUNNING 被硬中断后，可再次 invoke 续跑（RUNNING 状态恢复）。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1, locked=True)
+
+            class InterruptClient(FakeClient):
+                def call(self, prompt, system, **kw):
+                    raise KeyboardInterrupt
+
+            with mock.patch.object(rex, "ModelClient", InterruptClient):
+                with self.assertRaises(KeyboardInterrupt):
+                    rex.invoke(type("A", (), {"run_dir": rd})())
+            self.assertEqual(rex._read_state(rd), "RUNNING",
+                             "硬中断后状态应停在 RUNNING")
+            # 再次 invoke（RUNNING 状态）应能 resume 续跑
+            with mock.patch.object(rex, "ModelClient", FakeClient):
+                rc = rex.invoke(type("A", (), {"run_dir": rd})())
+            self.assertEqual(rc, 0)
+            self.assertEqual(rex._read_state(rd), "COMPLETE")
 
 
 class TestVerifyInputsFence(unittest.TestCase):
