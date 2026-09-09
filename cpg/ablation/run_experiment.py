@@ -26,7 +26,18 @@ from cpg.ablation import prompt_renderer  # noqa: E402
 from cpg.ablation import config  # noqa: E402
 from cpg.ablation import corpus_db  # noqa: E402
 from cpg.ablation.cpg_eval import build_cpg_slices_text  # noqa: E402
+from cpg.ablation.legacy_rq1_r0 import (  # noqa: E402
+    REPRESENTATION as LEGACY_REPR, MAX_CODE_CHARS, SUMMARY,
+    load_legacy_code_text, preflight_legacy,
+)
+from cpg.ablation.excerpt_plan import REPRESENTATION as CHANGED_HUNK_REPR  # noqa: E402
 from cpg.ablation.model_client import ModelClient, MODEL, MODEL_DIGEST, NUM_CTX, NUM_PREDICT, TEMPERATURE, TOP_P, SEED  # noqa: E402
+
+# 允许用于 RQ1-R prompt 生成的表示（选 C 裁决）：
+# changed-hunk-r0 是改进摘录器，按 Experiment design §二.2 不得混入 RQ1-R，
+# 因此不列入允许集（它仅用于独立覆盖审计 / future V4）。
+ALLOWED_REPRESENTATIONS = {LEGACY_REPR}
+assert CHANGED_HUNK_REPR not in ALLOWED_REPRESENTATIONS
 
 STATES = ("CREATED", "INPUTS_FROZEN", "RUNNING", "COMPLETE", "VERIFIED", "FAILED")
 
@@ -72,13 +83,20 @@ def prepare(args) -> int:
     if len(eligible) != manifest.get("eligible_total"):
         return _fail(run_dir, f"eligible 计数不符 {len(eligible)} != {manifest['eligible_total']}")
 
-    # 协议：冻结摘录策略 + 模型参数
+    # 协议：冻结摘录表示 + 模型参数。
+    # representation 必须显式指定；changed-hunk-r0 不得作为默认值，
+    # 且不得用于 RQ1-R prompt 生成（仅覆盖审计 / future V4）。
+    representation = getattr(args, "representation", None)
+    if representation not in ALLOWED_REPRESENTATIONS:
+        return _fail(run_dir, f"必须显式指定 representation，取值 "
+                              f"{sorted(ALLOWED_REPRESENTATIONS)}，实际 {representation!r}")
     protocol = {
         "model": MODEL, "model_digest": MODEL_DIGEST,
         "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT,
         "temperature": TEMPERATURE, "top_p": TOP_P, "seed": SEED,
-        "summary": False, "excerpt_hunk_window": 20, "excerpt_head_lines": 100,
-        "max_code_chars": 8000,
+        "representation": representation,
+        "summary": SUMMARY,
+        "max_code_chars": MAX_CODE_CHARS,
     }
 
     prompts_dir = run_dir / "prompts"
@@ -107,22 +125,18 @@ def prepare(args) -> int:
     prompt_manifest = []
     for s in eligible:
         cve = s["sample_id"]
-        pm_path = ROOT / s["source_path"] / "pair_manifest.json"
-        pm = json.loads(pm_path.read_text(encoding="utf-8"))
-        repo_dir = ROOT / "cpg/corpus_raw" / pm["repo_slug"].replace("/", "__")
-        source_dir = ROOT / s["source_path"]  # corpus-v3，干净克隆可复现
-        spec = type("S", (), {"sample_id": cve})()
-        plan = excerpt_plan.build_pair_selection_plan(
-            spec, pm, repo_dir, source_dir=source_dir,
-            max_chars=protocol["max_code_chars"],
-            head_lines=protocol["excerpt_head_lines"],
-            hunk_window=protocol["excerpt_hunk_window"],
-        )
         for side in ("vuln", "fixed"):
-            code_text = excerpt_plan.render_side(plan, side)
-            # 按 prefix 过滤该样本该侧的 taint 行，生成 cpg_slices（空则显式 success-zero）
+            # legacy-rq1-r0：用 staging 源（taint_rows 的 abs_path 指向 staging，
+            # 与 legacy 的 hit_paths 前缀匹配一致）；staging 由 canonical manifest
+            # 复制而来，树哈希需与 canonical 一致（preflight fail-closed）。
+            side_root = staging_dir / "corpus_src" / f"{cve}_{side}"
+            preflight_legacy(side_root, s.get(f"{side}_tree_sha256_lf"))
             rows_side = [r for r in taint_rows
                          if f"/{cve}_{side}/" in (r.get("abs_path") or "").replace("\\", "/")]
+            code_text = load_legacy_code_text(side_root, rows_side)
+            # 复刻历史 LocalLLMScorer._build_prompt 的 code_text[:8000] 二次截断
+            code_text = code_text[:protocol["max_code_chars"]]
+            # 按 prefix 过滤该样本该侧的 taint 行，生成 cpg_slices（空则显式 success-zero）
             cpg_slices = build_cpg_slices_text(rows_side, code_text)
             prompt = prompt_renderer.render_prompt(
                 {"cve_id": cve, "cwe": (s.get("cwes") or [None])[0] if isinstance(s.get("cwes"), list) else None},
@@ -136,12 +150,13 @@ def prepare(args) -> int:
                 "sample_id": cve, "side": side, "arm": "real",
                 "prompt_path": str(pout.relative_to(run_dir)),
                 "prompt_sha256": sha,
-                "selection_plan_sha256": plan.plan_sha(),
+                # legacy-rq1-r0 无结构化 selection plan，记录摘录内容 SHA 与表示版本
+                "representation": protocol["representation"],
+                "code_text_sha256": _sha256_text(code_text),
                 "source_tree_sha256": s.get(f"{side}_tree_sha256_lf"),
                 "cpg_bundle_sha256": cpg_bundle_sha,
                 "cpg_taint_rows": len(rows_side),
                 "cpg_slices_chars": len(cpg_slices),
-                "hunk_coverage": plan.hunk_coverage,
             })
 
     # 固定 seed 打乱调用顺序（vuln/fixed 交错）
@@ -288,6 +303,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("command", choices=["prepare", "verify-inputs", "invoke", "verify-results", "summarize"])
     ap.add_argument("--protocol", type=Path)
+    ap.add_argument("--representation", default=None,
+                    choices=sorted(ALLOWED_REPRESENTATIONS),
+                    help="摘录表示版本，必须显式指定（不允许 changed-hunk-r0）")
     ap.add_argument("--canonical-manifest", type=Path,
                     default=ROOT / "cpg/ablation/artifacts/canonical_corpus_manifest.json")
     ap.add_argument("--run-dir", required=True, type=Path)
