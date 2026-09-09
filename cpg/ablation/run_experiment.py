@@ -177,6 +177,8 @@ def prepare(args) -> int:
     (run_dir / "cpg_bundle.json").write_text(
         json.dumps({"cache_key": cpg_bundle_sha,
                     "codeql_version": cid,
+                    "query_set_sha256": qsha,
+                    "staged_manifest_sha256": staged["staged_manifest_sha256"],
                     "queries": bundle.get("queries", []),
                     "n_taint_rows": len(taint_rows)},
                    ensure_ascii=False, indent=2), encoding="utf-8")
