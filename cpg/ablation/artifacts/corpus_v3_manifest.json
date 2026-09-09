@@ -1,7 +1,7 @@
 {
   "schema_version": "corpus-v3/1",
   "generator": "rebuild_corpus.py",
-  "generator_sha256": "0002c9e8122aefbfc79451b1b81d4b85cbaebda6958288f07af5ced3357104c9",
+  "generator_sha256": "7a732a65bd852e1e3e969bfe1935892aefa6332bd36f9a3a71c84584b3c702b4",
   "python_version": "3.13.14",
   "git_version": "git version 2.55.0.windows.3",
   "dataset": "cpg\\dataset_d1.jsonl",
@@ -2979,5 +2979,7 @@
   "n_rebuilt": 82,
   "n_excluded": 3,
   "n_failed": 0,
-  "failures": []
+  "failures": [],
+  "fill_hunks_sha256": "00ed77856545c2b0e803f27b8a9eb5d2d34cfd76ae1789f436bbb20d8cd9b822",
+  "fill_hunks_note": "changed_hunks 已回填进 82 个 pair_manifest（M/A/D/R/C/T 全 status 显式）"
 }
