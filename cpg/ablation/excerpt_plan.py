@@ -1,7 +1,21 @@
 # -*- coding: utf-8 -*-
 """配对摘录计划（Code plan 第4阶段）——先建结构化计划，再渲染文本。
 
-替代 run_ablation._load_sample_code 的"按文件大小排序 + 头 100 行 + text[:remain] 截半行"。
+⚠️ **表示版本与适用范围（2026-09-09 裁决：选 C）**
+
+```text
+representation   = changed-hunk-r0
+role             = coverage-audit / future V4
+not_allowed_for  = RQ1-R
+```
+
+依据 Experiment design §二.2：RQ1-R 必须使用 `legacy-rq1-r0`（历史兼容摘录器），
+"改进后的摘录器必须另立版本，不能混进本轮"。因此本模块**不得进入 RQ1-R 调用图**，
+仅用于覆盖审计（输出 sample→path→hunk_idx→side→FULL/PARTIAL/ABSENT）与未来 V4 实验。
+
+已知未解决（不得写成"已解决"）：hunk 级最小窗口仍装不下 687 个（显式报告于
+`skipped_hunks`），56/82 样本存在跳过；73498 ssrf_adapter.py、45019 mcp.py 等
+核心安全文件在预算阶段被跳过。这些在本轮只报告、不现场修正。
 
 核心不变量：
 - 文件顺序依据**完整相对路径**（不依据各侧文件大小），vuln/fixed 两侧一致；
@@ -19,6 +33,10 @@ import hashlib
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
+
+REPRESENTATION = "changed-hunk-r0"
+ROLE = "coverage-audit / future V4"
+NOT_ALLOWED_FOR = "RQ1-R"
 
 # changed-hunk 覆盖三态
 FULL = "FULL"
