@@ -72,13 +72,25 @@ class TestRepresentationGate(unittest.TestCase):
     def test_prepare_rejects_changed_hunk(self):
         # argparse 层即拒绝：changed-hunk-r0 不在 ALLOWED_REPRESENTATIONS
         self.assertNotIn("changed-hunk-r0", rex.ALLOWED_REPRESENTATIONS)
-        self.assertEqual(rex.ALLOWED_REPRESENTATIONS, {"legacy-rq1-r0"})
+        self.assertEqual(rex.ALLOWED_REPRESENTATIONS,
+                         {"legacy-rq1-r0", "legacy-rq1-r1-cpg-canonical"})
 
     def test_prepare_records_representation_hashes(self):
         fp = rex.representation_fingerprints()
         for k in ("representation_sha256", "prompt_renderer_sha256", "system_sha256"):
             self.assertIn(k, fp)
             self.assertEqual(len(fp[k]), 64, f"{k} 应是 64 位 hex")
+
+    def test_canonical_fingerprint_includes_cpg_eval(self):
+        fp = rex.representation_fingerprints("legacy-rq1-r1-cpg-canonical")
+        for k in ("representation_sha256", "prompt_renderer_sha256",
+                  "system_sha256", "cpg_eval_sha256"):
+            self.assertIn(k, fp)
+            self.assertEqual(len(fp[k]), 64, f"{k} 应是 64 位 hex")
+        # canonical 的 representation_sha256 指向 r1 模块，r0 的指向 r0 模块
+        fp0 = rex.representation_fingerprints("legacy-rq1-r0")
+        self.assertNotEqual(fp["representation_sha256"],
+                            fp0["representation_sha256"])
 
 
 class TestInvokeSchema(unittest.TestCase):

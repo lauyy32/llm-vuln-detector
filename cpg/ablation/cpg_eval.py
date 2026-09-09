@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import ast
 import csv
+import hashlib
 import json
+import re
 from pathlib import Path
 
 from . import config
@@ -226,6 +228,52 @@ def build_ast_section_from_source(code_text: str) -> list[str]:
             if len(edges) >= AST_EDGE_CAP:
                 return [f"L{p} {pt}  ->  L{c} {ct}" for p, pt, c, ct in edges]
     return [f"L{p} {pt}  ->  L{c} {ct}" for p, pt, c, ct in edges]
+
+
+_SIDE_DIR_RE = re.compile(r"(CVE-[A-Za-z0-9-]+_(?:vuln|fixed))[/\\]")
+
+
+def _relative_path(abs_path: str | None) -> str:
+    """从 abs_path 抽取样本侧根之后的相对路径（稳定排序键用，非展示用）。"""
+    if not abs_path:
+        return ""
+    ap = abs_path.replace("\\", "/")
+    m = _SIDE_DIR_RE.search(ap)
+    if m:
+        return ap[m.end():]
+    return ap.rsplit("/", 1)[-1]
+
+
+def _as_int(v) -> int:
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return 0
+
+
+def canonical_row_hash(row: dict) -> str:
+    """行级规范哈希：字段按名排序后序列化，与 dict 迭代序、CSV 列序无关。"""
+    items = sorted((str(k), str(v)) for k, v in row.items())
+    return hashlib.sha256(
+        json.dumps(items, ensure_ascii=False).encode("utf-8")).hexdigest()
+
+
+def canonical_taint_sort_key(row: dict):
+    """确定性排序键：normalized CWE → 相对路径 → source/sink line → node → 行哈希。
+
+    键序列构成全序（末位行哈希保证同 CWE/路径/行/节点的行也不并列），
+    消除 CodeQL 跨运行 flow 路径返回顺序非确定。
+    """
+    cwe = config.normalize_cwe(row.get("cwe")) or ""
+    rel = _relative_path(row.get("abs_path")) or (row.get("file") or "")
+    return (cwe, rel, _as_int(row.get("sourceLine")), _as_int(row.get("sinkLine")),
+            str(row.get("sourceNode") or ""), str(row.get("sinkNode") or ""),
+            canonical_row_hash(row))
+
+
+def sort_taint_rows_canonical(rows: list[dict]) -> list[dict]:
+    """按稳定键排序 taint 行（不改行内容），返回新列表。"""
+    return sorted(rows, key=canonical_taint_sort_key)
 
 
 def build_cpg_slices_text(

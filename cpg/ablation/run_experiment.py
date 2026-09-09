@@ -26,8 +26,12 @@ from cpg.ablation import excerpt_plan  # noqa: E402
 from cpg.ablation import prompt_renderer  # noqa: E402
 from cpg.ablation import config  # noqa: E402
 from cpg.ablation import corpus_db  # noqa: E402
-from cpg.ablation.cpg_eval import build_cpg_slices_text  # noqa: E402
+from cpg.ablation import cpg_eval  # noqa: E402
+from cpg.ablation.cpg_eval import (  # noqa: E402
+    build_cpg_slices_text, sort_taint_rows_canonical,
+)
 from cpg.ablation import legacy_rq1_r0  # noqa: E402
+from cpg.ablation import legacy_rq1_r1_cpg_canonical  # noqa: E402
 from cpg.ablation.legacy_rq1_r0 import (  # noqa: E402
     REPRESENTATION as LEGACY_REPR, MAX_CODE_CHARS, SUMMARY,
     load_legacy_code_text, preflight_legacy,
@@ -35,10 +39,13 @@ from cpg.ablation.legacy_rq1_r0 import (  # noqa: E402
 from cpg.ablation.excerpt_plan import REPRESENTATION as CHANGED_HUNK_REPR  # noqa: E402
 from cpg.ablation.model_client import ModelClient, MODEL, MODEL_DIGEST, NUM_CTX, NUM_PREDICT, TEMPERATURE, TOP_P, SEED  # noqa: E402
 
-# 允许用于 RQ1-R prompt 生成的表示（选 C 裁决）：
+# 允许用于 RQ1-R prompt 生成的表示（选 C 裁决 + 确定性行序补正案）：
+# - legacy-rq1-r0：历史基线重跑（冻结表示）；
+# - legacy-rq1-r1-cpg-canonical：消除 CPG 流顺序非确定后的新实验表示（新表示另立版本）。
 # changed-hunk-r0 是改进摘录器，按 Experiment design §二.2 不得混入 RQ1-R，
 # 因此不列入允许集（它仅用于独立覆盖审计 / future V4）。
-ALLOWED_REPRESENTATIONS = {LEGACY_REPR}
+CANONICAL_REPR = legacy_rq1_r1_cpg_canonical.REPRESENTATION
+ALLOWED_REPRESENTATIONS = {LEGACY_REPR, CANONICAL_REPR}
 assert CHANGED_HUNK_REPR not in ALLOWED_REPRESENTATIONS
 
 STATES = ("CREATED", "INPUTS_FROZEN", "INPUTS_VERIFIED", "RUNNING", "COMPLETE",
@@ -51,6 +58,15 @@ def _sha256_text(s: str) -> str:
 
 # 参与逐条比对的指纹键（git_commit 仅记录，不参与比对）
 FINGERPRINT_KEYS = ("representation_sha256", "prompt_renderer_sha256", "system_sha256")
+# canonical 表示额外冻结 cpg_eval（canonical 行序实现所在）
+CANONICAL_FINGERPRINT_KEYS = FINGERPRINT_KEYS + ("cpg_eval_sha256",)
+
+
+def _fingerprint_keys(representation: str | None) -> tuple[str, ...]:
+    """按表示返回参与比对的指纹键。canonical 表示多冻结 cpg_eval 实现。"""
+    if representation == CANONICAL_REPR:
+        return CANONICAL_FINGERPRINT_KEYS
+    return FINGERPRINT_KEYS
 
 
 def _file_sha256(path: Path) -> str:
@@ -68,18 +84,24 @@ def _git_commit() -> str | None:
         return None
 
 
-def representation_fingerprints() -> dict:
+def representation_fingerprints(representation: str | None = None) -> dict:
     """表示实现的指纹：同一 representation 名称下改代码会被检出。
 
-    冻结 legacy_rq1_r0.py、prompt_renderer.py 与 SYSTEM 文本（LF 规范化），
-    并附记 git commit 便于回溯。
+    冻结表示模块、prompt_renderer 与 SYSTEM 文本（LF 规范化），并附记 git commit。
+    canonical 表示额外冻结 cpg_eval.py（canonical 行序实现所在）。
     """
-    return {
-        "representation_sha256": _file_sha256(Path(legacy_rq1_r0.__file__)),
+    fp = {
         "prompt_renderer_sha256": _file_sha256(Path(prompt_renderer.__file__)),
         "system_sha256": _sha256_text(prompt_renderer.SYSTEM),
         "git_commit": _git_commit(),
     }
+    if representation == CANONICAL_REPR:
+        fp["representation_sha256"] = _file_sha256(
+            Path(legacy_rq1_r1_cpg_canonical.__file__))
+        fp["cpg_eval_sha256"] = _file_sha256(Path(cpg_eval.__file__))
+    else:
+        fp["representation_sha256"] = _file_sha256(Path(legacy_rq1_r0.__file__))
+    return fp
 
 
 def _read_state(run_dir: Path) -> str:
@@ -134,7 +156,7 @@ def prepare(args) -> int:
         "summary": SUMMARY,
         "max_code_chars": MAX_CODE_CHARS,
     }
-    protocol.update(representation_fingerprints())  # 绑实现 SHA，改代码即漂移
+    protocol.update(representation_fingerprints(representation))  # 绑实现 SHA，改代码即漂移
 
     prompts_dir = run_dir / "prompts"
     prompts_dir.mkdir(parents=True, exist_ok=True)
@@ -177,8 +199,13 @@ def prepare(args) -> int:
             code_text = load_legacy_code_text(side_root, rows_side)
             # 复刻历史 LocalLLMScorer._build_prompt 的 code_text[:8000] 二次截断
             code_text = code_text[:protocol["max_code_chars"]]
-            # 按 prefix 过滤该样本该侧的 taint 行，生成 cpg_slices（空则显式 success-zero）
-            cpg_slices = build_cpg_slices_text(rows_side, code_text)
+            # 按 prefix 过滤该样本该侧的 taint 行，生成 cpg_slices（空则显式 success-zero）。
+            # r0：历史 cpg_slices 保持 CodeQL CSV 原始返回顺序（非 (src,sink) 升序）；
+            #     强行排序会让等价性从 144/145 降到 137/145，故 r0 不排序。
+            # r1（canonical）：结构化行层按稳定键排序，消除跨运行流顺序非确定。
+            rows_for_slice = (sort_taint_rows_canonical(rows_side)
+                              if representation == CANONICAL_REPR else rows_side)
+            cpg_slices = build_cpg_slices_text(rows_for_slice, code_text)
             # 历史 pipeline 经 _primary_cwe() → config.normalize_cwe() 输出 3 位补零
             # （CWE-22 → CWE-022）。legacy-rq1-r0 必须复刻，否则 prompt 头即不等价。
             _cwes = s.get("cwes") if isinstance(s.get("cwes"), list) else None
@@ -191,21 +218,21 @@ def prepare(args) -> int:
             sha = _sha256_text(prompt)
             pout = prompts_dir / f"{cve}_{side}.prompt.txt"
             pout.write_text(prompt, encoding="utf-8")
-            prompt_manifest.append({
+            rec = {
                 "sample_id": cve, "side": side, "arm": "real",
                 "prompt_path": str(pout.relative_to(run_dir)),
                 "prompt_sha256": sha,
-                # legacy-rq1-r0 无结构化 selection plan，记录摘录内容 SHA 与表示版本
+                # legacy 表示无结构化 selection plan，记录摘录内容 SHA 与表示版本
                 "representation": protocol["representation"],
                 "code_text_sha256": _sha256_text(code_text),
-                "representation_sha256": protocol["representation_sha256"],
-                "prompt_renderer_sha256": protocol["prompt_renderer_sha256"],
-                "system_sha256": protocol["system_sha256"],
                 "source_tree_sha256": s.get(f"{side}_tree_sha256_lf"),
                 "cpg_bundle_sha256": cpg_bundle_sha,
                 "cpg_taint_rows": len(rows_side),
                 "cpg_slices_chars": len(cpg_slices),
-            })
+            }
+            for k in _fingerprint_keys(representation):
+                rec[k] = protocol[k]
+            prompt_manifest.append(rec)
 
     # 固定 seed 打乱调用顺序（vuln/fixed 交错）
     rng = random.Random(SEED)
@@ -265,7 +292,9 @@ def _verify_inputs_integrity(run_dir: Path) -> list:
         if line.strip():
             manifest.append(json.loads(line))
     prot = json.loads((run_dir / "protocol.json").read_text(encoding="utf-8"))
-    fp_now = representation_fingerprints()
+    representation = prot.get("representation")
+    fp_now = representation_fingerprints(representation)
+    fp_keys = _fingerprint_keys(representation)
     seen = set()
     for p in manifest:
         key = (p["sample_id"], p["side"], p.get("arm"))
@@ -282,7 +311,7 @@ def _verify_inputs_integrity(run_dir: Path) -> list:
             errors.append(f"{key} prompt SHA 漂移: 磁盘 {actual[:12]} != 冻结 "
                           f"{str(p.get('prompt_sha256'))[:12]}")
         # 每条记录的指纹必须与 protocol 及当前实现一致（git_commit 不参与比对）
-        for k in FINGERPRINT_KEYS:
+        for k in fp_keys:
             v = fp_now[k]
             if p.get(k) != v:
                 errors.append(f"{key} 指纹 {k} 与当前实现不一致")
@@ -346,20 +375,20 @@ def invoke(args) -> int:
             seen.add(key)
             p = pmap[(item["sample_id"], item["side"])]
             prompt = (run_dir / p["prompt_path"]).read_text(encoding="utf-8")
+            extra = {
+                "prompt_path": p["prompt_path"],
+                "prompt_sha256": p["prompt_sha256"],
+                # legacy 表示无 selection plan；改用实现指纹 + 摘录内容 SHA
+                "representation": p.get("representation"),
+                "code_text_sha256": p.get("code_text_sha256"),
+                "source_tree_sha256": p["source_tree_sha256"],
+                "cpg_bundle_sha256": p.get("cpg_bundle_sha256"),
+            }
+            for k in _fingerprint_keys(p.get("representation")):
+                extra[k] = p.get(k)
             rec = client.call(prompt, prompt_renderer.SYSTEM,
                               sample_id=item["sample_id"], side=item["side"],
-                              arm=item["arm"], repeat=0, extra={
-                                  "prompt_path": p["prompt_path"],
-                                  "prompt_sha256": p["prompt_sha256"],
-                                  # legacy-rq1-r0 无 selection plan；改用实现指纹
-                                  "representation": p.get("representation"),
-                                  "code_text_sha256": p.get("code_text_sha256"),
-                                  "representation_sha256": p.get("representation_sha256"),
-                                  "prompt_renderer_sha256": p.get("prompt_renderer_sha256"),
-                                  "system_sha256": p.get("system_sha256"),
-                                  "source_tree_sha256": p["source_tree_sha256"],
-                                  "cpg_bundle_sha256": p.get("cpg_bundle_sha256"),
-                              })
+                              arm=item["arm"], repeat=0, extra=extra)
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
             f.flush()  # 写失败会抛异常中止
 
