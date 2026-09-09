@@ -145,6 +145,11 @@ class ModelClient:
             "prompt_sha256": extra.get("prompt_sha256") if extra else None,
             "system_sha256": _sha256_bytes(system.encode("utf-8")),
             "selection_plan_sha256": extra.get("selection_plan_sha256") if extra else None,
+            # 表示版本与实现指纹（P0-2：必须落盘，否则结果无法追溯所用表示）
+            "representation": (extra or {}).get("representation"),
+            "code_text_sha256": (extra or {}).get("code_text_sha256"),
+            "representation_sha256": (extra or {}).get("representation_sha256"),
+            "prompt_renderer_sha256": (extra or {}).get("prompt_renderer_sha256"),
             "source_tree_sha256": extra.get("source_tree_sha256") if extra else None,
             "cpg_bundle_sha256": extra.get("cpg_bundle_sha256") if extra else None,
             "model_name": self.model,

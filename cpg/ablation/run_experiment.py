@@ -16,6 +16,7 @@ import argparse
 import hashlib
 import json
 import random
+import subprocess
 import sys
 from pathlib import Path
 
@@ -40,26 +41,44 @@ from cpg.ablation.model_client import ModelClient, MODEL, MODEL_DIGEST, NUM_CTX,
 ALLOWED_REPRESENTATIONS = {LEGACY_REPR}
 assert CHANGED_HUNK_REPR not in ALLOWED_REPRESENTATIONS
 
-STATES = ("CREATED", "INPUTS_FROZEN", "RUNNING", "COMPLETE", "VERIFIED", "FAILED")
+STATES = ("CREATED", "INPUTS_FROZEN", "INPUTS_VERIFIED", "RUNNING", "COMPLETE",
+          "VERIFIED", "FAILED")
 
 
 def _sha256_text(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
+# 参与逐条比对的指纹键（git_commit 仅记录，不参与比对）
+FINGERPRINT_KEYS = ("representation_sha256", "prompt_renderer_sha256", "system_sha256")
+
+
 def _file_sha256(path: Path) -> str:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    """LF 规范化后 SHA-256：避免 Windows CRLF / Linux LF 导致同内容不同哈希。"""
+    b = Path(path).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(b).hexdigest()
+
+
+def _git_commit() -> str | None:
+    try:
+        r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(ROOT),
+                           capture_output=True, text=True, timeout=30)
+        return r.stdout.strip() if r.returncode == 0 else None
+    except Exception:
+        return None
 
 
 def representation_fingerprints() -> dict:
     """表示实现的指纹：同一 representation 名称下改代码会被检出。
 
-    至少冻结 legacy_rq1_r0.py、prompt_renderer.py 与 SYSTEM 文本。
+    冻结 legacy_rq1_r0.py、prompt_renderer.py 与 SYSTEM 文本（LF 规范化），
+    并附记 git commit 便于回溯。
     """
     return {
         "representation_sha256": _file_sha256(Path(legacy_rq1_r0.__file__)),
         "prompt_renderer_sha256": _file_sha256(Path(prompt_renderer.__file__)),
         "system_sha256": _sha256_text(prompt_renderer.SYSTEM),
+        "git_commit": _git_commit(),
     }
 
 
@@ -220,23 +239,63 @@ def verify_inputs(args) -> int:
             errors.append(f"{p['sample_id']}/{p['side']} fence 数 != 2")
     if errors:
         return _fail(run_dir, f"verify-inputs {len(errors)} 错误: {errors[:3]}")
-    print(f"[verify-inputs] PASS {len(manifest)} 份 prompt 验证通过")
+    # P0-1：verify-inputs 通过才进入 INPUTS_VERIFIED；invoke 只接受该状态
+    _write_state(run_dir, "INPUTS_VERIFIED", {"n_prompts": len(manifest)})
+    print(f"[verify-inputs] PASS {len(manifest)} 份 prompt 验证通过 → INPUTS_VERIFIED")
     return 0
 
 
-def invoke(args) -> int:
-    """调用模型。INPUTS_FROZEN → RUNNING → COMPLETE。"""
-    run_dir = args.run_dir
-    if _read_state(run_dir) != "INPUTS_FROZEN":
-        return _fail(run_dir, f"invoke 要求 INPUTS_FROZEN，当前 {_read_state(run_dir)}")
-
-    # 复核表示实现指纹：同一 representation 名称下改代码必须被检出
+def _verify_inputs_integrity(run_dir: Path) -> list:
+    """invoke 前独立复核（不能只信先前验证）：prompt SHA、指纹、schedule 一致性、重复键。"""
+    errors = []
+    manifest = []
+    for line in (run_dir / "prompt_manifest.jsonl").read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            manifest.append(json.loads(line))
     prot = json.loads((run_dir / "protocol.json").read_text(encoding="utf-8"))
     fp_now = representation_fingerprints()
-    for k, v in fp_now.items():
-        if prot.get(k) != v:
-            return _fail(run_dir, f"表示实现指纹漂移: {k} "
-                                  f"协议={prot.get(k)} 当前={v}")
+    seen = set()
+    for p in manifest:
+        key = (p["sample_id"], p["side"], p.get("arm"))
+        if key in seen:
+            errors.append(f"prompt manifest 重复键: {key}")
+        seen.add(key)
+        # 重新计算磁盘 prompt 的 SHA，必须与冻结值一致
+        pp = run_dir / p["prompt_path"]
+        if not pp.exists():
+            errors.append(f"{key} prompt 文件缺失: {pp}")
+            continue
+        actual = _sha256_text(pp.read_text(encoding="utf-8"))
+        if actual != p.get("prompt_sha256"):
+            errors.append(f"{key} prompt SHA 漂移: 磁盘 {actual[:12]} != 冻结 "
+                          f"{str(p.get('prompt_sha256'))[:12]}")
+        # 每条记录的指纹必须与 protocol 及当前实现一致（git_commit 不参与比对）
+        for k in FINGERPRINT_KEYS:
+            v = fp_now[k]
+            if p.get(k) != v:
+                errors.append(f"{key} 指纹 {k} 与当前实现不一致")
+            if prot.get(k) != v:
+                errors.append(f"{key} 指纹 {k} 与 protocol 不一致")
+    # schedule 与 manifest 集合必须一致
+    sched = {(s["sample_id"], s["side"], s.get("arm"))
+             for s in json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))}
+    if sched != seen:
+        errors.append(f"schedule 与 manifest 集合不一致: "
+                      f"sched-only={sorted(sched - seen)[:3]} manifest-only={sorted(seen - sched)[:3]}")
+    return errors
+
+
+def invoke(args) -> int:
+    """调用模型。INPUTS_VERIFIED → RUNNING → COMPLETE。"""
+    run_dir = args.run_dir
+    if _read_state(run_dir) != "INPUTS_VERIFIED":
+        return _fail(run_dir, f"invoke 要求 INPUTS_VERIFIED（须先跑 verify-inputs），"
+                              f"当前 {_read_state(run_dir)}")
+
+    # P0-1：invoke 自身独立复核输入完整性，不能只信先前验证
+    errs = _verify_inputs_integrity(run_dir)
+    if errs:
+        return _fail(run_dir, f"invoke 输入完整性复核失败（{len(errs)} 项）: {errs[:3]}")
 
     client = ModelClient()
     client.verify_digest()  # 不一致抛异常
@@ -282,6 +341,7 @@ def invoke(args) -> int:
                                   "prompt_renderer_sha256": p.get("prompt_renderer_sha256"),
                                   "system_sha256": p.get("system_sha256"),
                                   "source_tree_sha256": p["source_tree_sha256"],
+                                  "cpg_bundle_sha256": p.get("cpg_bundle_sha256"),
                               })
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
             f.flush()  # 写失败会抛异常中止

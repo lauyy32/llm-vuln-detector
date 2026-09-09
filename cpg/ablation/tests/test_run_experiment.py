@@ -32,13 +32,15 @@ def _write_run_dir(rd: Path, n: int = 1, with_selection_plan: bool = False,
         rec = {
             "sample_id": cve, "side": side, "arm": "real",
             "prompt_path": str(p.relative_to(rd)),
-            "prompt_sha256": "a" * 64,
+            # 真实 SHA：不得用占位值（否则固化完整性缺口）
+            "prompt_sha256": rex._sha256_text(p.read_text(encoding="utf-8")),
             "representation": "legacy-rq1-r0",
             "code_text_sha256": "b" * 64,
             "representation_sha256": fp["representation_sha256"],
             "prompt_renderer_sha256": fp["prompt_renderer_sha256"],
             "system_sha256": fp["system_sha256"],
             "source_tree_sha256": "c" * 64,
+            "cpg_bundle_sha256": "e" * 64,
         }
         if with_selection_plan:
             rec["selection_plan_sha256"] = "d" * 64
@@ -48,7 +50,7 @@ def _write_run_dir(rd: Path, n: int = 1, with_selection_plan: bool = False,
     (rd / "run_schedule.json").write_text(json.dumps(
         [{"sample_id": m["sample_id"], "side": m["side"], "arm": "real"}
          for m in manifest]), encoding="utf-8")
-    rex._write_state(rd, "INPUTS_FROZEN")
+    rex._write_state(rd, "INPUTS_VERIFIED")  # invoke 只接受该状态
 
 
 class FakeClient:
@@ -90,6 +92,47 @@ class TestInvokeSchema(unittest.TestCase):
                      (rd / "results.jsonl").read_text(encoding="utf-8").splitlines()
                      if l.strip()]
             self.assertEqual(len(lines), 2)
+
+    def test_invoke_rejects_prompt_sha_mismatch(self):
+        """P0-1：磁盘 prompt 被改动后，冻结 SHA 不匹配必须阻断。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1)
+            # 改动磁盘 prompt，使实际 SHA 与冻结值不符
+            (rd / "prompts" / "CVE-T0_vuln.prompt.txt").write_text("tampered",
+                                                                  encoding="utf-8")
+            with mock.patch.object(rex, "ModelClient", FakeClient):
+                rc = rex.invoke(type("A", (), {"run_dir": rd})())
+            self.assertNotEqual(rc, 0, "prompt SHA 漂移时 invoke 必须阻断")
+
+    def test_invoke_result_contains_representation_provenance(self):
+        """P0-2：结果必须落到 representation / 实现指纹 / cpg_bundle。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1)
+            fp = rex.representation_fingerprints()
+
+            class ProvClient(FakeClient):
+                def call(self, prompt, system, **kw):
+                    rec = super().call(prompt, system, **kw)
+                    ex = kw.get("extra") or {}
+                    rec.update({
+                        "representation": ex.get("representation"),
+                        "code_text_sha256": ex.get("code_text_sha256"),
+                        "representation_sha256": ex.get("representation_sha256"),
+                        "prompt_renderer_sha256": ex.get("prompt_renderer_sha256"),
+                        "cpg_bundle_sha256": ex.get("cpg_bundle_sha256"),
+                    })
+                    return rec
+
+            with mock.patch.object(rex, "ModelClient", ProvClient):
+                rc = rex.invoke(type("A", (), {"run_dir": rd})())
+            self.assertEqual(rc, 0)
+            rec = json.loads((rd / "results.jsonl").read_text(encoding="utf-8").splitlines()[0])
+            self.assertEqual(rec["representation"], "legacy-rq1-r0")
+            self.assertEqual(rec["representation_sha256"], fp["representation_sha256"])
+            self.assertEqual(rec["prompt_renderer_sha256"], fp["prompt_renderer_sha256"])
+            self.assertEqual(rec["cpg_bundle_sha256"], "e" * 64)
 
     def test_representation_hash_drift_blocks_invoke(self):
         with tempfile.TemporaryDirectory() as td:
