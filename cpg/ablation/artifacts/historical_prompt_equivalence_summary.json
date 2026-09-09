@@ -3,15 +3,16 @@
   "eligible_prompt_total": 164,
   "excluded_historical_total": 6,
   "unchanged_total": 145,
-  "unchanged_exact_match": 144,
+  "unchanged_exact_match": 143,
   "changed_total": 16,
   "unknown_total": 3,
   "code_text_changed_total": 10,
-  "cpg_slices_changed_total": 4,
-  "prompt_mismatch_total": 12,
+  "cpg_slices_changed_total": 5,
+  "prompt_mismatch_total": 13,
   "gate_pass": false,
   "gate_errors": [
-    "CVE-2026-45019/vuln: UNCHANGED source 但 prompt 不等价（层=['cpg_slices']）"
+    "CVE-2026-45019/vuln: UNCHANGED source 但 prompt 不等价（层=['cpg_slices']）",
+    "CVE-2026-67424/fixed: UNCHANGED source 但 prompt 不等价（层=['cpg_slices']）"
   ],
   "historical_commit": "2133a35cc54349cf5adc50aefdc4309063907656"
 }
