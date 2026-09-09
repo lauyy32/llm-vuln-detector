@@ -166,17 +166,25 @@ def prepare(args) -> int:
             # legacy-rq1-r0：用 staging 源（taint_rows 的 abs_path 指向 staging，
             # 与 legacy 的 hit_paths 前缀匹配一致）；staging 由 canonical manifest
             # 复制而来，树哈希需与 canonical 一致（preflight fail-closed）。
-            side_root = staging_dir / "corpus_src" / f"{cve}_{side}"
+            # 必须 resolve()：taint 行的 abs_path 是绝对路径，相对路径会导致
+            # legacy 的 hit_paths 前缀匹配失败并退化为头 100 行。
+            side_root = (staging_dir / "corpus_src" / f"{cve}_{side}").resolve()
             preflight_legacy(side_root, s.get(f"{side}_tree_sha256_lf"))
             rows_side = [r for r in taint_rows
                          if f"/{cve}_{side}/" in (r.get("abs_path") or "").replace("\\", "/")]
+            # 注：实测表明历史 cpg_slices 保持 CodeQL CSV 原始返回顺序（非 (src,sink) 升序）。
+            # 强行排序会让等价性从 144/145 降到 137/145，故此处不排序。
             code_text = load_legacy_code_text(side_root, rows_side)
             # 复刻历史 LocalLLMScorer._build_prompt 的 code_text[:8000] 二次截断
             code_text = code_text[:protocol["max_code_chars"]]
             # 按 prefix 过滤该样本该侧的 taint 行，生成 cpg_slices（空则显式 success-zero）
             cpg_slices = build_cpg_slices_text(rows_side, code_text)
+            # 历史 pipeline 经 _primary_cwe() → config.normalize_cwe() 输出 3 位补零
+            # （CWE-22 → CWE-022）。legacy-rq1-r0 必须复刻，否则 prompt 头即不等价。
+            _cwes = s.get("cwes") if isinstance(s.get("cwes"), list) else None
+            cwe_disp = config.normalize_cwe((_cwes or [None])[0])
             prompt = prompt_renderer.render_prompt(
-                {"cve_id": cve, "cwe": (s.get("cwes") or [None])[0] if isinstance(s.get("cwes"), list) else None},
+                {"cve_id": cve, "cwe": cwe_disp},
                 code_text, cpg_slices, summary=protocol["summary"],
                 max_code_chars=protocol["max_code_chars"],
             )
