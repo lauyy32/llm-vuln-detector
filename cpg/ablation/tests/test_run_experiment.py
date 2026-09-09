@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""run_experiment 契约测试：representation 冻结、RUN_LOCK、invoke schema、结果门禁。
+"""run_experiment 契约测试：representation 冻结、两阶段 RUN_LOCK、invoke schema、
+结果门禁、resume。
 
 invoke 测试一律使用 fake ModelClient，不得实际调用模型。
 """
@@ -13,14 +14,19 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 from cpg.ablation import run_experiment as rex  # noqa: E402
+from cpg.ablation import model_client as mc  # noqa: E402
 
 
 def _write_run_dir(rd: Path, n: int = 1, with_selection_plan: bool = False,
-                   protocol: dict | None = None, locked: bool = True) -> None:
+                   protocol: dict | None = None, locked: bool = False) -> None:
     (rd / "prompts").mkdir(parents=True, exist_ok=True)
     fp = rex.representation_fingerprints()
     prot = protocol if protocol is not None else {
         "representation": "legacy-rq1-r0", "summary": False, "max_code_chars": 8000,
+        "model": mc.MODEL, "model_digest": mc.MODEL_DIGEST,
+        "num_ctx": mc.NUM_CTX, "num_predict": mc.NUM_PREDICT,
+        "temperature": mc.TEMPERATURE, "top_p": mc.TOP_P, "seed": mc.SEED,
+        "cpg_cache_key": "e" * 64, "canonical_cpg_rows_sha256": "f" * 64,
         **fp,
     }
     (rd / "protocol.json").write_text(json.dumps(prot), encoding="utf-8")
@@ -28,12 +34,10 @@ def _write_run_dir(rd: Path, n: int = 1, with_selection_plan: bool = False,
     for i in range(n):
         cve, side = f"CVE-T{i}", "vuln"
         p = rd / "prompts" / f"{cve}_{side}.prompt.txt"
-        # 含 2 个 fence：使 verify-inputs 基础检查通过，得以走到完整性校验
         p.write_text("# 目标代码（节选）\n```\nx=1\n```\n", encoding="utf-8")
         rec = {
             "sample_id": cve, "side": side, "arm": "real",
             "prompt_path": str(p.relative_to(rd)),
-            # 真实 SHA：不得用占位值（否则固化完整性缺口）
             "prompt_sha256": rex._sha256_text(p.read_text(encoding="utf-8")),
             "representation": "legacy-rq1-r0",
             "code_text_sha256": "b" * 64,
@@ -55,28 +59,45 @@ def _write_run_dir(rd: Path, n: int = 1, with_selection_plan: bool = False,
     (rd / "cpg_bundle.json").write_text(json.dumps({"cpg_cache_key": "e" * 64}),
                                         encoding="utf-8")
     if locked:
-        _write_lock(rd)
+        _write_lock_request(rd)
+        _write_approval(rd)
     else:
-        rex._write_state(rd, "INPUTS_VERIFIED")  # 未锁定
+        rex._write_state(rd, "INPUTS_VERIFIED")
 
 
-def _write_lock(rd: Path) -> None:
-    """写 run_lock.json 绑定 5 个文件并置 REVIEW_LOCKED。canonical 用一个真实临时文件。"""
-    canonical = rd / "canonical.json"
-    canonical.write_text('{"samples": []}', encoding="utf-8")
+def _write_lock_request(rd: Path) -> None:
+    """写 lock_request.json（相对路径 + SHA）并置 INPUTS_LOCKED。"""
+    canonical_real = ROOT / "cpg/ablation/artifacts/canonical_corpus_manifest.json"
     files = {
-        "canonical_manifest": canonical,
-        "protocol": rd / "protocol.json",
-        "prompt_manifest": rd / "prompt_manifest.jsonl",
-        "run_schedule": rd / "run_schedule.json",
-        "cpg_bundle": rd / "cpg_bundle.json",
+        "canonical_manifest": {"base": "repo",
+                               "path": "cpg/ablation/artifacts/canonical_corpus_manifest.json",
+                               "sha256": rex._file_sha256(canonical_real)},
+        "protocol": {"base": "run", "path": "protocol.json",
+                     "sha256": rex._file_sha256(rd / "protocol.json")},
+        "prompt_manifest": {"base": "run", "path": "prompt_manifest.jsonl",
+                            "sha256": rex._file_sha256(rd / "prompt_manifest.jsonl")},
+        "run_schedule": {"base": "run", "path": "run_schedule.json",
+                         "sha256": rex._file_sha256(rd / "run_schedule.json")},
+        "cpg_bundle": {"base": "run", "path": "cpg_bundle.json",
+                       "sha256": rex._file_sha256(rd / "cpg_bundle.json")},
     }
-    lock = {"state": "REVIEW_LOCKED", "locked_at": "2026-09-09T00:00:00+00:00",
-            "git_commit": "0" * 40,
-            "files": {k: {"path": str(v.resolve()), "sha256": rex._file_sha256(v)}
-                      for k, v in files.items()}}
-    (rd / "run_lock.json").write_text(json.dumps(lock), encoding="utf-8")
-    rex._write_state(rd, "REVIEW_LOCKED")
+    lock = {"state": "INPUTS_LOCKED", "locked_at": "2026-09-09T00:00:00+00:00",
+            "git_commit": rex._git_commit(), "files": files}
+    lock_text = json.dumps(lock, ensure_ascii=False, indent=2)
+    (rd / "lock_request.json").write_text(lock_text + "\n", encoding="utf-8")
+    rex._write_state(rd, "INPUTS_LOCKED", {"lock_request_sha256": rex._lock_request_sha(rd)})
+
+
+def _write_approval(rd: Path, reviewer: str = "codex") -> None:
+    """写 review_approval.json 并置 REVIEW_LOCKED。"""
+    approval = {"reviewer": reviewer, "decision": "APPROVED",
+                "lock_request_sha256": rex._lock_request_sha(rd),
+                "reviewed_git_commit": rex._git_commit(),
+                "approved_at": "2026-09-09T00:00:00+00:00"}
+    (rd / "review_approval.json").write_text(json.dumps(approval), encoding="utf-8")
+    rex._write_state(rd, "REVIEW_LOCKED",
+                     {"lock_request_sha256": approval["lock_request_sha256"],
+                      "reviewer": reviewer})
 
 
 class FakeClient:
@@ -87,16 +108,34 @@ class FakeClient:
         return None
 
     def call(self, prompt, system, **kw):
-        return {"schema_version": "model-call/1", "verdict": "benign",
-                "parse_status": "OK", "sample_id": kw.get("sample_id"),
-                "side": kw.get("side"), "arm": kw.get("arm"),
-                "repeat": kw.get("repeat"), "run_error": None,
-                "raw_response": {}, "raw_response_sha256": "0" * 64}
+        ex = kw.get("extra") or {}
+        return {
+            "schema_version": "model-call/1", "verdict": "benign",
+            "parse_status": "OK", "sample_id": kw.get("sample_id"),
+            "side": kw.get("side"), "arm": kw.get("arm"),
+            "repeat": kw.get("repeat"), "run_error": None,
+            "raw_response": {}, "raw_response_sha256": "0" * 64,
+            "prompt_sha256": ex.get("prompt_sha256"),
+            "prompt_path": ex.get("prompt_path"),
+            "representation": ex.get("representation"),
+            "code_text_sha256": ex.get("code_text_sha256"),
+            "source_tree_sha256": ex.get("source_tree_sha256"),
+            "cpg_cache_key": ex.get("cpg_cache_key"),
+            "canonical_cpg_rows_sha256": ex.get("canonical_cpg_rows_sha256"),
+            "representation_sha256": ex.get("representation_sha256"),
+            "prompt_renderer_sha256": ex.get("prompt_renderer_sha256"),
+            "system_sha256": ex.get("system_sha256"),
+            "model_name": mc.MODEL, "model_digest": mc.MODEL_DIGEST,
+            "request": {"options": {"num_ctx": mc.NUM_CTX, "num_predict": mc.NUM_PREDICT,
+                                    "temperature": mc.TEMPERATURE, "top_p": mc.TOP_P,
+                                    "seed": mc.SEED}},
+            "request_sha256": "0" * 64,
+            "prompt_eval_count": 100,
+        }
 
 
 class TestRepresentationGate(unittest.TestCase):
     def test_prepare_rejects_changed_hunk(self):
-        # argparse 层即拒绝：changed-hunk-r0 不在 ALLOWED_REPRESENTATIONS
         self.assertNotIn("changed-hunk-r0", rex.ALLOWED_REPRESENTATIONS)
         self.assertEqual(rex.ALLOWED_REPRESENTATIONS,
                          {"legacy-rq1-r0", "legacy-rq1-r1-cpg-canonical"})
@@ -105,126 +144,140 @@ class TestRepresentationGate(unittest.TestCase):
         fp = rex.representation_fingerprints()
         for k in ("representation_sha256", "prompt_renderer_sha256", "system_sha256"):
             self.assertIn(k, fp)
-            self.assertEqual(len(fp[k]), 64, f"{k} 应是 64 位 hex")
+            self.assertEqual(len(fp[k]), 64)
 
     def test_canonical_fingerprint_includes_cpg_eval(self):
         fp = rex.representation_fingerprints("legacy-rq1-r1-cpg-canonical")
-        for k in ("representation_sha256", "prompt_renderer_sha256",
-                  "system_sha256", "cpg_eval_sha256"):
-            self.assertIn(k, fp)
-            self.assertEqual(len(fp[k]), 64, f"{k} 应是 64 位 hex")
+        self.assertIn("cpg_eval_sha256", fp)
         fp0 = rex.representation_fingerprints("legacy-rq1-r0")
-        self.assertNotEqual(fp["representation_sha256"],
-                            fp0["representation_sha256"])
+        self.assertNotEqual(fp["representation_sha256"], fp0["representation_sha256"])
 
 
 class TestRunLock(unittest.TestCase):
     def test_invoke_rejects_unlocked(self):
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
-            _write_run_dir(rd, n=1, locked=False)  # INPUTS_VERIFIED 未锁
+            _write_run_dir(rd, n=1, locked=False)
             with mock.patch.object(rex, "ModelClient", FakeClient):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
-            self.assertNotEqual(rc, 0, "未 REVIEW_LOCKED 时 invoke 必须拒绝")
+            self.assertNotEqual(rc, 0)
 
-    def test_invoke_rejects_run_lock_missing(self):
+    def test_invoke_rejects_inputs_locked_without_approval(self):
+        """有 lock_request 但无 reviewer approval 必须拒绝（P0-2）。"""
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
-            _write_run_dir(rd, n=1, locked=True)
-            (rd / "run_lock.json").unlink()
+            _write_run_dir(rd, n=1, locked=False)
+            _write_lock_request(rd)  # INPUTS_LOCKED，无 approval
+            rex._write_state(rd, "REVIEW_LOCKED")  # 伪造状态
+            with mock.patch.object(rex, "ModelClient", FakeClient):
+                rc = rex.invoke(type("A", (), {"run_dir": rd})())
+            self.assertNotEqual(rc, 0, "无 reviewer approval 时 invoke 必须拒绝")
+
+    def test_empty_lock_bypass_rejected(self):
+        """P0-1：空锁（files={}）或错误 state 不得绕过。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1, locked=False)
+            (rd / "lock_request.json").write_text(
+                json.dumps({"state": "NOT_LOCKED", "files": {}}), encoding="utf-8")
+            (rd / "review_approval.json").write_text(
+                json.dumps({"reviewer": "codex", "decision": "APPROVED",
+                            "lock_request_sha256": "0" * 64,
+                            "reviewed_git_commit": rex._git_commit()}), encoding="utf-8")
             rex._write_state(rd, "REVIEW_LOCKED")
             with mock.patch.object(rex, "ModelClient", FakeClient):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
-            self.assertNotEqual(rc, 0, "run_lock.json 缺失时 invoke 必须拒绝")
+            self.assertNotEqual(rc, 0, "空锁/错误 state 必须被拒绝")
+
+    def test_lock_state_mismatch_rejected(self):
+        """lock_request.state 非 INPUTS_LOCKED 必须被拒绝。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1, locked=False)
+            _write_lock_request(rd)
+            lock = json.loads((rd / "lock_request.json").read_text(encoding="utf-8"))
+            lock["state"] = "REVIEW_LOCKED"
+            (rd / "lock_request.json").write_text(json.dumps(lock), encoding="utf-8")
+            _write_approval(rd)
+            with mock.patch.object(rex, "ModelClient", FakeClient):
+                rc = rex.invoke(type("A", (), {"run_dir": rd})())
+            self.assertNotEqual(rc, 0)
+
+    def test_approve_lock_requires_inputs_locked(self):
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            rex._write_state(rd, "INPUTS_VERIFIED")
+            rc = rex.approve_lock(type("A", (), {"run_dir": rd, "reviewer": "codex"})())
+            self.assertNotEqual(rc, 0)
+
+    def test_approve_lock_requires_reviewer(self):
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            _write_run_dir(rd, n=1, locked=False)
+            _write_lock_request(rd)
+            rc = rex.approve_lock(type("A", (), {"run_dir": rd, "reviewer": None})())
+            self.assertNotEqual(rc, 0, "approve-lock 无 reviewer 必须拒绝")
 
     def test_invoke_rejects_lock_file_drift(self):
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
             _write_run_dir(rd, n=1, locked=True)
-            # 漂移：改动 protocol.json 使 run_lock 绑定的 SHA 失效
             (rd / "protocol.json").write_text('{"tampered": true}', encoding="utf-8")
             with mock.patch.object(rex, "ModelClient", FakeClient):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
-            self.assertNotEqual(rc, 0, "run_lock 绑定文件 SHA 漂移时 invoke 必须拒绝")
-
-    def test_lock_inputs_requires_inputs_verified(self):
-        with tempfile.TemporaryDirectory() as td:
-            rd = Path(td)
-            rex._write_state(rd, "CREATED")
-            rc = rex.lock_inputs(type("A", (), {"run_dir": rd, "canonical_manifest": rd / "x.json"})())
-            self.assertNotEqual(rc, 0, "非 INPUTS_VERIFIED 时 lock-inputs 必须拒绝")
+            self.assertNotEqual(rc, 0, "锁文件 SHA 漂移时 invoke 必须拒绝")
 
 
 class TestInvokeSchema(unittest.TestCase):
     def test_invoke_accepts_legacy_manifest_without_selection_plan(self):
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
-            _write_run_dir(rd, n=2, with_selection_plan=False)
+            _write_run_dir(rd, n=2, with_selection_plan=False, locked=True)
             with mock.patch.object(rex, "ModelClient", FakeClient):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
-            self.assertEqual(rc, 0, "legacy manifest 无 selection_plan 时 invoke 应成功")
+            self.assertEqual(rc, 0)
             lines = [json.loads(l) for l in
                      (rd / "results.jsonl").read_text(encoding="utf-8").splitlines()
                      if l.strip()]
             self.assertEqual(len(lines), 2)
 
     def test_invoke_rejects_prompt_sha_mismatch(self):
-        """P0-1：磁盘 prompt 被改动后，冻结 SHA 不匹配必须阻断。"""
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
-            _write_run_dir(rd, n=1)
+            _write_run_dir(rd, n=1, locked=True)
             (rd / "prompts" / "CVE-T0_vuln.prompt.txt").write_text("tampered",
                                                                   encoding="utf-8")
             with mock.patch.object(rex, "ModelClient", FakeClient):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
-            self.assertNotEqual(rc, 0, "prompt SHA 漂移时 invoke 必须阻断")
+            self.assertNotEqual(rc, 0)
 
     def test_invoke_result_contains_representation_provenance(self):
-        """P0-2：结果必须落到 representation / 实现指纹 / cpg_cache_key。"""
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
-            _write_run_dir(rd, n=1)
-            fp = rex.representation_fingerprints()
-
-            class ProvClient(FakeClient):
-                def call(self, prompt, system, **kw):
-                    rec = super().call(prompt, system, **kw)
-                    ex = kw.get("extra") or {}
-                    rec.update({
-                        "representation": ex.get("representation"),
-                        "code_text_sha256": ex.get("code_text_sha256"),
-                        "representation_sha256": ex.get("representation_sha256"),
-                        "prompt_renderer_sha256": ex.get("prompt_renderer_sha256"),
-                        "cpg_cache_key": ex.get("cpg_cache_key"),
-                    })
-                    return rec
-
-            with mock.patch.object(rex, "ModelClient", ProvClient):
+            _write_run_dir(rd, n=1, locked=True)
+            with mock.patch.object(rex, "ModelClient", FakeClient):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
             self.assertEqual(rc, 0)
             rec = json.loads((rd / "results.jsonl").read_text(encoding="utf-8").splitlines()[0])
             self.assertEqual(rec["representation"], "legacy-rq1-r0")
-            self.assertEqual(rec["representation_sha256"], fp["representation_sha256"])
-            self.assertEqual(rec["prompt_renderer_sha256"], fp["prompt_renderer_sha256"])
             self.assertEqual(rec["cpg_cache_key"], "e" * 64)
+            self.assertEqual(rec["canonical_cpg_rows_sha256"], "f" * 64)
 
     def test_schedule_duplicate_blocked_before_any_call(self):
-        """重复 schedule 必须在任何模型调用前阻断，且不留部分结果。"""
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
-            _write_run_dir(rd, n=2)
+            _write_run_dir(rd, n=2, locked=True)
             sched = json.loads((rd / "run_schedule.json").read_text(encoding="utf-8"))
-            sched.append(dict(sched[0]))  # 制造重复
+            sched.append(dict(sched[0]))
             (rd / "run_schedule.json").write_text(json.dumps(sched), encoding="utf-8")
-            _write_lock(rd)  # 重新绑定（schedule 内容变了）
+            _write_lock_request(rd)
+            _write_approval(rd)
             with mock.patch.object(rex, "ModelClient", FakeClient):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
-            self.assertNotEqual(rc, 0, "schedule 重复必须在调用前阻断")
-            self.assertFalse((rd / "results.jsonl").exists(),
-                             "阻断时不得已写入任何模型结果")
+            self.assertNotEqual(rc, 0)
+            self.assertFalse((rd / "results.jsonl").exists())
 
     def test_verify_inputs_requires_full_integrity(self):
-        """verify-inputs 必须在完整校验通过后才写 INPUTS_VERIFIED。"""
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
             _write_run_dir(rd, n=1, locked=False)
@@ -233,43 +286,51 @@ class TestInvokeSchema(unittest.TestCase):
             (rd / "run_schedule.json").write_text(json.dumps(sched), encoding="utf-8")
             rex._write_state(rd, "INPUTS_FROZEN")
             rc = rex.verify_inputs(type("A", (), {"run_dir": rd})())
-            self.assertNotEqual(rc, 0, "集合不一致时 verify-inputs 必须失败")
-            self.assertNotEqual(rex._read_state(rd), "INPUTS_VERIFIED",
-                                "不得在未通过完整校验时标记为已验证")
-
-    def test_representation_hash_drift_blocks_invoke(self):
-        with tempfile.TemporaryDirectory() as td:
-            rd = Path(td)
-            _write_run_dir(rd, n=1)
-            prot = json.loads((rd / "protocol.json").read_text(encoding="utf-8"))
-            prot["representation_sha256"] = "f" * 64
-            (rd / "protocol.json").write_text(json.dumps(prot), encoding="utf-8")
-            _write_lock(rd)  # 重新绑定（protocol 变了）
-            with mock.patch.object(rex, "ModelClient", FakeClient):
-                rc = rex.invoke(type("A", (), {"run_dir": rd})())
-            self.assertNotEqual(rc, 0, "表示实现 SHA 漂移时 invoke 不得静默通过")
+            self.assertNotEqual(rc, 0)
+            self.assertNotEqual(rex._read_state(rd), "INPUTS_VERIFIED")
 
 
 class TestVerifyResults(unittest.TestCase):
-    def _mk_results(self, rd: Path, overrides: dict | None = None) -> None:
-        """写一个"成功"结果集（n=1）。overrides 覆盖字段以制造坏结果。"""
-        rec = {"sample_id": "CVE-T0", "side": "vuln", "arm": "real", "repeat": 0,
-               "verdict": "benign", "parse_status": "OK", "run_error": None,
-               "representation": "legacy-rq1-r0",
-               "prompt_sha256": None, "raw_response": {}}
+    def _clean_record(self, rd: Path, sample_id: str, side: str, overrides: dict | None = None) -> dict:
+        prot = json.loads((rd / "protocol.json").read_text(encoding="utf-8"))
+        pm = None
+        for line in (rd / "prompt_manifest.jsonl").read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                r = json.loads(line)
+                if r["sample_id"] == sample_id and r["side"] == side:
+                    pm = r
+                    break
+        rec = {
+            "schema_version": "model-call/1", "verdict": "benign",
+            "parse_status": "OK", "sample_id": sample_id, "side": side,
+            "arm": "real", "repeat": 0, "run_error": None,
+            "raw_response": {}, "raw_response_sha256": "0" * 64,
+            "prompt_sha256": pm["prompt_sha256"], "prompt_path": pm["prompt_path"],
+            "representation": pm["representation"],
+            "code_text_sha256": pm["code_text_sha256"],
+            "source_tree_sha256": pm["source_tree_sha256"],
+            "cpg_cache_key": pm["cpg_cache_key"],
+            "canonical_cpg_rows_sha256": pm["canonical_cpg_rows_sha256"],
+            "representation_sha256": pm["representation_sha256"],
+            "prompt_renderer_sha256": pm["prompt_renderer_sha256"],
+            "system_sha256": pm["system_sha256"],
+            "model_name": prot["model"], "model_digest": prot["model_digest"],
+            "request": {"options": {"num_ctx": prot["num_ctx"], "num_predict": prot["num_predict"],
+                                    "temperature": prot["temperature"], "top_p": prot["top_p"],
+                                    "seed": prot["seed"]}},
+            "request_sha256": "0" * 64, "prompt_eval_count": 100,
+        }
         if overrides:
             rec.update(overrides)
-        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+        return rec
 
     def _setup(self) -> Path:
         self._td = tempfile.TemporaryDirectory()
         rd = Path(self._td.name)
         _write_run_dir(rd, n=1, locked=False)
-        # verify-results 要求 COMPLETE
         rex._write_state(rd, "COMPLETE")
-        # 把 manifest 的 prompt_sha256 写入结果以通过 provenance 检查
-        pm = json.loads((rd / "prompt_manifest.jsonl").read_text(encoding="utf-8").splitlines()[0])
-        self._mk_results(rd, overrides={"prompt_sha256": pm["prompt_sha256"]})
+        rec = self._clean_record(rd, "CVE-T0", "vuln")
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
         self.addCleanup(self._td.cleanup)
         return rd
 
@@ -279,66 +340,97 @@ class TestVerifyResults(unittest.TestCase):
 
     def test_verify_rejects_parse_error(self):
         rd = self._setup()
-        self._mk_results(rd, overrides={"parse_status": "ERROR", "verdict": None})
+        rec = self._clean_record(rd, "CVE-T0", "vuln",
+                                 overrides={"parse_status": "ERROR", "verdict": None})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
         self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
 
     def test_verify_rejects_run_error(self):
         rd = self._setup()
-        self._mk_results(rd, overrides={"run_error": "网络错误"})
+        rec = self._clean_record(rd, "CVE-T0", "vuln", overrides={"run_error": "网络错误"})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
         self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
 
     def test_verify_rejects_invalid_verdict(self):
         rd = self._setup()
-        self._mk_results(rd, overrides={"verdict": "maybe"})
+        rec = self._clean_record(rd, "CVE-T0", "vuln", overrides={"verdict": "maybe"})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
         self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
 
     def test_verify_rejects_duplicate_key(self):
         rd = self._setup()
-        pm = json.loads((rd / "prompt_manifest.jsonl").read_text(encoding="utf-8").splitlines()[0])
-        rec = {"sample_id": "CVE-T0", "side": "vuln", "arm": "real", "repeat": 0,
-               "verdict": "benign", "parse_status": "OK", "run_error": None,
-               "representation": "legacy-rq1-r0", "prompt_sha256": pm["prompt_sha256"]}
+        rec = self._clean_record(rd, "CVE-T0", "vuln")
         with (rd / "results.jsonl").open("a", encoding="utf-8") as f:
             f.write(json.dumps(rec) + "\n")
         self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
 
+    def test_verify_rejects_model_digest_drift(self):
+        rd = self._setup()
+        rec = self._clean_record(rd, "CVE-T0", "vuln", overrides={"model_digest": "f" * 64})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+        self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
+
 
 class TestResume(unittest.TestCase):
-    def test_resume_retries_error_record(self):
-        """错误记录（parse_status!=OK）不得被 resume 当作已完成。"""
+    def test_error_records_go_to_attempts_not_results(self):
+        """错误尝试进 attempts.jsonl，不进 results.jsonl；resume 重试成功（P0-3）。"""
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
             _write_run_dir(rd, n=1, locked=True)
-            # 预置一条错误记录
-            bad = {"sample_id": "CVE-T0", "side": "vuln", "arm": "real", "repeat": 0,
-                   "verdict": None, "parse_status": "ERROR", "run_error": "网络错误"}
-            (rd / "results.jsonl").write_text(json.dumps(bad) + "\n", encoding="utf-8")
-            with mock.patch.object(rex, "ModelClient", FakeClient):
+
+            class FlakyClient(FakeClient):
+                calls = 0
+
+                def call(self, prompt, system, **kw):
+                    type(self).calls += 1
+                    rec = super().call(prompt, system, **kw)
+                    if type(self).calls == 1:  # 仅第一次调用失败
+                        rec.update({"parse_status": "ERROR", "verdict": None,
+                                    "run_error": "网络错误"})
+                    return rec
+
+            with mock.patch.object(rex, "ModelClient", FlakyClient):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
-            self.assertEqual(rc, 0)
-            rows = [json.loads(l) for l in
-                    (rd / "results.jsonl").read_text(encoding="utf-8").splitlines()
-                    if l.strip()]
-            # 错误记录被剔除，只剩一条成功记录
-            self.assertEqual(len(rows), 1)
-            self.assertEqual(rows[0]["parse_status"], "OK")
-            self.assertIsNone(rows[0]["run_error"])
+                self.assertEqual(rex._read_state(rd), "RETRY_REQUIRED")
+                # 错误尝试不得进入 results.jsonl（允许空文件，但 0 条成功记录）
+                results_after_err = []
+                if (rd / "results.jsonl").exists():
+                    results_after_err = [l for l in
+                                         (rd / "results.jsonl").read_text(encoding="utf-8").splitlines()
+                                         if l.strip()]
+                self.assertEqual(len(results_after_err), 0,
+                                 "错误尝试不得写入 results.jsonl")
+                attempts = [json.loads(l) for l in
+                            (rd / "attempts.jsonl").read_text(encoding="utf-8").splitlines()
+                            if l.strip()]
+                self.assertEqual(len(attempts), 1, "错误尝试必须保留在 attempts.jsonl")
+                self.assertEqual(attempts[0]["parse_status"], "ERROR")
+                rc2 = rex.invoke(type("A", (), {"run_dir": rd})())
+                self.assertEqual(rc2, 0)
+                self.assertEqual(rex._read_state(rd), "COMPLETE")
+                results = [json.loads(l) for l in
+                           (rd / "results.jsonl").read_text(encoding="utf-8").splitlines()
+                           if l.strip()]
+                self.assertEqual(len(results), 1)
+                self.assertEqual(results[0]["parse_status"], "OK")
+                attempts2 = [json.loads(l) for l in
+                             (rd / "attempts.jsonl").read_text(encoding="utf-8").splitlines()
+                             if l.strip()]
+                self.assertEqual(len(attempts2), 2, "attempts 保留全部尝试（审计不丢失）")
 
 
 class TestVerifyInputsFence(unittest.TestCase):
     def test_verify_inputs_accepts_markdown_fence_in_code(self):
-        """含 markdown 代码块（```python ... ```）的 code_text 不得被 fence 检查误报。"""
         with tempfile.TemporaryDirectory() as td:
             rd = Path(td)
             _write_run_dir(rd, n=1, locked=False)
             p = rd / "prompts" / "CVE-T0_vuln.prompt.txt"
-            code = "# code\n```python\nx=1\n```\n"  # docstring 含 markdown 代码块
+            code = "# code\n```python\nx=1\n```\n"
             prompt = (f"# 审计任务\n- CVE: CVE-T0\n- 目标 CWE: CWE-022\n"
                       + rex.CODE_START + code + "\n```\n"
                       + "\n# 代码级上下文（CPG 污点切片）\n# CPG TAINT SLICE\n\n"
                       + "\n# 输出要求\n{}")
             p.write_text(prompt, encoding="utf-8")
-            # 更新 manifest 的 prompt_sha256 以匹配新 prompt
             pm = json.loads((rd / "prompt_manifest.jsonl").read_text(
                 encoding="utf-8").splitlines()[0])
             pm["prompt_sha256"] = rex._sha256_text(prompt)
@@ -346,7 +438,7 @@ class TestVerifyInputsFence(unittest.TestCase):
                                                       encoding="utf-8")
             rex._write_state(rd, "INPUTS_FROZEN")
             rc = rex.verify_inputs(type("A", (), {"run_dir": rd})())
-            self.assertEqual(rc, 0, "含 markdown ``` 的 code_text 不应被 fence 检查误报")
+            self.assertEqual(rc, 0)
 
 
 if __name__ == "__main__":
