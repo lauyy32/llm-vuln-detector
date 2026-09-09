@@ -28,7 +28,7 @@ from cpg.ablation import config  # noqa: E402
 from cpg.ablation import corpus_db  # noqa: E402
 from cpg.ablation import cpg_eval  # noqa: E402
 from cpg.ablation.cpg_eval import (  # noqa: E402
-    build_cpg_slices_text, sort_taint_rows_canonical,
+    build_cpg_slices_text, sort_taint_rows_canonical, canonical_cpg_rows_sha,
 )
 from cpg.ablation import legacy_rq1_r0  # noqa: E402
 from cpg.ablation import legacy_rq1_r1_cpg_canonical  # noqa: E402
@@ -48,8 +48,11 @@ CANONICAL_REPR = legacy_rq1_r1_cpg_canonical.REPRESENTATION
 ALLOWED_REPRESENTATIONS = {LEGACY_REPR, CANONICAL_REPR}
 assert CHANGED_HUNK_REPR not in ALLOWED_REPRESENTATIONS
 
-STATES = ("CREATED", "INPUTS_FROZEN", "INPUTS_VERIFIED", "RUNNING", "COMPLETE",
-          "VERIFIED", "FAILED")
+STATES = ("CREATED", "INPUTS_FROZEN", "INPUTS_VERIFIED", "REVIEW_LOCKED",
+          "RUNNING", "COMPLETE", "VERIFIED", "FAILED")
+
+# 合法 verdict 枚举（P0-2：verify-results fail-closed 用）
+VALID_VERDICTS = {"vulnerable", "benign", "abstain"}
 
 
 def _sha256_text(s: str) -> str:
@@ -173,15 +176,27 @@ def prepare(args) -> int:
     bundle = corpus_db.build_or_reuse_db(
         staged["staged_manifest_sha256"], qsha, cid, staging_dir, query_files, db_path)
     taint_rows = bundle.get("taint_rows", [])
-    cpg_bundle_sha = bundle["cache_key"]
+    # cpg_cache_key 是输入身份（staged+query+CodeQL identity 的 cache key），
+    # 不是 CPG 输出或 cpg_bundle.json 文件的 SHA（P0-3 命名纠正）。
+    cpg_cache_key = bundle["cache_key"]
+    # canonical_cpg_rows_sha256 才是"实际 CPG 输出内容"的规范身份（abs_path 已相对化）。
+    canonical_rows_sha = canonical_cpg_rows_sha(taint_rows)
     (run_dir / "cpg_bundle.json").write_text(
-        json.dumps({"cache_key": cpg_bundle_sha,
+        json.dumps({"cpg_cache_key": cpg_cache_key,
                     "codeql_version": cid,
                     "query_set_sha256": qsha,
                     "staged_manifest_sha256": staged["staged_manifest_sha256"],
+                    "canonical_cpg_rows_sha256": canonical_rows_sha,
                     "queries": bundle.get("queries", []),
                     "n_taint_rows": len(taint_rows)},
                    ensure_ascii=False, indent=2), encoding="utf-8")
+    # CPG provenance 纳入 protocol（P0-3：此前只写进 cpg_bundle.json，未被锁定/复核）
+    protocol.update({
+        "cpg_cache_key": cpg_cache_key,
+        "query_set_sha256": qsha,
+        "staged_manifest_sha256": staged["staged_manifest_sha256"],
+        "canonical_cpg_rows_sha256": canonical_rows_sha,
+    })
 
     prompt_manifest = []
     for s in eligible:
@@ -228,7 +243,8 @@ def prepare(args) -> int:
                 "representation": protocol["representation"],
                 "code_text_sha256": _sha256_text(code_text),
                 "source_tree_sha256": s.get(f"{side}_tree_sha256_lf"),
-                "cpg_bundle_sha256": cpg_bundle_sha,
+                "cpg_cache_key": cpg_cache_key,
+                "canonical_cpg_rows_sha256": canonical_rows_sha,
                 "cpg_taint_rows": len(rows_side),
                 "cpg_slices_chars": len(cpg_slices),
             }
@@ -333,12 +349,80 @@ def _verify_inputs_integrity(run_dir: Path) -> list:
     return errors
 
 
-def invoke(args) -> int:
-    """调用模型。INPUTS_VERIFIED → RUNNING → COMPLETE。"""
+def _locked_files(args, run_dir: Path) -> dict:
+    """run_lock 绑定的文件清单（绝对路径 + SHA）。canonical manifest 用 args 里的路径。"""
+    canonical = Path(args.canonical_manifest).resolve()
+    files = {
+        "canonical_manifest": canonical,
+        "protocol": (run_dir / "protocol.json").resolve(),
+        "prompt_manifest": (run_dir / "prompt_manifest.jsonl").resolve(),
+        "run_schedule": (run_dir / "run_schedule.json").resolve(),
+        "cpg_bundle": (run_dir / "cpg_bundle.json").resolve(),
+    }
+    out = {}
+    for name, p in files.items():
+        if not p.exists():
+            raise RuntimeError(f"[lock-inputs] 待锁定文件缺失: {name} -> {p}")
+        out[name] = {"path": str(p), "sha256": _file_sha256(p)}
+    return out
+
+
+def lock_inputs(args) -> int:
+    """锁定全部输入并写 REVIEW_LOCKED。INPUTS_VERIFIED → REVIEW_LOCKED（P0-1）。"""
     run_dir = args.run_dir
     if _read_state(run_dir) != "INPUTS_VERIFIED":
-        return _fail(run_dir, f"invoke 要求 INPUTS_VERIFIED（须先跑 verify-inputs），"
+        return _fail(run_dir, f"lock-inputs 要求 INPUTS_VERIFIED（须先跑 verify-inputs），"
                               f"当前 {_read_state(run_dir)}")
+    # 锁定前再做一次完整完整性校验，确保锁住的是已通过校验的输入
+    errs = _verify_inputs_integrity(run_dir)
+    if errs:
+        return _fail(run_dir, f"lock-inputs 完整性校验失败（{len(errs)} 项）: {errs[:3]}")
+    from datetime import datetime, timezone
+    lock = {
+        "state": "REVIEW_LOCKED",
+        "locked_at": datetime.now(timezone.utc).isoformat(),
+        "git_commit": _git_commit(),
+        "files": _locked_files(args, run_dir),
+    }
+    lock_text = json.dumps(lock, ensure_ascii=False, indent=2)
+    (run_dir / "run_lock.json").write_text(lock_text + "\n", encoding="utf-8")
+    _write_state(run_dir, "REVIEW_LOCKED", {"run_lock_sha256": _sha256_text(lock_text)})
+    print(f"[lock-inputs] REVIEW_LOCKED，run_lock.json 已绑定 "
+          f"{len(lock['files'])} 个文件")
+    return 0
+
+
+def _verify_run_lock(run_dir: Path) -> list:
+    """invoke 前复核 run_lock.json：绑定文件 SHA 未漂移（P0-1）。"""
+    lock_path = run_dir / "run_lock.json"
+    if not lock_path.exists():
+        return ["run_lock.json 缺失（须先跑 lock-inputs）"]
+    try:
+        lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        return [f"run_lock.json 解析失败: {e}"]
+    errors = []
+    for name, f in (lock.get("files") or {}).items():
+        p = Path(f["path"])
+        if not p.exists():
+            errors.append(f"run_lock 文件缺失: {name} -> {p}")
+            continue
+        if _file_sha256(p) != f["sha256"]:
+            errors.append(f"run_lock 文件 SHA 漂移: {name}")
+    return errors
+
+
+def invoke(args) -> int:
+    """调用模型。REVIEW_LOCKED → RUNNING → COMPLETE（P0-1：须先 lock-inputs）。"""
+    run_dir = args.run_dir
+    if _read_state(run_dir) != "REVIEW_LOCKED":
+        return _fail(run_dir, f"invoke 要求 REVIEW_LOCKED（须先跑 lock-inputs），"
+                              f"当前 {_read_state(run_dir)}")
+
+    # P0-1：invoke 前复核 run_lock（绑定文件 SHA 未漂移）
+    lock_errs = _verify_run_lock(run_dir)
+    if lock_errs:
+        return _fail(run_dir, f"invoke run_lock 复核失败: {lock_errs[:3]}")
 
     # P0-1：invoke 自身独立复核输入完整性，不能只信先前验证
     errs = _verify_inputs_integrity(run_dir)
@@ -359,13 +443,22 @@ def invoke(args) -> int:
     _write_state(run_dir, "RUNNING")
     results_path = run_dir / "results.jsonl"
     seen = set()
-    # 支持 resume：跳过已存在的唯一键；重复（非跳过）则失败
+    # 支持 resume：只把"干净成功"记录当作已完成；错误记录（parse_status!=OK 或
+    # run_error 非空）不跳过，且在开始时从文件剔除（重试后不会产生重复键）。
     done = set()
     if results_path.exists():
+        good_rows = []
         for line in results_path.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 r = json.loads(line)
-                done.add((r["sample_id"], r["side"], r["arm"], r["repeat"]))
+                key = (r["sample_id"], r["side"], r["arm"], r["repeat"])
+                if r.get("parse_status") == "OK" and not r.get("run_error"):
+                    done.add(key)
+                    good_rows.append(r)
+                # 否则（错误记录）不加入 done，重试时重新调用
+        results_path.write_text(
+            "\n".join(json.dumps(r, ensure_ascii=False) for r in good_rows) + "\n",
+            encoding="utf-8")
 
     with open(results_path, "a", encoding="utf-8") as f:
         for item in schedule:
@@ -384,7 +477,8 @@ def invoke(args) -> int:
                 "representation": p.get("representation"),
                 "code_text_sha256": p.get("code_text_sha256"),
                 "source_tree_sha256": p["source_tree_sha256"],
-                "cpg_bundle_sha256": p.get("cpg_bundle_sha256"),
+                "cpg_cache_key": p.get("cpg_cache_key"),
+                "canonical_cpg_rows_sha256": p.get("canonical_cpg_rows_sha256"),
             }
             for k in _fingerprint_keys(p.get("representation")):
                 extra[k] = p.get(k)
@@ -400,20 +494,60 @@ def invoke(args) -> int:
 
 
 def verify_results(args) -> int:
-    """验证结果完整性。COMPLETE → VERIFIED。"""
+    """严格验证结果完整性（fail-closed）。COMPLETE → VERIFIED。"""
     run_dir = args.run_dir
     if _read_state(run_dir) != "COMPLETE":
         return _fail(run_dir, f"verify-results 要求 COMPLETE，当前 {_read_state(run_dir)}")
     schedule = json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))
+    prot = json.loads((run_dir / "protocol.json").read_text(encoding="utf-8"))
+    pmap = {}
+    for line in (run_dir / "prompt_manifest.jsonl").read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            p = json.loads(line)
+            pmap[(p["sample_id"], p["side"])] = p
     results = []
     for line in (run_dir / "results.jsonl").read_text(encoding="utf-8").splitlines():
         if line.strip():
             results.append(json.loads(line))
+
+    errors = []
+    seen = set()
+    for r in results:
+        key = (r["sample_id"], r["side"], r.get("arm"), r.get("repeat"))
+        # 唯一键（重复结果 = 坏）
+        if key in seen:
+            errors.append(f"结果唯一键重复: {key}")
+        seen.add(key)
+        # verdict 枚举
+        if r.get("verdict") not in VALID_VERDICTS:
+            errors.append(f"{r['sample_id']}/{r['side']} verdict 非法: {r.get('verdict')!r}")
+        # parse_status 必须 OK（ERROR/网络失败不得通过）
+        if r.get("parse_status") != "OK":
+            errors.append(f"{r['sample_id']}/{r['side']} parse_status={r.get('parse_status')}")
+        # run_error 必须为空
+        if r.get("run_error"):
+            errors.append(f"{r['sample_id']}/{r['side']} run_error={str(r.get('run_error'))[:60]}")
+        # arm/repeat 契约
+        if r.get("arm") != "real":
+            errors.append(f"{r['sample_id']}/{r['side']} arm 非法: {r.get('arm')!r}")
+        if r.get("repeat") != 0:
+            errors.append(f"{r['sample_id']}/{r['side']} repeat 非法: {r.get('repeat')!r}")
+        # provenance：prompt SHA 与 manifest 一致、representation 与 protocol 一致
+        p = pmap.get((r["sample_id"], r["side"]))
+        if p is not None and r.get("prompt_sha256") != p.get("prompt_sha256"):
+            errors.append(f"{r['sample_id']}/{r['side']} prompt_sha256 与 manifest 不符")
+        if r.get("representation") != prot.get("representation"):
+            errors.append(f"{r['sample_id']}/{r['side']} representation 漂移")
+    # 集合必须与 schedule 完全一致
     got = {(r["sample_id"], r["side"]) for r in results}
     expected = {(s["sample_id"], s["side"]) for s in schedule}
     if got != expected:
         missing = expected - got
-        return _fail(run_dir, f"结果不完整，缺 {len(missing)} 项: {list(missing)[:3]}")
+        extra = got - expected
+        errors.append(f"结果集合不符: 缺 {len(missing)} 项 {sorted(missing)[:3]}，"
+                      f"多 {len(extra)} 项 {sorted(extra)[:3]}")
+    if errors:
+        return _fail(run_dir, f"verify-results {len(errors)} 错误: {errors[:5]}")
     _write_state(run_dir, "VERIFIED", {"n_results": len(results)})
     print(f"[verify-results] PASS {len(results)} 项结果完整")
     return 0
@@ -443,7 +577,7 @@ def summarize(args) -> int:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("command", choices=["prepare", "verify-inputs", "invoke", "verify-results", "summarize"])
+    ap.add_argument("command", choices=["prepare", "verify-inputs", "lock-inputs", "invoke", "verify-results", "summarize"])
     ap.add_argument("--protocol", type=Path)
     ap.add_argument("--representation", default=None,
                     choices=sorted(ALLOWED_REPRESENTATIONS),
@@ -453,8 +587,8 @@ def main():
     ap.add_argument("--run-dir", required=True, type=Path)
     args = ap.parse_args()
 
-    fn = {"prepare": prepare, "verify-inputs": verify_inputs, "invoke": invoke,
-          "verify-results": verify_results, "summarize": summarize}[args.command]
+    fn = {"prepare": prepare, "verify-inputs": verify_inputs, "lock-inputs": lock_inputs,
+          "invoke": invoke, "verify-results": verify_results, "summarize": summarize}[args.command]
     try:
         return fn(args)
     except Exception as e:

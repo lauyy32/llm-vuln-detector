@@ -252,8 +252,14 @@ def _as_int(v) -> int:
 
 
 def canonical_row_hash(row: dict) -> str:
-    """行级规范哈希：字段按名排序后序列化，与 dict 迭代序、CSV 列序无关。"""
-    items = sorted((str(k), str(v)) for k, v in row.items())
+    """行级规范哈希：字段按名排序后序列化，与 dict 迭代序、CSV 列序无关。
+
+    ``abs_path`` 字段的值替换为规范相对路径（消除跨克隆根目录差异），避免绝对
+    路径污染 tie-breaker，导致"相同行、不同仓库根路径"产出不同排序。
+    """
+    norm = {k: (_relative_path(v) if k == "abs_path" else v)
+            for k, v in row.items()}
+    items = sorted((str(k), str(v)) for k, v in norm.items())
     return hashlib.sha256(
         json.dumps(items, ensure_ascii=False).encode("utf-8")).hexdigest()
 
@@ -274,6 +280,17 @@ def canonical_taint_sort_key(row: dict):
 def sort_taint_rows_canonical(rows: list[dict]) -> list[dict]:
     """按稳定键排序 taint 行（不改行内容），返回新列表。"""
     return sorted(rows, key=canonical_taint_sort_key)
+
+
+def canonical_cpg_rows_sha(rows: list[dict]) -> str:
+    """canonical 排序后 taint 行集合的规范 SHA（跨机器稳定，abs_path 已相对化）。
+
+    与 sort_taint_rows_canonical 的行序一致，用于锚定"实际 CPG 输出内容"身份，
+    而非输入 cache key（后者绑 staged+query+CodeQL identity）。
+    """
+    canon = sort_taint_rows_canonical(rows)
+    joined = "\n".join(canonical_row_hash(r) for r in canon)
+    return hashlib.sha256(joined.encode("utf-8")).hexdigest()
 
 
 def build_cpg_slices_text(

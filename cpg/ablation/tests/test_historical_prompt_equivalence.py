@@ -96,7 +96,7 @@ class Fixture:
                     "prompt_sha256": ("0" * 64) if corrupt_sha else sha(txt),
                     "representation": "legacy-rq1-r0",
                     "source_tree_sha256": self.tree[(c, side)],
-                    "cpg_bundle_sha256": "e" * 64,
+                    "cpg_cache_key": "e" * 64,
                 })
         self.regen = self.regen_dir / "prompt_manifest.jsonl"
         self.regen.write_text("\n".join(json.dumps(r) for r in recs) + "\n",
@@ -268,7 +268,7 @@ class TestEquivalenceGate(unittest.TestCase):
         recs.append({"sample_id": "CVE-EXTRA", "side": "vuln", "arm": "real",
                      "prompt_path": "../prompts/x.txt", "prompt_sha256": "0" * 64,
                      "representation": "legacy-rq1-r0",
-                     "source_tree_sha256": "a" * 64, "cpg_bundle_sha256": "e" * 64})
+                     "source_tree_sha256": "a" * 64, "cpg_cache_key": "e" * 64})
         self.fx.regen.write_text("\n".join(json.dumps(r) for r in recs) + "\n",
                                  encoding="utf-8")
         self.assertEqual(heq.main(self.fx.argv()), 2)

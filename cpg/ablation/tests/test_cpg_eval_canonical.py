@@ -74,6 +74,30 @@ class TestCanonicalSort(unittest.TestCase):
         self.assertEqual(cpg_eval.canonical_row_hash(r),
                          cpg_eval.canonical_row_hash(r_rev))
 
+    def test_row_hash_independent_of_clone_root(self):
+        # 相同行、不同仓库根路径：abs_path 前缀不同，但 row hash 必须相同
+        r1 = _row("CWE-022", "backend/mcp.py", 10, 40,
+                  abs_path="C:/Users/lenovo/a/staging/corpus_src/CVE-2026-45019_vuln/backend/mcp.py")
+        r2 = _row("CWE-022", "backend/mcp.py", 10, 40,
+                  abs_path="D:/other/clone/b/staging/corpus_src/CVE-2026-45019_vuln/backend/mcp.py")
+        self.assertEqual(cpg_eval.canonical_row_hash(r1),
+                         cpg_eval.canonical_row_hash(r2),
+                         "row hash 不得受仓库根路径影响")
+
+    def test_sort_and_render_identical_across_clone_roots(self):
+        # 相同行集合、不同根路径 → 排序顺序与渲染文本完全一致
+        def build(root):
+            return [
+                _row("CWE-022", "b.py", 1, 2, abs_path=f"{root}/corpus_src/CVE-2026-45019_vuln/b.py"),
+                _row("CWE-022", "a.py", 3, 4, abs_path=f"{root}/corpus_src/CVE-2026-45019_vuln/a.py"),
+                _row("CWE-089", "z.py", 5, 6, abs_path=f"{root}/corpus_src/CVE-2026-45019_vuln/z.py"),
+            ]
+        s1 = cpg_eval.build_cpg_slices_text(
+            cpg_eval.sort_taint_rows_canonical(build("C:/Users/lenovo/clone1")), "")
+        s2 = cpg_eval.build_cpg_slices_text(
+            cpg_eval.sort_taint_rows_canonical(build("D:/mnt/elsewhere/clone2")), "")
+        self.assertEqual(s1, s2)
+
     def test_relative_path_extraction(self):
         ap = "C:/x/staging/corpus_src/CVE-2026-45019_vuln/backend/chainlit/mcp.py"
         self.assertEqual(cpg_eval._relative_path(ap), "backend/chainlit/mcp.py")
