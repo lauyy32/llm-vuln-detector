@@ -105,6 +105,8 @@ def main():
                     default=ROOT / "cpg/ablation/seeds/v10_d1_7b/results.csv")
     ap.add_argument("--regenerated-manifest", type=Path, required=True,
                     help="新目录 prompt_manifest.jsonl（prepare 产出）")
+    ap.add_argument("--canonical-manifest", type=Path, required=True,
+                    help="canonical_corpus_manifest.json（成员与排除原因的唯一权威）")
     ap.add_argument("--historical-source", type=Path,
                     default=ROOT / "cpg/ablation/artifacts/historical_v1_source_manifest.jsonl")
     ap.add_argument("--out", type=Path,
@@ -114,6 +116,19 @@ def main():
     args = ap.parse_args()
 
     index = load_historical_index(args.raw, args.results)
+
+    # canonical 是成员与排除原因的唯一权威；硬编码表降级为交叉断言
+    cm = json.loads(args.canonical_manifest.read_text(encoding="utf-8"))
+    canon_elig = {s["sample_id"] for s in cm["samples"] if s.get("eligible")}
+    canon_excl = {s["sample_id"]: (s.get("exclusion_reason") or "UNSPECIFIED")
+                  for s in cm["samples"] if not s.get("eligible")}
+    canon_tree = {(s["sample_id"], side): s.get(f"{side}_tree_sha256_lf")
+                  for s in cm["samples"] for side in ("vuln", "fixed")}
+    if set(EXCLUDED) != set(canon_excl):
+        print(f"[FAIL] 硬编码排除表与 canonical 不一致: "
+              f"表多={sorted(set(EXCLUDED) - set(canon_excl))} "
+              f"canonical多={sorted(set(canon_excl) - set(EXCLUDED))}")
+        return 2
 
     # 历史源码证据（side 级；缺失即 UNKNOWN）
     hist_src = {}
@@ -134,6 +149,15 @@ def main():
                 return 1
             regen[key] = r
 
+    # regen 集合必须恰好等于 canonical eligible × {vuln, fixed}（不多不少）
+    regen_keys = set(regen)
+    want_keys = {(c, s) for c in canon_elig for s in ("vuln", "fixed")}
+    if regen_keys != want_keys:
+        print(f"[FAIL] regen 集合 != canonical eligible×sides: "
+              f"多={sorted(regen_keys - want_keys)[:3]} "
+              f"缺={sorted(want_keys - regen_keys)[:3]}")
+        return 2
+
     run_dir = args.regenerated_manifest.parent
     comparisons = []
     excluded_rows = []
@@ -143,8 +167,9 @@ def main():
             "historical_row_index": h["historical_row_index"],
             "historical_prompt_sha256": sha_text(h["prompt"]),
         }
-        if cve in EXCLUDED:
-            row["exclusion_reason"] = EXCLUDED[cve]
+        # 排除判定以 canonical eligible 为准（硬编码表已交叉断言为一致）
+        if cve not in canon_elig:
+            row["exclusion_reason"] = canon_excl.get(cve, "NOT_IN_CANONICAL")
             excluded_rows.append(row)
             continue
         reg = regen.get((cve, side))
@@ -156,6 +181,11 @@ def main():
         actual = sha_text(ppath.read_text(encoding="utf-8"))
         if actual != reg["prompt_sha256"]:
             print(f"[FAIL] 重生成 prompt SHA 漂移: {cve}/{side}")
+            return 2
+        # regen 的 source_tree_sha 必须等于 canonical 对应 side 树哈希
+        want_tree = canon_tree.get((cve, side))
+        if want_tree and reg.get("source_tree_sha256") != want_tree:
+            print(f"[FAIL] regen source_tree_sha 与 canonical 不符: {cve}/{side}")
             return 2
         regen_prompt = ppath.read_text(encoding="utf-8")
         hs = split_prompt(h["prompt"])
@@ -184,6 +214,20 @@ def main():
         if not row["prompt_exact_match"] and not layers:
             layers.append("renderer_or_metadata")
         row["mismatch_layer"] = layers
+        # 次级诊断：区分"仅 CPG 流块顺序不同"与真实内容差异。
+        # 仅用于解释失败，不改变 Gate 判定（UNCHANGED 侧不字节相等即 FAIL）。
+        if row["prompt_exact_match"]:
+            row["difference_type"] = None
+            row["semantic_multiset_match"] = True
+        elif (hs["code_text"] == rs["code_text"]
+              and sorted((hs["cpg_slices"] or "").splitlines())
+                == sorted((rs["cpg_slices"] or "").splitlines())):
+            row["difference_type"] = "CPG_ORDER_ONLY"
+            row["semantic_multiset_match"] = True
+        else:
+            row["difference_type"] = "CONTENT_DIFF"
+            row["semantic_multiset_match"] = False
+        row["ordered_exact_match"] = row["prompt_exact_match"]
         comparisons.append(row)
 
     # 范围恒等式

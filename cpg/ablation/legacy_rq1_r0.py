@@ -78,7 +78,7 @@ def load_legacy_code_text(side_root: Path, taint_rows: list[dict],
     `side_root`：该侧源码根目录（如 `cpg/corpus-v3/<CVE>/vuln`）。
     `taint_rows`：该侧 taint 命中行（含 abs_path/sourceLine/sinkLine）。
     """
-    root = side_root
+    root = Path(side_root).resolve()
     hit_paths: dict[str, list[tuple[int, int]]] = {}
     root_str = str(root).replace("\\", "/") + "/"
     for r in taint_rows:

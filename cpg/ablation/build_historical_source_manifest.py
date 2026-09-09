@@ -51,15 +51,26 @@ def export_historical_corpus(tmpdir: Path) -> Path:
 
 
 def load_backup(backup: Path):
-    """返回 {(cve, side): Path(目录)} 与文件级 SHA 校验表。"""
+    """返回 ({(cve, side): Path(目录)}, {side_key: {rel_path: sha256}}, manifest_sha)。
+
+    side_key 形如 "CVE-2026-53500/vuln"，与备份 manifest 的 path 前缀一致。
+    """
     if not backup.exists():
-        return {}, {}
+        return {}, {}, None
     mpath = backup / "manifest-sha256.json"
-    sha_map = {}
+    sha_by_side = {}
+    manifest_sha = None
     if mpath.exists():
-        mf = json.loads(mpath.read_text(encoding="utf-8"))
+        raw = mpath.read_bytes()
+        manifest_sha = hashlib.sha256(raw).hexdigest()
+        mf = json.loads(raw.decode("utf-8"))
         for f in mf.get("files", []):
-            sha_map[f["path"]] = f["sha256"]
+            p = f["path"].replace("\\", "/")
+            parts = p.split("/")
+            if len(parts) >= 3 and parts[1] in ("vuln", "fixed"):
+                key = f"{parts[0]}/{parts[1]}"
+                rel = "/".join(parts[2:])
+                sha_by_side.setdefault(key, {})[rel] = f["sha256"]
     corpus = backup / "corpus"
     dirs = {}
     if corpus.exists():
@@ -68,9 +79,30 @@ def load_backup(backup: Path):
                 continue
             for side in ("vuln", "fixed"):
                 sd = cve_dir / side
-                if sd.is_dir():
+                # 只收录非空 side：空目录无源码可取证，应标 unavailable 而非误报不一致
+                if sd.is_dir() and any(x.is_file() for x in sd.rglob("*")):
                     dirs[(cve_dir.name, side)] = sd
-    return dirs, sha_map
+    return dirs, sha_by_side, manifest_sha
+
+
+def verify_backup_side(side_dir: Path, expected: dict) -> list:
+    """校验备份 side 目录：文件集合与每个文件原始 SHA 必须与 manifest 一致。"""
+    errors = []
+    actual = {}
+    for p in sorted(side_dir.rglob("*")):
+        if p.is_file():
+            actual[p.relative_to(side_dir).as_posix()] = hashlib.sha256(
+                p.read_bytes()).hexdigest()
+    missing = sorted(set(expected) - set(actual))
+    extra = sorted(set(actual) - set(expected))
+    if missing:
+        errors.append(f"备份缺文件: {missing[:3]}")
+    if extra:
+        errors.append(f"备份多出文件: {extra[:3]}")
+    for rel, want in expected.items():
+        if rel in actual and actual[rel] != want:
+            errors.append(f"备份 SHA 不符: {rel}")
+    return errors
 
 
 def main():
@@ -88,7 +120,8 @@ def main():
     else:
         samples = [s for s in args.samples.split(",") if s]
 
-    backup_dirs, backup_sha = load_backup(args.backup)
+    backup_dirs, backup_sha, manifest_sha = load_backup(args.backup)
+    backup_verified = 0
     rows = []
     with tempfile.TemporaryDirectory() as td:
         hist_root = export_historical_corpus(Path(td))
@@ -106,11 +139,25 @@ def main():
                     continue
                 bdir = backup_dirs.get((cve, side))
                 if bdir is not None:
+                    expected = backup_sha.get(f"{cve}/{side}", {})
+                    if not expected:
+                        raise RuntimeError(
+                            f"备份 manifest 无 {cve}/{side} 的条目，不得按备份取证")
+                    errs = verify_backup_side(bdir, expected)
+                    if errs:
+                        raise RuntimeError(
+                            f"备份完整性校验失败 {cve}/{side}: {errs[:3]}")
+                    backup_verified += 1
                     rows.append({
                         "sample_id": cve, "side": side,
                         "tree_sha256_lf": tree_sha_lf(bdir),
                         "evidence_type": "private-backup-manifest",
-                        "evidence_ref": str(bdir),
+                        # 逻辑引用：不含本机绝对路径（避免泄露用户名且可供第三方解析）
+                        "evidence_ref": (
+                            f"backup-manifest:{manifest_sha}/{cve}/{side}"
+                            if manifest_sha else f"backup-manifest:unknown/{cve}/{side}"),
+                        "backup_manifest_sha256": manifest_sha,
+                        "backup_files_verified": len(expected),
                         "historical_commit": None,
                     })
                     continue
