@@ -1,0 +1,174 @@
+{
+  "metric": "lower_bound_tokens（不含 CPG；OVERHEAD 为下界常数）",
+  "num_ctx": 32768,
+  "num_predict": 1024,
+  "n_fit": 10,
+  "n_confirmation_fit": 10,
+  "rows": [
+    {
+      "sample_id": "CVE-2026-12482",
+      "vuln_src_tokens": 10915,
+      "patch_tokens": 509,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 13048,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-70491",
+      "vuln_src_tokens": 6553,
+      "patch_tokens": 420,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 8597,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-50558",
+      "vuln_src_tokens": 48315,
+      "patch_tokens": 951,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 50890,
+      "num_ctx": 32768,
+      "context_fit": false,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "vuln_src_tokens": 38705,
+      "patch_tokens": 8827,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 49156,
+      "num_ctx": 32768,
+      "context_fit": false,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-53502",
+      "vuln_src_tokens": 905,
+      "patch_tokens": 1317,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 3846,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "vuln_src_tokens": 188666,
+      "patch_tokens": 31671,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 221961,
+      "num_ctx": 32768,
+      "context_fit": false,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "vuln_src_tokens": 4827,
+      "patch_tokens": 2521,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 8972,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "vuln_src_tokens": 58245,
+      "patch_tokens": 9355,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 69224,
+      "num_ctx": 32768,
+      "context_fit": false,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "vuln_src_tokens": 7092,
+      "patch_tokens": 5236,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 13952,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "vuln_src_tokens": 10810,
+      "patch_tokens": 1739,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 14173,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "vuln_src_tokens": 6516,
+      "patch_tokens": 2176,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 10316,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-54785",
+      "vuln_src_tokens": 7678,
+      "patch_tokens": 2018,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 11320,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-50181",
+      "vuln_src_tokens": 5908,
+      "patch_tokens": 2023,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 9555,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "vuln_src_tokens": 9151,
+      "patch_tokens": 3754,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 14529,
+      "num_ctx": 32768,
+      "context_fit": true,
+      "confirmation_eligible": true
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "vuln_src_tokens": 33904,
+      "patch_tokens": 44132,
+      "prompt_overhead": 600,
+      "num_predict": 1024,
+      "total_lower_bound": 79660,
+      "num_ctx": 32768,
+      "context_fit": false,
+      "confirmation_eligible": false
+    }
+  ]
+}

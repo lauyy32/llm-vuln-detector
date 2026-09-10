@@ -1,7 +1,7 @@
 {
   "schema": "v4-gate-a-report/1",
   "generated_from": {
-    "git_commit": "5a5a9a93aa0bb808d6a11b1a62b375eb52ff28e3",
+    "git_commit": "d9583ceddb80e346ef29fb9ea6b41989b487cb54",
     "n_candidates": 15,
     "n_confirmation": 14
   },
@@ -14,6 +14,9 @@
   "upstream": {
     "resolved": 15,
     "content_not_equivalent": [],
+    "fetch_error": [],
+    "path_not_equivalent": [],
+    "parents_abnormal": [],
     "composite_signal": [
       "CVE-2026-50181",
       "CVE-2026-45019"
@@ -39,6 +42,7 @@
   "token_gate": {
     "tokenizer": "cpg/ablation/artifacts/v4/tokenizer/tokenizer.json",
     "vocab_size": 151665,
+    "metric": "patch_token（非 final_prompt_token，见 P0-4 警示）",
     "ratio_bounds": [
       0.8,
       1.25
@@ -170,11 +174,19 @@
       "min": 420,
       "max": 44132,
       "median": 2176
+    },
+    "patch_context_fit": {
+      "num_ctx": 32768,
+      "over_num_ctx": [
+        "CVE-2026-45019"
+      ],
+      "note": "仅 patch token；最终 prompt 还须加源码/CPG/system/num_predict"
     }
   },
   "gate_a_pass": false,
   "blockers": [
     "placebo token ratio out of bounds",
-    "shuffled token ratio out of bounds"
+    "shuffled token ratio out of bounds",
+    "real patch 超 num_ctx: ['CVE-2026-45019']"
   ]
 }

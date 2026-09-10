@@ -63,9 +63,25 @@ def _manifest_by_id() -> dict:
 
 
 def build_canonical_manifest(out_dir: Path) -> dict:
-    """Gate A-1：15 例 V4 候选集（从 canonical manifest 提取，fail-closed）。"""
-    by_id = _manifest_by_id()
+    """Gate A-1：15 例 V4 候选集（从 canonical manifest 提取，fail-closed）。
+
+    P0-3 强化：重复 sample 检测、必填字段校验（repo/parent/fix/两侧 tree SHA/
+    pair_manifest SHA）、**从磁盘重算两侧 tree SHA**、pair_manifest SHA 校验、
+    source_path 位于唯一 corpus-v3 根、目录名 == sample_id。
+    """
+    from cpg.ablation.canonical_manifest import tree_sha_lf as _tree_sha_lf  # 权威实现
+    raw = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+    samples = raw.get("samples", [])
+    ids = [s.get("sample_id") for s in samples]
+    dups = sorted({i for i in ids if ids.count(i) > 1})
+    by_id = {}
+    for s in samples:
+        by_id.setdefault(s.get("sample_id"), s)
+    v3_root = (ROOT / "cpg" / "corpus-v3").resolve()
     entries, errors = [], []
+    pm_drift = []
+    if dups:
+        errors.append(f"canonical manifest 重复 sample: {dups}")
     for cve in V4_CANDIDATES:
         s = by_id.get(cve)
         if s is None:
@@ -74,16 +90,48 @@ def build_canonical_manifest(out_dir: Path) -> dict:
         if not s.get("eligible"):
             errors.append(f"{cve} 非 eligible（{s.get('exclusion_reason')}）")
             continue
-        sp = s.get("source_path")
-        if not sp or "/corpus-v3/" not in (ROOT / sp).resolve().as_posix():
-            errors.append(f"{cve} source_path 不在 corpus-v3: {sp}")
+        missing = [k for k in ("repo_slug", "parent_commit", "fix_commit", "source_path",
+                               "vuln_tree_sha256_lf", "fixed_tree_sha256_lf",
+                               "pair_manifest_sha256") if not s.get(k)]
+        if missing:
+            errors.append(f"{cve} 缺必填字段: {missing}")
             continue
+        src_dir = (ROOT / s["source_path"]).resolve()
+        if src_dir.parent != v3_root:
+            errors.append(f"{cve} source_path 父目录非唯一 corpus-v3 根: {src_dir.parent}")
+            continue
+        if src_dir.name != cve:
+            errors.append(f"{cve} 目录名 != sample_id: {src_dir.name}")
+            continue
+        drift = []
+        for side, key in (("vuln", "vuln_tree_sha256_lf"), ("fixed", "fixed_tree_sha256_lf")):
+            disk = _tree_sha_lf(src_dir / side)
+            if disk != s[key]:
+                drift.append(f"{side}: 磁盘 {disk[:12]} != manifest {s[key][:12]}")
+        if drift:
+            errors.append(f"{cve} tree SHA 漂移 {'; '.join(drift)}")
+            continue
+        pm = src_dir / "pair_manifest.json"
+        if not pm.exists():
+            errors.append(f"{cve} 缺 pair_manifest.json")
+            continue
+        pm_sha = _sha256_bytes(pm.read_bytes())
+        if pm_sha != s["pair_manifest_sha256"]:
+            # 经查证：canonical manifest 的 pair_manifest_sha256 为陈旧字段
+            # （f20e516 于 2026-09-09 17:29 重建 pair_manifest 后未同步 manifest；
+            #  该值与磁盘 raw、LF 归一、以及任何 git 历史版本均不符）。
+            # 语料权威锚定是 tree_sha256_lf（上面已独立重算并通过），故此处
+            # **记录为 drift（非阻断）**，并在 gate 报告中显式列出，待 reviewer 决定
+            # 是否回填 manifest。不擅自修改权威工件。
+            pm_drift.append({"sample_id": cve,
+                             "manifest": s["pair_manifest_sha256"],
+                             "disk_raw": pm_sha})
         entries.append({
             "sample_id": cve,
             "repo_slug": s.get("repo_slug"),
             "parent_commit": s.get("parent_commit"),
             "fix_commit": s.get("fix_commit"),
-            "source_path": sp,
+            "source_path": s.get("source_path"),
             "vuln_tree_sha256_lf": s.get("vuln_tree_sha256_lf"),
             "fixed_tree_sha256_lf": s.get("fixed_tree_sha256_lf"),
             "pair_manifest_sha256": s.get("pair_manifest_sha256"),
@@ -101,6 +149,7 @@ def build_canonical_manifest(out_dir: Path) -> dict:
         },
         "n_candidates": len(entries),
         "n_confirmation": sum(1 for e in entries if e["confirmation_eligible"]),
+        "pair_manifest_drift": pm_drift,
         "candidates": entries,
         "errors": errors,
     }
@@ -111,28 +160,84 @@ def build_canonical_manifest(out_dir: Path) -> dict:
 
 
 def build_upstream_report(out_dir: Path) -> dict:
-    """Gate A-2：对 15 例跑上游投影（复用 upstream_manifest），补 composite/cross-language 判定。"""
-    out = out_dir / "v4_upstream_real_report.json"
+    """Gate A-2：对 15 例跑上游投影（复用 upstream_manifest），补 composite/cross-language 判定。
+
+    P0-2 fail-closed：输出到唯一临时文件；校验子进程 returncode、15 例**精确键集**、
+    每例证据（单 parent、路径级等价、内容级等价、无 fetch_error），任一不满足即抛异常；
+    通过后原子提升到最终路径。**绝不读取陈旧输出。**
+    """
+    final = out_dir / "v4_upstream_real_report.json"
+    tmp = out_dir / "v4_upstream_real_report.tmp.json"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    if tmp.exists():
+        tmp.unlink()
     cmd = [sys.executable, str(ROOT / "cpg/ablation/upstream_manifest.py"),
-           "--cves", *V4_CANDIDATES, "--out", str(out)]
+           "--cves", *V4_CANDIDATES, "--out", str(tmp)]
     r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
                        cwd=str(ROOT), timeout=3600)
-    if not out.exists():
-        raise RuntimeError(f"upstream_manifest 失败: {(r.stderr or r.stdout)[-500:]}")
-    d = json.loads(out.read_text(encoding="utf-8"))
-    for _cve, s in d.get("samples", {}).items():
+    if r.returncode != 0:
+        raise RuntimeError(f"upstream_manifest rc={r.returncode}: "
+                           f"{(r.stderr or r.stdout)[-500:]}")
+    if not tmp.exists():
+        raise RuntimeError("upstream_manifest 未产出输出文件（rc=0 但无输出）")
+    d = json.loads(tmp.read_text(encoding="utf-8"))
+    sm = d.get("samples", {})
+    if set(sm) != set(V4_CANDIDATES):
+        raise RuntimeError(f"upstream 样本键不匹配: 缺={sorted(set(V4_CANDIDATES) - set(sm))} "
+                           f"多={sorted(set(sm) - set(V4_CANDIDATES))}")
+    for cve in V4_CANDIDATES:
+        s = sm[cve]
         if "python_projection_n" not in s:
-            continue
+            raise RuntimeError(f"{cve} upstream 未解析: {str(s)[:120]}")
+        if s.get("parents_count") != 1:
+            raise RuntimeError(f"{cve} parents_count={s.get('parents_count')}（V4 要求单 parent）")
+        dp = s.get("delta_paths") or {}
+        if dp.get("path_set_equivalent") is not True:
+            raise RuntimeError(f"{cve} 路径级不等价: {dp}")
+        cc = s.get("content")
+        if not isinstance(cc, dict):
+            raise RuntimeError(f"{cve} 缺内容级证据")
+        if cc.get("fetch_error"):
+            raise RuntimeError(f"{cve} fetch_error: {cc['fetch_error']}")
+        if cc.get("content_equivalent") is not True:
+            raise RuntimeError(f"{cve} 内容级不等价: {cc}")
         msg = (s.get("commit_message_head") or "").lower()
         s["composite_signal"] = bool(s.get("is_merge")) or ("merge" in msg)
         s["cross_language_signal"] = (s.get("python_projection_n", 0) == 0
                                       and s.get("non_python_excluded_n", 0) > 0)
-    out.write_text(json.dumps(d, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    tmp.write_text(json.dumps(d, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    tmp.replace(final)  # 原子提升
     return d
 
 
 def _diff_sha(diff_text: str) -> str:
     return hashlib.sha256(diff_text.encode("utf-8")).hexdigest()
+
+
+PATCHES_REL = "patches"
+
+
+def persist_patch(out_dir: Path, arm: str, cve: str, diff_text: str) -> dict:
+    """P0-1：把 exact diff 落盘为 patches/{arm}/{cve}.diff（字节写入，保 LF/CRLF）。
+
+    返回绑定信息（相对路径 + 原始字节 SHA-256 + 字节数）。后续所有阶段（token 计数、
+    prompt 组装、审计）**只能读取该文件**，禁止重新生成 diff——保证
+    "apply-clean 验证的 diff == 计 token 的 diff == 进入 prompt 的 diff"。
+    """
+    rel = f"{PATCHES_REL}/{arm}/{cve}.diff"
+    p = out_dir / rel
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_bytes(diff_text.encode("utf-8"))
+    b = p.read_bytes()
+    return {"patch_path": rel, "patch_sha256": _sha256_bytes(b), "patch_bytes": len(b)}
+
+
+def read_patch(out_dir: Path, rel: str) -> str:
+    """P0-1：按冻结相对路径读取 exact diff（校验存在）。"""
+    p = out_dir / rel
+    if not p.exists():
+        raise FileNotFoundError(f"冻结 patch 缺失: {rel}（禁止重生成，须先跑 arms）")
+    return p.read_bytes().decode("utf-8")
 
 
 def _arm_row(cve: str, arm: str, diff: str, rep: dict, expected: str,
@@ -161,9 +266,10 @@ def build_real_manifest(out_dir: Path) -> list:
     for cve in V4_CANDIDATES:
         diff, rep = v4g.gen_complete_real_diff(cve)
         ok, msg = v4g.apply_and_verify(cve, diff)
-        rows.append(_arm_row(cve, "real", diff, rep, "benign",
-                             {"apply_clean": ok, "tree_equivalent": ok,
-                              "apply_message": msg[:200]}))
+        extra = persist_patch(out_dir, "real", cve, diff)
+        extra.update({"apply_clean": ok, "tree_equivalent": ok,
+                      "apply_message": msg[:200]})
+        rows.append(_arm_row(cve, "real", diff, rep, "benign", extra))
     _write_jsonl(out_dir / "real_manifest.jsonl", rows)
     return rows
 
@@ -173,34 +279,38 @@ def build_placebo_manifest(out_dir: Path) -> list:
     rows = []
     for cve in V4_CANDIDATES:
         diff, rep = v4g.gen_placebo_diff(cve)
-        rows.append(_arm_row(cve, "placebo", diff, rep, "vulnerable",
-                             {"ast_equivalent": rep.get("ast_equivalent"),
-                              "apply_clean": rep.get("apply_clean"),
-                              "edits": rep.get("edits", [])}))
+        extra = persist_patch(out_dir, "placebo", cve, diff)
+        extra.update({"ast_equivalent": rep.get("ast_equivalent"),
+                      "apply_clean": rep.get("apply_clean"),
+                      "edits": rep.get("edits", [])})
+        rows.append(_arm_row(cve, "placebo", diff, rep, "vulnerable", extra))
     _write_jsonl(out_dir / "placebo_manifest.jsonl", rows)
     return rows
 
 
-def build_shuffled_manifest(out_dir: Path) -> list:
+def build_shuffled_manifest(out_dir: Path, donors: dict | None = None) -> list:
     """Gate A-3：shuffled 臂 = 循环配对的下一个 CVE 的真实 diff（结构像补丁但无关）。
 
     语义沿用 B4（既有三臂主实验）：donor ≠ 目标；donor diff 本身是完整且在其自身
     vuln 树上 apply-clean 的（real 臂同源构造）。残余漏洞 oracle：donor 补丁不触及
     目标树 → 目标漏洞原样存在。
+
+    注：token matching donor 属 P0-5 有效性升级项，本函数当前仅实现 B4 语义（机械工件）。
     """
-    donors = {cve: v4g.gen_complete_real_diff(cve)[0] for cve in V4_CANDIDATES}
+    if donors is None:
+        donors = {cve: v4g.gen_complete_real_diff(cve)[0] for cve in V4_CANDIDATES}
     rows = []
     for i, cve in enumerate(V4_CANDIDATES):
         donor = V4_CANDIDATES[(i + 1) % len(V4_CANDIDATES)]
         diff = donors[donor]
-        # donor diff 在 donor 树上 apply-clean（沿用 real 的树等价门禁）
         donor_ok, donor_msg = v4g.apply_and_verify(donor, diff)
         _, rep = v4g.gen_complete_real_diff(donor)
         assert donor != cve, f"shuffled donor 不得来自同一 CVE: {cve}"
-        rows.append(_arm_row(cve, "shuffled", diff, rep, "vulnerable",
-                             {"donor": donor, "donor_apply_clean": donor_ok,
-                              "donor_tree_equivalent": donor_ok,
-                              "donor_message": donor_msg[:200]}))
+        extra = persist_patch(out_dir, "shuffled", cve, diff)
+        extra.update({"donor": donor, "donor_apply_clean": donor_ok,
+                      "donor_tree_equivalent": donor_ok,
+                      "donor_message": donor_msg[:200]})
+        rows.append(_arm_row(cve, "shuffled", diff, rep, "vulnerable", extra))
     _write_jsonl(out_dir / "shuffled_manifest.jsonl", rows)
     return rows
 
@@ -234,43 +344,66 @@ def _read_jsonl(path: Path) -> list:
 
 
 def build_token_gate(out_dir: Path) -> dict:
-    """Gate A-4：四臂 diff 的真实 token 计数 + token 比门禁 [0.8, 1.25]（以 real 为基准）。
+    """Gate A-4：四臂 token 计量 + token 比门禁 [0.8, 1.25]（以 real 为基准）。
 
-    口径说明：按"候选补丁（diff）送入模型的 token 数"计；四臂 prompt 的固定部分
-    （system/vuln 代码/CPG）相同，故 diff-level 比值比 prompt-level 更严格（更保守）。
+    P0-1/P0-4 修正：
+    - token 一律从**冻结的 patches/{arm}/{cve}.diff 文件**读取计算，禁止重生成
+      （保证与 apply-clean 验证、将来 prompt 使用的 diff 是同一份字节）。
+    - 界内判定用**未舍入原始比值**（舍入后的值仅作展示）。
+
+    口径警示（P0-4）：本函数计量的是 **patch（候选补丁）token**，不是冻结协议 A4b
+    要求的**最终 prompt token**。最终 prompt 比值与 context-fit 须由 G0 prompt 草案
+    另行计量（见 build_prompt_draft / feasibility 表），二者不可互相替代。
     """
-    real = {r["sample_id"]: r for r in _read_jsonl(out_dir / "real_manifest.jsonl")}
-    arms = {"placebo": _read_jsonl(out_dir / "placebo_manifest.jsonl"),
-            "shuffled": _read_jsonl(out_dir / "shuffled_manifest.jsonl")}
-    # 重新算各臂 diff 文本的 token（manifest 里存的是 SHA，需重生成文本）
+    manifests = {"real": _read_jsonl(out_dir / "real_manifest.jsonl"),
+                 "placebo": _read_jsonl(out_dir / "placebo_manifest.jsonl"),
+                 "shuffled": _read_jsonl(out_dir / "shuffled_manifest.jsonl")}
     report = {"tokenizer": str(TOKENIZER_PATH.relative_to(ROOT).as_posix()),
               "vocab_size": _tokenizer().get_vocab_size(),
+              "metric": "patch_token（非 final_prompt_token，见 P0-4 警示）",
               "ratio_bounds": [TOKEN_RATIO_LO, TOKEN_RATIO_HI],
               "per_arm": {}}
-    real_tok = {}
-    for cve in V4_CANDIDATES:
-        diff, _ = v4g.gen_complete_real_diff(cve)
-        real_tok[cve] = count_tokens(diff)
-    report["per_arm"]["real"] = {"tokens": real_tok}
+    patch_tok = {}
+    for arm, rows in manifests.items():
+        patch_tok[arm] = {}
+        for r in rows:
+            diff = read_patch(out_dir, r["patch_path"])
+            # 校验冻结文件未被篡改（与 manifest 绑定 SHA 一致）
+            if _sha256_bytes(diff.encode("utf-8")) != r["patch_sha256"]:
+                raise RuntimeError(f"{arm}/{r['sample_id']} 冻结 patch SHA 漂移")
+            patch_tok[arm][r["sample_id"]] = count_tokens(diff)
+        report["per_arm"][arm] = {"tokens": patch_tok[arm]}
+    real_tok = patch_tok["real"]
     for arm in ("placebo", "shuffled"):
-        arm_tok = {}
-        for cve in V4_CANDIDATES:
-            if arm == "placebo":
-                diff, _ = v4g.gen_placebo_diff(cve)
+        ratios_raw = {}
+        ratios_shown = {}
+        for c in V4_CANDIDATES:
+            if real_tok.get(c):
+                rr = patch_tok[arm][c] / real_tok[c]
+                ratios_raw[c] = rr
+                ratios_shown[c] = round(rr, 4)
             else:
-                donor = V4_CANDIDATES[(V4_CANDIDATES.index(cve) + 1) % len(V4_CANDIDATES)]
-                diff, _ = v4g.gen_complete_real_diff(donor)
-            arm_tok[cve] = count_tokens(diff)
-        ratios = {c: round(arm_tok[c] / real_tok[c], 4) if real_tok[c] else None
-                  for c in V4_CANDIDATES}
-        out_of_bounds = [c for c, r in ratios.items()
-                         if r is None or not (TOKEN_RATIO_LO <= r <= TOKEN_RATIO_HI)]
-        report["per_arm"][arm] = {"tokens": arm_tok, "ratio_vs_real": ratios,
-                                  "out_of_bounds": out_of_bounds}
+                ratios_raw[c] = None
+                ratios_shown[c] = None
+        oob = [c for c, r in ratios_raw.items()
+               if r is None or not (TOKEN_RATIO_LO <= r <= TOKEN_RATIO_HI)]
+        report["per_arm"][arm]["ratio_vs_real"] = ratios_shown
+        report["per_arm"][arm]["out_of_bounds"] = oob
     report["real_token_summary"] = {
         "min": min(real_tok.values()), "max": max(real_tok.values()),
         "median": sorted(real_tok.values())[len(real_tok) // 2]}
+    # P0-4：patch 级 context-fit（不含源码/CPG/system/输出；仅下界预警）
+    report["patch_context_fit"] = {
+        "num_ctx": _num_ctx(),
+        "over_num_ctx": sorted([c for c, t in real_tok.items() if t > _num_ctx()]),
+        "note": "仅 patch token；最终 prompt 还须加源码/CPG/system/num_predict",
+    }
     return report
+
+
+def _num_ctx() -> int:
+    from cpg.ablation.model_client import NUM_CTX
+    return NUM_CTX
 
 
 def build_gate_a_report(out_dir: Path) -> dict:
@@ -294,7 +427,14 @@ def build_gate_a_report(out_dir: Path) -> dict:
             "resolved": sum(1 for s in up_samples.values() if "python_projection_n" in s),
             "content_not_equivalent": [c for c, s in up_samples.items()
                                        if isinstance(s.get("content"), dict)
-                                       and s["content"].get("content_equivalent") is False],
+                                       and s["content"].get("content_equivalent") is not True],
+            "fetch_error": sorted({f for s in up_samples.values()
+                                   if isinstance(s.get("content"), dict)
+                                   for f in (s["content"].get("fetch_error") or [])}),
+            "path_not_equivalent": [c for c, s in up_samples.items()
+                                    if (s.get("delta_paths") or {}).get("path_set_equivalent") is not True],
+            "parents_abnormal": [c for c, s in up_samples.items()
+                                 if s.get("parents_count") != 1],
             "composite_signal": [c for c, s in up_samples.items() if s.get("composite_signal")],
             "cross_language_signal": [c for c, s in up_samples.items()
                                       if s.get("cross_language_signal")],
@@ -320,6 +460,17 @@ def build_gate_a_report(out_dir: Path) -> dict:
     blockers = []
     if cm["errors"]:
         blockers.append("canonical errors")
+    up = report["upstream"]
+    if up["resolved"] != len(V4_CANDIDATES):
+        blockers.append(f"upstream resolved {up['resolved']}/{len(V4_CANDIDATES)}")
+    if up["content_not_equivalent"]:
+        blockers.append(f"upstream content_not_equivalent: {up['content_not_equivalent']}")
+    if up["fetch_error"]:
+        blockers.append(f"upstream fetch_error: {up['fetch_error']}")
+    if up["path_not_equivalent"]:
+        blockers.append(f"upstream path_not_equivalent: {up['path_not_equivalent']}")
+    if up["parents_abnormal"]:
+        blockers.append(f"upstream parents_abnormal: {up['parents_abnormal']}")
     if report["arms"]["real"]["tree_equivalent_fail"]:
         blockers.append("real tree_equivalent fail")
     if report["arms"]["placebo"]["apply_clean_fail"] or report["arms"]["placebo"]["ast_not_equivalent"]:
@@ -329,6 +480,9 @@ def build_gate_a_report(out_dir: Path) -> dict:
     for arm in ("placebo", "shuffled"):
         if tok["per_arm"][arm]["out_of_bounds"]:
             blockers.append(f"{arm} token ratio out of bounds")
+    # P0-4：patch 级 context-fit 下界预警（最终 prompt 还须加源码/CPG/system/输出）
+    if tok["patch_context_fit"]["over_num_ctx"]:
+        blockers.append(f"real patch 超 num_ctx: {tok['patch_context_fit']['over_num_ctx']}")
     report["gate_a_pass"] = not blockers
     report["blockers"] = blockers
     (out_dir / "gate_a_report.json").write_text(
@@ -336,9 +490,58 @@ def build_gate_a_report(out_dir: Path) -> dict:
     return report
 
 
+def build_feasibility_table(out_dir: Path) -> dict:
+    """P0-4：不看模型结果的 V4 可行性表（真实 tokenizer + context-fit 下界）。
+
+    对每例估算"确认性最小 prompt"的 token 下界：
+      vuln 源码上下文（real diff 涉及文件的 vuln 版本，逐个按冻结文件读）
+      + candidate patch（real / placebo / shuffled）
+      + system/prompt 开销（常数下界）
+      + num_predict（输出预算）
+    并与 num_ctx 比较，给出 context_fit 判定。**不含 CPG 切片**，故为下界。
+    """
+    from cpg.ablation.model_client import NUM_CTX, NUM_PREDICT
+    OVERHEAD = 600  # system + 指令 + 输出格式的下界（实测后应替换为真实模板 token 数）
+    real_rows = {r["sample_id"]: r for r in _read_jsonl(out_dir / "real_manifest.jsonl")}
+    rows = []
+    for cve in V4_CANDIDATES:
+        r = real_rows[cve]
+        src = sample_dir_path(cve) / "vuln"
+        src_tok = 0
+        for rel in sorted(set(r.get("modified", [])) | set(r.get("added", []))):
+            p = src / rel
+            if p.exists():
+                src_tok += count_tokens(p.read_bytes().decode("utf-8", errors="replace"))
+        patch_tok = count_tokens(read_patch(out_dir, r["patch_path"]))
+        total = src_tok + patch_tok + OVERHEAD + NUM_PREDICT
+        rows.append({"sample_id": cve,
+                     "vuln_src_tokens": src_tok,
+                     "patch_tokens": patch_tok,
+                     "prompt_overhead": OVERHEAD,
+                     "num_predict": NUM_PREDICT,
+                     "total_lower_bound": total,
+                     "num_ctx": NUM_CTX,
+                     "context_fit": total <= NUM_CTX,
+                     "confirmation_eligible": cve not in CONFIRMATORY_EXCLUDED})
+    doc = {"metric": "lower_bound_tokens（不含 CPG；OVERHEAD 为下界常数）",
+           "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT,
+           "n_fit": sum(1 for x in rows if x["context_fit"]),
+           "n_confirmation_fit": sum(1 for x in rows
+                                     if x["context_fit"] and x["confirmation_eligible"]),
+           "rows": rows}
+    (out_dir / "v4_feasibility_table.json").write_text(
+        json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return doc
+
+
+def sample_dir_path(cve: str):
+    """候选样本的 corpus-v3 目录（复用 v4_patch_gen.sample_dir 的 fail-closed 校验）。"""
+    return v4g.sample_dir(cve)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate", "all"])
+    ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate", "feasibility", "all"])
     ap.add_argument("--out-dir", type=Path, default=OUT_DIR)
     args = ap.parse_args()
     try:
@@ -378,6 +581,13 @@ def main() -> int:
             print(f"  {arm} token 越界: {len(oob)} 例 {oob}")
         if not rep["gate_a_pass"]:
             return 1
+    if args.step in ("feasibility", "all"):
+        f = build_feasibility_table(args.out_dir)
+        print(f"[Feasibility] context_fit {f['n_fit']}/{len(f['rows'])}"
+              f"（确认性 {f['n_confirmation_fit']}）")
+        for r in f["rows"]:
+            if not r["context_fit"]:
+                print(f"  OVER {r['sample_id']}: {r['total_lower_bound']} > {r['num_ctx']}")
     return 0
 
 

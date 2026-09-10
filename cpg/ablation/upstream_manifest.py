@@ -341,15 +341,20 @@ def main() -> int:
 
         cache_file = CACHE / f"{cve}.json"
         d = None
-        if args.no_fetch and cache_file.exists():
-            d = json.loads(cache_file.read_text(encoding="utf-8"))
-        elif cache_file.exists():
-            d = json.loads(cache_file.read_text(encoding="utf-8"))
-        else:
-            d = curl_json(api_url(repo, sha))
-            if "_error" not in d:
-                cache_file.write_text(json.dumps(d, ensure_ascii=False),
-                                      encoding="utf-8")
+        if cache_file.exists():
+            cached = json.loads(cache_file.read_text(encoding="utf-8"))
+            # P0-2：缓存必须绑定 repo_slug + fix_commit，否则弃用重取（防陈旧复用）
+            if cached.get("sha") == sha and cached.get("_cache_repo") == repo:
+                d = cached
+        if d is None:
+            if args.no_fetch:
+                d = {"_error": f"no_fetch 且无有效缓存（repo={repo} sha={sha[:12]}）"}
+            else:
+                d = curl_json(api_url(repo, sha))
+                if "_error" not in d:
+                    d["_cache_repo"] = repo
+                    cache_file.write_text(json.dumps(d, ensure_ascii=False),
+                                          encoding="utf-8")
 
         if d is None or "_error" in d:
             err = (d or {}).get("_error", "fetch 失败")
