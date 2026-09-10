@@ -1,7 +1,7 @@
 {
   "schema": "v4-gate-a-report/1",
   "generated_from": {
-    "git_commit": "ac4e89d1473aee308e56fbca05dc51016cb15c01",
+    "git_commit": "9f29b8b0d0bd90166944a969f44a46e8aed102e6",
     "n_candidates": 15,
     "n_confirmation": 14
   },

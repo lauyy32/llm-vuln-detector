@@ -28,7 +28,10 @@ sys.path.insert(0, str(ROOT))
 from cpg.ablation import v4_patch_gen as v4g  # noqa: E402
 from cpg.ablation import upstream_manifest as um  # noqa: E402
 
-CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.json"
+# V4 只消费**版本化 v2** manifest（旧 manifest 的 pair_manifest_sha256 整体陈旧，
+# 且被 RQ1-R lock 逐字节绑定、不得修改）。见 canonical_manifest_v2.py 的谱系说明。
+CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.v2.json"
+OLD_CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.json"
 OUT_DIR = ROOT / "cpg" / "ablation" / "artifacts" / "v4"
 
 # V4 候选集 = CPG 双标 15 例（来源：cpg/ablation/partial_arm_construction.md §候选表）。
@@ -116,16 +119,16 @@ def build_canonical_manifest(out_dir: Path) -> dict:
             errors.append(f"{cve} 缺 pair_manifest.json")
             continue
         pm_sha = _sha256_bytes(pm.read_bytes())
-        if pm_sha != s["pair_manifest_sha256"]:
-            # 经查证：canonical manifest 的 pair_manifest_sha256 为陈旧字段
-            # （f20e516 于 2026-09-09 17:29 重建 pair_manifest 后未同步 manifest；
-            #  该值与磁盘 raw、LF 归一、以及任何 git 历史版本均不符）。
-            # 语料权威锚定是 tree_sha256_lf（上面已独立重算并通过），故此处
-            # **记录为 drift（非阻断）**，并在 gate 报告中显式列出，待 reviewer 决定
-            # 是否回填 manifest。不擅自修改权威工件。
-            pm_drift.append({"sample_id": cve,
-                             "manifest": s["pair_manifest_sha256"],
-                             "disk_raw": pm_sha})
+        # V4 用 v2 的重算字段（旧字段 pair_manifest_sha256 已知整体陈旧）
+        expect_pm = s.get("v2_pair_manifest_sha256", s.get("pair_manifest_sha256"))
+        if pm_sha != expect_pm:
+            errors.append(f"{cve} pair_manifest SHA 与 v2 不符（阻断）")
+            continue
+        # 双重校验：v2 重算的 tree SHA 也必须与磁盘一致
+        for side, key in (("vuln", "v2_vuln_tree_sha256_lf"), ("fixed", "v2_fixed_tree_sha256_lf")):
+            if s.get(key) and _tree_sha_lf(src_dir / side) != s[key]:
+                errors.append(f"{cve} {side} 树 SHA 与 v2 不符（阻断）")
+                break
         entries.append({
             "sample_id": cve,
             "repo_slug": s.get("repo_slug"),
@@ -144,12 +147,15 @@ def build_canonical_manifest(out_dir: Path) -> dict:
         "generated_from": {
             "canonical_manifest": str(CANONICAL_MANIFEST.relative_to(ROOT).as_posix()),
             "canonical_manifest_sha256": _sha256_bytes(CANONICAL_MANIFEST.read_bytes()),
+            "supersedes": str(OLD_CANONICAL_MANIFEST.relative_to(ROOT).as_posix()),
+            "supersedes_sha256": (_sha256_bytes(OLD_CANONICAL_MANIFEST.read_bytes())
+                                  if OLD_CANONICAL_MANIFEST.exists() else None),
+            "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
             "git_commit": _git_commit(),
             "candidate_source": "cpg/ablation/partial_arm_construction.md",
         },
         "n_candidates": len(entries),
         "n_confirmation": sum(1 for e in entries if e["confirmation_eligible"]),
-        "pair_manifest_drift": pm_drift,
         "candidates": entries,
         "errors": errors,
     }
@@ -548,6 +554,30 @@ def sample_dir_path(cve: str):
     return v4g.sample_dir(cve)
 
 
+def build_manifest_registry(out_dir: Path) -> dict:
+    """manifest registry：分别登记 RQ1-R（旧，冻结）与 V4（v2，活动）的权威锚点。"""
+    def _ent(path: Path, consumer: str, status: str, note: str) -> dict:
+        return {"consumer": consumer,
+                "manifest": path.relative_to(ROOT).as_posix(),
+                "sha256": _sha256_bytes(path.read_bytes()) if path.exists() else None,
+                "status": status, "note": note}
+    reg = {
+        "schema": "manifest-registry/1",
+        "generated_git_commit": _git_commit(),
+        "entries": [
+            _ent(OLD_CANONICAL_MANIFEST, "RQ1-R", "FROZEN_LEGACY_INPUT",
+                 "被 cpg/ablation/.work/rq1-r-canonical-v4/lock_request.json 逐字节绑定；"
+                 "pair_manifest_sha256 字段整体陈旧但不得就地修改"),
+            _ent(CANONICAL_MANIFEST, "V4", "ACTIVE",
+                 "由 canonical_manifest_v2.py 从 corpus-v3 机械重算；"
+                 "revision_reason=PAIR_MANIFEST_PROVENANCE_REFRESH"),
+        ],
+    }
+    (out_dir / "manifest_registry.json").write_text(
+        json.dumps(reg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return reg
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate", "feasibility", "all"])
@@ -559,8 +589,11 @@ def main() -> int:
         pass
     if args.step in ("canonical", "all"):
         doc = build_canonical_manifest(args.out_dir)
+        reg = build_manifest_registry(args.out_dir)
         print(f"[GateA-1] v4_canonical_manifest.json: {doc['n_candidates']} 候选，"
               f"{doc['n_confirmation']} 确认性；errors={len(doc['errors'])}")
+        print(f"[Registry] {len(reg['entries'])} 条："
+              f"{[(e['consumer'], e['status']) for e in reg['entries']]}")
         for e in doc["errors"]:
             print("  ERR:", e)
         if doc["errors"]:

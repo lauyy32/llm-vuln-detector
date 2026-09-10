@@ -1,6 +1,6 @@
 {
  "generated_from": {
-  "git_commit": "ac4e89d1473aee308e56fbca05dc51016cb15c01",
+  "git_commit": "9f29b8b0d0bd90166944a969f44a46e8aed102e6",
   "content_compare": true,
   "line_ending_normalized": true,
   "note": "L2 内容级按归一化行尾(CRLF→LF)比对；原始字节差异见 line_ending_diff"

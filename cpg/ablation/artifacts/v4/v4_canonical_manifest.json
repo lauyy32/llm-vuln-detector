@@ -1,90 +1,16 @@
 {
   "schema": "v4-canonical-manifest/1",
   "generated_from": {
-    "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.json",
-    "canonical_manifest_sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
-    "git_commit": "d9583ceddb80e346ef29fb9ea6b41989b487cb54",
+    "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
+    "canonical_manifest_sha256": "8290834061e4a7f0901aa19a87cbd29cf3ce4dd3f669da89b5017bd37c2a9faf",
+    "supersedes": "cpg/ablation/artifacts/canonical_corpus_manifest.json",
+    "supersedes_sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
+    "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
+    "git_commit": "9f29b8b0d0bd90166944a969f44a46e8aed102e6",
     "candidate_source": "cpg/ablation/partial_arm_construction.md"
   },
   "n_candidates": 15,
   "n_confirmation": 14,
-  "pair_manifest_drift": [
-    {
-      "sample_id": "CVE-2026-12482",
-      "manifest": "703970b41bcc5e5c41ccd83499de0203bb5fa461776289c03862188e60684943",
-      "disk_raw": "0e19bb8cce7fd47119f2b73893c6ea3529b046106684d77f9a11c04982a66fcd"
-    },
-    {
-      "sample_id": "CVE-2026-70491",
-      "manifest": "107a140fcdfce1cefcf36cba01fa762aa159e0120b2d5dca54a0804c86cf0b49",
-      "disk_raw": "b65cb6f497a732c64a0406c641f412484c0e3ab714c1e6f5a5591f2cd160b8c1"
-    },
-    {
-      "sample_id": "CVE-2026-50558",
-      "manifest": "83445dc0c0c6022349f91ac958e5c82f042408b955268ab5c0ad2ac5ebd567ae",
-      "disk_raw": "b912ccf9fb55f5c3505f7e1ee148b81bcf439d697a62a15635d8ceb79e912e3d"
-    },
-    {
-      "sample_id": "CVE-2026-67424",
-      "manifest": "86b43ff48c43b4e7e00a907722dd880b1c89ced7b536db0dcc9fb5267089c5e1",
-      "disk_raw": "c065d176089569c9cc9e0834403d5f4a40898e01f062f0960b5c9b8e64cee3af"
-    },
-    {
-      "sample_id": "CVE-2026-53502",
-      "manifest": "e90cb6464febe06fbf7e364b71101ad8d64323c7cdddc2b92e43ebab7e834c44",
-      "disk_raw": "cb6358f77c562ac9d2767fcc679fe9f44169ff0e49c9909bdc98af24be6f4b9e"
-    },
-    {
-      "sample_id": "CVE-2026-73498",
-      "manifest": "05ce323ba0d8baa908442b15a3ffa5d3553aab5eec385a0492fa2cebfdce9555",
-      "disk_raw": "e8d57f92008cb8fdab28f82dd9bee7480b4c69ea7ea27c5091a8232bc1c7ea5d"
-    },
-    {
-      "sample_id": "CVE-2026-53598",
-      "manifest": "a0b2afa9720f315bccc30cd073e7a876d86a244f2bbcb176128d1acbbcce43d9",
-      "disk_raw": "fcc60d0e685c97af5eaccb698fc9bc9c24d9f021c8dbc655935df57ed0293c4e"
-    },
-    {
-      "sample_id": "CVE-2026-67425",
-      "manifest": "32dce6b8e4fb6e71a616ee9b557e69fbf2478c0626f23230824427ec68cc2a7e",
-      "disk_raw": "14f1a99ad991b9a4b77db9a5cc21b7b482e6234156a3be989bdf3b3baa896c57"
-    },
-    {
-      "sample_id": "CVE-2026-54706",
-      "manifest": "b19dac95688fbb6554be467f4c4a4162bd08cdc781db264b857f3c454f79048c",
-      "disk_raw": "79f42d4bdefa980226bcc6a7c3438dfb279b333ed1226ddf82338af870ad0186"
-    },
-    {
-      "sample_id": "CVE-2026-59890",
-      "manifest": "7bb696e1a34f1150feb936442a0ce662c5f3d3b13418ba4722eb0fdb051b8688",
-      "disk_raw": "d91c8d341150004b942ee228390bf4591c2ca3a648d60027ce95704c4eba1c99"
-    },
-    {
-      "sample_id": "CVE-2026-54707",
-      "manifest": "6198ec07a32ac5a4e951ca569a78bf9947405408227b40bf89301685f3583761",
-      "disk_raw": "df44899386fab3c029edfa8a6859db46eba34e4f7c12dd955b25101ea17d2e8c"
-    },
-    {
-      "sample_id": "CVE-2026-54785",
-      "manifest": "319c0d6704431741350bd89cb434757ed57a828861aac861592086f0b0d3a609",
-      "disk_raw": "00212dea0914765cdfd34bc743157f2bbb89a140c6d275b174dd1ec8f1cf175f"
-    },
-    {
-      "sample_id": "CVE-2026-50181",
-      "manifest": "8c755b94aaa991105d357225b4a10c13c5113741ec23c88c060be94c0ddea4f1",
-      "disk_raw": "6c330a252c2b2de440a757291748dc8c2905ddaf7239c2a7d332e67bcdedb8c8"
-    },
-    {
-      "sample_id": "CVE-2026-54574",
-      "manifest": "32463c386a655c116171a2eaf604be224b736f1d47646e902a322f8a39b321b2",
-      "disk_raw": "31c3dd32266f7c866dde398a69d83cb55c491ea8ddd281906bd2ef2733645511"
-    },
-    {
-      "sample_id": "CVE-2026-45019",
-      "manifest": "a40c8fe760e6a1fae75faa8b649ba4613a0723e601a1e8090b014272cbb0eeec",
-      "disk_raw": "7206f9d94b9b08c2ecefa14f79bc6098c3b86a1f690c252cb3579cf58d1ef7b8"
-    }
-  ],
   "candidates": [
     {
       "sample_id": "CVE-2026-12482",

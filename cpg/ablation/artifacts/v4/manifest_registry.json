@@ -1,0 +1,20 @@
+{
+  "schema": "manifest-registry/1",
+  "generated_git_commit": "9f29b8b0d0bd90166944a969f44a46e8aed102e6",
+  "entries": [
+    {
+      "consumer": "RQ1-R",
+      "manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.json",
+      "sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
+      "status": "FROZEN_LEGACY_INPUT",
+      "note": "被 cpg/ablation/.work/rq1-r-canonical-v4/lock_request.json 逐字节绑定；pair_manifest_sha256 字段整体陈旧但不得就地修改"
+    },
+    {
+      "consumer": "V4",
+      "manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
+      "sha256": "8290834061e4a7f0901aa19a87cbd29cf3ce4dd3f669da89b5017bd37c2a9faf",
+      "status": "ACTIVE",
+      "note": "由 canonical_manifest_v2.py 从 corpus-v3 机械重算；revision_reason=PAIR_MANIFEST_PROVENANCE_REFRESH"
+    }
+  ]
+}
