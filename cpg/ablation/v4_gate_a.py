@@ -30,8 +30,10 @@ from cpg.ablation import upstream_manifest as um  # noqa: E402
 
 # V4 只消费**版本化 v2** manifest（旧 manifest 的 pair_manifest_sha256 整体陈旧，
 # 且被 RQ1-R lock 逐字节绑定、不得修改）。见 canonical_manifest_v2.py 的谱系说明。
-CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.v2.json"
-OLD_CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.json"
+# P0-2：路径从单一来源 v4_manifest 取；CLI 强制显式传入并校验一致。
+from cpg.ablation import v4_manifest  # noqa: E402
+CANONICAL_MANIFEST = v4_manifest.V4_CANONICAL_MANIFEST
+OLD_CANONICAL_MANIFEST = v4_manifest.LEGACY_CANONICAL_MANIFEST
 OUT_DIR = ROOT / "cpg" / "ablation" / "artifacts" / "v4"
 
 # V4 候选集 = CPG 双标 15 例（来源：cpg/ablation/partial_arm_construction.md §候选表）。
@@ -427,6 +429,18 @@ def build_gate_a_report(out_dir: Path) -> dict:
     up_samples = up.get("samples", {})
     report = {
         "schema": "v4-gate-a-report/1",
+        "provenance": {
+            "canonical_manifest": str(CANONICAL_MANIFEST.relative_to(ROOT).as_posix()),
+            "canonical_manifest_sha256": _sha256_bytes(CANONICAL_MANIFEST.read_bytes()),
+            "supersedes": str(OLD_CANONICAL_MANIFEST.relative_to(ROOT).as_posix()),
+            "supersedes_sha256": (_sha256_bytes(OLD_CANONICAL_MANIFEST.read_bytes())
+                                  if OLD_CANONICAL_MANIFEST.exists() else None),
+            "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
+            "stale_policy": ("基于旧 manifest 生成的 V4 派生工件（gate_a_report / "
+                             "real|placebo|shuffled_manifest / v4_canonical_manifest / "
+                             "v4_upstream_real_report / v4_feasibility_table / patches/**）"
+                             "已由本次从 v2 的重新生成**完全替换**，无残留旧工件"),
+        },
         "generated_from": {"git_commit": _git_commit(),
                            "n_candidates": cm["n_candidates"],
                            "n_confirmation": cm["n_confirmation"]},
@@ -582,11 +596,23 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate", "feasibility", "all"])
     ap.add_argument("--out-dir", type=Path, default=OUT_DIR)
+    ap.add_argument("--canonical-manifest", type=Path, default=None,
+                    help="V4 权威 manifest（必须显式传入且等于 v4_manifest 单一来源）")
     args = ap.parse_args()
     try:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
+    # P0-2：缺参数即拒绝；且必须与单一来源一致（防 split-brain）
+    if args.canonical_manifest is None:
+        print("[FAIL] 必须显式传入 --canonical-manifest（V4 禁止隐式默认）")
+        return 1
+    if args.canonical_manifest.resolve() != v4_manifest.manifest_path().resolve():
+        print(f"[FAIL] --canonical-manifest 与单一来源不符: "
+              f"{args.canonical_manifest} != {v4_manifest.manifest_path()}")
+        return 1
+    print(f"[manifest] {v4_manifest.manifest_path().name} "
+          f"sha256={v4_manifest.manifest_sha256()[:16]}")
     if args.step in ("canonical", "all"):
         doc = build_canonical_manifest(args.out_dir)
         reg = build_manifest_registry(args.out_dir)

@@ -28,8 +28,10 @@ from pathlib import Path
 from typing import Optional
 
 ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(ROOT))
 # V4 数据入口：只接受 canonical manifest 指定的 corpus-v3 语料（禁止旧 corpus_pairs）
-CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.json"
+# P0-2：manifest 路径从**单一来源** v4_manifest 取，禁止本模块各自维护默认常量。
+from cpg.ablation.v4_manifest import V4_CANONICAL_MANIFEST as CANONICAL_MANIFEST  # noqa: E402
 _ENC = {"encoding": "utf-8", "errors": "strict"}
 
 _CANONICAL_CACHE: dict = {}

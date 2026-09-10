@@ -2,11 +2,11 @@
   "schema": "v4-canonical-manifest/1",
   "generated_from": {
     "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
-    "canonical_manifest_sha256": "8290834061e4a7f0901aa19a87cbd29cf3ce4dd3f669da89b5017bd37c2a9faf",
+    "canonical_manifest_sha256": "f880bbe41a12678b603e21c5aa4c5d1d89e8ec0c82b94ba9b1becefca27ed595",
     "supersedes": "cpg/ablation/artifacts/canonical_corpus_manifest.json",
     "supersedes_sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
     "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
-    "git_commit": "9f29b8b0d0bd90166944a969f44a46e8aed102e6",
+    "git_commit": "be286de19438ed49a9227ec41cf6824d5609faf4",
     "candidate_source": "cpg/ablation/partial_arm_construction.md"
   },
   "n_candidates": 15,
@@ -20,7 +20,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-12482",
       "vuln_tree_sha256_lf": "46a906ead697330454443c29be83c5f932bf5a4be0f37df5f82692da8461b620",
       "fixed_tree_sha256_lf": "43ce0f0bcdbdeafd57c63a17014069f48877050e360183890f9ef23893d824e5",
-      "pair_manifest_sha256": "703970b41bcc5e5c41ccd83499de0203bb5fa461776289c03862188e60684943",
+      "pair_manifest_sha256": "0e19bb8cce7fd47119f2b73893c6ea3529b046106684d77f9a11c04982a66fcd",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -32,7 +32,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-70491",
       "vuln_tree_sha256_lf": "013e88facb04cb74d4a429b2879f4c015a7288fd01160d5d09230b15b2c1d001",
       "fixed_tree_sha256_lf": "fa3528edfe024684fa49f651fc9ce17ec0d1bebad7203ec4201028e76a67aa93",
-      "pair_manifest_sha256": "107a140fcdfce1cefcf36cba01fa762aa159e0120b2d5dca54a0804c86cf0b49",
+      "pair_manifest_sha256": "b65cb6f497a732c64a0406c641f412484c0e3ab714c1e6f5a5591f2cd160b8c1",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -44,7 +44,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-50558",
       "vuln_tree_sha256_lf": "490f4f827b095926e9c8bab2807b7b2020adb997fb6128e84c631536430ca210",
       "fixed_tree_sha256_lf": "2ed053ce2c44b269aa4485d22030cb2ca2fae0175e84fd884dd644d91e61b4fd",
-      "pair_manifest_sha256": "83445dc0c0c6022349f91ac958e5c82f042408b955268ab5c0ad2ac5ebd567ae",
+      "pair_manifest_sha256": "b912ccf9fb55f5c3505f7e1ee148b81bcf439d697a62a15635d8ceb79e912e3d",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -56,7 +56,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-67424",
       "vuln_tree_sha256_lf": "2a0c623840362c22a80e77f759d1d795b4534b412c0c63c2b40e8e3508142d62",
       "fixed_tree_sha256_lf": "aa4d26de3f0bd017d87a70f4c15b72ba7d8d9ad69d55de809378305882afb7af",
-      "pair_manifest_sha256": "86b43ff48c43b4e7e00a907722dd880b1c89ced7b536db0dcc9fb5267089c5e1",
+      "pair_manifest_sha256": "c065d176089569c9cc9e0834403d5f4a40898e01f062f0960b5c9b8e64cee3af",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -68,7 +68,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-53502",
       "vuln_tree_sha256_lf": "814107d5dfe6eeae36ac9bb6fa371fb413c8cb632d3adc7a4245e34c7dfe5343",
       "fixed_tree_sha256_lf": "4dae635381809f2945eef4efd7abb72f72ad5e2b060292544e9b0ffcc233ead3",
-      "pair_manifest_sha256": "e90cb6464febe06fbf7e364b71101ad8d64323c7cdddc2b92e43ebab7e834c44",
+      "pair_manifest_sha256": "cb6358f77c562ac9d2767fcc679fe9f44169ff0e49c9909bdc98af24be6f4b9e",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -80,7 +80,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-73498",
       "vuln_tree_sha256_lf": "64506e4b06bc3fb5ff7d60c8ccbd5fa1c4f0bb5b066673e6ce70b4a08651ab15",
       "fixed_tree_sha256_lf": "5a36125ca47753102687570523b1a19bcfbbf4d743cc0ec8275fc4158202934f",
-      "pair_manifest_sha256": "05ce323ba0d8baa908442b15a3ffa5d3553aab5eec385a0492fa2cebfdce9555",
+      "pair_manifest_sha256": "e8d57f92008cb8fdab28f82dd9bee7480b4c69ea7ea27c5091a8232bc1c7ea5d",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -92,7 +92,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-53598",
       "vuln_tree_sha256_lf": "592f3022f28ab4151195cd2b1fcf536e9acaead070fbb52dd1de77a0ccb30d53",
       "fixed_tree_sha256_lf": "dc2660254a6fdb3bfad5f3436622ef4dbe95322e072fdcfcaacb33d348d15371",
-      "pair_manifest_sha256": "a0b2afa9720f315bccc30cd073e7a876d86a244f2bbcb176128d1acbbcce43d9",
+      "pair_manifest_sha256": "fcc60d0e685c97af5eaccb698fc9bc9c24d9f021c8dbc655935df57ed0293c4e",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -104,7 +104,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-67425",
       "vuln_tree_sha256_lf": "cfb3aa1a466a7c17597b8f0b47158471876b85c0c41bcd1bfb50e9ef78d4a082",
       "fixed_tree_sha256_lf": "1905ef56d9058ec199a2695393d5f931831e279969d0cf45813458bec709efad",
-      "pair_manifest_sha256": "32dce6b8e4fb6e71a616ee9b557e69fbf2478c0626f23230824427ec68cc2a7e",
+      "pair_manifest_sha256": "14f1a99ad991b9a4b77db9a5cc21b7b482e6234156a3be989bdf3b3baa896c57",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -116,7 +116,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-54706",
       "vuln_tree_sha256_lf": "3bef3a0715e96015c721a88d8e6553a5a12821eaebe6b50f6e093f00f5ba6275",
       "fixed_tree_sha256_lf": "34795c8ef954eed3bf7048510e62851c59a23c81dd18c40221b50103f808e73b",
-      "pair_manifest_sha256": "b19dac95688fbb6554be467f4c4a4162bd08cdc781db264b857f3c454f79048c",
+      "pair_manifest_sha256": "79f42d4bdefa980226bcc6a7c3438dfb279b333ed1226ddf82338af870ad0186",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -128,7 +128,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-59890",
       "vuln_tree_sha256_lf": "263bd3e1bee5ab1ed7872244cd1a8b69e85c6ae0d9103ed5dcce68ba35f15623",
       "fixed_tree_sha256_lf": "c07f45bba2c6d14da2da24a4cd9d4bda27b0eb0dae18df7d1cbfd526eba6af3c",
-      "pair_manifest_sha256": "7bb696e1a34f1150feb936442a0ce662c5f3d3b13418ba4722eb0fdb051b8688",
+      "pair_manifest_sha256": "d91c8d341150004b942ee228390bf4591c2ca3a648d60027ce95704c4eba1c99",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -140,7 +140,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-54707",
       "vuln_tree_sha256_lf": "eeed20dd95542a59b40cefa6a044bea5c532f7c2718bce7df22bc265b23c90ce",
       "fixed_tree_sha256_lf": "3870b41e4e02525ed2e946de1770328b5d28d25b30df2b234debb4cad91f4528",
-      "pair_manifest_sha256": "6198ec07a32ac5a4e951ca569a78bf9947405408227b40bf89301685f3583761",
+      "pair_manifest_sha256": "df44899386fab3c029edfa8a6859db46eba34e4f7c12dd955b25101ea17d2e8c",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -152,7 +152,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-54785",
       "vuln_tree_sha256_lf": "c8603ded5d7fb290d669f05f7fa2211e7933415ecaac40498f1a0651d1bc0a96",
       "fixed_tree_sha256_lf": "4ace5f407dc8de76b27186a180dce21d77f3ced0e0d8d6f3877d298f2217d557",
-      "pair_manifest_sha256": "319c0d6704431741350bd89cb434757ed57a828861aac861592086f0b0d3a609",
+      "pair_manifest_sha256": "00212dea0914765cdfd34bc743157f2bbb89a140c6d275b174dd1ec8f1cf175f",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -164,7 +164,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-50181",
       "vuln_tree_sha256_lf": "10f5b647c1684e3651d77dd7d92f7c9c61f19b4ebba00103720b4f9e99531ae9",
       "fixed_tree_sha256_lf": "62ac27f3711fe1745f1b6f011a11b6c0a480ee8f7f64acd7c3055a82fa8f9891",
-      "pair_manifest_sha256": "8c755b94aaa991105d357225b4a10c13c5113741ec23c88c060be94c0ddea4f1",
+      "pair_manifest_sha256": "6c330a252c2b2de440a757291748dc8c2905ddaf7239c2a7d332e67bcdedb8c8",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -176,7 +176,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-54574",
       "vuln_tree_sha256_lf": "c1471f2bc2bdba4626fa80287985112f2004b7c58a59b711e1702a3a9d810c0a",
       "fixed_tree_sha256_lf": "caf1ff4144419af6554d73869980d2d0c3d01cd88d1f26e3d34bb0eae6d968a3",
-      "pair_manifest_sha256": "32463c386a655c116171a2eaf604be224b736f1d47646e902a322f8a39b321b2",
+      "pair_manifest_sha256": "31c3dd32266f7c866dde398a69d83cb55c491ea8ddd281906bd2ef2733645511",
       "confirmation_eligible": true,
       "exclusion_reason": null
     },
@@ -188,7 +188,7 @@
       "source_path": "cpg/corpus-v3/CVE-2026-45019",
       "vuln_tree_sha256_lf": "c55926639a1b7a7f5112fff97f0825264a391ba535d8ae00beb5454f7fffed2f",
       "fixed_tree_sha256_lf": "4086a0542173cf30c5040d927371b689cc16f65569a2aafe3610f9b95455f927",
-      "pair_manifest_sha256": "a40c8fe760e6a1fae75faa8b649ba4613a0723e601a1e8090b014272cbb0eeec",
+      "pair_manifest_sha256": "7206f9d94b9b08c2ecefa14f79bc6098c3b86a1f690c252cb3579cf58d1ef7b8",
       "confirmation_eligible": false,
       "exclusion_reason": "COMPOSITE_FIX_COMMIT_UNRESOLVED"
     }

@@ -28,7 +28,9 @@ ROOT = Path(__file__).resolve().parents[2]
 # 审计脚本（rebuild_pair / rerun_61539 / upstream_five_state_audit）使用。
 # V4 流程一律走 CANONICAL_MANIFEST + CORPUS_V3（见 read_sample/corpus_py_files_v3）。
 CORPUS = ROOT / "cpg" / "corpus_pairs"  # legacy
-CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.json"
+sys.path.insert(0, str(ROOT))
+# P0-2：manifest 路径从**单一来源** v4_manifest 取，禁止本模块各自维护默认常量。
+from cpg.ablation.v4_manifest import V4_CANONICAL_MANIFEST as CANONICAL_MANIFEST  # noqa: E402
 CORPUS_V3 = ROOT / "cpg" / "corpus-v3"
 CACHE = ROOT / "cpg" / "ablation" / ".work" / "upstream_api_cache"
 
