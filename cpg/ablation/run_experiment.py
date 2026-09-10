@@ -20,6 +20,7 @@ import random
 import subprocess
 import sys
 import time
+import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -34,12 +35,13 @@ from cpg.ablation.cpg_eval import (  # noqa: E402
 )
 from cpg.ablation import legacy_rq1_r0  # noqa: E402
 from cpg.ablation import legacy_rq1_r1_cpg_canonical  # noqa: E402
+from cpg.ablation import model_client  # noqa: E402
 from cpg.ablation.legacy_rq1_r0 import (  # noqa: E402
     REPRESENTATION as LEGACY_REPR, MAX_CODE_CHARS, SUMMARY,
     load_legacy_code_text, preflight_legacy,
 )
 from cpg.ablation.excerpt_plan import REPRESENTATION as CHANGED_HUNK_REPR  # noqa: E402
-from cpg.ablation.model_client import ModelClient, MODEL, MODEL_DIGEST, NUM_CTX, NUM_PREDICT, TEMPERATURE, TOP_P, SEED  # noqa: E402
+from cpg.ablation.model_client import ModelClient, MODEL, MODEL_DIGEST, NUM_CTX, NUM_PREDICT, TEMPERATURE, TOP_P, SEED, OLLAMA_VERSION  # noqa: E402
 
 # 允许用于 RQ1-R prompt 生成的表示（选 C 裁决 + 确定性行序补正案）：
 # - legacy-rq1-r0：历史基线重跑（冻结表示）；
@@ -169,34 +171,47 @@ def _pid_alive(pid: int) -> bool:
         return True
 
 
-def _acquire_lease(run_dir: Path) -> str | None:
-    """获取 invoke 独占租约（防并发）。返回错误消息，成功返回 None。
+def _acquire_lease(run_dir: Path) -> tuple[str | None, str | None]:
+    """原子获取 invoke 独占租约（防并发）。返回 (lease_id, error)。
 
-    中断后残留的租约若 pid 已死则清理重建，否则拒绝并发（P0-2）。
+    用 ``O_CREAT|O_EXCL`` 原子创建，消除 check-then-write 竞争窗口（P0-2）。
+    中断残留租约若 pid 已死则清理后重试；lease_id 用于释放时校验所有权。
     """
     lease_path = run_dir / "invoke.lease"
-    if lease_path.exists():
+    for _ in range(2):  # 一次正常尝试 + 一次清理过期后重试
+        lease_id = uuid.uuid4().hex
         try:
-            lease = json.loads(lease_path.read_text(encoding="utf-8"))
-            pid = lease.get("pid")
-            if pid and _pid_alive(int(pid)):
-                return f"invoke 已有活跃租约（pid={pid}），拒绝并发"
-        except (json.JSONDecodeError, ValueError, OSError):
-            pass
-        try:
-            lease_path.unlink()  # 进程已死或文件损坏 → 清理
-        except OSError:
-            pass
-    lease_path.write_text(json.dumps({"pid": os.getpid(),
-                                      "started_at": time.time()}),
-                          encoding="utf-8")
-    return None
+            fd = os.open(str(lease_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            try:
+                lease = json.loads(lease_path.read_text(encoding="utf-8"))
+                pid = lease.get("pid")
+                if pid and _pid_alive(int(pid)):
+                    return None, f"invoke 已有活跃租约（pid={pid}），拒绝并发"
+            except (json.JSONDecodeError, ValueError, OSError):
+                pass
+            try:
+                lease_path.unlink()  # 已死或损坏 → 清理后重试
+            except OSError:
+                return None, "invoke 租约清理失败（可能并发占用）"
+            continue
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump({"pid": os.getpid(), "lease_id": lease_id,
+                       "started_at": time.time()}, f)
+        return lease_id, None
+    return None, "invoke 租约竞争失败（重试后仍被占用）"
 
 
-def _release_lease(run_dir: Path) -> None:
+def _release_lease(run_dir: Path, lease_id: str | None) -> None:
+    """释放租约：仅当租约属于自己（lease_id 匹配）才删除，避免误删他人租约。"""
+    if not lease_id:
+        return
+    lease_path = run_dir / "invoke.lease"
     try:
-        (run_dir / "invoke.lease").unlink()
-    except OSError:
+        lease = json.loads(lease_path.read_text(encoding="utf-8"))
+        if lease.get("lease_id") == lease_id:
+            lease_path.unlink()
+    except (json.JSONDecodeError, OSError):
         pass
 
 
@@ -227,11 +242,17 @@ def prepare(args) -> int:
         "model": MODEL, "model_digest": MODEL_DIGEST,
         "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT,
         "temperature": TEMPERATURE, "top_p": TOP_P, "seed": SEED,
+        "ollama_version": OLLAMA_VERSION,
         "representation": representation,
         "summary": SUMMARY,
         "max_code_chars": MAX_CODE_CHARS,
     }
     protocol.update(representation_fingerprints(representation))  # 绑实现 SHA，改代码即漂移
+
+    # P1：冻结运行时版本，实际不符即 fail-closed（digest 相同不保证 runtime 行为一致）
+    actual_ov = model_client.ollama_version_number()
+    if actual_ov != OLLAMA_VERSION:
+        return _fail(run_dir, f"Ollama 版本不符: 实际 {actual_ov} != 冻结 {OLLAMA_VERSION}")
 
     prompts_dir = run_dir / "prompts"
     prompts_dir.mkdir(parents=True, exist_ok=True)
@@ -597,8 +618,13 @@ def invoke(args) -> int:
     client = ModelClient()
     client.verify_digest()  # 不一致抛异常
 
-    # P0-2：获取独占租约（防并发）。中断后残留租约若 pid 已死则清理重建。
-    lease_err = _acquire_lease(run_dir)
+    # P1：核对 Ollama 运行时不符即拒绝（非变异，修复环境后可重试）
+    actual_ov = model_client.ollama_version_number()
+    if actual_ov != OLLAMA_VERSION:
+        return _reject(f"Ollama 版本不符: 实际 {actual_ov} != 冻结 {OLLAMA_VERSION}")
+
+    # P0-2：原子获取独占租约（防并发）。中断后残留租约若 pid 已死则清理重建。
+    lease_id, lease_err = _acquire_lease(run_dir)
     if lease_err:
         return _reject(lease_err)
 
@@ -613,7 +639,7 @@ def invoke(args) -> int:
     try:
         return _run_invoke_loop(run_dir, client, schedule, pmap)
     finally:
-        _release_lease(run_dir)
+        _release_lease(run_dir, lease_id)
 
 
 def _run_invoke_loop(run_dir: Path, client, schedule: list, pmap: dict) -> int:
@@ -745,6 +771,9 @@ def verify_results(args) -> int:
             errors.append(f"{r['sample_id']}/{r['side']} model_name 漂移")
         if r.get("model_digest") != prot.get("model_digest"):
             errors.append(f"{r['sample_id']}/{r['side']} model_digest 漂移")
+        if r.get("ollama_version_number") != prot.get("ollama_version"):
+            errors.append(f"{r['sample_id']}/{r['side']} ollama_version 漂移 "
+                          f"({r.get('ollama_version_number')!r} != {prot.get('ollama_version')!r})")
         if r.get("system_sha256") != prot.get("system_sha256"):
             errors.append(f"{r['sample_id']}/{r['side']} system_sha256 漂移")
         if r.get("representation") != prot.get("representation"):
@@ -778,6 +807,25 @@ def verify_results(args) -> int:
             errors.append(f"{r['sample_id']}/{r['side']} 缺 raw_response_text（无法重算哈希）")
         elif _sha256_text(raw_text) != r.get("raw_response_sha256"):
             errors.append(f"{r['sample_id']}/{r['side']} raw_response_sha256 与原始响应不符")
+        # P0-1：从原始响应文本重新解析，verdict/计数必须与结果记录一致（防仅篡改 verdict）
+        if raw_text is not None:
+            try:
+                reparsed = json.loads(raw_text)
+            except json.JSONDecodeError:
+                reparsed = {"_raw": raw_text}
+            if reparsed != r.get("raw_response"):
+                errors.append(f"{r['sample_id']}/{r['side']} raw_response 与原始响应重解析不等价")
+            resp_field = reparsed.get("response", "") if isinstance(reparsed, dict) else ""
+            derived = ModelClient._extract_verdict(resp_field)
+            if derived != r.get("verdict"):
+                errors.append(f"{r['sample_id']}/{r['side']} verdict 与原始响应重解析不符 "
+                              f"({derived!r} != {r.get('verdict')!r})")
+            rp_count = reparsed.get("prompt_eval_count") if isinstance(reparsed, dict) else None
+            if rp_count != r.get("prompt_eval_count"):
+                errors.append(f"{r['sample_id']}/{r['side']} prompt_eval_count 与原始响应不符")
+            rp_reason = reparsed.get("done_reason") if isinstance(reparsed, dict) else None
+            if rp_reason != r.get("done_reason"):
+                errors.append(f"{r['sample_id']}/{r['side']} done_reason 与原始响应不符")
         # 核对 request 中的 prompt/system 与磁盘/SYSTEM 一致
         p = pmap.get((r["sample_id"], r["side"]))
         if p is not None:

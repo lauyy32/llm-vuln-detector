@@ -17,6 +17,26 @@ from cpg.ablation import run_experiment as rex  # noqa: E402
 from cpg.ablation import model_client as mc  # noqa: E402
 
 
+def setUpModule():
+    """把 Ollama 版本核对 patch 成冻结值，使测试不依赖本机实际 ollama（P1）。"""
+    global _ollama_patch
+    _ollama_patch = mock.patch.object(mc, "ollama_version_number",
+                                      return_value=mc.OLLAMA_VERSION)
+    _ollama_patch.start()
+
+
+def tearDownModule():
+    _ollama_patch.stop()
+
+
+def _sample_raw_response(verdict: str = "benign", prompt_eval_count: int = 100,
+                         done_reason: str = "stop") -> dict:
+    """构造一份合法的 Ollama 原始响应对象（含 response 字段供 verdict 重解析）。"""
+    return {"response": json.dumps({"verdict": verdict, "cwe": None,
+                                    "confidence": 0.9, "rationale": "x"}),
+            "prompt_eval_count": prompt_eval_count, "done_reason": done_reason}
+
+
 def _write_run_dir(rd: Path, n: int = 1, with_selection_plan: bool = False,
                    protocol: dict | None = None, locked: bool = False) -> None:
     (rd / "prompts").mkdir(parents=True, exist_ok=True)
@@ -26,6 +46,7 @@ def _write_run_dir(rd: Path, n: int = 1, with_selection_plan: bool = False,
         "model": mc.MODEL, "model_digest": mc.MODEL_DIGEST,
         "num_ctx": mc.NUM_CTX, "num_predict": mc.NUM_PREDICT,
         "temperature": mc.TEMPERATURE, "top_p": mc.TOP_P, "seed": mc.SEED,
+        "ollama_version": mc.OLLAMA_VERSION,
         "cpg_cache_key": "e" * 64, "canonical_cpg_rows_sha256": "f" * 64,
         **fp,
     }
@@ -114,13 +135,14 @@ class FakeClient:
                    "options": {"num_ctx": mc.NUM_CTX, "num_predict": mc.NUM_PREDICT,
                                "temperature": mc.TEMPERATURE, "top_p": mc.TOP_P,
                                "seed": mc.SEED}}
-        raw_text = "{}"
+        raw_obj = _sample_raw_response()
+        raw_text = json.dumps(raw_obj)
         return {
             "schema_version": "model-call/1", "verdict": "benign",
             "parse_status": "OK", "sample_id": kw.get("sample_id"),
             "side": kw.get("side"), "arm": kw.get("arm"),
             "repeat": kw.get("repeat"), "run_error": None,
-            "raw_response": {}, "raw_response_text": raw_text,
+            "raw_response": raw_obj, "raw_response_text": raw_text,
             "raw_response_sha256": rex._sha256_text(raw_text),
             "prompt_sha256": ex.get("prompt_sha256"),
             "prompt_path": ex.get("prompt_path"),
@@ -134,9 +156,11 @@ class FakeClient:
             "cpg_eval_sha256": ex.get("cpg_eval_sha256"),
             "system_sha256": ex.get("system_sha256"),
             "model_name": mc.MODEL, "model_digest": mc.MODEL_DIGEST,
+            "ollama_version": mc.OLLAMA_VERSION,
+            "ollama_version_number": mc.OLLAMA_VERSION,
             "request": request,
             "request_sha256": rex._sha256_text(json.dumps(request, sort_keys=True)),
-            "prompt_eval_count": 100,
+            "prompt_eval_count": 100, "done_reason": "stop",
         }
 
 
@@ -323,12 +347,13 @@ class TestVerifyResults(unittest.TestCase):
                    "options": {"num_ctx": prot["num_ctx"], "num_predict": prot["num_predict"],
                                "temperature": prot["temperature"], "top_p": prot["top_p"],
                                "seed": prot["seed"]}}
-        raw_text = "{}"
+        raw_obj = _sample_raw_response()
+        raw_text = json.dumps(raw_obj)
         rec = {
             "schema_version": "model-call/1", "verdict": "benign",
             "parse_status": "OK", "sample_id": sample_id, "side": side,
             "arm": "real", "repeat": 0, "run_error": None,
-            "raw_response": {}, "raw_response_text": raw_text,
+            "raw_response": raw_obj, "raw_response_text": raw_text,
             "raw_response_sha256": rex._sha256_text(raw_text),
             "prompt_sha256": pm["prompt_sha256"], "prompt_path": pm["prompt_path"],
             "representation": pm["representation"],
@@ -341,9 +366,11 @@ class TestVerifyResults(unittest.TestCase):
             "cpg_eval_sha256": pm.get("cpg_eval_sha256"),
             "system_sha256": pm["system_sha256"],
             "model_name": prot["model"], "model_digest": prot["model_digest"],
+            "ollama_version": prot.get("ollama_version"),
+            "ollama_version_number": prot.get("ollama_version"),
             "request": request,
             "request_sha256": rex._sha256_text(json.dumps(request, sort_keys=True)),
-            "prompt_eval_count": 100,
+            "prompt_eval_count": 100, "done_reason": "stop",
         }
         if overrides:
             rec.update(overrides)
@@ -418,6 +445,23 @@ class TestVerifyResults(unittest.TestCase):
         (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
         self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
 
+    def test_verify_rejects_forged_verdict_only(self):
+        """P0-1：仅篡改 verdict（原始响应与哈希均不变）必须被拒绝。"""
+        rd = self._setup()
+        rec = self._clean_record(rd, "CVE-T0", "vuln",
+                                 overrides={"verdict": "vulnerable"})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+        self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0,
+                            "verdict 与原始响应重解析不符时必须拒绝")
+
+    def test_verify_rejects_ollama_version_drift(self):
+        """P1：结果 Ollama 版本与 protocol 冻结值不符必须拒绝。"""
+        rd = self._setup()
+        rec = self._clean_record(rd, "CVE-T0", "vuln",
+                                 overrides={"ollama_version_number": "0.0.0"})
+        (rd / "results.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+        self.assertNotEqual(rex.verify_results(type("A", (), {"run_dir": rd})()), 0)
+
 
 class TestResume(unittest.TestCase):
     def test_error_records_go_to_attempts_not_results(self):
@@ -486,6 +530,42 @@ class TestResume(unittest.TestCase):
                 rc = rex.invoke(type("A", (), {"run_dir": rd})())
             self.assertEqual(rc, 0)
             self.assertEqual(rex._read_state(rd), "COMPLETE")
+
+
+class TestLease(unittest.TestCase):
+    def test_lease_concurrent_exactly_one_wins(self):
+        """P0-2：并发获取租约必须恰好一个成功（O_CREAT|O_EXCL 原子性）。"""
+        import threading
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            results = []
+            barrier = threading.Barrier(2)
+
+            def worker():
+                barrier.wait()  # 两线程同时起跑
+                results.append(rex._acquire_lease(rd))
+
+            ts = [threading.Thread(target=worker) for _ in range(2)]
+            for t in ts:
+                t.start()
+            for t in ts:
+                t.join()
+            oks = [r for r in results if r[1] is None]
+            errs = [r for r in results if r[1] is not None]
+            self.assertEqual(len(oks), 1, f"应恰好一个成功，实际 {results}")
+            self.assertEqual(len(errs), 1, f"应恰好一个失败，实际 {results}")
+
+    def test_lease_release_only_own(self):
+        """P0-2：释放只删属于自己的租约（lease_id 所有权校验）。"""
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            lease_id, err = rex._acquire_lease(rd)
+            self.assertIsNone(err)
+            self.assertTrue((rd / "invoke.lease").exists())
+            rex._release_lease(rd, "not-my-lease-id")  # 非本人 → 不得删除
+            self.assertTrue((rd / "invoke.lease").exists())
+            rex._release_lease(rd, lease_id)  # 本人 → 删除
+            self.assertFalse((rd / "invoke.lease").exists())
 
 
 class TestVerifyInputsFence(unittest.TestCase):

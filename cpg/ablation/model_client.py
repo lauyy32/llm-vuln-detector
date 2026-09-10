@@ -29,12 +29,30 @@ TEMPERATURE = 0
 TOP_P = 1.0
 SEED = 20260908
 BASE_URL = "http://localhost:11434"
+# 冻结 Ollama 运行时版本（P1）：digest 相同不保证不同 runtime 行为一致。
+OLLAMA_VERSION = "0.33.3"
 
 SCHEMA_VERSION = "model-call/1"
 
 
 def _sha256_bytes(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
+
+
+def ollama_version_number() -> str | None:
+    """模块级：从 ``ollama --version`` 输出提取版本号（如 0.33.3）；无则 None。
+
+    不依赖 ModelClient 实例，便于 invoke 前独立核对运行时版本（P1）。
+    """
+    import re
+    try:
+        r = subprocess.run(["ollama", "--version"], capture_output=True,
+                           text=True, timeout=30)
+        out = r.stdout.strip() if r.returncode == 0 else ""
+    except Exception:
+        out = ""
+    m = re.search(r"(\d+\.\d+\.\d+)", out)
+    return m.group(1) if m else None
 
 
 class ModelClient:
@@ -59,6 +77,17 @@ class ModelClient:
             return r.stdout.strip() if r.returncode == 0 else f"unknown(rc={r.returncode})"
         except Exception:
             return "unknown"
+
+    def ollama_version_number(self) -> str | None:
+        """从 ollama --version 输出提取版本号（如 0.33.3）；无则 None。"""
+        return ollama_version_number()
+
+    def verify_ollama_version(self, expected: str = OLLAMA_VERSION) -> None:
+        """核对实际 Ollama 版本与冻结值一致，不一致立即抛异常（fail-closed）。"""
+        actual = self.ollama_version_number()
+        if actual != expected:
+            raise RuntimeError(
+                f"[FATAL] Ollama 版本不一致: 实际 {actual} != 冻结 {expected}")
 
     def actual_digest(self) -> str:
         req = urllib.request.Request(f"{self.base_url}/api/tags", method="GET")
@@ -157,6 +186,7 @@ class ModelClient:
             "model_name": self.model,
             "model_digest": self.expected_digest,
             "ollama_version": self.ollama_version(),
+            "ollama_version_number": self.ollama_version_number(),
             "request": g["request"],
             "request_sha256": request_sha,
             "raw_response": resp_obj,
