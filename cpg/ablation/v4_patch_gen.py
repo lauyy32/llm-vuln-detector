@@ -68,6 +68,17 @@ def _run(args, cwd, check=True) -> subprocess.CompletedProcess:
                           check=check, **_ENC)
 
 
+def _run_bytes(args, cwd, check=True) -> bytes:
+    """字节模式：不做 universal-newline 转换，保留 CRLF 行尾。
+
+    ``text=True`` 会把 stdout 的 ``\\r\\n`` 统一转成 ``\\n``（universal newlines），
+    使 CRLF 源文件（如 CVE-2026-73498 的 oauth.py）的 diff 被改写成 LF，
+    apply 到 CRLF 语料时必然失败。
+    """
+    r = subprocess.run(args, capture_output=True, cwd=str(cwd), check=check)
+    return r.stdout
+
+
 def file_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -102,9 +113,14 @@ def list_tree(root: Path) -> dict[str, Path]:
 
 
 def _norm_header(full: str) -> str:
-    """P1-3：仅规范化 header 行前缀；保留末尾换行（P0-1）。"""
+    """P1-3：仅规范化 header 行前缀；保留末尾换行（P0-1）。
+
+    必须按 ``"\\n"`` 切分而非 ``splitlines()``：后者会在 CR/CRLF/\\v/\\f/\\x85 等处额外分行
+    并吃掉 ``\\r``，把 CRLF 源文件的 diff 行尾改写成 LF，导致 apply 与 CRLF 语料不匹配
+    （CVE-2026-73498 的 oauth.py 上游即 CRLF，是唯一暴露该 bug 的样本）。
+    """
     out = []
-    for ln in full.splitlines():
+    for ln in full.split("\n"):
         if ln.startswith(("diff --git", "--- ", "+++ ", "rename from", "rename to")):
             ln = (ln.replace("a/vuln/", "a/").replace("b/vuln/", "b/")
                     .replace("vuln/", "", 1))
@@ -171,9 +187,8 @@ def gen_complete_real_diff(cve: str, override_pair: Optional[Path] = None) -> tu
         shutil.move(str(repo / "fixed"), str(repo / "vuln"))
         _git_index_add(repo)
         _run(["git", "commit", "-qm", "fixed"], repo)
-        r = _run(["git", "diff", "--binary", "--full-index", "-M",
-                  f"{vrev}..HEAD", "--", "vuln/"], repo)
-        full = r.stdout
+        full = _run_bytes(["git", "diff", "--binary", "--full-index", "-M",
+                           f"{vrev}..HEAD", "--", "vuln/"], repo).decode("utf-8", errors="replace")
     norm = _norm_header(full)
     return norm, _parse_sections(norm)
 
