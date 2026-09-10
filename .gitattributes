@@ -4,6 +4,7 @@
 *.jsonl text eol=lf
 *.md   text eol=lf
 *.ql   text eol=lf
+*.diff text eol=lf
 *.yml  text eol=lf
 *.yaml text eol=lf
 *.txt  text eol=lf
