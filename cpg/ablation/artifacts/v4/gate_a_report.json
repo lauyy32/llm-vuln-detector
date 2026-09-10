@@ -1,7 +1,7 @@
 {
   "schema": "v4-gate-a-report/1",
   "generated_from": {
-    "git_commit": "d9583ceddb80e346ef29fb9ea6b41989b487cb54",
+    "git_commit": "ac4e89d1473aee308e56fbca05dc51016cb15c01",
     "n_candidates": 15,
     "n_confirmation": 14
   },
@@ -17,7 +17,8 @@
     "fetch_error": [],
     "path_not_equivalent": [],
     "parents_abnormal": [],
-    "composite_signal": [
+    "composite_signal": [],
+    "fork_merge_message": [
       "CVE-2026-50181",
       "CVE-2026-45019"
     ],

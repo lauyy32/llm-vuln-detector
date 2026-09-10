@@ -1,6 +1,6 @@
 {
  "generated_from": {
-  "git_commit": "5a5a9a93aa0bb808d6a11b1a62b375eb52ff28e3",
+  "git_commit": "ac4e89d1473aee308e56fbca05dc51016cb15c01",
   "content_compare": true,
   "line_ending_normalized": true,
   "note": "L2 内容级按归一化行尾(CRLF→LF)比对；原始字节差异见 line_ending_diff"
@@ -62,7 +62,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-70491": {
@@ -120,7 +121,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-50558": {
@@ -178,7 +180,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-67424": {
@@ -252,7 +255,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-53502": {
@@ -311,7 +315,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-73498": {
@@ -401,7 +406,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-53598": {
@@ -461,7 +467,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-67425": {
@@ -539,7 +546,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-54706": {
@@ -599,7 +607,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-59890": {
@@ -659,7 +668,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-54707": {
@@ -718,7 +728,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-54785": {
@@ -778,7 +789,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-50181": {
@@ -838,7 +850,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": true,
+   "fork_merge_message": true,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-54574": {
@@ -898,7 +911,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": false,
+   "fork_merge_message": false,
+   "composite_signal": null,
    "cross_language_signal": false
   },
   "CVE-2026-45019": {
@@ -965,7 +979,8 @@
    "reviewer_2": "",
    "adjudication": "",
    "exclusion_reason": "",
-   "composite_signal": true,
+   "fork_merge_message": true,
+   "composite_signal": null,
    "cross_language_signal": false
   }
  }

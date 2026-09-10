@@ -202,7 +202,11 @@ def build_upstream_report(out_dir: Path) -> dict:
         if cc.get("content_equivalent") is not True:
             raise RuntimeError(f"{cve} 内容级不等价: {cc}")
         msg = (s.get("commit_message_head") or "").lower()
-        s["composite_signal"] = bool(s.get("is_merge")) or ("merge" in msg)
+        # ⚠️ "Merge commit from fork" 是 GitHub 从 fork 合并 PR 的**固定消息**，
+        # parents_count 仍为 1（非真 merge）——**不能**据此判复合提交（假阳性）。
+        # 仅记录为 exact 名称的弱信号，供人工裁决，不作门禁判据。
+        s["fork_merge_message"] = ("merge commit from fork" in msg)
+        s["composite_signal"] = None  # 复合性须人工裁决（见 partial_arm_construction.md）
         s["cross_language_signal"] = (s.get("python_projection_n", 0) == 0
                                       and s.get("non_python_excluded_n", 0) > 0)
     tmp.write_text(json.dumps(d, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
@@ -436,6 +440,7 @@ def build_gate_a_report(out_dir: Path) -> dict:
             "parents_abnormal": [c for c, s in up_samples.items()
                                  if s.get("parents_count") != 1],
             "composite_signal": [c for c, s in up_samples.items() if s.get("composite_signal")],
+            "fork_merge_message": [c for c, s in up_samples.items() if s.get("fork_merge_message")],
             "cross_language_signal": [c for c, s in up_samples.items()
                                       if s.get("cross_language_signal")],
         },
@@ -491,17 +496,19 @@ def build_gate_a_report(out_dir: Path) -> dict:
 
 
 def build_feasibility_table(out_dir: Path) -> dict:
-    """P0-4：不看模型结果的 V4 可行性表（真实 tokenizer + context-fit 下界）。
+    """P0-4：V4 可行性表（真实 tokenizer）。
 
-    对每例估算"确认性最小 prompt"的 token 下界：
-      vuln 源码上下文（real diff 涉及文件的 vuln 版本，逐个按冻结文件读）
-      + candidate patch（real / placebo / shuffled）
-      + system/prompt 开销（常数下界）
-      + num_predict（输出预算）
-    并与 num_ctx 比较，给出 context_fit 判定。**不含 CPG 切片**，故为下界。
+    ⚠️ 口径修正（codex P0）：本表是把 real diff 涉及文件的**完整源码**计入的
+    **full-file estimate**，不是下界——正式 prompt 会用摘录/窗口表示，源码部分
+    可能显著小于完整文件。因此**只有与摘录无关的情形才判"确定超限"**：
+
+      patch_tokens + num_predict > num_ctx   → 确定超（不含任何源码/系统开销）
+
+    其余样本一律标 `needs_renderer`：必须由真实 G0 renderer 渲染后精确计数再判。
+    `prompt_overhead` 是人工常数下界，**不作为门禁**。
     """
     from cpg.ablation.model_client import NUM_CTX, NUM_PREDICT
-    OVERHEAD = 600  # system + 指令 + 输出格式的下界（实测后应替换为真实模板 token 数）
+    OVERHEAD = 600  # 人工常数下界（仅参考，非门禁）
     real_rows = {r["sample_id"]: r for r in _read_jsonl(out_dir / "real_manifest.jsonl")}
     rows = []
     for cve in V4_CANDIDATES:
@@ -513,21 +520,23 @@ def build_feasibility_table(out_dir: Path) -> dict:
             if p.exists():
                 src_tok += count_tokens(p.read_bytes().decode("utf-8", errors="replace"))
         patch_tok = count_tokens(read_patch(out_dir, r["patch_path"]))
-        total = src_tok + patch_tok + OVERHEAD + NUM_PREDICT
+        # 确定超限：仅 patch + 输出预算（与摘录无关）
+        firm_over = (patch_tok + NUM_PREDICT) > NUM_CTX
         rows.append({"sample_id": cve,
-                     "vuln_src_tokens": src_tok,
                      "patch_tokens": patch_tok,
-                     "prompt_overhead": OVERHEAD,
+                     "full_file_src_tokens": src_tok,       # 仅参考，非下界
                      "num_predict": NUM_PREDICT,
-                     "total_lower_bound": total,
+                     "patch_plus_output": patch_tok + NUM_PREDICT,
                      "num_ctx": NUM_CTX,
-                     "context_fit": total <= NUM_CTX,
+                     "firm_over_num_ctx": firm_over,
+                     "verdict": ("FIRM_OVER" if firm_over else "needs_renderer"),
                      "confirmation_eligible": cve not in CONFIRMATORY_EXCLUDED})
-    doc = {"metric": "lower_bound_tokens（不含 CPG；OVERHEAD 为下界常数）",
+    doc = {"metric": "firm_over = patch_tokens + num_predict > num_ctx（与摘录无关）",
+           "full_file_estimate_note": "full_file_src_tokens 为完整文件估算，非下界、非门禁",
+           "prompt_overhead_constant": OVERHEAD,
            "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT,
-           "n_fit": sum(1 for x in rows if x["context_fit"]),
-           "n_confirmation_fit": sum(1 for x in rows
-                                     if x["context_fit"] and x["confirmation_eligible"]),
+           "n_firm_over": sum(1 for x in rows if x["firm_over_num_ctx"]),
+           "firm_over": [x["sample_id"] for x in rows if x["firm_over_num_ctx"]],
            "rows": rows}
     (out_dir / "v4_feasibility_table.json").write_text(
         json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -583,11 +592,8 @@ def main() -> int:
             return 1
     if args.step in ("feasibility", "all"):
         f = build_feasibility_table(args.out_dir)
-        print(f"[Feasibility] context_fit {f['n_fit']}/{len(f['rows'])}"
-              f"（确认性 {f['n_confirmation_fit']}）")
-        for r in f["rows"]:
-            if not r["context_fit"]:
-                print(f"  OVER {r['sample_id']}: {r['total_lower_bound']} > {r['num_ctx']}")
+        print(f"[Feasibility] 确定超 num_ctx（patch+输出）: {f['n_firm_over']}/"
+              f"{len(f['rows'])} {f['firm_over']}；其余 needs_renderer")
     return 0
 
 
