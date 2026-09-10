@@ -154,7 +154,7 @@ def main() -> int:
     # P0-3：全部通过后原子提升
     args.out.parent.mkdir(parents=True, exist_ok=True)
     tmp = args.out.with_suffix(args.out.suffix + ".tmp")
-    tmp.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    tmp.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
     tmp.replace(args.out)
     print(f"[v2] 写入 {args.out}")
     return 0

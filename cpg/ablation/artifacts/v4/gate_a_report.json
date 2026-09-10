@@ -2,14 +2,14 @@
   "schema": "v4-gate-a-report/1",
   "provenance": {
     "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
-    "canonical_manifest_sha256": "f880bbe41a12678b603e21c5aa4c5d1d89e8ec0c82b94ba9b1becefca27ed595",
+    "canonical_manifest_sha256": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996",
     "supersedes": "cpg/ablation/artifacts/canonical_corpus_manifest.json",
     "supersedes_sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
     "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
     "stale_policy": "基于旧 manifest 生成的 V4 派生工件（gate_a_report / real|placebo|shuffled_manifest / v4_canonical_manifest / v4_upstream_real_report / v4_feasibility_table / patches/**）已由本次从 v2 的重新生成**完全替换**，无残留旧工件"
   },
   "generated_from": {
-    "git_commit": "be286de19438ed49a9227ec41cf6824d5609faf4",
+    "git_commit": "edf7cea021cfafd8f5cbb3f875054978bab8e411",
     "n_candidates": 15,
     "n_confirmation": 14
   },

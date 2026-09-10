@@ -53,6 +53,16 @@ def _sha256_bytes(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
+def write_text_lf(path: Path, text: str) -> None:
+    """写文本用 LF（.gitattributes 规定 *.json/*.jsonl 为 eol=lf）。
+
+    若用 Path.write_text 默认（Windows 下 os.linesep=CRLF），磁盘字节与 Git blob 会
+    不一致，干净克隆后 SHA 漂移——与 patch 的 -text 问题同源。
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(text.replace("\r\n", "\n").encode("utf-8"))
+
+
 def _git_commit() -> str | None:
     try:
         r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(ROOT),
@@ -162,8 +172,8 @@ def build_canonical_manifest(out_dir: Path) -> dict:
         "errors": errors,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "v4_canonical_manifest.json").write_text(
-        json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_text_lf(out_dir / "v4_canonical_manifest.json", 
+        json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
     return doc
 
 
@@ -217,7 +227,7 @@ def build_upstream_report(out_dir: Path) -> dict:
         s["composite_signal"] = None  # 复合性须人工裁决（见 partial_arm_construction.md）
         s["cross_language_signal"] = (s.get("python_projection_n", 0) == 0
                                       and s.get("non_python_excluded_n", 0) > 0)
-    tmp.write_text(json.dumps(d, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    write_text_lf(tmp, json.dumps(d, ensure_ascii=False, indent=1) + "\n")
     tmp.replace(final)  # 原子提升
     return d
 
@@ -329,8 +339,7 @@ def build_shuffled_manifest(out_dir: Path, donors: dict | None = None) -> list:
 
 def _write_jsonl(path: Path, rows: list) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n",
-                    encoding="utf-8")
+    write_text_lf(path, "\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n")
 
 
 TOKENIZER_PATH = OUT_DIR / "tokenizer" / "tokenizer.json"
@@ -510,8 +519,8 @@ def build_gate_a_report(out_dir: Path) -> dict:
         blockers.append(f"real patch 超 num_ctx: {tok['patch_context_fit']['over_num_ctx']}")
     report["gate_a_pass"] = not blockers
     report["blockers"] = blockers
-    (out_dir / "gate_a_report.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_text_lf(out_dir / "gate_a_report.json", 
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     return report
 
 
@@ -558,8 +567,8 @@ def build_feasibility_table(out_dir: Path) -> dict:
            "n_firm_over": sum(1 for x in rows if x["firm_over_num_ctx"]),
            "firm_over": [x["sample_id"] for x in rows if x["firm_over_num_ctx"]],
            "rows": rows}
-    (out_dir / "v4_feasibility_table.json").write_text(
-        json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_text_lf(out_dir / "v4_feasibility_table.json", 
+        json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
     return doc
 
 
@@ -587,8 +596,8 @@ def build_manifest_registry(out_dir: Path) -> dict:
                  "revision_reason=PAIR_MANIFEST_PROVENANCE_REFRESH"),
         ],
     }
-    (out_dir / "manifest_registry.json").write_text(
-        json.dumps(reg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_text_lf(out_dir / "manifest_registry.json", 
+        json.dumps(reg, ensure_ascii=False, indent=2) + "\n")
     return reg
 
 

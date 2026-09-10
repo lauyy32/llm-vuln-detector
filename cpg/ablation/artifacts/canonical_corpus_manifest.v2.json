@@ -8,9 +8,9 @@
   "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
   "revision_detail": "旧 pair_manifest_sha256 整体陈旧（f20e516 重建 pair manifest 后未同步）；本版本按当前 corpus-v3 机械重算，不改任何语料文件",
   "generator": {
-    "git_commit": "be286de19438ed49a9227ec41cf6824d5609faf4",
+    "git_commit": "edf7cea021cfafd8f5cbb3f875054978bab8e411",
     "implementation": "cpg/ablation/canonical_manifest_v2.py",
-    "implementation_sha256": "222853697b0a2bd980738c707540f8c9ec9ad9ff7ff235d06c00a0eb90afaecd",
+    "implementation_sha256": "d2b8360176d72746ecb510405fba0898a8c51d72b59e3810bd316823c8157c29",
     "tree_sha_impl": "cpg.ablation.canonical_manifest.tree_sha_lf（复用权威实现）"
   },
   "samples": [

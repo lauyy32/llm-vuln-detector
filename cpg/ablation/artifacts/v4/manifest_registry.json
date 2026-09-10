@@ -1,6 +1,6 @@
 {
   "schema": "manifest-registry/1",
-  "generated_git_commit": "be286de19438ed49a9227ec41cf6824d5609faf4",
+  "generated_git_commit": "edf7cea021cfafd8f5cbb3f875054978bab8e411",
   "entries": [
     {
       "consumer": "RQ1-R",
@@ -12,7 +12,7 @@
     {
       "consumer": "V4",
       "manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
-      "sha256": "f880bbe41a12678b603e21c5aa4c5d1d89e8ec0c82b94ba9b1becefca27ed595",
+      "sha256": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996",
       "status": "ACTIVE",
       "note": "由 canonical_manifest_v2.py 从 corpus-v3 机械重算；revision_reason=PAIR_MANIFEST_PROVENANCE_REFRESH"
     }
