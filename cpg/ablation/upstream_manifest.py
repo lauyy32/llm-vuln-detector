@@ -24,7 +24,12 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CORPUS = ROOT / "cpg" / "corpus_pairs"
+# 旧语料目录：仅供 legacy 函数（read_meta/read_corpus_file/corpus_py_files）与历史
+# 审计脚本（rebuild_pair / rerun_61539 / upstream_five_state_audit）使用。
+# V4 流程一律走 CANONICAL_MANIFEST + CORPUS_V3（见 read_sample/corpus_py_files_v3）。
+CORPUS = ROOT / "cpg" / "corpus_pairs"  # legacy
+CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.json"
+CORPUS_V3 = ROOT / "cpg" / "corpus-v3"
 CACHE = ROOT / "cpg" / "ablation" / ".work" / "upstream_api_cache"
 
 
@@ -122,6 +127,7 @@ def api_url(repo: str, sha: str) -> str:
 
 
 def read_meta(cve: str) -> dict:
+    """[legacy] 读 corpus_pairs/<cve>/meta.json（历史审计脚本用）。V4 用 read_sample。"""
     p = CORPUS / cve / "meta.json"
     if not p.exists():
         return {"_error": f"无 meta.json: {p}"}
@@ -132,6 +138,7 @@ def read_meta(cve: str) -> dict:
 
 
 def corpus_py_files(meta: dict) -> set:
+    """[legacy] 从 corpus_pairs meta.files（路径字符串）提取 Python 相对路径。V4 用 corpus_py_files_v3。"""
     out = set()
     for f in meta.get("files", []):
         norm = f.replace("\\", "/")
@@ -173,8 +180,70 @@ def tokens_estimate(lines: int) -> int:
 
 
 def read_corpus_file(cve: str, side: str, filename: str):
-    """读 corpus vuln/fixed 文件；不存在返回 None。side ∈ {vuln, fixed}。"""
+    """[legacy] 读 corpus_pairs vuln/fixed 文件；不存在返回 None。V4 用 read_corpus_v3_file。"""
     p = CORPUS / cve / side / filename
+    if not p.exists():
+        return None
+    return p.read_bytes()
+
+
+# ---------------------------------------------------------------------------
+# V4 数据入口（canonical manifest + corpus-v3；fail-closed 禁止旧 corpus_pairs）
+# ---------------------------------------------------------------------------
+_CANONICAL_CACHE: dict = {}
+
+
+def canonical_samples() -> dict:
+    """读 canonical manifest，返回 {sample_id: sample}。"""
+    if not _CANONICAL_CACHE:
+        m = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+        _CANONICAL_CACHE["by_id"] = {s["sample_id"]: s for s in m["samples"]}
+    return _CANONICAL_CACHE["by_id"]
+
+
+def read_sample(cve: str) -> dict:
+    """V4 入口：从 canonical manifest 读样本（repo_slug/fix_commit/parent_commit/source_path）。"""
+    s = canonical_samples().get(cve)
+    if s is None:
+        return {"_error": f"{cve} 不在 canonical manifest"}
+    return s
+
+
+def sample_dir(cve: str) -> Path:
+    """V4 入口：解析样本目录（须 corpus-v3）；fail-closed 禁止 corpus_pairs。"""
+    s = canonical_samples().get(cve)
+    if s is None:
+        raise KeyError(f"{cve} 不在 canonical manifest")
+    sp = s.get("source_path")
+    if not sp:
+        raise ValueError(f"{cve} 无 source_path")
+    p = (ROOT / sp).resolve()
+    posix = p.as_posix()
+    if "/corpus_pairs/" in posix or posix.endswith("/corpus_pairs"):
+        raise AssertionError(f"V4 禁止读旧 corpus_pairs: {p}")
+    if "/corpus-v3/" not in posix:
+        raise AssertionError(f"V4 source_path 须位于 corpus-v3: {p}")
+    return p
+
+
+def corpus_py_files_v3(cve: str) -> set:
+    """V4：从 corpus-v3/<cve>/pair_manifest.json 的 files 读 Python 相对路径集。"""
+    pm = sample_dir(cve) / "pair_manifest.json"
+    if not pm.exists():
+        return set()
+    d = json.loads(pm.read_text(encoding="utf-8"))
+    out = set()
+    for f in d.get("files", []):
+        path = f if isinstance(f, str) else f.get("path", "")
+        path = (path or "").replace("\\", "/")
+        if path.endswith(".py"):
+            out.add(path)
+    return out
+
+
+def read_corpus_v3_file(cve: str, side: str, filename: str):
+    """V4：读 corpus-v3/<cve>/<side>/<filename>（side ∈ {vuln, fixed}）；不存在返回 None。"""
+    p = sample_dir(cve) / side / filename
     if not p.exists():
         return None
     return p.read_bytes()
@@ -191,8 +260,8 @@ def content_compare(cve: str, repo: str, parent: str, fix: str,
     fetch_err = []          # raw fetch 失败的文件
 
     for filename in up_py:
-        c_vuln = read_corpus_file(cve, "vuln", filename)
-        c_fixed = read_corpus_file(cve, "fixed", filename)
+        c_vuln = read_corpus_v3_file(cve, "vuln", filename)
+        c_fixed = read_corpus_v3_file(cve, "fixed", filename)
         if no_fetch:
             continue
         p_raw = curl_raw(raw_url(repo, parent, filename))
@@ -255,7 +324,7 @@ def main() -> int:
 
     rows = []
     for cve in args.cves:
-        meta = read_meta(cve)
+        meta = read_sample(cve)
         if "_error" in meta:
             manifest["samples"][cve] = {"error": meta["_error"]}
             rows.append((cve, "META_ERR", "", "", "", "", "", "", "", ""))
@@ -268,7 +337,7 @@ def main() -> int:
             rows.append((cve, "META_MISSING", "", "", "", "", "", "", "", ""))
             continue
 
-        corpus_py = corpus_py_files(meta)
+        corpus_py = corpus_py_files_v3(cve)
 
         cache_file = CACHE / f"{cve}.json"
         d = None

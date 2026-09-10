@@ -28,8 +28,39 @@ from pathlib import Path
 from typing import Optional
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-PAIRS = ROOT / "cpg" / "corpus_pairs"
+# V4 数据入口：只接受 canonical manifest 指定的 corpus-v3 语料（禁止旧 corpus_pairs）
+CANONICAL_MANIFEST = ROOT / "cpg" / "ablation" / "artifacts" / "canonical_corpus_manifest.json"
 _ENC = {"encoding": "utf-8", "errors": "strict"}
+
+_CANONICAL_CACHE: dict = {}
+
+
+def _canonical_by_id() -> dict:
+    if not _CANONICAL_CACHE:
+        m = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+        _CANONICAL_CACHE["by_id"] = {s["sample_id"]: s for s in m["samples"]}
+    return _CANONICAL_CACHE["by_id"]
+
+
+def sample_dir(cve: str) -> Path:
+    """V4 数据入口：由 canonical manifest 的 source_path 解析样本目录（须 corpus-v3）。
+
+    fail-closed：样本不在 canonical manifest / 无 source_path / 路径落旧 corpus_pairs，
+    一律抛异常（禁止 V4 读取旧语料）。
+    """
+    s = _canonical_by_id().get(cve)
+    if s is None:
+        raise KeyError(f"{cve} 不在 canonical manifest（V4 只接受 canonical 样本）")
+    sp = s.get("source_path")
+    if not sp:
+        raise ValueError(f"{cve} 无 source_path")
+    p = (ROOT / sp).resolve()
+    posix = p.as_posix()
+    if "/corpus_pairs/" in posix or posix.endswith("/corpus_pairs"):
+        raise AssertionError(f"V4 禁止读取旧 corpus_pairs: {p}")
+    if "/corpus-v3/" not in posix:
+        raise AssertionError(f"V4 source_path 须位于 corpus-v3: {p}")
+    return p
 
 
 def _run(args, cwd, check=True) -> subprocess.CompletedProcess:
@@ -39,6 +70,23 @@ def _run(args, cwd, check=True) -> subprocess.CompletedProcess:
 
 def file_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def write_patch(path: Path, diff_text: str) -> None:
+    """写 patch 文件用字节写入：Windows 下 write_text 默认 newline=None 会把 LF 转 CRLF，
+    而 corpus-v3 语料为 LF，CRLF patch 会致 apply 不匹配（旧 corpus_pairs 为 CRLF 故未暴露）。"""
+    path.write_bytes(diff_text.encode("utf-8"))
+
+
+def git_apply(cwd: Path, patch: Path, check: bool = False,
+              extra: tuple = ()) -> subprocess.CompletedProcess:
+    """行尾中立 apply：强制 core.autocrlf=false，使 LF 语料 apply 后不被转成 CRLF。"""
+    cmd = ["git", "-c", "core.autocrlf=false", "apply", "--binary"]
+    if check:
+        cmd.append("--check")
+    cmd += list(extra)
+    cmd.append(str(patch))
+    return subprocess.run(cmd, capture_output=True, text=True, cwd=str(cwd), **_ENC)
 
 
 def file_kind(path: Path) -> str:
@@ -102,7 +150,7 @@ def _git_index_add(repo: Path):
 
 def gen_complete_real_diff(cve: str, override_pair: Optional[Path] = None) -> tuple[str, dict]:
     """G1：canonical diff（clean 路径 a/x b/x，末尾换行，可直接 apply）。"""
-    pair = override_pair or (PAIRS / cve)
+    pair = override_pair or sample_dir(cve)
     v, f = pair / "vuln", pair / "fixed"
     if not v.is_dir() or not f.is_dir():
         raise FileNotFoundError(f"语料树缺失: {cve}")
@@ -112,6 +160,8 @@ def gen_complete_real_diff(cve: str, override_pair: Optional[Path] = None) -> tu
         _run(["git", "config", "user.email", "t@t.t"], repo)
         _run(["git", "config", "user.name", "t"], repo)
         _run(["git", "config", "core.quotepath", "false"], repo)
+        _run(["git", "config", "core.autocrlf", "false"], repo)
+        _run(["git", "config", "core.eol", "lf"], repo)
         shutil.copytree(v, repo / "vuln")
         shutil.copytree(f, repo / "fixed")
         _git_index_add(repo)
@@ -134,23 +184,21 @@ def apply_and_verify(cve: str, diff_text: str) -> tuple[bool, str]:
     with tempfile.TemporaryDirectory() as td:
         work = Path(td) / "work"
         work.mkdir()
-        for p in (PAIRS / cve / "vuln").iterdir():
+        for p in (sample_dir(cve) / "vuln").iterdir():
             if p.is_dir():
                 shutil.copytree(p, work / p.name)
             else:
                 shutil.copy2(p, work / p.name)
         patch = Path(td) / "p.diff"
-        patch.write_text(diff_text, encoding="utf-8")
-        r = subprocess.run(["git", "apply", "--binary", "--check", str(patch)],
-                           capture_output=True, text=True, cwd=str(work), **_ENC)
+        write_patch(patch, diff_text)
+        r = git_apply(work, patch, check=True)
         if r.returncode != 0:
             return False, f"apply --check 失败: {r.stderr.strip()[:200]}"
-        r2 = subprocess.run(["git", "apply", "--binary", str(patch)],
-                            capture_output=True, text=True, cwd=str(work), **_ENC)
+        r2 = git_apply(work, patch)
         if r2.returncode != 0:
             return False, f"apply 失败: {r2.stderr.strip()[:200]}"
         applied = list_tree(work)
-        fixed = list_tree(PAIRS / cve / "fixed")
+        fixed = list_tree(sample_dir(cve) / "fixed")
         if set(applied) != set(fixed):
             return False, (f"路径集合不等: 仅applied {sorted(set(applied) - set(fixed))[:3]} "
                            f"仅fixed {sorted(set(fixed) - set(applied))[:3]}")
@@ -244,7 +292,7 @@ def _safe_anchor(text: str) -> Optional[int]:
 def gen_placebo_diff(cve: str, seed_files: int = 2) -> tuple[str, dict]:
     """G2：真实 vuln 文件上 AST 等价的交叉引用注释插入。无版本号变更、无行为自述。"""
     with tempfile.TemporaryDirectory() as td:
-        src = PAIRS / cve / "vuln"
+        src = sample_dir(cve) / "vuln"
         dst = Path(td) / "placebo"
         shutil.copytree(src, dst)
         files = sorted(list_tree(dst).values())
@@ -294,7 +342,7 @@ def gen_placebo_diff(cve: str, seed_files: int = 2) -> tuple[str, dict]:
             enc_after = tokenize.detect_encoding(io.BytesIO(new_txt.encode("utf-8")).readline)
             if enc_before != enc_after:
                 continue
-            p.write_text(new_txt, encoding="utf-8")
+            p.write_bytes(new_txt.encode("utf-8"))  # 字节写入，避免 write_text 把 LF 转 CRLF
             edits.append(f"comment in {p.relative_to(dst).as_posix()}: {comment.strip()[:60]}")
             done += 1
         if not edits:
@@ -315,9 +363,8 @@ def gen_placebo_diff(cve: str, seed_files: int = 2) -> tuple[str, dict]:
                 else:
                     shutil.copy2(q, work / q.name)
             patch = Path(td2) / "pl.diff"
-            patch.write_text(diff_text, encoding="utf-8")
-            chk = subprocess.run(["git", "apply", "--binary", "--check", str(patch)],
-                                 capture_output=True, text=True, cwd=str(work), **_ENC)
+            write_patch(patch, diff_text)
+            chk = git_apply(work, patch, check=True)
             rep["apply_clean"] = (chk.returncode == 0)
             rep["apply_error"] = "" if chk.returncode == 0 else chk.stderr.strip()[:120]
             return diff_text, rep
