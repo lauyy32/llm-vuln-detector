@@ -4,7 +4,9 @@
 *.jsonl text eol=lf
 *.md   text eol=lf
 *.ql   text eol=lf
-*.diff text eol=lf
+# patch 必须**字节冻结**：diff 里可能故意保留 CRLF 源文件的 \r（如 73498），
+# 任何行尾归一化都会使 Git blob SHA 与 manifest 绑定 SHA 不符、干净克隆即漂移。
+*.diff -text
 *.yml  text eol=lf
 *.yaml text eol=lf
 *.txt  text eol=lf
