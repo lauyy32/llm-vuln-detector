@@ -1,6 +1,6 @@
 {
  "generated_from": {
-  "git_commit": "b63377bf01cecd1d620aeff3d32f43ca3e1ecc84",
+  "git_commit": "da595af2fb841eb121dc7000694216678c0c83ac",
   "content_compare": true,
   "line_ending_normalized": true,
   "note": "L2 内容级按归一化行尾(CRLF→LF)比对；原始字节差异见 line_ending_diff"
@@ -452,7 +452,7 @@
       "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
       "upstream_parent": {
        "status": 200,
-       "attempts": 2,
+       "attempts": 1,
        "raw_sha256": "536c87660def52b69a04128d01e3634415e0651799052753ad820f6fe320e224",
        "lf_sha256": "536c87660def52b69a04128d01e3634415e0651799052753ad820f6fe320e224"
       },
@@ -832,7 +832,7 @@
       },
       "upstream_fix": {
        "status": 200,
-       "attempts": 1,
+       "attempts": 2,
        "raw_sha256": "88da0918ca262748b2928e785526cb9a1bb347cb1ab8af7a38b8a9dca142248a",
        "lf_sha256": "88da0918ca262748b2928e785526cb9a1bb347cb1ab8af7a38b8a9dca142248a"
       },
@@ -1030,7 +1030,7 @@
       },
       "upstream_fix": {
        "status": 200,
-       "attempts": 1,
+       "attempts": 2,
        "raw_sha256": "cdcdb6b443cdefe9831b7dbcba6257556295ba5839078a215525db55d6e9df49",
        "lf_sha256": "cdcdb6b443cdefe9831b7dbcba6257556295ba5839078a215525db55d6e9df49"
       },
@@ -1058,7 +1058,7 @@
       "fix_commit": "3b986d13677b30fe6651c8c72ebb25957ac0a40d",
       "upstream_parent": {
        "status": 200,
-       "attempts": 1,
+       "attempts": 2,
        "raw_sha256": "d612a17cc6fcb8f7bbe8fcabdb37821eb47d3b4f3eabcc228e419f2549274d10",
        "lf_sha256": "d612a17cc6fcb8f7bbe8fcabdb37821eb47d3b4f3eabcc228e419f2549274d10"
       },
@@ -1613,9 +1613,9 @@
        "cr_count": 0,
        "bytes": 6210
       },
-      "base_equivalent": false,
+      "base_equivalent": true,
       "fixed_equivalent": true,
-      "verdict": "MISMATCH"
+      "verdict": "OK"
      },
      {
       "path": "src/mcp_atlassian/utils/urls.py",
@@ -1725,7 +1725,7 @@
       "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
       "upstream_parent": {
        "status": 200,
-       "attempts": 2,
+       "attempts": 1,
        "raw_sha256": "6fce6abf34b9a565a79e1c57332497964c29cc3b3306424fb02ea2b162739c3e",
        "lf_sha256": "6fce6abf34b9a565a79e1c57332497964c29cc3b3306424fb02ea2b162739c3e"
       },
@@ -2255,9 +2255,9 @@
        "cr_count": 0,
        "bytes": 6151
       },
-      "base_equivalent": false,
+      "base_equivalent": true,
       "fixed_equivalent": true,
-      "verdict": "MISMATCH"
+      "verdict": "OK"
      },
      {
       "path": "tests/unit/utils/test_urls.py",
@@ -3021,7 +3021,7 @@
       "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
       "upstream_parent": {
        "status": 200,
-       "attempts": 2,
+       "attempts": 1,
        "raw_sha256": "99e68fe885e92c87866d389eb45813cfa4f97e3ae22e8dd30448d6f1a96ec104",
        "lf_sha256": "99e68fe885e92c87866d389eb45813cfa4f97e3ae22e8dd30448d6f1a96ec104"
       },
@@ -3197,7 +3197,7 @@
       },
       "upstream_fix": {
        "status": 200,
-       "attempts": 2,
+       "attempts": 1,
        "raw_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac",
        "lf_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac"
       },
@@ -3328,7 +3328,7 @@
       },
       "upstream_fix": {
        "status": 200,
-       "attempts": 2,
+       "attempts": 1,
        "raw_sha256": "fa9b8d21ab52d2f9025e215d7e7709e7ab68014478be2eb53c57f094662fdd1a",
        "lf_sha256": "fa9b8d21ab52d2f9025e215d7e7709e7ab68014478be2eb53c57f094662fdd1a"
       },
@@ -3362,7 +3362,7 @@
       },
       "upstream_fix": {
        "status": 200,
-       "attempts": 2,
+       "attempts": 1,
        "raw_sha256": "79ec1034506015d40fa8e9ceb5ee797dcf6e7d5df3605f4c297e7954f27ba0fa",
        "lf_sha256": "79ec1034506015d40fa8e9ceb5ee797dcf6e7d5df3605f4c297e7954f27ba0fa"
       },
@@ -3410,9 +3410,9 @@
        "cr_count": 0,
        "bytes": 10761
       },
-      "base_equivalent": false,
+      "base_equivalent": true,
       "fixed_equivalent": true,
-      "verdict": "MISMATCH"
+      "verdict": "OK"
      }
     ]
    },
@@ -3517,7 +3517,7 @@
       "fix_commit": "dd9f436a36486b4cb8a4c70a2321548b0be09b8f",
       "upstream_parent": {
        "status": 200,
-       "attempts": 2,
+       "attempts": 1,
        "raw_sha256": "78c83ae69200e760e2cc1ea6a64b5253e6fc0a3c1a3424b931280bfd5d4bac52",
        "lf_sha256": "78c83ae69200e760e2cc1ea6a64b5253e6fc0a3c1a3424b931280bfd5d4bac52"
       },

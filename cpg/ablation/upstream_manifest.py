@@ -322,10 +322,15 @@ def content_compare(cve: str, repo: str, parent: str, fix: str,
                 fixed_mismatch.append(filename)
             if (b"\r\n" in c_fixed) != (b"\r\n" in up_fix):
                 line_ending_diff.append(filename)
-        ev["base_equivalent"] = (up_base is not None and c_vuln is not None
-                                 and norm_eol(c_vuln) == norm_eol(up_base))
-        ev["fixed_equivalent"] = (up_fix is not None and c_fixed is not None
-                                  and norm_eol(c_fixed) == norm_eol(up_fix))
+        # added 文件（parent 404 且 corpus vuln 侧无）应判等价，而非 mismatch
+        ev["base_equivalent"] = (
+            (up_base is None and c_vuln is None)
+            or (up_base is not None and c_vuln is not None
+                and norm_eol(c_vuln) == norm_eol(up_base)))
+        ev["fixed_equivalent"] = (
+            (up_fix is None and c_fixed is None)
+            or (up_fix is not None and c_fixed is not None
+                and norm_eol(c_fixed) == norm_eol(up_fix)))
         ev["verdict"] = "OK" if (ev["base_equivalent"] and ev["fixed_equivalent"]) else "MISMATCH"
         evidence.append(ev)
 
