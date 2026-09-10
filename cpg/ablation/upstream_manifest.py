@@ -193,12 +193,23 @@ def read_corpus_file(cve: str, side: str, filename: str):
 # V4 数据入口（canonical manifest + corpus-v3；fail-closed 禁止旧 corpus_pairs）
 # ---------------------------------------------------------------------------
 _CANONICAL_CACHE: dict = {}
+_MANIFEST_OVERRIDE: dict = {"path": None}
+
+
+def set_canonical_manifest(path) -> None:
+    """P0-2 闭环：由顶层显式指定 manifest 路径（子进程不再仅依赖中央常量）。"""
+    _MANIFEST_OVERRIDE["path"] = Path(path)
+    _CANONICAL_CACHE.clear()
+
+
+def _manifest_path() -> Path:
+    return _MANIFEST_OVERRIDE["path"] or CANONICAL_MANIFEST
 
 
 def canonical_samples() -> dict:
     """读 canonical manifest，返回 {sample_id: sample}。"""
     if not _CANONICAL_CACHE:
-        m = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+        m = json.loads(_manifest_path().read_text(encoding="utf-8"))
         _CANONICAL_CACHE["by_id"] = {s["sample_id"]: s for s in m["samples"]}
     return _CANONICAL_CACHE["by_id"]
 
@@ -312,7 +323,24 @@ def main() -> int:
     ap.add_argument("--out", default="cpg/ablation/.work/upstream_manifest.json")
     ap.add_argument("--no-fetch", action="store_true")
     ap.add_argument("--no-content", action="store_true")
+    ap.add_argument("--canonical-manifest", type=Path, default=None,
+                    help="P0-2 闭环：显式指定 canonical manifest（缺省用中央常量）")
+    ap.add_argument("--expected-manifest-sha256", default=None,
+                    help="P0-2 闭环：期望的 manifest SHA-256，运行时重算校验（防 TOCTOU）")
     args = ap.parse_args()
+
+    # P0-2 闭环：显式绑定 + 运行时不变量校验
+    if args.canonical_manifest is not None:
+        if not args.canonical_manifest.exists():
+            print(f"[FAIL] canonical manifest 不存在: {args.canonical_manifest}")
+            return 1
+        got = hashlib.sha256(args.canonical_manifest.read_bytes()).hexdigest()
+        if args.expected_manifest_sha256 and got != args.expected_manifest_sha256:
+            print(f"[FAIL] manifest SHA 漂移: 期望 {args.expected_manifest_sha256[:16]} "
+                  f"实际 {got[:16]}")
+            return 1
+        set_canonical_manifest(args.canonical_manifest)
+        print(f"[manifest] {args.canonical_manifest.name} sha256={got[:16]}")
 
     CACHE.mkdir(parents=True, exist_ok=True)
     manifest = {"generated_from": {

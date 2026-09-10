@@ -1,6 +1,6 @@
 {
   "schema": "manifest-registry/1",
-  "generated_git_commit": "edf7cea021cfafd8f5cbb3f875054978bab8e411",
+  "generated_git_commit": "ff3a4740b4bc6375f9db40777e397f3001088b5e",
   "entries": [
     {
       "consumer": "RQ1-R",

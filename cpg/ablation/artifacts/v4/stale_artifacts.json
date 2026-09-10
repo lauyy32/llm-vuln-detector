@@ -1,0 +1,64 @@
+{
+  "schema": "stale-artifacts/1",
+  "superseded_at_commit": "9f29b8b",
+  "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
+  "note": "旧 V4 派生工件（基于陈旧 manifest）已被从 canonical v2 的重新生成替换；下表逐项给出旧/新 SHA，供机器核对无残留",
+  "entries": [
+    {
+      "artifact": "cpg/ablation/artifacts/v4/v4_canonical_manifest.json",
+      "superseded_sha256": "c6af68bbe62e718e2a9974f314578f3340fe9548e2b1bc67d655a7606e7f2417",
+      "superseded_at_commit": "9f29b8b",
+      "current_sha256": "5538b7899d4d80d9b7a7be56545627ca78d4887033dcc65562673d92006ca824",
+      "replaced": true
+    },
+    {
+      "artifact": "cpg/ablation/artifacts/v4/v4_upstream_real_report.json",
+      "superseded_sha256": "63cbf3d429e6c6a501f641d6513aa830a7d8d5065856aa0cd55750563da8c27f",
+      "superseded_at_commit": "9f29b8b",
+      "current_sha256": "531e5243645db6902625f0b8c34b7e42516204f5db095c896b5feac89d13bc24",
+      "replaced": true
+    },
+    {
+      "artifact": "cpg/ablation/artifacts/v4/real_manifest.jsonl",
+      "superseded_sha256": "1c6007f4e696a155b6232a5613ec14b8022f8a699d5f49926611753c545b802d",
+      "superseded_at_commit": "9f29b8b",
+      "current_sha256": "1c6007f4e696a155b6232a5613ec14b8022f8a699d5f49926611753c545b802d",
+      "replaced": false
+    },
+    {
+      "artifact": "cpg/ablation/artifacts/v4/placebo_manifest.jsonl",
+      "superseded_sha256": "f1d8971d9b7c196e650772eca7290fbddfcfe35df81a9e3a224d245fe39e5b8b",
+      "superseded_at_commit": "9f29b8b",
+      "current_sha256": "f1d8971d9b7c196e650772eca7290fbddfcfe35df81a9e3a224d245fe39e5b8b",
+      "replaced": false
+    },
+    {
+      "artifact": "cpg/ablation/artifacts/v4/shuffled_manifest.jsonl",
+      "superseded_sha256": "84639852d174390fc69ec04eb5c4e6f6457064bba268f5bc60331bbb6b394aff",
+      "superseded_at_commit": "9f29b8b",
+      "current_sha256": "84639852d174390fc69ec04eb5c4e6f6457064bba268f5bc60331bbb6b394aff",
+      "replaced": false
+    },
+    {
+      "artifact": "cpg/ablation/artifacts/v4/gate_a_report.json",
+      "superseded_sha256": "115f54a050fd743556239402288fb2e46ba5e055557030c15c9900547914a0ff",
+      "superseded_at_commit": "9f29b8b",
+      "current_sha256": "5670830ad5ed1898e7bd2295ecca062864cb11b908e893bc2424a1058349bbad",
+      "replaced": true
+    },
+    {
+      "artifact": "cpg/ablation/artifacts/v4/v4_feasibility_table.json",
+      "superseded_sha256": "9bb5fea8e4e9b825a1107159df61775626113869db31ce2924dbb58b22de1f3b",
+      "superseded_at_commit": "9f29b8b",
+      "current_sha256": "9bb5fea8e4e9b825a1107159df61775626113869db31ce2924dbb58b22de1f3b",
+      "replaced": false
+    },
+    {
+      "artifact": "cpg/ablation/artifacts/v4/manifest_registry.json",
+      "superseded_sha256": null,
+      "superseded_at_commit": "9f29b8b",
+      "current_sha256": "a21c2572678b38cd9b535e462e0e79703db46e9339fda236e3027b6195f6c940",
+      "replaced": false
+    }
+  ]
+}

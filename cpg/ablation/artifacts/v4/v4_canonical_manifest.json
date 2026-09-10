@@ -6,7 +6,7 @@
     "supersedes": "cpg/ablation/artifacts/canonical_corpus_manifest.json",
     "supersedes_sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
     "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
-    "git_commit": "edf7cea021cfafd8f5cbb3f875054978bab8e411",
+    "git_commit": "ff3a4740b4bc6375f9db40777e397f3001088b5e",
     "candidate_source": "cpg/ablation/partial_arm_construction.md"
   },
   "n_candidates": 15,

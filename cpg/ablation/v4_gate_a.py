@@ -131,13 +131,16 @@ def build_canonical_manifest(out_dir: Path) -> dict:
             errors.append(f"{cve} 缺 pair_manifest.json")
             continue
         pm_sha = _sha256_bytes(pm.read_bytes())
-        # V4 用 v2 的重算字段（旧字段 pair_manifest_sha256 已知整体陈旧）
-        expect_pm = s.get("v2_pair_manifest_sha256", s.get("pair_manifest_sha256"))
+        # V4 用 v2 的**正式**字段（无 v2_* fallback，避免重新引入字段歧义）
+        if "pair_manifest_sha256" not in s:
+            errors.append(f"{cve} v2 缺 pair_manifest_sha256 字段")
+            continue
+        expect_pm = s["pair_manifest_sha256"]
         if pm_sha != expect_pm:
             errors.append(f"{cve} pair_manifest SHA 与 v2 不符（阻断）")
             continue
         # 双重校验：v2 重算的 tree SHA 也必须与磁盘一致
-        for side, key in (("vuln", "v2_vuln_tree_sha256_lf"), ("fixed", "v2_fixed_tree_sha256_lf")):
+        for side, key in (("vuln", "vuln_tree_sha256_lf"), ("fixed", "fixed_tree_sha256_lf")):
             if s.get(key) and _tree_sha_lf(src_dir / side) != s[key]:
                 errors.append(f"{cve} {side} 树 SHA 与 v2 不符（阻断）")
                 break
@@ -190,7 +193,9 @@ def build_upstream_report(out_dir: Path) -> dict:
     if tmp.exists():
         tmp.unlink()
     cmd = [sys.executable, str(ROOT / "cpg/ablation/upstream_manifest.py"),
-           "--cves", *V4_CANDIDATES, "--out", str(tmp)]
+           "--cves", *V4_CANDIDATES, "--out", str(tmp),
+           "--canonical-manifest", str(CANONICAL_MANIFEST),
+           "--expected-manifest-sha256", v4_manifest.manifest_sha256()]
     r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
                        cwd=str(ROOT), timeout=3600)
     if r.returncode != 0:
@@ -490,10 +495,28 @@ def build_gate_a_report(out_dir: Path) -> dict:
         },
         "token_gate": tok,
     }
+    # P1 闭环：Gate 消费 registry——V4 ACTIVE 项的 path/SHA 必须与磁盘一致
+    registry_errs = []
+    reg_path = out_dir / "manifest_registry.json"
+    if not reg_path.exists():
+        registry_errs.append("缺 manifest_registry.json")
+    else:
+        reg = json.loads(reg_path.read_text(encoding="utf-8"))
+        act = [e for e in reg.get("entries", []) if e.get("status") == "ACTIVE"
+               and e.get("consumer") == "V4"]
+        if len(act) != 1:
+            registry_errs.append(f"V4 ACTIVE 项数 != 1（{len(act)}）")
+        else:
+            p = ROOT / act[0]["manifest"]
+            if not p.exists() or _sha256_bytes(p.read_bytes()) != act[0]["sha256"]:
+                registry_errs.append("registry V4 manifest SHA 漂移")
+    report["registry_check"] = {"errors": registry_errs}
     # Gate A 总判定
     blockers = []
     if cm["errors"]:
         blockers.append("canonical errors")
+    if registry_errs:
+        blockers.append(f"registry: {registry_errs}")
     up = report["upstream"]
     if up["resolved"] != len(V4_CANDIDATES):
         blockers.append(f"upstream resolved {up['resolved']}/{len(V4_CANDIDATES)}")
@@ -601,12 +624,50 @@ def build_manifest_registry(out_dir: Path) -> dict:
     return reg
 
 
+# 旧 V4 派生工件（基于陈旧 manifest 生成）最后所在的 commit；之后全部从 v2 重生成。
+SUPERSEDED_AT_COMMIT = "9f29b8b"
+V4_ARTIFACTS = [
+    "v4_canonical_manifest.json", "v4_upstream_real_report.json",
+    "real_manifest.jsonl", "placebo_manifest.jsonl", "shuffled_manifest.jsonl",
+    "gate_a_report.json", "v4_feasibility_table.json", "manifest_registry.json",
+]
+
+
+def build_stale_artifacts(out_dir: Path) -> dict:
+    """P1 闭环：旧工件（git 历史 SHA）→ 新工件（当前 SHA）的机器可审计 superseded 映射。"""
+    entries = []
+    for rel in V4_ARTIFACTS:
+        gitrel = f"cpg/ablation/artifacts/v4/{rel}"
+        old = subprocess.run(["git", "show", f"{SUPERSEDED_AT_COMMIT}:{gitrel}"],
+                             cwd=str(ROOT), capture_output=True).stdout
+        cur = out_dir / rel
+        entries.append({
+            "artifact": gitrel,
+            "superseded_sha256": _sha256_bytes(old) if old else None,
+            "superseded_at_commit": SUPERSEDED_AT_COMMIT,
+            "current_sha256": _sha256_bytes(cur.read_bytes()) if cur.exists() else None,
+            "replaced": bool(old) and cur.exists()
+                        and _sha256_bytes(old) != _sha256_bytes(cur.read_bytes()),
+        })
+    doc = {"schema": "stale-artifacts/1",
+           "superseded_at_commit": SUPERSEDED_AT_COMMIT,
+           "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
+           "note": "旧 V4 派生工件（基于陈旧 manifest）已被从 canonical v2 的重新生成替换；"
+                   "下表逐项给出旧/新 SHA，供机器核对无残留",
+           "entries": entries}
+    write_text_lf(out_dir / "stale_artifacts.json",
+                  json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+    return doc
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate", "feasibility", "all"])
     ap.add_argument("--out-dir", type=Path, default=OUT_DIR)
     ap.add_argument("--canonical-manifest", type=Path, default=None,
                     help="V4 权威 manifest（必须显式传入且等于 v4_manifest 单一来源）")
+    ap.add_argument("--expected-manifest-sha256", default=None,
+                    help="P0-2 闭环：期望 manifest SHA-256（运行时重算校验，防 TOCTOU）")
     args = ap.parse_args()
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -620,8 +681,12 @@ def main() -> int:
         print(f"[FAIL] --canonical-manifest 与单一来源不符: "
               f"{args.canonical_manifest} != {v4_manifest.manifest_path()}")
         return 1
-    print(f"[manifest] {v4_manifest.manifest_path().name} "
-          f"sha256={v4_manifest.manifest_sha256()[:16]}")
+    _cur_sha = v4_manifest.manifest_sha256()
+    if args.expected_manifest_sha256 and _cur_sha != args.expected_manifest_sha256:
+        print(f"[FAIL] manifest SHA 漂移: 期望 {args.expected_manifest_sha256[:16]} "
+              f"实际 {_cur_sha[:16]}")
+        return 1
+    print(f"[manifest] {v4_manifest.manifest_path().name} sha256={_cur_sha[:16]}")
     if args.step in ("canonical", "all"):
         doc = build_canonical_manifest(args.out_dir)
         reg = build_manifest_registry(args.out_dir)
@@ -651,7 +716,10 @@ def main() -> int:
             bad = [r["sample_id"] for r in rows if not r.get(key)]
             print(f"  {name}: {key} 失败 {len(bad)} 例 {bad}")
     if args.step in ("gate", "all"):
+        stale = build_stale_artifacts(args.out_dir)
         rep = build_gate_a_report(args.out_dir)
+        n_rep = sum(1 for e in stale["entries"] if e["replaced"])
+        print(f"[Stale] stale_artifacts.json: {n_rep}/{len(stale['entries'])} 项已替换")
         print(f"[GateA-4] gate_a_pass={rep['gate_a_pass']} | blockers={rep['blockers']}")
         for arm in ("placebo", "shuffled"):
             oob = rep["token_gate"]["per_arm"][arm]["out_of_bounds"]
