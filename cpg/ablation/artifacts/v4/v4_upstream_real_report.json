@@ -1,6 +1,6 @@
 {
  "generated_from": {
-  "git_commit": "edf7cea021cfafd8f5cbb3f875054978bab8e411",
+  "git_commit": "b63377bf01cecd1d620aeff3d32f43ca3e1ecc84",
   "content_compare": true,
   "line_ending_normalized": true,
   "note": "L2 内容级按归一化行尾(CRLF→LF)比对；原始字节差异见 line_ending_diff"
@@ -41,7 +41,77 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "keras/src/utils/file_utils.py",
+      "parent_commit": "19796fab16d003cea4516cb8a58640609f04a515",
+      "fix_commit": "9867df45c456dd1077a6243bb56219f66e288150",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "592aa9e68520de6b40f2daa3966f15c4aaf97b65ecc2de8ae15eae140814c2e5",
+       "lf_sha256": "592aa9e68520de6b40f2daa3966f15c4aaf97b65ecc2de8ae15eae140814c2e5"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a0a8391d53ac4f8432004125cd2ae15ce46054d5c5c3912dee8814b558735854",
+       "lf_sha256": "a0a8391d53ac4f8432004125cd2ae15ce46054d5c5c3912dee8814b558735854"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "592aa9e68520de6b40f2daa3966f15c4aaf97b65ecc2de8ae15eae140814c2e5",
+       "lf_sha256": "592aa9e68520de6b40f2daa3966f15c4aaf97b65ecc2de8ae15eae140814c2e5",
+       "cr_count": 0,
+       "bytes": 19787
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a0a8391d53ac4f8432004125cd2ae15ce46054d5c5c3912dee8814b558735854",
+       "lf_sha256": "a0a8391d53ac4f8432004125cd2ae15ce46054d5c5c3912dee8814b558735854",
+       "cr_count": 0,
+       "bytes": 19770
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "keras/src/utils/file_utils_test.py",
+      "parent_commit": "19796fab16d003cea4516cb8a58640609f04a515",
+      "fix_commit": "9867df45c456dd1077a6243bb56219f66e288150",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "cf208a1db5a7d9d2f36ac1563646881bcd9791d1fee998e25cbcd589aaafdc11",
+       "lf_sha256": "cf208a1db5a7d9d2f36ac1563646881bcd9791d1fee998e25cbcd589aaafdc11"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "864502522de1a4d5e5629410f6c0a6a7356242ea6ccc65019455ec7097b59964",
+       "lf_sha256": "864502522de1a4d5e5629410f6c0a6a7356242ea6ccc65019455ec7097b59964"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "cf208a1db5a7d9d2f36ac1563646881bcd9791d1fee998e25cbcd589aaafdc11",
+       "lf_sha256": "cf208a1db5a7d9d2f36ac1563646881bcd9791d1fee998e25cbcd589aaafdc11",
+       "cr_count": 0,
+       "bytes": 29477
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "864502522de1a4d5e5629410f6c0a6a7356242ea6ccc65019455ec7097b59964",
+       "lf_sha256": "864502522de1a4d5e5629410f6c0a6a7356242ea6ccc65019455ec7097b59964",
+       "cr_count": 0,
+       "bytes": 30089
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 16,
    "token_estimate": 128,
@@ -100,7 +170,43 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "backend/open_webui/routers/tools.py",
+      "parent_commit": "9562f1a67d4296bbbc5bb2163b5929be0ceb6545",
+      "fix_commit": "c05de13b4fca1ac8a17153782b46b3d0aacf491c",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "afb743361637214dfe4b35b6401b04b954968bf25e91eb78295768cca3fdcd2e",
+       "lf_sha256": "afb743361637214dfe4b35b6401b04b954968bf25e91eb78295768cca3fdcd2e"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "3b597edf0cbc6230138bfbc113f94686e3be5e446fb1c1078a842210e210a41f",
+       "lf_sha256": "3b597edf0cbc6230138bfbc113f94686e3be5e446fb1c1078a842210e210a41f"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "afb743361637214dfe4b35b6401b04b954968bf25e91eb78295768cca3fdcd2e",
+       "lf_sha256": "afb743361637214dfe4b35b6401b04b954968bf25e91eb78295768cca3fdcd2e",
+       "cr_count": 0,
+       "bytes": 31169
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "3b597edf0cbc6230138bfbc113f94686e3be5e446fb1c1078a842210e210a41f",
+       "lf_sha256": "3b597edf0cbc6230138bfbc113f94686e3be5e446fb1c1078a842210e210a41f",
+       "cr_count": 0,
+       "bytes": 31310
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 28,
    "token_estimate": 224,
@@ -159,7 +265,43 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "penelope.py",
+      "parent_commit": "ef417fff6cfb2ab02f3303949fe60a4f163d0ed5",
+      "fix_commit": "a040afb5db32c7e80b5e8a2f9b2164cf911cfa62",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "957bdf3977e66cf21f13bbe87ff62ce79baf338d96ec6dae9ece4dbe901a04a8",
+       "lf_sha256": "957bdf3977e66cf21f13bbe87ff62ce79baf338d96ec6dae9ece4dbe901a04a8"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "c84ff758f2fae7e65e9d51b50836e42b3ebc7f691906120d9c524ea00947a1d6",
+       "lf_sha256": "c84ff758f2fae7e65e9d51b50836e42b3ebc7f691906120d9c524ea00947a1d6"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "957bdf3977e66cf21f13bbe87ff62ce79baf338d96ec6dae9ece4dbe901a04a8",
+       "lf_sha256": "957bdf3977e66cf21f13bbe87ff62ce79baf338d96ec6dae9ece4dbe901a04a8",
+       "cr_count": 0,
+       "bytes": 178025
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "c84ff758f2fae7e65e9d51b50836e42b3ebc7f691906120d9c524ea00947a1d6",
+       "lf_sha256": "c84ff758f2fae7e65e9d51b50836e42b3ebc7f691906120d9c524ea00947a1d6",
+       "cr_count": 0,
+       "bytes": 179245
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 62,
    "token_estimate": 496,
@@ -234,7 +376,587 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "src/core/modules/atomic/ai/vision_analyze.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "5d0f0941d077667b9798db0aa07ec83ac25505d3d0a5d65f614cf30c9c84e0dc",
+       "lf_sha256": "5d0f0941d077667b9798db0aa07ec83ac25505d3d0a5d65f614cf30c9c84e0dc"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "6811f78cd231d702214a5b2c1feb6d4a761b65a7f3e06ab42678579ef2a29d61",
+       "lf_sha256": "6811f78cd231d702214a5b2c1feb6d4a761b65a7f3e06ab42678579ef2a29d61"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "5d0f0941d077667b9798db0aa07ec83ac25505d3d0a5d65f614cf30c9c84e0dc",
+       "lf_sha256": "5d0f0941d077667b9798db0aa07ec83ac25505d3d0a5d65f614cf30c9c84e0dc",
+       "cr_count": 0,
+       "bytes": 13594
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "6811f78cd231d702214a5b2c1feb6d4a761b65a7f3e06ab42678579ef2a29d61",
+       "lf_sha256": "6811f78cd231d702214a5b2c1feb6d4a761b65a7f3e06ab42678579ef2a29d61",
+       "cr_count": 0,
+       "bytes": 13914
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/browser/proxy_rotate.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "5639e86d30b59d74644e4b7932a6a3018c2c9af925399f107d2e1c35b0a5c273",
+       "lf_sha256": "5639e86d30b59d74644e4b7932a6a3018c2c9af925399f107d2e1c35b0a5c273"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ca8e65f26f7af82cc915694afcb70433143d104c9953d8dcab69e2ec2f47aebf",
+       "lf_sha256": "ca8e65f26f7af82cc915694afcb70433143d104c9953d8dcab69e2ec2f47aebf"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "5639e86d30b59d74644e4b7932a6a3018c2c9af925399f107d2e1c35b0a5c273",
+       "lf_sha256": "5639e86d30b59d74644e4b7932a6a3018c2c9af925399f107d2e1c35b0a5c273",
+       "cr_count": 0,
+       "bytes": 11125
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "ca8e65f26f7af82cc915694afcb70433143d104c9953d8dcab69e2ec2f47aebf",
+       "lf_sha256": "ca8e65f26f7af82cc915694afcb70433143d104c9953d8dcab69e2ec2f47aebf",
+       "cr_count": 0,
+       "bytes": 11492
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/communication/slack_send.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 2,
+       "raw_sha256": "536c87660def52b69a04128d01e3634415e0651799052753ad820f6fe320e224",
+       "lf_sha256": "536c87660def52b69a04128d01e3634415e0651799052753ad820f6fe320e224"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "684c143bebf35807f5fdad0718f1f1a2631cb278c883a51ec5e7f38418c4ae9e",
+       "lf_sha256": "684c143bebf35807f5fdad0718f1f1a2631cb278c883a51ec5e7f38418c4ae9e"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "536c87660def52b69a04128d01e3634415e0651799052753ad820f6fe320e224",
+       "lf_sha256": "536c87660def52b69a04128d01e3634415e0651799052753ad820f6fe320e224",
+       "cr_count": 0,
+       "bytes": 3943
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "684c143bebf35807f5fdad0718f1f1a2631cb278c883a51ec5e7f38418c4ae9e",
+       "lf_sha256": "684c143bebf35807f5fdad0718f1f1a2631cb278c883a51ec5e7f38418c4ae9e",
+       "cr_count": 0,
+       "bytes": 4301
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/graphql/mutation.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "fa55eac580099b690b4c9a222273606c37c4244fa9b06cb99811a1d846ca19c8",
+       "lf_sha256": "fa55eac580099b690b4c9a222273606c37c4244fa9b06cb99811a1d846ca19c8"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "6932d8bd528399d9d4f8d1ab0e39f0f50c47e85f403ebfa83c4f2e5aac31d55a",
+       "lf_sha256": "6932d8bd528399d9d4f8d1ab0e39f0f50c47e85f403ebfa83c4f2e5aac31d55a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "fa55eac580099b690b4c9a222273606c37c4244fa9b06cb99811a1d846ca19c8",
+       "lf_sha256": "fa55eac580099b690b4c9a222273606c37c4244fa9b06cb99811a1d846ca19c8",
+       "cr_count": 0,
+       "bytes": 7082
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "6932d8bd528399d9d4f8d1ab0e39f0f50c47e85f403ebfa83c4f2e5aac31d55a",
+       "lf_sha256": "6932d8bd528399d9d4f8d1ab0e39f0f50c47e85f403ebfa83c4f2e5aac31d55a",
+       "cr_count": 0,
+       "bytes": 7416
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/graphql/query.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "54f6267a57bf25b965c2fb56c4dacb563ee883eaccb0b1fffc32854f8a32ad8e",
+       "lf_sha256": "54f6267a57bf25b965c2fb56c4dacb563ee883eaccb0b1fffc32854f8a32ad8e"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "7af443f187843145c059420745932646c0e422c336c412379b6ec2f08e90138f",
+       "lf_sha256": "7af443f187843145c059420745932646c0e422c336c412379b6ec2f08e90138f"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "54f6267a57bf25b965c2fb56c4dacb563ee883eaccb0b1fffc32854f8a32ad8e",
+       "lf_sha256": "54f6267a57bf25b965c2fb56c4dacb563ee883eaccb0b1fffc32854f8a32ad8e",
+       "cr_count": 0,
+       "bytes": 7188
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "7af443f187843145c059420745932646c0e422c336c412379b6ec2f08e90138f",
+       "lf_sha256": "7af443f187843145c059420745932646c0e422c336c412379b6ec2f08e90138f",
+       "cr_count": 0,
+       "bytes": 7522
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/http/batch.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "18384088fea0d6a13ab5f65897c5b8c45bf1e0ff02c4a3e1e241ffd73111d774",
+       "lf_sha256": "18384088fea0d6a13ab5f65897c5b8c45bf1e0ff02c4a3e1e241ffd73111d774"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "66b9e7e8f92fd8811251e4174ed40e7080dae0792aa4635c45255642124c5946",
+       "lf_sha256": "66b9e7e8f92fd8811251e4174ed40e7080dae0792aa4635c45255642124c5946"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "18384088fea0d6a13ab5f65897c5b8c45bf1e0ff02c4a3e1e241ffd73111d774",
+       "lf_sha256": "18384088fea0d6a13ab5f65897c5b8c45bf1e0ff02c4a3e1e241ffd73111d774",
+       "cr_count": 0,
+       "bytes": 9657
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "66b9e7e8f92fd8811251e4174ed40e7080dae0792aa4635c45255642124c5946",
+       "lf_sha256": "66b9e7e8f92fd8811251e4174ed40e7080dae0792aa4635c45255642124c5946",
+       "cr_count": 0,
+       "bytes": 10019
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/http/get.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f2b62ff23fe0be9c6c5f47874bd73ba14008f154bc4ba9d809e0baee85966d9b",
+       "lf_sha256": "f2b62ff23fe0be9c6c5f47874bd73ba14008f154bc4ba9d809e0baee85966d9b"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "69d14a024850b12cb78f756ac7a5e2a94d6a89fb5aeb5fafa5d5269404338bec",
+       "lf_sha256": "69d14a024850b12cb78f756ac7a5e2a94d6a89fb5aeb5fafa5d5269404338bec"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "f2b62ff23fe0be9c6c5f47874bd73ba14008f154bc4ba9d809e0baee85966d9b",
+       "lf_sha256": "f2b62ff23fe0be9c6c5f47874bd73ba14008f154bc4ba9d809e0baee85966d9b",
+       "cr_count": 0,
+       "bytes": 4484
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "69d14a024850b12cb78f756ac7a5e2a94d6a89fb5aeb5fafa5d5269404338bec",
+       "lf_sha256": "69d14a024850b12cb78f756ac7a5e2a94d6a89fb5aeb5fafa5d5269404338bec",
+       "cr_count": 0,
+       "bytes": 4802
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/http/request.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "61c1b89c4756bebe5df23b39635b93bc130b4c70a186c65b6b7ed7a756ffe496",
+       "lf_sha256": "61c1b89c4756bebe5df23b39635b93bc130b4c70a186c65b6b7ed7a756ffe496"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "075a2ecea434084ae84e7a45ad94e5bde7f9a378e3228b1a5d94aee848d1cd98",
+       "lf_sha256": "075a2ecea434084ae84e7a45ad94e5bde7f9a378e3228b1a5d94aee848d1cd98"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "61c1b89c4756bebe5df23b39635b93bc130b4c70a186c65b6b7ed7a756ffe496",
+       "lf_sha256": "61c1b89c4756bebe5df23b39635b93bc130b4c70a186c65b6b7ed7a756ffe496",
+       "cr_count": 0,
+       "bytes": 15650
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "075a2ecea434084ae84e7a45ad94e5bde7f9a378e3228b1a5d94aee848d1cd98",
+       "lf_sha256": "075a2ecea434084ae84e7a45ad94e5bde7f9a378e3228b1a5d94aee848d1cd98",
+       "cr_count": 0,
+       "bytes": 16262
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/monitor/http_check.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "1c2eb55c56184a22c8ef83f4a7a03d472673bd5eccf720e36d118ff10b4f98b3",
+       "lf_sha256": "1c2eb55c56184a22c8ef83f4a7a03d472673bd5eccf720e36d118ff10b4f98b3"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "0ebe51aff97540f9140aa50f4a7914cb429e475987e377ae9134ade0d32ed540",
+       "lf_sha256": "0ebe51aff97540f9140aa50f4a7914cb429e475987e377ae9134ade0d32ed540"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "1c2eb55c56184a22c8ef83f4a7a03d472673bd5eccf720e36d118ff10b4f98b3",
+       "lf_sha256": "1c2eb55c56184a22c8ef83f4a7a03d472673bd5eccf720e36d118ff10b4f98b3",
+       "cr_count": 0,
+       "bytes": 11649
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "0ebe51aff97540f9140aa50f4a7914cb429e475987e377ae9134ade0d32ed540",
+       "lf_sha256": "0ebe51aff97540f9140aa50f4a7914cb429e475987e377ae9134ade0d32ed540",
+       "cr_count": 0,
+       "bytes": 12232
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/verify/visual_diff.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "d8e919b346eff5b0f7ee6b581ea03a0a66e39d84f9e23b5e4748b1625c583b8a",
+       "lf_sha256": "d8e919b346eff5b0f7ee6b581ea03a0a66e39d84f9e23b5e4748b1625c583b8a"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "76d5691d0ff8d5625bd9993680297d554d24dcdd931a8b08de7828599444d024",
+       "lf_sha256": "76d5691d0ff8d5625bd9993680297d554d24dcdd931a8b08de7828599444d024"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "d8e919b346eff5b0f7ee6b581ea03a0a66e39d84f9e23b5e4748b1625c583b8a",
+       "lf_sha256": "d8e919b346eff5b0f7ee6b581ea03a0a66e39d84f9e23b5e4748b1625c583b8a",
+       "cr_count": 0,
+       "bytes": 17485
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "76d5691d0ff8d5625bd9993680297d554d24dcdd931a8b08de7828599444d024",
+       "lf_sha256": "76d5691d0ff8d5625bd9993680297d554d24dcdd931a8b08de7828599444d024",
+       "cr_count": 0,
+       "bytes": 17982
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/third_party/communication/messaging/discord.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f4e53ca423282bf38985d806db5057149eb9d5c9d4a8087bf6fe694211ff0a70",
+       "lf_sha256": "f4e53ca423282bf38985d806db5057149eb9d5c9d4a8087bf6fe694211ff0a70"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "30a8a3b75d482bc55f1d87f9d4755f373c2a429cb712783e9fdfd29ec3bee660",
+       "lf_sha256": "30a8a3b75d482bc55f1d87f9d4755f373c2a429cb712783e9fdfd29ec3bee660"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "f4e53ca423282bf38985d806db5057149eb9d5c9d4a8087bf6fe694211ff0a70",
+       "lf_sha256": "f4e53ca423282bf38985d806db5057149eb9d5c9d4a8087bf6fe694211ff0a70",
+       "cr_count": 0,
+       "bytes": 6116
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "30a8a3b75d482bc55f1d87f9d4755f373c2a429cb712783e9fdfd29ec3bee660",
+       "lf_sha256": "30a8a3b75d482bc55f1d87f9d4755f373c2a429cb712783e9fdfd29ec3bee660",
+       "cr_count": 0,
+       "bytes": 6649
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/third_party/communication/messaging/slack.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "212a74cdefe79b7a76e1eab0d0d7c1ce9c2017cea1dc8fa335a62d41e2792a49",
+       "lf_sha256": "212a74cdefe79b7a76e1eab0d0d7c1ce9c2017cea1dc8fa335a62d41e2792a49"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "6e29d3660795ad1de8edf7113ab3d6cc76adba361dadaffb668fd7c0d4e4609d",
+       "lf_sha256": "6e29d3660795ad1de8edf7113ab3d6cc76adba361dadaffb668fd7c0d4e4609d"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "212a74cdefe79b7a76e1eab0d0d7c1ce9c2017cea1dc8fa335a62d41e2792a49",
+       "lf_sha256": "212a74cdefe79b7a76e1eab0d0d7c1ce9c2017cea1dc8fa335a62d41e2792a49",
+       "cr_count": 0,
+       "bytes": 6659
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "6e29d3660795ad1de8edf7113ab3d6cc76adba361dadaffb668fd7c0d4e4609d",
+       "lf_sha256": "6e29d3660795ad1de8edf7113ab3d6cc76adba361dadaffb668fd7c0d4e4609d",
+       "cr_count": 0,
+       "bytes": 7192
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/third_party/communication/messaging/teams.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "91e5ce1af7af3c990a9aed0bf828350689ce7ccc96c5b1e57bcd5cd618392924",
+       "lf_sha256": "91e5ce1af7af3c990a9aed0bf828350689ce7ccc96c5b1e57bcd5cd618392924"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "5a9cb98a454c16923a7e0651cda0a2c7d3dff07715e1dd45ab3d619df93492c9",
+       "lf_sha256": "5a9cb98a454c16923a7e0651cda0a2c7d3dff07715e1dd45ab3d619df93492c9"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "91e5ce1af7af3c990a9aed0bf828350689ce7ccc96c5b1e57bcd5cd618392924",
+       "lf_sha256": "91e5ce1af7af3c990a9aed0bf828350689ce7ccc96c5b1e57bcd5cd618392924",
+       "cr_count": 0,
+       "bytes": 6204
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "5a9cb98a454c16923a7e0651cda0a2c7d3dff07715e1dd45ab3d619df93492c9",
+       "lf_sha256": "5a9cb98a454c16923a7e0651cda0a2c7d3dff07715e1dd45ab3d619df93492c9",
+       "cr_count": 0,
+       "bytes": 6788
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/third_party/developer/http/requests.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "90d4c3c8e58fb1a390411f766ea1f7b7b98130cf4148f8922315c93c41661387",
+       "lf_sha256": "90d4c3c8e58fb1a390411f766ea1f7b7b98130cf4148f8922315c93c41661387"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "88da0918ca262748b2928e785526cb9a1bb347cb1ab8af7a38b8a9dca142248a",
+       "lf_sha256": "88da0918ca262748b2928e785526cb9a1bb347cb1ab8af7a38b8a9dca142248a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "90d4c3c8e58fb1a390411f766ea1f7b7b98130cf4148f8922315c93c41661387",
+       "lf_sha256": "90d4c3c8e58fb1a390411f766ea1f7b7b98130cf4148f8922315c93c41661387",
+       "cr_count": 0,
+       "bytes": 7024
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "88da0918ca262748b2928e785526cb9a1bb347cb1ab8af7a38b8a9dca142248a",
+       "lf_sha256": "88da0918ca262748b2928e785526cb9a1bb347cb1ab8af7a38b8a9dca142248a",
+       "cr_count": 0,
+       "bytes": 7669
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/utils.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac",
+       "lf_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "b7958c0d038c0ff450e04ed84c5d6b74a3ff5585d485329e476de757683b9ab0",
+       "lf_sha256": "b7958c0d038c0ff450e04ed84c5d6b74a3ff5585d485329e476de757683b9ab0"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac",
+       "lf_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac",
+       "cr_count": 0,
+       "bytes": 27341
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "b7958c0d038c0ff450e04ed84c5d6b74a3ff5585d485329e476de757683b9ab0",
+       "lf_sha256": "b7958c0d038c0ff450e04ed84c5d6b74a3ff5585d485329e476de757683b9ab0",
+       "cr_count": 0,
+       "bytes": 30029
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/verification_service.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "951ef7401f3f499f2f971a7885bba63c8471a110440f66ab271be978f353841d",
+       "lf_sha256": "951ef7401f3f499f2f971a7885bba63c8471a110440f66ab271be978f353841d"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "8dfd992ec8eba26c57a6b34efa51e32ad74b5c5abf6afbd7304328a416bcf6a5",
+       "lf_sha256": "8dfd992ec8eba26c57a6b34efa51e32ad74b5c5abf6afbd7304328a416bcf6a5"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "951ef7401f3f499f2f971a7885bba63c8471a110440f66ab271be978f353841d",
+       "lf_sha256": "951ef7401f3f499f2f971a7885bba63c8471a110440f66ab271be978f353841d",
+       "cr_count": 0,
+       "bytes": 14200
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "8dfd992ec8eba26c57a6b34efa51e32ad74b5c5abf6afbd7304328a416bcf6a5",
+       "lf_sha256": "8dfd992ec8eba26c57a6b34efa51e32ad74b5c5abf6afbd7304328a416bcf6a5",
+       "cr_count": 0,
+       "bytes": 17420
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/test_verification_service.py",
+      "parent_commit": "2471c6e774102fcca21c61eb66cae057c0f0cecf",
+      "fix_commit": "0a0a528520ec18f5a21f1ddf858a71cc1edfb6e9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "58fcf57af120d0cc5abfbc77261c25ab5f6ff84a1e5a4df643fc8ce1fa861fa6",
+       "lf_sha256": "58fcf57af120d0cc5abfbc77261c25ab5f6ff84a1e5a4df643fc8ce1fa861fa6"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "55a9755d5b28fb90445ad8c7e554919b1d026bfaa8dc5d3643821705a8ca1e45",
+       "lf_sha256": "55a9755d5b28fb90445ad8c7e554919b1d026bfaa8dc5d3643821705a8ca1e45"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "58fcf57af120d0cc5abfbc77261c25ab5f6ff84a1e5a4df643fc8ce1fa861fa6",
+       "lf_sha256": "58fcf57af120d0cc5abfbc77261c25ab5f6ff84a1e5a4df643fc8ce1fa861fa6",
+       "cr_count": 0,
+       "bytes": 6012
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "55a9755d5b28fb90445ad8c7e554919b1d026bfaa8dc5d3643821705a8ca1e45",
+       "lf_sha256": "55a9755d5b28fb90445ad8c7e554919b1d026bfaa8dc5d3643821705a8ca1e45",
+       "cr_count": 0,
+       "bytes": 6944
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 369,
    "token_estimate": 2952,
@@ -294,7 +1016,77 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "tests/loaders/test_file_loader.py",
+      "parent_commit": "471ef279700e9f79941d451acf88abe1601df875",
+      "fix_commit": "3b986d13677b30fe6651c8c72ebb25957ac0a40d",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ef667ecc1e89171b648435edd2946eef983973007ee9e23916b993541c41aa0a",
+       "lf_sha256": "ef667ecc1e89171b648435edd2946eef983973007ee9e23916b993541c41aa0a"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "cdcdb6b443cdefe9831b7dbcba6257556295ba5839078a215525db55d6e9df49",
+       "lf_sha256": "cdcdb6b443cdefe9831b7dbcba6257556295ba5839078a215525db55d6e9df49"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ef667ecc1e89171b648435edd2946eef983973007ee9e23916b993541c41aa0a",
+       "lf_sha256": "ef667ecc1e89171b648435edd2946eef983973007ee9e23916b993541c41aa0a",
+       "cr_count": 0,
+       "bytes": 2496
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "cdcdb6b443cdefe9831b7dbcba6257556295ba5839078a215525db55d6e9df49",
+       "lf_sha256": "cdcdb6b443cdefe9831b7dbcba6257556295ba5839078a215525db55d6e9df49",
+       "cr_count": 0,
+       "bytes": 4108
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "thumbor/loaders/file_loader.py",
+      "parent_commit": "471ef279700e9f79941d451acf88abe1601df875",
+      "fix_commit": "3b986d13677b30fe6651c8c72ebb25957ac0a40d",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "d612a17cc6fcb8f7bbe8fcabdb37821eb47d3b4f3eabcc228e419f2549274d10",
+       "lf_sha256": "d612a17cc6fcb8f7bbe8fcabdb37821eb47d3b4f3eabcc228e419f2549274d10"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "b37f2ac556959fde2b8198cbe789fc8350c6381d4740d5d4e8515ad8de9d9e8f",
+       "lf_sha256": "b37f2ac556959fde2b8198cbe789fc8350c6381d4740d5d4e8515ad8de9d9e8f"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "d612a17cc6fcb8f7bbe8fcabdb37821eb47d3b4f3eabcc228e419f2549274d10",
+       "lf_sha256": "d612a17cc6fcb8f7bbe8fcabdb37821eb47d3b4f3eabcc228e419f2549274d10",
+       "cr_count": 0,
+       "bytes": 1535
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "b37f2ac556959fde2b8198cbe789fc8350c6381d4740d5d4e8515ad8de9d9e8f",
+       "lf_sha256": "b37f2ac556959fde2b8198cbe789fc8350c6381d4740d5d4e8515ad8de9d9e8f",
+       "cr_count": 0,
+       "bytes": 2291
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 73,
    "token_estimate": 584,
@@ -385,7 +1177,1123 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "src/mcp_atlassian/confluence/attachments.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "c3aa1c200e83f33c284c94c0bfc9e5eec3dd893f7b719e1a35d64d2a7961d08c",
+       "lf_sha256": "c3aa1c200e83f33c284c94c0bfc9e5eec3dd893f7b719e1a35d64d2a7961d08c"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "0f32292c7cd19f7075420ee7c0bbe3b7af6c6d682aa70e63a6d936ce1138ae03",
+       "lf_sha256": "0f32292c7cd19f7075420ee7c0bbe3b7af6c6d682aa70e63a6d936ce1138ae03"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "c3aa1c200e83f33c284c94c0bfc9e5eec3dd893f7b719e1a35d64d2a7961d08c",
+       "lf_sha256": "c3aa1c200e83f33c284c94c0bfc9e5eec3dd893f7b719e1a35d64d2a7961d08c",
+       "cr_count": 0,
+       "bytes": 30305
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "0f32292c7cd19f7075420ee7c0bbe3b7af6c6d682aa70e63a6d936ce1138ae03",
+       "lf_sha256": "0f32292c7cd19f7075420ee7c0bbe3b7af6c6d682aa70e63a6d936ce1138ae03",
+       "cr_count": 0,
+       "bytes": 30435
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/confluence/client.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "cae937d845a8baf33954253df67a8792691191a4318f5d21cafa62046a2e562f",
+       "lf_sha256": "cae937d845a8baf33954253df67a8792691191a4318f5d21cafa62046a2e562f"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "01021188da49ff8ed09a2e6883c1ca8466983dfd19fc687ae378f5eea544e1dc",
+       "lf_sha256": "01021188da49ff8ed09a2e6883c1ca8466983dfd19fc687ae378f5eea544e1dc"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "cae937d845a8baf33954253df67a8792691191a4318f5d21cafa62046a2e562f",
+       "lf_sha256": "cae937d845a8baf33954253df67a8792691191a4318f5d21cafa62046a2e562f",
+       "cr_count": 0,
+       "bytes": 10841
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "01021188da49ff8ed09a2e6883c1ca8466983dfd19fc687ae378f5eea544e1dc",
+       "lf_sha256": "01021188da49ff8ed09a2e6883c1ca8466983dfd19fc687ae378f5eea544e1dc",
+       "cr_count": 0,
+       "bytes": 11575
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/confluence/search.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "7e672b8735d2732053c1c505d579c6a52cae2475dbc57d8b21f12159bb733c51",
+       "lf_sha256": "7e672b8735d2732053c1c505d579c6a52cae2475dbc57d8b21f12159bb733c51"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "096c8d6f5d36b33138e8146abf12ac33376e3bc921abec40e43bfff6bcfa897a",
+       "lf_sha256": "096c8d6f5d36b33138e8146abf12ac33376e3bc921abec40e43bfff6bcfa897a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "7e672b8735d2732053c1c505d579c6a52cae2475dbc57d8b21f12159bb733c51",
+       "lf_sha256": "7e672b8735d2732053c1c505d579c6a52cae2475dbc57d8b21f12159bb733c51",
+       "cr_count": 0,
+       "bytes": 7454
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "096c8d6f5d36b33138e8146abf12ac33376e3bc921abec40e43bfff6bcfa897a",
+       "lf_sha256": "096c8d6f5d36b33138e8146abf12ac33376e3bc921abec40e43bfff6bcfa897a",
+       "cr_count": 0,
+       "bytes": 8082
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/jira/attachments.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a1458c94784e6fd3bd12558aeac37160aeedde8f58fc0cd5cc9df0bf0f71587f",
+       "lf_sha256": "a1458c94784e6fd3bd12558aeac37160aeedde8f58fc0cd5cc9df0bf0f71587f"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ba6a14f2bba43951acbcb4aa7e783669a3ba5b4ea31de47d997044f87c48b34a",
+       "lf_sha256": "ba6a14f2bba43951acbcb4aa7e783669a3ba5b4ea31de47d997044f87c48b34a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "a1458c94784e6fd3bd12558aeac37160aeedde8f58fc0cd5cc9df0bf0f71587f",
+       "lf_sha256": "a1458c94784e6fd3bd12558aeac37160aeedde8f58fc0cd5cc9df0bf0f71587f",
+       "cr_count": 0,
+       "bytes": 16329
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "ba6a14f2bba43951acbcb4aa7e783669a3ba5b4ea31de47d997044f87c48b34a",
+       "lf_sha256": "ba6a14f2bba43951acbcb4aa7e783669a3ba5b4ea31de47d997044f87c48b34a",
+       "cr_count": 0,
+       "bytes": 17045
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/jira/client.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "d01d46377998332c3f525978c9b7e1d55a974ff6d19d1c4ec2ba7c17ee89340e",
+       "lf_sha256": "d01d46377998332c3f525978c9b7e1d55a974ff6d19d1c4ec2ba7c17ee89340e"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "5d36f2bb5f42d3311af3e704fe28f6ca072f5f34178e87f80f8f5c70d8963e90",
+       "lf_sha256": "5d36f2bb5f42d3311af3e704fe28f6ca072f5f34178e87f80f8f5c70d8963e90"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "d01d46377998332c3f525978c9b7e1d55a974ff6d19d1c4ec2ba7c17ee89340e",
+       "lf_sha256": "d01d46377998332c3f525978c9b7e1d55a974ff6d19d1c4ec2ba7c17ee89340e",
+       "cr_count": 0,
+       "bytes": 17405
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "5d36f2bb5f42d3311af3e704fe28f6ca072f5f34178e87f80f8f5c70d8963e90",
+       "lf_sha256": "5d36f2bb5f42d3311af3e704fe28f6ca072f5f34178e87f80f8f5c70d8963e90",
+       "cr_count": 0,
+       "bytes": 18151
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/jira/search.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "20820cf739f78373ea329b4461eddfe896d5ff5fb29b19eb37a28fca24e0a1ca",
+       "lf_sha256": "20820cf739f78373ea329b4461eddfe896d5ff5fb29b19eb37a28fca24e0a1ca"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "98643a3649b8861f7c23f0fcbb0c237efaabb7dee6dc5733d90ca5437d2acfc1",
+       "lf_sha256": "98643a3649b8861f7c23f0fcbb0c237efaabb7dee6dc5733d90ca5437d2acfc1"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "20820cf739f78373ea329b4461eddfe896d5ff5fb29b19eb37a28fca24e0a1ca",
+       "lf_sha256": "20820cf739f78373ea329b4461eddfe896d5ff5fb29b19eb37a28fca24e0a1ca",
+       "cr_count": 0,
+       "bytes": 12583
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "98643a3649b8861f7c23f0fcbb0c237efaabb7dee6dc5733d90ca5437d2acfc1",
+       "lf_sha256": "98643a3649b8861f7c23f0fcbb0c237efaabb7dee6dc5733d90ca5437d2acfc1",
+       "cr_count": 0,
+       "bytes": 13422
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/servers/confluence.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "aa5a53551fe1401ad03deda896fc384fcabed71ffcc7127fbc4205a5dc180ed5",
+       "lf_sha256": "aa5a53551fe1401ad03deda896fc384fcabed71ffcc7127fbc4205a5dc180ed5"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "1ff160d01b1d94e5ba1af53414058ae4b104377ef8e6368c0115b85dd642dd7d",
+       "lf_sha256": "1ff160d01b1d94e5ba1af53414058ae4b104377ef8e6368c0115b85dd642dd7d"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "aa5a53551fe1401ad03deda896fc384fcabed71ffcc7127fbc4205a5dc180ed5",
+       "lf_sha256": "aa5a53551fe1401ad03deda896fc384fcabed71ffcc7127fbc4205a5dc180ed5",
+       "cr_count": 0,
+       "bytes": 100912
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "1ff160d01b1d94e5ba1af53414058ae4b104377ef8e6368c0115b85dd642dd7d",
+       "lf_sha256": "1ff160d01b1d94e5ba1af53414058ae4b104377ef8e6368c0115b85dd642dd7d",
+       "cr_count": 0,
+       "bytes": 101358
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/servers/dependencies.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "00a4ce1b15ce867b6cbdea218fbeaaf7d0248ee57e5e99bad247831c6611d37f",
+       "lf_sha256": "00a4ce1b15ce867b6cbdea218fbeaaf7d0248ee57e5e99bad247831c6611d37f"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "77e7d2dfc0506b772774ec7d3ad36b4248b6147ac0ad3dffbc4445d6b47d351c",
+       "lf_sha256": "77e7d2dfc0506b772774ec7d3ad36b4248b6147ac0ad3dffbc4445d6b47d351c"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "00a4ce1b15ce867b6cbdea218fbeaaf7d0248ee57e5e99bad247831c6611d37f",
+       "lf_sha256": "00a4ce1b15ce867b6cbdea218fbeaaf7d0248ee57e5e99bad247831c6611d37f",
+       "cr_count": 0,
+       "bytes": 25889
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "77e7d2dfc0506b772774ec7d3ad36b4248b6147ac0ad3dffbc4445d6b47d351c",
+       "lf_sha256": "77e7d2dfc0506b772774ec7d3ad36b4248b6147ac0ad3dffbc4445d6b47d351c",
+       "cr_count": 0,
+       "bytes": 26861
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/servers/main.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "76ad94a317255d84de6358718d05a0bffcde195fe53d99acd8333cc473b0df8e",
+       "lf_sha256": "76ad94a317255d84de6358718d05a0bffcde195fe53d99acd8333cc473b0df8e"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ccda01e910c8e1aac5f0b5838196041b414b78788ae0c1a77e7fb8ceff80f37d",
+       "lf_sha256": "ccda01e910c8e1aac5f0b5838196041b414b78788ae0c1a77e7fb8ceff80f37d"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "76ad94a317255d84de6358718d05a0bffcde195fe53d99acd8333cc473b0df8e",
+       "lf_sha256": "76ad94a317255d84de6358718d05a0bffcde195fe53d99acd8333cc473b0df8e",
+       "cr_count": 0,
+       "bytes": 34287
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "ccda01e910c8e1aac5f0b5838196041b414b78788ae0c1a77e7fb8ceff80f37d",
+       "lf_sha256": "ccda01e910c8e1aac5f0b5838196041b414b78788ae0c1a77e7fb8ceff80f37d",
+       "cr_count": 0,
+       "bytes": 36287
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/utils/oauth.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "fa195c922f71a66e2c6ce5a1123438d27efb574079829febce84817e2527c786",
+       "lf_sha256": "39f25124ac5e0e2a1621324841117eb8084a519a8fceeb8d5f5211f811f81a1d"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f045f09640a6476f9e4abb2432b316565b4a2351336da8b30dfdcffcde12f27b",
+       "lf_sha256": "4ce7eaaec018014b19b6b81fba6bb6eb365208274b60ae9fc113f412347bbf4d"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "fa195c922f71a66e2c6ce5a1123438d27efb574079829febce84817e2527c786",
+       "lf_sha256": "39f25124ac5e0e2a1621324841117eb8084a519a8fceeb8d5f5211f811f81a1d",
+       "cr_count": 724,
+       "bytes": 27910
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "f045f09640a6476f9e4abb2432b316565b4a2351336da8b30dfdcffcde12f27b",
+       "lf_sha256": "4ce7eaaec018014b19b6b81fba6bb6eb365208274b60ae9fc113f412347bbf4d",
+       "cr_count": 729,
+       "bytes": 28246
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/utils/oauth_setup.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "631b50d48899027846299328ee76c2df119e5382700889e9a78b308672a6807c",
+       "lf_sha256": "631b50d48899027846299328ee76c2df119e5382700889e9a78b308672a6807c"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "dae71521da9925f01e67b04fe14a1d4ead4fe857f22e183447037ed2938d8053",
+       "lf_sha256": "dae71521da9925f01e67b04fe14a1d4ead4fe857f22e183447037ed2938d8053"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "631b50d48899027846299328ee76c2df119e5382700889e9a78b308672a6807c",
+       "lf_sha256": "631b50d48899027846299328ee76c2df119e5382700889e9a78b308672a6807c",
+       "cr_count": 0,
+       "bytes": 16030
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "dae71521da9925f01e67b04fe14a1d4ead4fe857f22e183447037ed2938d8053",
+       "lf_sha256": "dae71521da9925f01e67b04fe14a1d4ead4fe857f22e183447037ed2938d8053",
+       "cr_count": 0,
+       "bytes": 16287
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/utils/ssl.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "66806709a3ee08d2c547ac3b2b8ca4313d64071b42f8a55b01351b897c4270de",
+       "lf_sha256": "66806709a3ee08d2c547ac3b2b8ca4313d64071b42f8a55b01351b897c4270de"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "bedbfa0aa3e50bb9dbdaeeef51e30c81ba10125e1351631861b41a0aa4a4fff0",
+       "lf_sha256": "bedbfa0aa3e50bb9dbdaeeef51e30c81ba10125e1351631861b41a0aa4a4fff0"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "66806709a3ee08d2c547ac3b2b8ca4313d64071b42f8a55b01351b897c4270de",
+       "lf_sha256": "66806709a3ee08d2c547ac3b2b8ca4313d64071b42f8a55b01351b897c4270de",
+       "cr_count": 0,
+       "bytes": 4710
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "bedbfa0aa3e50bb9dbdaeeef51e30c81ba10125e1351631861b41a0aa4a4fff0",
+       "lf_sha256": "bedbfa0aa3e50bb9dbdaeeef51e30c81ba10125e1351631861b41a0aa4a4fff0",
+       "cr_count": 0,
+       "bytes": 5268
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_atlassian/utils/ssrf_adapter.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 404,
+       "attempts": 1,
+       "raw_sha256": "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed",
+       "lf_sha256": "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "59b5f4247ca4dd63443c38b23a48ff1bdaf80365be874e008511541c2563b3d5",
+       "lf_sha256": "59b5f4247ca4dd63443c38b23a48ff1bdaf80365be874e008511541c2563b3d5"
+      },
+      "corpus_vuln": {
+       "present": false
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "59b5f4247ca4dd63443c38b23a48ff1bdaf80365be874e008511541c2563b3d5",
+       "lf_sha256": "59b5f4247ca4dd63443c38b23a48ff1bdaf80365be874e008511541c2563b3d5",
+       "cr_count": 0,
+       "bytes": 6210
+      },
+      "base_equivalent": false,
+      "fixed_equivalent": true,
+      "verdict": "MISMATCH"
+     },
+     {
+      "path": "src/mcp_atlassian/utils/urls.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "5aa8db222ae3539493a58dba711de8160b60988ce50f45b0b5284e577fc6f1db",
+       "lf_sha256": "5aa8db222ae3539493a58dba711de8160b60988ce50f45b0b5284e577fc6f1db"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a10b981102f20c28c0db4ebb17371dd965314283b100148cf497265927c8680e",
+       "lf_sha256": "a10b981102f20c28c0db4ebb17371dd965314283b100148cf497265927c8680e"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "5aa8db222ae3539493a58dba711de8160b60988ce50f45b0b5284e577fc6f1db",
+       "lf_sha256": "5aa8db222ae3539493a58dba711de8160b60988ce50f45b0b5284e577fc6f1db",
+       "cr_count": 0,
+       "bytes": 6029
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a10b981102f20c28c0db4ebb17371dd965314283b100148cf497265927c8680e",
+       "lf_sha256": "a10b981102f20c28c0db4ebb17371dd965314283b100148cf497265927c8680e",
+       "cr_count": 0,
+       "bytes": 7056
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/e2e/cloud/test_confluence_cloud_operations.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "02d1080531325a04f08d9279a402c6a400955a01b8d34caf74584d64074f0116",
+       "lf_sha256": "02d1080531325a04f08d9279a402c6a400955a01b8d34caf74584d64074f0116"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ee806a0bf578b125f46afefc5e2a8df236bc27b9714f5624bc813752945bfef7",
+       "lf_sha256": "ee806a0bf578b125f46afefc5e2a8df236bc27b9714f5624bc813752945bfef7"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "02d1080531325a04f08d9279a402c6a400955a01b8d34caf74584d64074f0116",
+       "lf_sha256": "02d1080531325a04f08d9279a402c6a400955a01b8d34caf74584d64074f0116",
+       "cr_count": 0,
+       "bytes": 13557
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "ee806a0bf578b125f46afefc5e2a8df236bc27b9714f5624bc813752945bfef7",
+       "lf_sha256": "ee806a0bf578b125f46afefc5e2a8df236bc27b9714f5624bc813752945bfef7",
+       "cr_count": 0,
+       "bytes": 13577
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/e2e/cloud/test_mcp_tools_cloud.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "9c528ca07166e42ebc87c963a7e09c5797c267a7855b057dfd8a454ec349fa11",
+       "lf_sha256": "9c528ca07166e42ebc87c963a7e09c5797c267a7855b057dfd8a454ec349fa11"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "4a9175812d0457cfe2674ccee258f196b2f281f563c035e2384f8453ab047271",
+       "lf_sha256": "4a9175812d0457cfe2674ccee258f196b2f281f563c035e2384f8453ab047271"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "9c528ca07166e42ebc87c963a7e09c5797c267a7855b057dfd8a454ec349fa11",
+       "lf_sha256": "9c528ca07166e42ebc87c963a7e09c5797c267a7855b057dfd8a454ec349fa11",
+       "cr_count": 0,
+       "bytes": 13743
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "4a9175812d0457cfe2674ccee258f196b2f281f563c035e2384f8453ab047271",
+       "lf_sha256": "4a9175812d0457cfe2674ccee258f196b2f281f563c035e2384f8453ab047271",
+       "cr_count": 0,
+       "bytes": 13773
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/e2e/conftest.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 2,
+       "raw_sha256": "6fce6abf34b9a565a79e1c57332497964c29cc3b3306424fb02ea2b162739c3e",
+       "lf_sha256": "6fce6abf34b9a565a79e1c57332497964c29cc3b3306424fb02ea2b162739c3e"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "e19d42b929a42c0edb4718a71c151d32ec7142e9d6b42668a52fb41ab32effce",
+       "lf_sha256": "e19d42b929a42c0edb4718a71c151d32ec7142e9d6b42668a52fb41ab32effce"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "6fce6abf34b9a565a79e1c57332497964c29cc3b3306424fb02ea2b162739c3e",
+       "lf_sha256": "6fce6abf34b9a565a79e1c57332497964c29cc3b3306424fb02ea2b162739c3e",
+       "cr_count": 0,
+       "bytes": 17797
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "e19d42b929a42c0edb4718a71c151d32ec7142e9d6b42668a52fb41ab32effce",
+       "lf_sha256": "e19d42b929a42c0edb4718a71c151d32ec7142e9d6b42668a52fb41ab32effce",
+       "cr_count": 0,
+       "bytes": 18685
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/e2e/test_confluence_dc_operations.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "50591ad5758d4d4dd01c4c3b275c39a43cff888dc0b611410b01bb7782be3b68",
+       "lf_sha256": "50591ad5758d4d4dd01c4c3b275c39a43cff888dc0b611410b01bb7782be3b68"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ebb3b8f55f50f0837a28552942b77010dad327df8f7eeb0e1eec691d993a3c45",
+       "lf_sha256": "ebb3b8f55f50f0837a28552942b77010dad327df8f7eeb0e1eec691d993a3c45"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "50591ad5758d4d4dd01c4c3b275c39a43cff888dc0b611410b01bb7782be3b68",
+       "lf_sha256": "50591ad5758d4d4dd01c4c3b275c39a43cff888dc0b611410b01bb7782be3b68",
+       "cr_count": 0,
+       "bytes": 11315
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "ebb3b8f55f50f0837a28552942b77010dad327df8f7eeb0e1eec691d993a3c45",
+       "lf_sha256": "ebb3b8f55f50f0837a28552942b77010dad327df8f7eeb0e1eec691d993a3c45",
+       "cr_count": 0,
+       "bytes": 11335
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/e2e/test_mcp_tools_dc.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "aeb7f7af9b4b28042dc868107cee933e864db9ce011e02dcd9c54c0ae382c54d",
+       "lf_sha256": "aeb7f7af9b4b28042dc868107cee933e864db9ce011e02dcd9c54c0ae382c54d"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "8e091e7fbc899e3bfa405ef4d7c734caffad324200b3c3ce30401994298dc167",
+       "lf_sha256": "8e091e7fbc899e3bfa405ef4d7c734caffad324200b3c3ce30401994298dc167"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "aeb7f7af9b4b28042dc868107cee933e864db9ce011e02dcd9c54c0ae382c54d",
+       "lf_sha256": "aeb7f7af9b4b28042dc868107cee933e864db9ce011e02dcd9c54c0ae382c54d",
+       "cr_count": 0,
+       "bytes": 13390
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "8e091e7fbc899e3bfa405ef4d7c734caffad324200b3c3ce30401994298dc167",
+       "lf_sha256": "8e091e7fbc899e3bfa405ef4d7c734caffad324200b3c3ce30401994298dc167",
+       "cr_count": 0,
+       "bytes": 13420
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/confluence/test_attachments.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "10f9ecdaaedb001653b2af1a55d5888e6f9426d1a34f1566f086cbea93549e38",
+       "lf_sha256": "10f9ecdaaedb001653b2af1a55d5888e6f9426d1a34f1566f086cbea93549e38"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "3a12856df508681dc8c431c186f0dfe11d54f6de2ea028ad250881597b73a6e1",
+       "lf_sha256": "3a12856df508681dc8c431c186f0dfe11d54f6de2ea028ad250881597b73a6e1"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "10f9ecdaaedb001653b2af1a55d5888e6f9426d1a34f1566f086cbea93549e38",
+       "lf_sha256": "10f9ecdaaedb001653b2af1a55d5888e6f9426d1a34f1566f086cbea93549e38",
+       "cr_count": 0,
+       "bytes": 74724
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "3a12856df508681dc8c431c186f0dfe11d54f6de2ea028ad250881597b73a6e1",
+       "lf_sha256": "3a12856df508681dc8c431c186f0dfe11d54f6de2ea028ad250881597b73a6e1",
+       "cr_count": 0,
+       "bytes": 76240
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/confluence/test_client.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "97d39d8af49b2103c091c60e9bd856c07e3f692fc70db8e7c0e73474c68a97fb",
+       "lf_sha256": "97d39d8af49b2103c091c60e9bd856c07e3f692fc70db8e7c0e73474c68a97fb"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "59a9a523ad032114b910eb6f2c69818299dbffc6aadc3ad3f9555a02ff0f628b",
+       "lf_sha256": "59a9a523ad032114b910eb6f2c69818299dbffc6aadc3ad3f9555a02ff0f628b"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "97d39d8af49b2103c091c60e9bd856c07e3f692fc70db8e7c0e73474c68a97fb",
+       "lf_sha256": "97d39d8af49b2103c091c60e9bd856c07e3f692fc70db8e7c0e73474c68a97fb",
+       "cr_count": 0,
+       "bytes": 18495
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "59a9a523ad032114b910eb6f2c69818299dbffc6aadc3ad3f9555a02ff0f628b",
+       "lf_sha256": "59a9a523ad032114b910eb6f2c69818299dbffc6aadc3ad3f9555a02ff0f628b",
+       "cr_count": 0,
+       "bytes": 18552
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/confluence/test_search.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "d05eeded83a049f806353e9c2bab51f4a47e601d14d9205175488e4652fbc69f",
+       "lf_sha256": "d05eeded83a049f806353e9c2bab51f4a47e601d14d9205175488e4652fbc69f"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "18813129214876483f59175de93b3fc53db0e023601fa8724103f435d691a5a3",
+       "lf_sha256": "18813129214876483f59175de93b3fc53db0e023601fa8724103f435d691a5a3"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "d05eeded83a049f806353e9c2bab51f4a47e601d14d9205175488e4652fbc69f",
+       "lf_sha256": "d05eeded83a049f806353e9c2bab51f4a47e601d14d9205175488e4652fbc69f",
+       "cr_count": 0,
+       "bytes": 34217
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "18813129214876483f59175de93b3fc53db0e023601fa8724103f435d691a5a3",
+       "lf_sha256": "18813129214876483f59175de93b3fc53db0e023601fa8724103f435d691a5a3",
+       "cr_count": 0,
+       "bytes": 36083
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/jira/test_attachments.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a555d29335fb1263d46bf3f558c42079ab615fc38231d79f507f0aecef283831",
+       "lf_sha256": "a555d29335fb1263d46bf3f558c42079ab615fc38231d79f507f0aecef283831"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "319eb06e1a204caa0a7357b36095c10eab867fa0a76a7721a7d855b4da9fa19a",
+       "lf_sha256": "319eb06e1a204caa0a7357b36095c10eab867fa0a76a7721a7d855b4da9fa19a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "a555d29335fb1263d46bf3f558c42079ab615fc38231d79f507f0aecef283831",
+       "lf_sha256": "a555d29335fb1263d46bf3f558c42079ab615fc38231d79f507f0aecef283831",
+       "cr_count": 0,
+       "bytes": 50300
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "319eb06e1a204caa0a7357b36095c10eab867fa0a76a7721a7d855b4da9fa19a",
+       "lf_sha256": "319eb06e1a204caa0a7357b36095c10eab867fa0a76a7721a7d855b4da9fa19a",
+       "cr_count": 0,
+       "bytes": 54372
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/jira/test_client.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f7b591754f0cd1ca1ccc74dc0f23aa494db7728652f3481c5b46d0295e7d47f5",
+       "lf_sha256": "f7b591754f0cd1ca1ccc74dc0f23aa494db7728652f3481c5b46d0295e7d47f5"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f2eae381312852e55d5873633b2ae02aed68af9c328241dbec7a5712eb3b485a",
+       "lf_sha256": "f2eae381312852e55d5873633b2ae02aed68af9c328241dbec7a5712eb3b485a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "f7b591754f0cd1ca1ccc74dc0f23aa494db7728652f3481c5b46d0295e7d47f5",
+       "lf_sha256": "f7b591754f0cd1ca1ccc74dc0f23aa494db7728652f3481c5b46d0295e7d47f5",
+       "cr_count": 0,
+       "bytes": 17786
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "f2eae381312852e55d5873633b2ae02aed68af9c328241dbec7a5712eb3b485a",
+       "lf_sha256": "f2eae381312852e55d5873633b2ae02aed68af9c328241dbec7a5712eb3b485a",
+       "cr_count": 0,
+       "bytes": 21284
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/jira/test_search.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "c445d67b642c1c849a9eefb54b592e00bbc1841b727bbba5f8a93447377a5797",
+       "lf_sha256": "c445d67b642c1c849a9eefb54b592e00bbc1841b727bbba5f8a93447377a5797"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "3cf9a758f00d0f7dcb173db785f15a54cbf38e36084f0d2e57edc3a43527e274",
+       "lf_sha256": "3cf9a758f00d0f7dcb173db785f15a54cbf38e36084f0d2e57edc3a43527e274"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "c445d67b642c1c849a9eefb54b592e00bbc1841b727bbba5f8a93447377a5797",
+       "lf_sha256": "c445d67b642c1c849a9eefb54b592e00bbc1841b727bbba5f8a93447377a5797",
+       "cr_count": 0,
+       "bytes": 46271
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "3cf9a758f00d0f7dcb173db785f15a54cbf38e36084f0d2e57edc3a43527e274",
+       "lf_sha256": "3cf9a758f00d0f7dcb173db785f15a54cbf38e36084f0d2e57edc3a43527e274",
+       "cr_count": 0,
+       "bytes": 51384
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/servers/test_confluence_server.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "3fe5e2c8662aa5998cd0b2ce84c0f69d23b7aeb2f2dbb99ee151ef959ab58926",
+       "lf_sha256": "3fe5e2c8662aa5998cd0b2ce84c0f69d23b7aeb2f2dbb99ee151ef959ab58926"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "e0ec862c2d5657b3cb95b7c926e7370ec07ec1ea0253424d2a4c10f69a5894e7",
+       "lf_sha256": "e0ec862c2d5657b3cb95b7c926e7370ec07ec1ea0253424d2a4c10f69a5894e7"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "3fe5e2c8662aa5998cd0b2ce84c0f69d23b7aeb2f2dbb99ee151ef959ab58926",
+       "lf_sha256": "3fe5e2c8662aa5998cd0b2ce84c0f69d23b7aeb2f2dbb99ee151ef959ab58926",
+       "cr_count": 0,
+       "bytes": 52596
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "e0ec862c2d5657b3cb95b7c926e7370ec07ec1ea0253424d2a4c10f69a5894e7",
+       "lf_sha256": "e0ec862c2d5657b3cb95b7c926e7370ec07ec1ea0253424d2a4c10f69a5894e7",
+       "cr_count": 0,
+       "bytes": 53879
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/servers/test_dependencies.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "6f2fae162e51c2112586d668402cec6bd73c6f7d840c81d7bfcf3d578550671f",
+       "lf_sha256": "6f2fae162e51c2112586d668402cec6bd73c6f7d840c81d7bfcf3d578550671f"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "637528394808fe5892b5db7b28bedeed48deb4083cabb60476322ae3eeaa830a",
+       "lf_sha256": "637528394808fe5892b5db7b28bedeed48deb4083cabb60476322ae3eeaa830a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "6f2fae162e51c2112586d668402cec6bd73c6f7d840c81d7bfcf3d578550671f",
+       "lf_sha256": "6f2fae162e51c2112586d668402cec6bd73c6f7d840c81d7bfcf3d578550671f",
+       "cr_count": 0,
+       "bytes": 62336
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "637528394808fe5892b5db7b28bedeed48deb4083cabb60476322ae3eeaa830a",
+       "lf_sha256": "637528394808fe5892b5db7b28bedeed48deb4083cabb60476322ae3eeaa830a",
+       "cr_count": 0,
+       "bytes": 72262
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/servers/test_main_server.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "dc80611fa6248a862b2197b95c665137de1bd5cd91f88423819917a66144b793",
+       "lf_sha256": "dc80611fa6248a862b2197b95c665137de1bd5cd91f88423819917a66144b793"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f98e729dd597169f559e1bf867684802cfd35917560237e73f92125cd0fc3944",
+       "lf_sha256": "f98e729dd597169f559e1bf867684802cfd35917560237e73f92125cd0fc3944"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "dc80611fa6248a862b2197b95c665137de1bd5cd91f88423819917a66144b793",
+       "lf_sha256": "dc80611fa6248a862b2197b95c665137de1bd5cd91f88423819917a66144b793",
+       "cr_count": 0,
+       "bytes": 28532
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "f98e729dd597169f559e1bf867684802cfd35917560237e73f92125cd0fc3944",
+       "lf_sha256": "f98e729dd597169f559e1bf867684802cfd35917560237e73f92125cd0fc3944",
+       "cr_count": 0,
+       "bytes": 29735
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/servers/test_mcp_protocol.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "da209af0df5383812d9a00fdadc3939a5402a9bce215757bee5cdc428bdc9e27",
+       "lf_sha256": "da209af0df5383812d9a00fdadc3939a5402a9bce215757bee5cdc428bdc9e27"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "8579f800eede7c9ecc8267d2931eb32a94c19bb9f64c2267b567eeb2e9d823fd",
+       "lf_sha256": "8579f800eede7c9ecc8267d2931eb32a94c19bb9f64c2267b567eeb2e9d823fd"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "da209af0df5383812d9a00fdadc3939a5402a9bce215757bee5cdc428bdc9e27",
+       "lf_sha256": "da209af0df5383812d9a00fdadc3939a5402a9bce215757bee5cdc428bdc9e27",
+       "cr_count": 0,
+       "bytes": 49013
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "8579f800eede7c9ecc8267d2931eb32a94c19bb9f64c2267b567eeb2e9d823fd",
+       "lf_sha256": "8579f800eede7c9ecc8267d2931eb32a94c19bb9f64c2267b567eeb2e9d823fd",
+       "cr_count": 0,
+       "bytes": 51313
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/utils/test_oauth.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "e20184ae71d7950b20525605b63f5d1f60aa8e7e681a3f3c13143473b89ecdf8",
+       "lf_sha256": "4c988d621414889df7f1c246b902edebf041d29b6c189d88011e35069c78168b"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "76b040cc706b287dcae72f72c2dc01b1f451a4eaf7c47f8194d160fa28f8856b",
+       "lf_sha256": "bea545819f17e501b061e07e11c4c7dd4e84f15b989b5d87db6b348889a1bb19"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "e20184ae71d7950b20525605b63f5d1f60aa8e7e681a3f3c13143473b89ecdf8",
+       "lf_sha256": "4c988d621414889df7f1c246b902edebf041d29b6c189d88011e35069c78168b",
+       "cr_count": 1221,
+       "bytes": 50297
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "76b040cc706b287dcae72f72c2dc01b1f451a4eaf7c47f8194d160fa28f8856b",
+       "lf_sha256": "bea545819f17e501b061e07e11c4c7dd4e84f15b989b5d87db6b348889a1bb19",
+       "cr_count": 1258,
+       "bytes": 52024
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/utils/test_oauth_setup.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "72570414e5d91f0c830c0a2810ba50ac206b360c38e1daadea0c4cbdc11f79c5",
+       "lf_sha256": "72570414e5d91f0c830c0a2810ba50ac206b360c38e1daadea0c4cbdc11f79c5"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f79c94aade42a9e55645d689fec1e67a45da7ed925dd500ebb600d0c3c31162c",
+       "lf_sha256": "f79c94aade42a9e55645d689fec1e67a45da7ed925dd500ebb600d0c3c31162c"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "72570414e5d91f0c830c0a2810ba50ac206b360c38e1daadea0c4cbdc11f79c5",
+       "lf_sha256": "72570414e5d91f0c830c0a2810ba50ac206b360c38e1daadea0c4cbdc11f79c5",
+       "cr_count": 0,
+       "bytes": 14663
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "f79c94aade42a9e55645d689fec1e67a45da7ed925dd500ebb600d0c3c31162c",
+       "lf_sha256": "f79c94aade42a9e55645d689fec1e67a45da7ed925dd500ebb600d0c3c31162c",
+       "cr_count": 0,
+       "bytes": 16172
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/unit/utils/test_ssrf_adapter.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 404,
+       "attempts": 1,
+       "raw_sha256": "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed",
+       "lf_sha256": "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a241780782c678d1f62eb15e3d0f597ec4b6b27c7dfb39c0c066b0c8b4a102b5",
+       "lf_sha256": "a241780782c678d1f62eb15e3d0f597ec4b6b27c7dfb39c0c066b0c8b4a102b5"
+      },
+      "corpus_vuln": {
+       "present": false
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a241780782c678d1f62eb15e3d0f597ec4b6b27c7dfb39c0c066b0c8b4a102b5",
+       "lf_sha256": "a241780782c678d1f62eb15e3d0f597ec4b6b27c7dfb39c0c066b0c8b4a102b5",
+       "cr_count": 0,
+       "bytes": 6151
+      },
+      "base_equivalent": false,
+      "fixed_equivalent": true,
+      "verdict": "MISMATCH"
+     },
+     {
+      "path": "tests/unit/utils/test_urls.py",
+      "parent_commit": "4067d1db4097755cc6add87f95fe3f0746c98c0b",
+      "fix_commit": "b041733473f95119dd539542a43c280737a8e460",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f35edc088bfa0de9d0959b40f7205fa85c52ded6db43ee20796a8fbd0f3ba250",
+       "lf_sha256": "f35edc088bfa0de9d0959b40f7205fa85c52ded6db43ee20796a8fbd0f3ba250"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "632b0a1f458819b381d889a6c2db626473c81e9ecd8afada64a87a7a8cbded13",
+       "lf_sha256": "632b0a1f458819b381d889a6c2db626473c81e9ecd8afada64a87a7a8cbded13"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "f35edc088bfa0de9d0959b40f7205fa85c52ded6db43ee20796a8fbd0f3ba250",
+       "lf_sha256": "f35edc088bfa0de9d0959b40f7205fa85c52ded6db43ee20796a8fbd0f3ba250",
+       "cr_count": 0,
+       "bytes": 13638
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "632b0a1f458819b381d889a6c2db626473c81e9ecd8afada64a87a7a8cbded13",
+       "lf_sha256": "632b0a1f458819b381d889a6c2db626473c81e9ecd8afada64a87a7a8cbded13",
+       "cr_count": 0,
+       "bytes": 15596
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 1900,
    "token_estimate": 15200,
@@ -446,7 +2354,111 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "runtime/python/prompty/prompty/_version.py",
+      "parent_commit": "90171a7738f9ff5a186416381cbfad9077cdf637",
+      "fix_commit": "88ac9948d7d37995edbb2f6d36913436626c39e1",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "14a30c5836a80b80468e1b51261d0a0d6d2f7d725e40f2aaddb2510f3a0cda19",
+       "lf_sha256": "14a30c5836a80b80468e1b51261d0a0d6d2f7d725e40f2aaddb2510f3a0cda19"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f2c0161e9159316585d085ea0f911b9ccae4b1716af730d28392345c435d9c22",
+       "lf_sha256": "f2c0161e9159316585d085ea0f911b9ccae4b1716af730d28392345c435d9c22"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "14a30c5836a80b80468e1b51261d0a0d6d2f7d725e40f2aaddb2510f3a0cda19",
+       "lf_sha256": "14a30c5836a80b80468e1b51261d0a0d6d2f7d725e40f2aaddb2510f3a0cda19",
+       "cr_count": 0,
+       "bytes": 20
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "f2c0161e9159316585d085ea0f911b9ccae4b1716af730d28392345c435d9c22",
+       "lf_sha256": "f2c0161e9159316585d085ea0f911b9ccae4b1716af730d28392345c435d9c22",
+       "cr_count": 0,
+       "bytes": 20
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "runtime/python/prompty/prompty/core/loader.py",
+      "parent_commit": "90171a7738f9ff5a186416381cbfad9077cdf637",
+      "fix_commit": "88ac9948d7d37995edbb2f6d36913436626c39e1",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ce88c2c1996e47dcbee5863b6e46ef3d1db263b2a846f57e69686cdfa8323272",
+       "lf_sha256": "ce88c2c1996e47dcbee5863b6e46ef3d1db263b2a846f57e69686cdfa8323272"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "8b1bef303e9299f2929d1c870a34af283ad3e06c0fd2f609f2d3bbab9555e926",
+       "lf_sha256": "8b1bef303e9299f2929d1c870a34af283ad3e06c0fd2f609f2d3bbab9555e926"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ce88c2c1996e47dcbee5863b6e46ef3d1db263b2a846f57e69686cdfa8323272",
+       "lf_sha256": "ce88c2c1996e47dcbee5863b6e46ef3d1db263b2a846f57e69686cdfa8323272",
+       "cr_count": 0,
+       "bytes": 5650
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "8b1bef303e9299f2929d1c870a34af283ad3e06c0fd2f609f2d3bbab9555e926",
+       "lf_sha256": "8b1bef303e9299f2929d1c870a34af283ad3e06c0fd2f609f2d3bbab9555e926",
+       "cr_count": 0,
+       "bytes": 7273
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "runtime/python/prompty/tests/test_loader.py",
+      "parent_commit": "90171a7738f9ff5a186416381cbfad9077cdf637",
+      "fix_commit": "88ac9948d7d37995edbb2f6d36913436626c39e1",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ecd622b4dc7a2f06a1ad8d967dc331d7a3c42d4bca3f9be622901d7b7d3cba81",
+       "lf_sha256": "ecd622b4dc7a2f06a1ad8d967dc331d7a3c42d4bca3f9be622901d7b7d3cba81"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "733e748c42c936d6e324581f19d70990751f20dd5bd82573b3dacc9ffc7e4f28",
+       "lf_sha256": "733e748c42c936d6e324581f19d70990751f20dd5bd82573b3dacc9ffc7e4f28"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ecd622b4dc7a2f06a1ad8d967dc331d7a3c42d4bca3f9be622901d7b7d3cba81",
+       "lf_sha256": "ecd622b4dc7a2f06a1ad8d967dc331d7a3c42d4bca3f9be622901d7b7d3cba81",
+       "cr_count": 0,
+       "bytes": 17941
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "733e748c42c936d6e324581f19d70990751f20dd5bd82573b3dacc9ffc7e4f28",
+       "lf_sha256": "733e748c42c936d6e324581f19d70990751f20dd5bd82573b3dacc9ffc7e4f28",
+       "cr_count": 0,
+       "bytes": 20651
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 126,
    "token_estimate": 1008,
@@ -525,7 +2537,723 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "src/core/engine/variable_resolver.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "295b098407fad2d859bc67e6f16b97ab05c30b56623e78a8687932c6f24f8a6b",
+       "lf_sha256": "295b098407fad2d859bc67e6f16b97ab05c30b56623e78a8687932c6f24f8a6b"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "71fccca46396f97117570251344ed210420cba613ebb69ae376062d84c9449d8",
+       "lf_sha256": "71fccca46396f97117570251344ed210420cba613ebb69ae376062d84c9449d8"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "295b098407fad2d859bc67e6f16b97ab05c30b56623e78a8687932c6f24f8a6b",
+       "lf_sha256": "295b098407fad2d859bc67e6f16b97ab05c30b56623e78a8687932c6f24f8a6b",
+       "cr_count": 0,
+       "bytes": 16332
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "71fccca46396f97117570251344ed210420cba613ebb69ae376062d84c9449d8",
+       "lf_sha256": "71fccca46396f97117570251344ed210420cba613ebb69ae376062d84c9449d8",
+       "cr_count": 0,
+       "bytes": 17084
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/module_policy.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "d976c3d9fb969a18c8d4965d8358da374004f22b988edfe7565381d18d999315",
+       "lf_sha256": "d976c3d9fb969a18c8d4965d8358da374004f22b988edfe7565381d18d999315"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "328549f546ca8704b4c908a62829340a59fc5ec517f12f0e6024d9f89343d816",
+       "lf_sha256": "328549f546ca8704b4c908a62829340a59fc5ec517f12f0e6024d9f89343d816"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "d976c3d9fb969a18c8d4965d8358da374004f22b988edfe7565381d18d999315",
+       "lf_sha256": "d976c3d9fb969a18c8d4965d8358da374004f22b988edfe7565381d18d999315",
+       "cr_count": 0,
+       "bytes": 10675
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "328549f546ca8704b4c908a62829340a59fc5ec517f12f0e6024d9f89343d816",
+       "lf_sha256": "328549f546ca8704b4c908a62829340a59fc5ec517f12f0e6024d9f89343d816",
+       "cr_count": 0,
+       "bytes": 12406
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/ai/model.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "e1de8336202dff7a67bea86f6427b3224b3c6400360e50edfe8f28ecfb89424f",
+       "lf_sha256": "e1de8336202dff7a67bea86f6427b3224b3c6400360e50edfe8f28ecfb89424f"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "db31abdb75d2b2e952e4d597eb74841f4fad852ad1745fb248ef82ca82909e2c",
+       "lf_sha256": "db31abdb75d2b2e952e4d597eb74841f4fad852ad1745fb248ef82ca82909e2c"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "e1de8336202dff7a67bea86f6427b3224b3c6400360e50edfe8f28ecfb89424f",
+       "lf_sha256": "e1de8336202dff7a67bea86f6427b3224b3c6400360e50edfe8f28ecfb89424f",
+       "cr_count": 0,
+       "bytes": 5402
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "db31abdb75d2b2e952e4d597eb74841f4fad852ad1745fb248ef82ca82909e2c",
+       "lf_sha256": "db31abdb75d2b2e952e4d597eb74841f4fad852ad1745fb248ef82ca82909e2c",
+       "cr_count": 0,
+       "bytes": 6332
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/browser/pagination.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "7f14b707f9b9f0407be631ab5188f0d23244a1243421dff57074fbbd0ef499cd",
+       "lf_sha256": "7f14b707f9b9f0407be631ab5188f0d23244a1243421dff57074fbbd0ef499cd"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "22c7bb7d26ea551244b4a4e8f6129f55556cc4e186527bfbdfaf5e84c9b11fa6",
+       "lf_sha256": "22c7bb7d26ea551244b4a4e8f6129f55556cc4e186527bfbdfaf5e84c9b11fa6"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "7f14b707f9b9f0407be631ab5188f0d23244a1243421dff57074fbbd0ef499cd",
+       "lf_sha256": "7f14b707f9b9f0407be631ab5188f0d23244a1243421dff57074fbbd0ef499cd",
+       "cr_count": 0,
+       "bytes": 25469
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "22c7bb7d26ea551244b4a4e8f6129f55556cc4e186527bfbdfaf5e84c9b11fa6",
+       "lf_sha256": "22c7bb7d26ea551244b4a4e8f6129f55556cc4e186527bfbdfaf5e84c9b11fa6",
+       "cr_count": 0,
+       "bytes": 25903
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/document/excel_write.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "02b829d907222a590ec332d6465f1d205dec20a152eb2adbcb2935f6145e7ec8",
+       "lf_sha256": "02b829d907222a590ec332d6465f1d205dec20a152eb2adbcb2935f6145e7ec8"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "95662680bc96af9483ea932d411ea4dcb88ce2c749695a7f4ee63fd934c9038b",
+       "lf_sha256": "95662680bc96af9483ea932d411ea4dcb88ce2c749695a7f4ee63fd934c9038b"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "02b829d907222a590ec332d6465f1d205dec20a152eb2adbcb2935f6145e7ec8",
+       "lf_sha256": "02b829d907222a590ec332d6465f1d205dec20a152eb2adbcb2935f6145e7ec8",
+       "cr_count": 0,
+       "bytes": 5211
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "95662680bc96af9483ea932d411ea4dcb88ce2c749695a7f4ee63fd934c9038b",
+       "lf_sha256": "95662680bc96af9483ea932d411ea4dcb88ce2c749695a7f4ee63fd934c9038b",
+       "cr_count": 0,
+       "bytes": 5549
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/document/pdf_fill_form.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "64f958588739acadce28d576ca4750d129f67fe75f857f12824302f6e5b72ee8",
+       "lf_sha256": "64f958588739acadce28d576ca4750d129f67fe75f857f12824302f6e5b72ee8"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "b31aece674dab2bde8012c2799ee6adce580087e20a4f22d7887eb0e00a55f1c",
+       "lf_sha256": "b31aece674dab2bde8012c2799ee6adce580087e20a4f22d7887eb0e00a55f1c"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "64f958588739acadce28d576ca4750d129f67fe75f857f12824302f6e5b72ee8",
+       "lf_sha256": "64f958588739acadce28d576ca4750d129f67fe75f857f12824302f6e5b72ee8",
+       "cr_count": 0,
+       "bytes": 7388
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "b31aece674dab2bde8012c2799ee6adce580087e20a4f22d7887eb0e00a55f1c",
+       "lf_sha256": "b31aece674dab2bde8012c2799ee6adce580087e20a4f22d7887eb0e00a55f1c",
+       "cr_count": 0,
+       "bytes": 7740
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/document/pdf_to_word.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "61ec53ffe348f2eb9817421b69a349e48b49f2147d4aa1d971e7da50f6977813",
+       "lf_sha256": "61ec53ffe348f2eb9817421b69a349e48b49f2147d4aa1d971e7da50f6977813"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "306b4c7da849258c36666dccd56b1c80b9491b40f343e2460cb4cd5738eda349",
+       "lf_sha256": "306b4c7da849258c36666dccd56b1c80b9491b40f343e2460cb4cd5738eda349"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "61ec53ffe348f2eb9817421b69a349e48b49f2147d4aa1d971e7da50f6977813",
+       "lf_sha256": "61ec53ffe348f2eb9817421b69a349e48b49f2147d4aa1d971e7da50f6977813",
+       "cr_count": 0,
+       "bytes": 6634
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "306b4c7da849258c36666dccd56b1c80b9491b40f343e2460cb4cd5738eda349",
+       "lf_sha256": "306b4c7da849258c36666dccd56b1c80b9491b40f343e2460cb4cd5738eda349",
+       "cr_count": 0,
+       "bytes": 6986
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/document/word_to_pdf.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a9673a8b43afdbd5dc0668694157923e9819bd299edfd9fa3d692252c4e0bfb7",
+       "lf_sha256": "a9673a8b43afdbd5dc0668694157923e9819bd299edfd9fa3d692252c4e0bfb7"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "790defd8eea0e813630dec1e646b28371cc96f442b5c57ff064dd0a73364423c",
+       "lf_sha256": "790defd8eea0e813630dec1e646b28371cc96f442b5c57ff064dd0a73364423c"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "a9673a8b43afdbd5dc0668694157923e9819bd299edfd9fa3d692252c4e0bfb7",
+       "lf_sha256": "a9673a8b43afdbd5dc0668694157923e9819bd299edfd9fa3d692252c4e0bfb7",
+       "cr_count": 0,
+       "bytes": 8817
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "790defd8eea0e813630dec1e646b28371cc96f442b5c57ff064dd0a73364423c",
+       "lf_sha256": "790defd8eea0e813630dec1e646b28371cc96f442b5c57ff064dd0a73364423c",
+       "cr_count": 0,
+       "bytes": 9170
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/image/compress.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "eb7128c64c6c21498e960a8c15c4cd3f196692b7b28322ba46052f3257c6252c",
+       "lf_sha256": "eb7128c64c6c21498e960a8c15c4cd3f196692b7b28322ba46052f3257c6252c"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "534d17d5031d2c6d2ed8bd6009d3c7d9838ad564d7ea103d80f832cdf28c5523",
+       "lf_sha256": "534d17d5031d2c6d2ed8bd6009d3c7d9838ad564d7ea103d80f832cdf28c5523"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "eb7128c64c6c21498e960a8c15c4cd3f196692b7b28322ba46052f3257c6252c",
+       "lf_sha256": "eb7128c64c6c21498e960a8c15c4cd3f196692b7b28322ba46052f3257c6252c",
+       "cr_count": 0,
+       "bytes": 6750
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "534d17d5031d2c6d2ed8bd6009d3c7d9838ad564d7ea103d80f832cdf28c5523",
+       "lf_sha256": "534d17d5031d2c6d2ed8bd6009d3c7d9838ad564d7ea103d80f832cdf28c5523",
+       "cr_count": 0,
+       "bytes": 7102
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/image/convert.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "db35ea78827cdf851870303c51d1132dea54eb827710c5b708419e927d8cb984",
+       "lf_sha256": "db35ea78827cdf851870303c51d1132dea54eb827710c5b708419e927d8cb984"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a1f50589a5015808f035a2efe3d5c320fda9bfb6288730197111c68bd2625a6a",
+       "lf_sha256": "a1f50589a5015808f035a2efe3d5c320fda9bfb6288730197111c68bd2625a6a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "db35ea78827cdf851870303c51d1132dea54eb827710c5b708419e927d8cb984",
+       "lf_sha256": "db35ea78827cdf851870303c51d1132dea54eb827710c5b708419e927d8cb984",
+       "cr_count": 0,
+       "bytes": 6224
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a1f50589a5015808f035a2efe3d5c320fda9bfb6288730197111c68bd2625a6a",
+       "lf_sha256": "a1f50589a5015808f035a2efe3d5c320fda9bfb6288730197111c68bd2625a6a",
+       "cr_count": 0,
+       "bytes": 6576
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/image/crop.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "20f43017eeb69b8c2c61585394a8c11787ce73c58506032f774e81e5e8337086",
+       "lf_sha256": "20f43017eeb69b8c2c61585394a8c11787ce73c58506032f774e81e5e8337086"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "10f6ac4a62e199b7b67792721947f18e1f60bac82ec5ac0609d38415d3e0d63d",
+       "lf_sha256": "10f6ac4a62e199b7b67792721947f18e1f60bac82ec5ac0609d38415d3e0d63d"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "20f43017eeb69b8c2c61585394a8c11787ce73c58506032f774e81e5e8337086",
+       "lf_sha256": "20f43017eeb69b8c2c61585394a8c11787ce73c58506032f774e81e5e8337086",
+       "cr_count": 0,
+       "bytes": 7593
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "10f6ac4a62e199b7b67792721947f18e1f60bac82ec5ac0609d38415d3e0d63d",
+       "lf_sha256": "10f6ac4a62e199b7b67792721947f18e1f60bac82ec5ac0609d38415d3e0d63d",
+       "cr_count": 0,
+       "bytes": 7911
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/image/download.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "38e7d1440eab0dafe7f78e656262310ef9e94ec6017d400aeb9fc528c32ec513",
+       "lf_sha256": "38e7d1440eab0dafe7f78e656262310ef9e94ec6017d400aeb9fc528c32ec513"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "d397af17be670dc2ef165712af5626f8bd1ad5b636a64a5adb3198c9c3738e07",
+       "lf_sha256": "d397af17be670dc2ef165712af5626f8bd1ad5b636a64a5adb3198c9c3738e07"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "38e7d1440eab0dafe7f78e656262310ef9e94ec6017d400aeb9fc528c32ec513",
+       "lf_sha256": "38e7d1440eab0dafe7f78e656262310ef9e94ec6017d400aeb9fc528c32ec513",
+       "cr_count": 0,
+       "bytes": 5284
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "d397af17be670dc2ef165712af5626f8bd1ad5b636a64a5adb3198c9c3738e07",
+       "lf_sha256": "d397af17be670dc2ef165712af5626f8bd1ad5b636a64a5adb3198c9c3738e07",
+       "cr_count": 0,
+       "bytes": 5598
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/image/qrcode_generate.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "82a95c64d9226dc66a039359098e6d209021a61597edf7ef281d5226db4e4001",
+       "lf_sha256": "82a95c64d9226dc66a039359098e6d209021a61597edf7ef281d5226db4e4001"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "4ca8777c3a8334d7190c41fe813843dd7087b6ed832e9ba47e3cde16065e6015",
+       "lf_sha256": "4ca8777c3a8334d7190c41fe813843dd7087b6ed832e9ba47e3cde16065e6015"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "82a95c64d9226dc66a039359098e6d209021a61597edf7ef281d5226db4e4001",
+       "lf_sha256": "82a95c64d9226dc66a039359098e6d209021a61597edf7ef281d5226db4e4001",
+       "cr_count": 0,
+       "bytes": 9340
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "4ca8777c3a8334d7190c41fe813843dd7087b6ed832e9ba47e3cde16065e6015",
+       "lf_sha256": "4ca8777c3a8334d7190c41fe813843dd7087b6ed832e9ba47e3cde16065e6015",
+       "cr_count": 0,
+       "bytes": 9691
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/image/resize.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "02f74357a8cba4ebf702ea3cdfb8cc1b358164ae14c5e98d1ca97a204af5bba0",
+       "lf_sha256": "02f74357a8cba4ebf702ea3cdfb8cc1b358164ae14c5e98d1ca97a204af5bba0"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "3084026e79a1397c3d3e091aebcc806211017da3909ec254f7fcff016dfcd699",
+       "lf_sha256": "3084026e79a1397c3d3e091aebcc806211017da3909ec254f7fcff016dfcd699"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "02f74357a8cba4ebf702ea3cdfb8cc1b358164ae14c5e98d1ca97a204af5bba0",
+       "lf_sha256": "02f74357a8cba4ebf702ea3cdfb8cc1b358164ae14c5e98d1ca97a204af5bba0",
+       "cr_count": 0,
+       "bytes": 5892
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "3084026e79a1397c3d3e091aebcc806211017da3909ec254f7fcff016dfcd699",
+       "lf_sha256": "3084026e79a1397c3d3e091aebcc806211017da3909ec254f7fcff016dfcd699",
+       "cr_count": 0,
+       "bytes": 6244
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/image/rotate.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 2,
+       "raw_sha256": "99e68fe885e92c87866d389eb45813cfa4f97e3ae22e8dd30448d6f1a96ec104",
+       "lf_sha256": "99e68fe885e92c87866d389eb45813cfa4f97e3ae22e8dd30448d6f1a96ec104"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "10056001ebe4a3b8e6942636dc13ea807c55791cb45bc8633f2578d0c1ff6816",
+       "lf_sha256": "10056001ebe4a3b8e6942636dc13ea807c55791cb45bc8633f2578d0c1ff6816"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "99e68fe885e92c87866d389eb45813cfa4f97e3ae22e8dd30448d6f1a96ec104",
+       "lf_sha256": "99e68fe885e92c87866d389eb45813cfa4f97e3ae22e8dd30448d6f1a96ec104",
+       "cr_count": 0,
+       "bytes": 6956
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "10056001ebe4a3b8e6942636dc13ea807c55791cb45bc8633f2578d0c1ff6816",
+       "lf_sha256": "10056001ebe4a3b8e6942636dc13ea807c55791cb45bc8633f2578d0c1ff6816",
+       "cr_count": 0,
+       "bytes": 7274
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/image/watermark.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "005f4002c35e3f437c0ae7eca9b58bdda6306be1534814efffd84ead40ebe564",
+       "lf_sha256": "005f4002c35e3f437c0ae7eca9b58bdda6306be1534814efffd84ead40ebe564"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "b381754ff1dd4d6dfd65e3f3a5eee1f6f51fc157405ea06e749a91b1202598b5",
+       "lf_sha256": "b381754ff1dd4d6dfd65e3f3a5eee1f6f51fc157405ea06e749a91b1202598b5"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "005f4002c35e3f437c0ae7eca9b58bdda6306be1534814efffd84ead40ebe564",
+       "lf_sha256": "005f4002c35e3f437c0ae7eca9b58bdda6306be1534814efffd84ead40ebe564",
+       "cr_count": 0,
+       "bytes": 10234
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "b381754ff1dd4d6dfd65e3f3a5eee1f6f51fc157405ea06e749a91b1202598b5",
+       "lf_sha256": "b381754ff1dd4d6dfd65e3f3a5eee1f6f51fc157405ea06e749a91b1202598b5",
+       "cr_count": 0,
+       "bytes": 10552
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/llm/agent.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "20b2441bf3abb2d5b7d3bca8fae3c3c57f7dbbec8912ca20d030992ffdcc33c9",
+       "lf_sha256": "20b2441bf3abb2d5b7d3bca8fae3c3c57f7dbbec8912ca20d030992ffdcc33c9"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "dfc33a68966dd5eaa62dd6047c9b3ccffea5ffe0d6e311eebcf7626f367c019c",
+       "lf_sha256": "dfc33a68966dd5eaa62dd6047c9b3ccffea5ffe0d6e311eebcf7626f367c019c"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "20b2441bf3abb2d5b7d3bca8fae3c3c57f7dbbec8912ca20d030992ffdcc33c9",
+       "lf_sha256": "20b2441bf3abb2d5b7d3bca8fae3c3c57f7dbbec8912ca20d030992ffdcc33c9",
+       "cr_count": 0,
+       "bytes": 44402
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "dfc33a68966dd5eaa62dd6047c9b3ccffea5ffe0d6e311eebcf7626f367c019c",
+       "lf_sha256": "dfc33a68966dd5eaa62dd6047c9b3ccffea5ffe0d6e311eebcf7626f367c019c",
+       "cr_count": 0,
+       "bytes": 45027
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/llm/chat.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "5b1d430aeaa32c68f89893b59361eb90637c112f4169d42c3997633d36245c55",
+       "lf_sha256": "5b1d430aeaa32c68f89893b59361eb90637c112f4169d42c3997633d36245c55"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "53c79d26e2efe74229a44945e81308f528266ca5473daf43c0fb48000abd688f",
+       "lf_sha256": "53c79d26e2efe74229a44945e81308f528266ca5473daf43c0fb48000abd688f"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "5b1d430aeaa32c68f89893b59361eb90637c112f4169d42c3997633d36245c55",
+       "lf_sha256": "5b1d430aeaa32c68f89893b59361eb90637c112f4169d42c3997633d36245c55",
+       "cr_count": 0,
+       "bytes": 15250
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "53c79d26e2efe74229a44945e81308f528266ca5473daf43c0fb48000abd688f",
+       "lf_sha256": "53c79d26e2efe74229a44945e81308f528266ca5473daf43c0fb48000abd688f",
+       "cr_count": 0,
+       "bytes": 15863
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/modules/atomic/vector/connector.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "acf90374417b794d626e32bd06dae7de5fd98e1e250f8f8349df85cabbd55512",
+       "lf_sha256": "acf90374417b794d626e32bd06dae7de5fd98e1e250f8f8349df85cabbd55512"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "e171bcd091891520012e8042e7709bc6b0d1ddd77c0c23e2309c8c1c794edba1",
+       "lf_sha256": "e171bcd091891520012e8042e7709bc6b0d1ddd77c0c23e2309c8c1c794edba1"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "acf90374417b794d626e32bd06dae7de5fd98e1e250f8f8349df85cabbd55512",
+       "lf_sha256": "acf90374417b794d626e32bd06dae7de5fd98e1e250f8f8349df85cabbd55512",
+       "cr_count": 0,
+       "bytes": 8280
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "e171bcd091891520012e8042e7709bc6b0d1ddd77c0c23e2309c8c1c794edba1",
+       "lf_sha256": "e171bcd091891520012e8042e7709bc6b0d1ddd77c0c23e2309c8c1c794edba1",
+       "cr_count": 0,
+       "bytes": 8997
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/core/utils.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "0b97f43d43178e6718effc1c1a7c541db4d5a2ac6ac1cd679a05dffec87dfb43",
+       "lf_sha256": "0b97f43d43178e6718effc1c1a7c541db4d5a2ac6ac1cd679a05dffec87dfb43"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 2,
+       "raw_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac",
+       "lf_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "0b97f43d43178e6718effc1c1a7c541db4d5a2ac6ac1cd679a05dffec87dfb43",
+       "lf_sha256": "0b97f43d43178e6718effc1c1a7c541db4d5a2ac6ac1cd679a05dffec87dfb43",
+       "cr_count": 0,
+       "bytes": 24895
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac",
+       "lf_sha256": "ff56beb267ce4cbf995db5f3205904f5b41ea9893a031bf86636ea04bab964ac",
+       "cr_count": 0,
+       "bytes": 27341
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/modules/test_new_modules.py",
+      "parent_commit": "9103529c204cad3e698b726ed958b626bcfbc182",
+      "fix_commit": "d5f89d71303e3c1e6418d347c5c55fcd173cc8cc",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "8b4dd2c0372d9a2266072be5f2c591b66a6624ed8778c85c09ccb9e5e8c241c8",
+       "lf_sha256": "8b4dd2c0372d9a2266072be5f2c591b66a6624ed8778c85c09ccb9e5e8c241c8"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "27d25f2da38ed04bcce4602e804c2c98b9d6ef88cba04ae877cb9cab1d336503",
+       "lf_sha256": "27d25f2da38ed04bcce4602e804c2c98b9d6ef88cba04ae877cb9cab1d336503"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "8b4dd2c0372d9a2266072be5f2c591b66a6624ed8778c85c09ccb9e5e8c241c8",
+       "lf_sha256": "8b4dd2c0372d9a2266072be5f2c591b66a6624ed8778c85c09ccb9e5e8c241c8",
+       "cr_count": 0,
+       "bytes": 32281
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "27d25f2da38ed04bcce4602e804c2c98b9d6ef88cba04ae877cb9cab1d336503",
+       "lf_sha256": "27d25f2da38ed04bcce4602e804c2c98b9d6ef88cba04ae877cb9cab1d336503",
+       "cr_count": 0,
+       "bytes": 32623
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 322,
    "token_estimate": 2576,
@@ -586,7 +3314,107 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "cli/onionshare_cli/web/send_base_mode.py",
+      "parent_commit": "8cc75e1d7e88bd31f7276733449d412bf71c8999",
+      "fix_commit": "48f31cfac077fcc9c04c67c2a6dbf87d956f5eec",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "77759e21b8347513b1c4e182596e771baf6da69bac3dbfb8f72be8720479d168",
+       "lf_sha256": "77759e21b8347513b1c4e182596e771baf6da69bac3dbfb8f72be8720479d168"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 2,
+       "raw_sha256": "fa9b8d21ab52d2f9025e215d7e7709e7ab68014478be2eb53c57f094662fdd1a",
+       "lf_sha256": "fa9b8d21ab52d2f9025e215d7e7709e7ab68014478be2eb53c57f094662fdd1a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "77759e21b8347513b1c4e182596e771baf6da69bac3dbfb8f72be8720479d168",
+       "lf_sha256": "77759e21b8347513b1c4e182596e771baf6da69bac3dbfb8f72be8720479d168",
+       "cr_count": 0,
+       "bytes": 13950
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "fa9b8d21ab52d2f9025e215d7e7709e7ab68014478be2eb53c57f094662fdd1a",
+       "lf_sha256": "fa9b8d21ab52d2f9025e215d7e7709e7ab68014478be2eb53c57f094662fdd1a",
+       "cr_count": 0,
+       "bytes": 15986
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "cli/onionshare_cli/web/share_mode.py",
+      "parent_commit": "8cc75e1d7e88bd31f7276733449d412bf71c8999",
+      "fix_commit": "48f31cfac077fcc9c04c67c2a6dbf87d956f5eec",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "7c025d248626fe40526210256563172349fcdb34b8e4e572155b903585aa4297",
+       "lf_sha256": "7c025d248626fe40526210256563172349fcdb34b8e4e572155b903585aa4297"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 2,
+       "raw_sha256": "79ec1034506015d40fa8e9ceb5ee797dcf6e7d5df3605f4c297e7954f27ba0fa",
+       "lf_sha256": "79ec1034506015d40fa8e9ceb5ee797dcf6e7d5df3605f4c297e7954f27ba0fa"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "7c025d248626fe40526210256563172349fcdb34b8e4e572155b903585aa4297",
+       "lf_sha256": "7c025d248626fe40526210256563172349fcdb34b8e4e572155b903585aa4297",
+       "cr_count": 0,
+       "bytes": 21820
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "79ec1034506015d40fa8e9ceb5ee797dcf6e7d5df3605f4c297e7954f27ba0fa",
+       "lf_sha256": "79ec1034506015d40fa8e9ceb5ee797dcf6e7d5df3605f4c297e7954f27ba0fa",
+       "cr_count": 0,
+       "bytes": 22698
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "cli/tests/test_cli_web_symlink.py",
+      "parent_commit": "8cc75e1d7e88bd31f7276733449d412bf71c8999",
+      "fix_commit": "48f31cfac077fcc9c04c67c2a6dbf87d956f5eec",
+      "upstream_parent": {
+       "status": 404,
+       "attempts": 1,
+       "raw_sha256": "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed",
+       "lf_sha256": "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "e8da8d13213b4d6e994c265c4e482f8a5bc8e006ab0aaba559c1d379cc8036a8",
+       "lf_sha256": "e8da8d13213b4d6e994c265c4e482f8a5bc8e006ab0aaba559c1d379cc8036a8"
+      },
+      "corpus_vuln": {
+       "present": false
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "e8da8d13213b4d6e994c265c4e482f8a5bc8e006ab0aaba559c1d379cc8036a8",
+       "lf_sha256": "e8da8d13213b4d6e994c265c4e482f8a5bc8e006ab0aaba559c1d379cc8036a8",
+       "cr_count": 0,
+       "bytes": 10761
+      },
+      "base_equivalent": false,
+      "fixed_equivalent": true,
+      "verdict": "MISMATCH"
+     }
+    ]
    },
    "changed_lines": 375,
    "token_estimate": 3000,
@@ -647,7 +3475,111 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "setuptools/command/egg_info.py",
+      "parent_commit": "84ed5913724df5a12dc804e1d5efe12508e706d2",
+      "fix_commit": "dd9f436a36486b4cb8a4c70a2321548b0be09b8f",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ff2658273e42acb874698793d865c1a7a6e31746b442062fa03477b8174a2597",
+       "lf_sha256": "ff2658273e42acb874698793d865c1a7a6e31746b442062fa03477b8174a2597"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "75fde7317f70bedfe7ab2ac596aa16fc79e869e04dc429d6ee36377459ef1ddd",
+       "lf_sha256": "75fde7317f70bedfe7ab2ac596aa16fc79e869e04dc429d6ee36377459ef1ddd"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ff2658273e42acb874698793d865c1a7a6e31746b442062fa03477b8174a2597",
+       "lf_sha256": "ff2658273e42acb874698793d865c1a7a6e31746b442062fa03477b8174a2597",
+       "cr_count": 0,
+       "bytes": 25754
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "75fde7317f70bedfe7ab2ac596aa16fc79e869e04dc429d6ee36377459ef1ddd",
+       "lf_sha256": "75fde7317f70bedfe7ab2ac596aa16fc79e869e04dc429d6ee36377459ef1ddd",
+       "cr_count": 0,
+       "bytes": 26744
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "setuptools/tests/test_manifest.py",
+      "parent_commit": "84ed5913724df5a12dc804e1d5efe12508e706d2",
+      "fix_commit": "dd9f436a36486b4cb8a4c70a2321548b0be09b8f",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 2,
+       "raw_sha256": "78c83ae69200e760e2cc1ea6a64b5253e6fc0a3c1a3424b931280bfd5d4bac52",
+       "lf_sha256": "78c83ae69200e760e2cc1ea6a64b5253e6fc0a3c1a3424b931280bfd5d4bac52"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "c0abd33f1aab4c90098e3b78789d37ad7888653280ef15e88316a3e6e166868a",
+       "lf_sha256": "c0abd33f1aab4c90098e3b78789d37ad7888653280ef15e88316a3e6e166868a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "78c83ae69200e760e2cc1ea6a64b5253e6fc0a3c1a3424b931280bfd5d4bac52",
+       "lf_sha256": "78c83ae69200e760e2cc1ea6a64b5253e6fc0a3c1a3424b931280bfd5d4bac52",
+       "cr_count": 0,
+       "bytes": 18562
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "c0abd33f1aab4c90098e3b78789d37ad7888653280ef15e88316a3e6e166868a",
+       "lf_sha256": "c0abd33f1aab4c90098e3b78789d37ad7888653280ef15e88316a3e6e166868a",
+       "cr_count": 0,
+       "bytes": 20407
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "setuptools/unicode_utils.py",
+      "parent_commit": "84ed5913724df5a12dc804e1d5efe12508e706d2",
+      "fix_commit": "dd9f436a36486b4cb8a4c70a2321548b0be09b8f",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ba430687ca44030e85fc4cdbf8ae43ddcfb4efc46003f19c174a16ea5838952b",
+       "lf_sha256": "ba430687ca44030e85fc4cdbf8ae43ddcfb4efc46003f19c174a16ea5838952b"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "0e400678e34254f1f7e8ef29a85515473e9df98699ea4d4314098ee414721d52",
+       "lf_sha256": "0e400678e34254f1f7e8ef29a85515473e9df98699ea4d4314098ee414721d52"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ba430687ca44030e85fc4cdbf8ae43ddcfb4efc46003f19c174a16ea5838952b",
+       "lf_sha256": "ba430687ca44030e85fc4cdbf8ae43ddcfb4efc46003f19c174a16ea5838952b",
+       "cr_count": 0,
+       "bytes": 3189
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "0e400678e34254f1f7e8ef29a85515473e9df98699ea4d4314098ee414721d52",
+       "lf_sha256": "0e400678e34254f1f7e8ef29a85515473e9df98699ea4d4314098ee414721d52",
+       "cr_count": 0,
+       "bytes": 3831
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 87,
    "token_estimate": 696,
@@ -707,7 +3639,77 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "cli/onionshare_cli/web/receive_mode.py",
+      "parent_commit": "8cc75e1d7e88bd31f7276733449d412bf71c8999",
+      "fix_commit": "a090e97193efc91fbeac9dace7793ea568b83cf5",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "6d2a30951628abd61761fd21627f1d0875e29f8b3cca6a57fa3d7c62ac379bc3",
+       "lf_sha256": "6d2a30951628abd61761fd21627f1d0875e29f8b3cca6a57fa3d7c62ac379bc3"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "5f65a6d4c5b69d0313a34979ce3429c5d0f58d95be0cbb36b2874d0f73a56f7d",
+       "lf_sha256": "5f65a6d4c5b69d0313a34979ce3429c5d0f58d95be0cbb36b2874d0f73a56f7d"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "6d2a30951628abd61761fd21627f1d0875e29f8b3cca6a57fa3d7c62ac379bc3",
+       "lf_sha256": "6d2a30951628abd61761fd21627f1d0875e29f8b3cca6a57fa3d7c62ac379bc3",
+       "cr_count": 0,
+       "bytes": 23740
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "5f65a6d4c5b69d0313a34979ce3429c5d0f58d95be0cbb36b2874d0f73a56f7d",
+       "lf_sha256": "5f65a6d4c5b69d0313a34979ce3429c5d0f58d95be0cbb36b2874d0f73a56f7d",
+       "cr_count": 0,
+       "bytes": 25641
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "desktop/tests/test_gui_receive.py",
+      "parent_commit": "8cc75e1d7e88bd31f7276733449d412bf71c8999",
+      "fix_commit": "a090e97193efc91fbeac9dace7793ea568b83cf5",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "32a347be709027f7df3133556917d67c858920f6188f43a9e2ccf88f4fb185a7",
+       "lf_sha256": "32a347be709027f7df3133556917d67c858920f6188f43a9e2ccf88f4fb185a7"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "49aae89b4b1e31dcd8b5dd9351963a484f54aabc36f5e96ced4326d4901e7e35",
+       "lf_sha256": "49aae89b4b1e31dcd8b5dd9351963a484f54aabc36f5e96ced4326d4901e7e35"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "32a347be709027f7df3133556917d67c858920f6188f43a9e2ccf88f4fb185a7",
+       "lf_sha256": "32a347be709027f7df3133556917d67c858920f6188f43a9e2ccf88f4fb185a7",
+       "cr_count": 0,
+       "bytes": 9846
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "49aae89b4b1e31dcd8b5dd9351963a484f54aabc36f5e96ced4326d4901e7e35",
+       "lf_sha256": "49aae89b4b1e31dcd8b5dd9351963a484f54aabc36f5e96ced4326d4901e7e35",
+       "cr_count": 0,
+       "bytes": 12753
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 143,
    "token_estimate": 1144,
@@ -768,7 +3770,111 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "src/__init__.py",
+      "parent_commit": "bb3ad9e44dba04092abc2e2a8af83223f10402db",
+      "fix_commit": "8f3b85afd02b692c4bc974b5176e12fb277ea801",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "96ca578ad31e74c51c3613012b819651e0101015af84817ea1a3880c05706eb7",
+       "lf_sha256": "96ca578ad31e74c51c3613012b819651e0101015af84817ea1a3880c05706eb7"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a0a8104102cfbe2d874fc755f46b98223a9cc305df2c1086d159f8ad24384280",
+       "lf_sha256": "a0a8104102cfbe2d874fc755f46b98223a9cc305df2c1086d159f8ad24384280"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "96ca578ad31e74c51c3613012b819651e0101015af84817ea1a3880c05706eb7",
+       "lf_sha256": "96ca578ad31e74c51c3613012b819651e0101015af84817ea1a3880c05706eb7",
+       "cr_count": 0,
+       "bytes": 104
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a0a8104102cfbe2d874fc755f46b98223a9cc305df2c1086d159f8ad24384280",
+       "lf_sha256": "a0a8104102cfbe2d874fc755f46b98223a9cc305df2c1086d159f8ad24384280",
+       "cr_count": 0,
+       "bytes": 104
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "src/mcp_server.py",
+      "parent_commit": "bb3ad9e44dba04092abc2e2a8af83223f10402db",
+      "fix_commit": "8f3b85afd02b692c4bc974b5176e12fb277ea801",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "1896bde7c8cca3aba2a97603869920d3df662cd8042039151d66a3da564908d4",
+       "lf_sha256": "1896bde7c8cca3aba2a97603869920d3df662cd8042039151d66a3da564908d4"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a69317bb41a72ecc9d2ac34e7c6c016bda6f232ef81e4f6b6d81458203711430",
+       "lf_sha256": "a69317bb41a72ecc9d2ac34e7c6c016bda6f232ef81e4f6b6d81458203711430"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "1896bde7c8cca3aba2a97603869920d3df662cd8042039151d66a3da564908d4",
+       "lf_sha256": "1896bde7c8cca3aba2a97603869920d3df662cd8042039151d66a3da564908d4",
+       "cr_count": 0,
+       "bytes": 17636
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a69317bb41a72ecc9d2ac34e7c6c016bda6f232ef81e4f6b6d81458203711430",
+       "lf_sha256": "a69317bb41a72ecc9d2ac34e7c6c016bda6f232ef81e4f6b6d81458203711430",
+       "cr_count": 0,
+       "bytes": 18102
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/test_mcp_server.py",
+      "parent_commit": "bb3ad9e44dba04092abc2e2a8af83223f10402db",
+      "fix_commit": "8f3b85afd02b692c4bc974b5176e12fb277ea801",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ecaf3b2930c8f38573aedf96895343cbbe6b341f61634096b2d6842d82c9684c",
+       "lf_sha256": "ecaf3b2930c8f38573aedf96895343cbbe6b341f61634096b2d6842d82c9684c"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a5ed55992ffbdfa6a92865ab6c1d70cd1038b3ff78f7aa4e5877864bf7a1ee14",
+       "lf_sha256": "a5ed55992ffbdfa6a92865ab6c1d70cd1038b3ff78f7aa4e5877864bf7a1ee14"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ecaf3b2930c8f38573aedf96895343cbbe6b341f61634096b2d6842d82c9684c",
+       "lf_sha256": "ecaf3b2930c8f38573aedf96895343cbbe6b341f61634096b2d6842d82c9684c",
+       "cr_count": 0,
+       "bytes": 13957
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a5ed55992ffbdfa6a92865ab6c1d70cd1038b3ff78f7aa4e5877864bf7a1ee14",
+       "lf_sha256": "a5ed55992ffbdfa6a92865ab6c1d70cd1038b3ff78f7aa4e5877864bf7a1ee14",
+       "cr_count": 0,
+       "bytes": 17146
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 127,
    "token_estimate": 1016,
@@ -829,7 +3935,111 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "langroid/agent/tools/file_tools.py",
+      "parent_commit": "fee670d502ed6d82b8414388bd137a315830331f",
+      "fix_commit": "56e2756ecab70a70a7e6edbee2f2187b8484683e",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "e971df6d091ec5d1dc07cd07ba97352132de7a3f33d9348b5c95e77e2c29a86f",
+       "lf_sha256": "e971df6d091ec5d1dc07cd07ba97352132de7a3f33d9348b5c95e77e2c29a86f"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a45d1bc58bbb7d0b42988449be778ed132912b71800ea239fe9e1133843ab939",
+       "lf_sha256": "a45d1bc58bbb7d0b42988449be778ed132912b71800ea239fe9e1133843ab939"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "e971df6d091ec5d1dc07cd07ba97352132de7a3f33d9348b5c95e77e2c29a86f",
+       "lf_sha256": "e971df6d091ec5d1dc07cd07ba97352132de7a3f33d9348b5c95e77e2c29a86f",
+       "cr_count": 0,
+       "bytes": 7325
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a45d1bc58bbb7d0b42988449be778ed132912b71800ea239fe9e1133843ab939",
+       "lf_sha256": "a45d1bc58bbb7d0b42988449be778ed132912b71800ea239fe9e1133843ab939",
+       "cr_count": 0,
+       "bytes": 7772
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "langroid/utils/system.py",
+      "parent_commit": "fee670d502ed6d82b8414388bd137a315830331f",
+      "fix_commit": "56e2756ecab70a70a7e6edbee2f2187b8484683e",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ab7409b5349aa48c0d7bc30c84610cd37c20c4f2e66620f8effb05d692b1e772",
+       "lf_sha256": "ab7409b5349aa48c0d7bc30c84610cd37c20c4f2e66620f8effb05d692b1e772"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "2fd9fe6b63ee0665e2dda1a71685297b8c874b155f248fc66b3a9a320fbc82b4",
+       "lf_sha256": "2fd9fe6b63ee0665e2dda1a71685297b8c874b155f248fc66b3a9a320fbc82b4"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ab7409b5349aa48c0d7bc30c84610cd37c20c4f2e66620f8effb05d692b1e772",
+       "lf_sha256": "ab7409b5349aa48c0d7bc30c84610cd37c20c4f2e66620f8effb05d692b1e772",
+       "cr_count": 0,
+       "bytes": 8472
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "2fd9fe6b63ee0665e2dda1a71685297b8c874b155f248fc66b3a9a320fbc82b4",
+       "lf_sha256": "2fd9fe6b63ee0665e2dda1a71685297b8c874b155f248fc66b3a9a320fbc82b4",
+       "cr_count": 0,
+       "bytes": 9548
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "tests/main/test_file_tools.py",
+      "parent_commit": "fee670d502ed6d82b8414388bd137a315830331f",
+      "fix_commit": "56e2756ecab70a70a7e6edbee2f2187b8484683e",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "864b6df951bf7017ef49744d3ca51027a317d916dd0f363477e72285c17896ba",
+       "lf_sha256": "864b6df951bf7017ef49744d3ca51027a317d916dd0f363477e72285c17896ba"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "dd014295e683bf82fe088e5421b80384761ae196cc77641c94d5230f7126a900",
+       "lf_sha256": "dd014295e683bf82fe088e5421b80384761ae196cc77641c94d5230f7126a900"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "864b6df951bf7017ef49744d3ca51027a317d916dd0f363477e72285c17896ba",
+       "lf_sha256": "864b6df951bf7017ef49744d3ca51027a317d916dd0f363477e72285c17896ba",
+       "cr_count": 0,
+       "bytes": 9823
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "dd014295e683bf82fe088e5421b80384761ae196cc77641c94d5230f7126a900",
+       "lf_sha256": "dd014295e683bf82fe088e5421b80384761ae196cc77641c94d5230f7126a900",
+       "cr_count": 0,
+       "bytes": 13047
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 135,
    "token_estimate": 1080,
@@ -890,7 +4100,111 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "proot_distro/commands/restore.py",
+      "parent_commit": "f5ff24beef945fcfe04831a913602169c17e97f6",
+      "fix_commit": "a96d7a9667f38e45d812614852ee3915d1c0ae45",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "72846d1b7b3d499163c1717f55645bbbcac744a481becf24e99c616277407bac",
+       "lf_sha256": "72846d1b7b3d499163c1717f55645bbbcac744a481becf24e99c616277407bac"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "0a068eab76fb14d9b6613c001ddd4f70db21e956d1e78d0f688ddc0ba9aa515c",
+       "lf_sha256": "0a068eab76fb14d9b6613c001ddd4f70db21e956d1e78d0f688ddc0ba9aa515c"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "72846d1b7b3d499163c1717f55645bbbcac744a481becf24e99c616277407bac",
+       "lf_sha256": "72846d1b7b3d499163c1717f55645bbbcac744a481becf24e99c616277407bac",
+       "cr_count": 0,
+       "bytes": 14339
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "0a068eab76fb14d9b6613c001ddd4f70db21e956d1e78d0f688ddc0ba9aa515c",
+       "lf_sha256": "0a068eab76fb14d9b6613c001ddd4f70db21e956d1e78d0f688ddc0ba9aa515c",
+       "cr_count": 0,
+       "bytes": 16701
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "proot_distro/helpers/build_engine/copy_step.py",
+      "parent_commit": "f5ff24beef945fcfe04831a913602169c17e97f6",
+      "fix_commit": "a96d7a9667f38e45d812614852ee3915d1c0ae45",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "221e15d91200d811c2fa056370a193029583a2166c288b0764d371d332031419",
+       "lf_sha256": "221e15d91200d811c2fa056370a193029583a2166c288b0764d371d332031419"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "f70c4748544c622f2bc356dfdaed785c73cf175e43e226c8141ca3b124b5eaa1",
+       "lf_sha256": "f70c4748544c622f2bc356dfdaed785c73cf175e43e226c8141ca3b124b5eaa1"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "221e15d91200d811c2fa056370a193029583a2166c288b0764d371d332031419",
+       "lf_sha256": "221e15d91200d811c2fa056370a193029583a2166c288b0764d371d332031419",
+       "cr_count": 0,
+       "bytes": 17476
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "f70c4748544c622f2bc356dfdaed785c73cf175e43e226c8141ca3b124b5eaa1",
+       "lf_sha256": "f70c4748544c622f2bc356dfdaed785c73cf175e43e226c8141ca3b124b5eaa1",
+       "cr_count": 0,
+       "bytes": 18279
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "proot_distro/helpers/tar_extract.py",
+      "parent_commit": "f5ff24beef945fcfe04831a913602169c17e97f6",
+      "fix_commit": "a96d7a9667f38e45d812614852ee3915d1c0ae45",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "92c2008291c38bcbe054f9ff28fe8aab2d0663366229ef82e1dafee0a0639e83",
+       "lf_sha256": "92c2008291c38bcbe054f9ff28fe8aab2d0663366229ef82e1dafee0a0639e83"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "7fe2515d0b549d3f1459cd264c58c8f5d06e1b6154fefb3488121e09d38ca932",
+       "lf_sha256": "7fe2515d0b549d3f1459cd264c58c8f5d06e1b6154fefb3488121e09d38ca932"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "92c2008291c38bcbe054f9ff28fe8aab2d0663366229ef82e1dafee0a0639e83",
+       "lf_sha256": "92c2008291c38bcbe054f9ff28fe8aab2d0663366229ef82e1dafee0a0639e83",
+       "cr_count": 0,
+       "bytes": 8660
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "7fe2515d0b549d3f1459cd264c58c8f5d06e1b6154fefb3488121e09d38ca932",
+       "lf_sha256": "7fe2515d0b549d3f1459cd264c58c8f5d06e1b6154fefb3488121e09d38ca932",
+       "cr_count": 0,
+       "bytes": 12674
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 195,
    "token_estimate": 1560,
@@ -958,7 +4272,349 @@
     "delta_fixed_presence": [],
     "line_ending_diff": [],
     "fetch_error": [],
-    "content_equivalent": true
+    "content_equivalent": true,
+    "evidence": [
+     {
+      "path": "backend/chainlit/config.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "5cae1fac5e2efd1be59dfb31742f780d07c1cb4856cb67c1eda8658e40688282",
+       "lf_sha256": "5cae1fac5e2efd1be59dfb31742f780d07c1cb4856cb67c1eda8658e40688282"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "b52a02d9049eb5494a2032682ddd4684d94ae88719b85b9f5f275c20ebf583c7",
+       "lf_sha256": "b52a02d9049eb5494a2032682ddd4684d94ae88719b85b9f5f275c20ebf583c7"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "5cae1fac5e2efd1be59dfb31742f780d07c1cb4856cb67c1eda8658e40688282",
+       "lf_sha256": "5cae1fac5e2efd1be59dfb31742f780d07c1cb4856cb67c1eda8658e40688282",
+       "cr_count": 0,
+       "bytes": 24160
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "b52a02d9049eb5494a2032682ddd4684d94ae88719b85b9f5f275c20ebf583c7",
+       "lf_sha256": "b52a02d9049eb5494a2032682ddd4684d94ae88719b85b9f5f275c20ebf583c7",
+       "cr_count": 0,
+       "bytes": 31916
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "backend/chainlit/mcp.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ee7719177ab6256306d25c815aba24ca83b99fc9c0f9c09d9967b7d42c39a4ea",
+       "lf_sha256": "ee7719177ab6256306d25c815aba24ca83b99fc9c0f9c09d9967b7d42c39a4ea"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "4d0965e253b500f1403ac8c81bc3d6eae144df515d51b0915ec30906823061ff",
+       "lf_sha256": "4d0965e253b500f1403ac8c81bc3d6eae144df515d51b0915ec30906823061ff"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ee7719177ab6256306d25c815aba24ca83b99fc9c0f9c09d9967b7d42c39a4ea",
+       "lf_sha256": "ee7719177ab6256306d25c815aba24ca83b99fc9c0f9c09d9967b7d42c39a4ea",
+       "cr_count": 0,
+       "bytes": 3438
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "4d0965e253b500f1403ac8c81bc3d6eae144df515d51b0915ec30906823061ff",
+       "lf_sha256": "4d0965e253b500f1403ac8c81bc3d6eae144df515d51b0915ec30906823061ff",
+       "cr_count": 0,
+       "bytes": 11688
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "backend/chainlit/server.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "ff4869493d041a88845f562660cc545863ea9211fbc9d61d6266b0dafdfca9d3",
+       "lf_sha256": "ff4869493d041a88845f562660cc545863ea9211fbc9d61d6266b0dafdfca9d3"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "042daf093270c1c4c61c31447e16381ead3b53f5533e655b08354a5881e495af",
+       "lf_sha256": "042daf093270c1c4c61c31447e16381ead3b53f5533e655b08354a5881e495af"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "ff4869493d041a88845f562660cc545863ea9211fbc9d61d6266b0dafdfca9d3",
+       "lf_sha256": "ff4869493d041a88845f562660cc545863ea9211fbc9d61d6266b0dafdfca9d3",
+       "cr_count": 0,
+       "bytes": 59556
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "042daf093270c1c4c61c31447e16381ead3b53f5533e655b08354a5881e495af",
+       "lf_sha256": "042daf093270c1c4c61c31447e16381ead3b53f5533e655b08354a5881e495af",
+       "cr_count": 0,
+       "bytes": 77070
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "backend/chainlit/session.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "9ad60095fc229f17cf42b65de056ee3f1baa6b0a183bec83b9ea1f399fce2115",
+       "lf_sha256": "9ad60095fc229f17cf42b65de056ee3f1baa6b0a183bec83b9ea1f399fce2115"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "0276d129a58133c12f49836c5db1d717b3df1f4dd3af5631556d89181fcec089",
+       "lf_sha256": "0276d129a58133c12f49836c5db1d717b3df1f4dd3af5631556d89181fcec089"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "9ad60095fc229f17cf42b65de056ee3f1baa6b0a183bec83b9ea1f399fce2115",
+       "lf_sha256": "9ad60095fc229f17cf42b65de056ee3f1baa6b0a183bec83b9ea1f399fce2115",
+       "cr_count": 0,
+       "bytes": 13827
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "0276d129a58133c12f49836c5db1d717b3df1f4dd3af5631556d89181fcec089",
+       "lf_sha256": "0276d129a58133c12f49836c5db1d717b3df1f4dd3af5631556d89181fcec089",
+       "cr_count": 0,
+       "bytes": 16401
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "backend/chainlit/types.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "dd4860fec8bb2aaceb841777aac956f83a73fde4c8f0cdf3f84774f20fd4a463",
+       "lf_sha256": "dd4860fec8bb2aaceb841777aac956f83a73fde4c8f0cdf3f84774f20fd4a463"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "2f9a644eabb7de370c6a1caae02d05e251b84f789edda4851149bc1fd2b0b94d",
+       "lf_sha256": "2f9a644eabb7de370c6a1caae02d05e251b84f789edda4851149bc1fd2b0b94d"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "dd4860fec8bb2aaceb841777aac956f83a73fde4c8f0cdf3f84774f20fd4a463",
+       "lf_sha256": "dd4860fec8bb2aaceb841777aac956f83a73fde4c8f0cdf3f84774f20fd4a463",
+       "cr_count": 0,
+       "bytes": 7552
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "2f9a644eabb7de370c6a1caae02d05e251b84f789edda4851149bc1fd2b0b94d",
+       "lf_sha256": "2f9a644eabb7de370c6a1caae02d05e251b84f789edda4851149bc1fd2b0b94d",
+       "cr_count": 0,
+       "bytes": 7694
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "backend/chainlit/version.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "0587df9fb1dbc5287d6fb309f1c532d219e32ceb1248e48514a5ea135d68323e",
+       "lf_sha256": "0587df9fb1dbc5287d6fb309f1c532d219e32ceb1248e48514a5ea135d68323e"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "91ba7cbf9c5410fe3c83a48750e19f79b9408783fec411a28890e90148a0e598",
+       "lf_sha256": "91ba7cbf9c5410fe3c83a48750e19f79b9408783fec411a28890e90148a0e598"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "0587df9fb1dbc5287d6fb309f1c532d219e32ceb1248e48514a5ea135d68323e",
+       "lf_sha256": "0587df9fb1dbc5287d6fb309f1c532d219e32ceb1248e48514a5ea135d68323e",
+       "cr_count": 0,
+       "bytes": 23
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "91ba7cbf9c5410fe3c83a48750e19f79b9408783fec411a28890e90148a0e598",
+       "lf_sha256": "91ba7cbf9c5410fe3c83a48750e19f79b9408783fec411a28890e90148a0e598",
+       "cr_count": 0,
+       "bytes": 23
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "backend/tests/test_config.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "edd739636f7f4e665c7f5438311195e35a544a5ef54dada6c8ef06406f5d48b4",
+       "lf_sha256": "edd739636f7f4e665c7f5438311195e35a544a5ef54dada6c8ef06406f5d48b4"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "6d67288c6abb21e70ad385d2e108c17558111cdf409ce98870ba8255e4e26ea3",
+       "lf_sha256": "6d67288c6abb21e70ad385d2e108c17558111cdf409ce98870ba8255e4e26ea3"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "edd739636f7f4e665c7f5438311195e35a544a5ef54dada6c8ef06406f5d48b4",
+       "lf_sha256": "edd739636f7f4e665c7f5438311195e35a544a5ef54dada6c8ef06406f5d48b4",
+       "cr_count": 0,
+       "bytes": 4463
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "6d67288c6abb21e70ad385d2e108c17558111cdf409ce98870ba8255e4e26ea3",
+       "lf_sha256": "6d67288c6abb21e70ad385d2e108c17558111cdf409ce98870ba8255e4e26ea3",
+       "cr_count": 0,
+       "bytes": 20688
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "backend/tests/test_mcp.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "1a6ff07554ca92a3ee358382d90c332fad5ee0950f3fb5d4aec087b41b77cf57",
+       "lf_sha256": "1a6ff07554ca92a3ee358382d90c332fad5ee0950f3fb5d4aec087b41b77cf57"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "a3d7f2adaa3d09fc27b54bfdfe39e8c23311e68272f7ec39d63dda45dab7979a",
+       "lf_sha256": "a3d7f2adaa3d09fc27b54bfdfe39e8c23311e68272f7ec39d63dda45dab7979a"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "1a6ff07554ca92a3ee358382d90c332fad5ee0950f3fb5d4aec087b41b77cf57",
+       "lf_sha256": "1a6ff07554ca92a3ee358382d90c332fad5ee0950f3fb5d4aec087b41b77cf57",
+       "cr_count": 0,
+       "bytes": 17534
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "a3d7f2adaa3d09fc27b54bfdfe39e8c23311e68272f7ec39d63dda45dab7979a",
+       "lf_sha256": "a3d7f2adaa3d09fc27b54bfdfe39e8c23311e68272f7ec39d63dda45dab7979a",
+       "cr_count": 0,
+       "bytes": 93828
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "backend/tests/test_session.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "6f38bcfd82b7a78cf540060129ea99abe554acfdbb1e144059dfb209cdda7972",
+       "lf_sha256": "6f38bcfd82b7a78cf540060129ea99abe554acfdbb1e144059dfb209cdda7972"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "11fc048992801b9970afbe30a996692cb1850902f783de77121f65c3347f1d79",
+       "lf_sha256": "11fc048992801b9970afbe30a996692cb1850902f783de77121f65c3347f1d79"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "6f38bcfd82b7a78cf540060129ea99abe554acfdbb1e144059dfb209cdda7972",
+       "lf_sha256": "6f38bcfd82b7a78cf540060129ea99abe554acfdbb1e144059dfb209cdda7972",
+       "cr_count": 0,
+       "bytes": 24728
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "11fc048992801b9970afbe30a996692cb1850902f783de77121f65c3347f1d79",
+       "lf_sha256": "11fc048992801b9970afbe30a996692cb1850902f783de77121f65c3347f1d79",
+       "cr_count": 0,
+       "bytes": 25582
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     },
+     {
+      "path": "cypress/e2e/config_overrides/main.py",
+      "parent_commit": "b8506a47fa59d7eaba40ad6d27496c2605a64cb9",
+      "fix_commit": "0565fd0eccb915fce159929598b053ed79f6e0c9",
+      "upstream_parent": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "e716e0b49c496ee0162619e5b2d998730a87852b91aa41638bde1b125bd205d9",
+       "lf_sha256": "e716e0b49c496ee0162619e5b2d998730a87852b91aa41638bde1b125bd205d9"
+      },
+      "upstream_fix": {
+       "status": 200,
+       "attempts": 1,
+       "raw_sha256": "96ab6ae9908e27a84ae18bfdc9ee2d5aa93404778226bc0be762c8f5c0fca7fd",
+       "lf_sha256": "96ab6ae9908e27a84ae18bfdc9ee2d5aa93404778226bc0be762c8f5c0fca7fd"
+      },
+      "corpus_vuln": {
+       "present": true,
+       "raw_sha256": "e716e0b49c496ee0162619e5b2d998730a87852b91aa41638bde1b125bd205d9",
+       "lf_sha256": "e716e0b49c496ee0162619e5b2d998730a87852b91aa41638bde1b125bd205d9",
+       "cr_count": 0,
+       "bytes": 2681
+      },
+      "corpus_fixed": {
+       "present": true,
+       "raw_sha256": "96ab6ae9908e27a84ae18bfdc9ee2d5aa93404778226bc0be762c8f5c0fca7fd",
+       "lf_sha256": "96ab6ae9908e27a84ae18bfdc9ee2d5aa93404778226bc0be762c8f5c0fca7fd",
+       "cr_count": 0,
+       "bytes": 2840
+      },
+      "base_equivalent": true,
+      "fixed_equivalent": true,
+      "verdict": "OK"
+     }
+    ]
    },
    "changed_lines": 4163,
    "token_estimate": 33304,

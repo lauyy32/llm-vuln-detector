@@ -660,9 +660,106 @@ def build_stale_artifacts(out_dir: Path) -> dict:
     return doc
 
 
+_HUNK_RE = None
+
+
+def excerpt_vuln_for_patch(sample_dir: Path, patch_text: str, window: int = 20,
+                           max_chars: int = 24000) -> str:
+    """按 candidate patch 的 hunk 行号，从 vuln 树做窗口摘录（±window 行）。
+
+    这是 V4 的**表示策略草案**（正式冻结前须由 reviewer 确认）：只给补丁触及位置
+    附近的代码，而非整文件。为满足预算，按 hunk 出现顺序累积，超 max_chars 即停
+    （并标注被裁剪的文件数），避免 RENDER_FAILURE。
+    """
+    import re
+    hunks: dict[str, list] = {}
+    cur = None
+    for ln in patch_text.split("\n"):
+        if ln.startswith("diff --git ") and " b/" in ln:
+            cur = ln.split(" b/", 1)[1].strip()
+            hunks.setdefault(cur, [])
+        elif ln.startswith("@@ ") and cur is not None:
+            m = re.match(r"@@ -(\d+)(?:,(\d+))?", ln)
+            if m:
+                hunks[cur].append((int(m.group(1)), int(m.group(2) or 1)))
+    chunks, total, dropped = [], 0, 0
+    for rel in sorted(hunks):
+        p = sample_dir / "vuln" / rel
+        if not p.exists():
+            continue
+        lines = p.read_text(encoding="utf-8", errors="replace").split("\n")
+        keep: set = set()
+        for start, count in hunks[rel]:
+            lo = max(0, start - 1 - window)
+            hi = min(len(lines), start - 1 + count + window)
+            keep.update(range(lo, hi))
+        if not keep:
+            continue
+        body = "\n".join(lines[i] for i in sorted(keep))
+        chunk = f"// ---- {rel} ----\n{body}"
+        if total + len(chunk) > max_chars:
+            dropped += 1
+            continue
+        chunks.append(chunk)
+        total += len(chunk)
+    out = "\n\n".join(chunks)
+    if dropped:
+        out += f"\n\n// [excerpt note] 另有 {dropped} 个触及文件因预算未纳入本摘录"
+    return out
+
+
+def build_g0_prompts(out_dir: Path) -> dict:
+    """P0-4/G0：用真实 renderer 渲染四臂 prompt，落盘全文并用真实 tokenizer 计数。
+
+    每个 (cve, arm) 给出 FIT / OVER_BUDGET / RENDER_FAILURE。
+    """
+    from cpg.ablation.model_client import NUM_CTX, NUM_PREDICT
+    from cpg.ablation import prompt_renderer as pr
+    cm = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+    cwe_by = {s["sample_id"]: (s.get("cwes") or [None])[0] for s in cm["samples"]}
+    rows = []
+    prompt_dir = out_dir / "g0_prompts"
+    for cve in V4_CANDIDATES:
+        sd = sample_dir_path(cve)
+        for arm in ("real", "placebo", "shuffled"):
+            rel = f"{PATCHES_REL}/{arm}/{cve}.diff"
+            patch = read_patch(out_dir, rel)
+            code = excerpt_vuln_for_patch(sd, patch)
+            rec = {"sample_id": cve, "arm": arm, "patch_path": rel}
+            try:
+                prompt = pr.render_v4_prompt(cve=cve, cwe=cwe_by.get(cve),
+                                             code_text=code, candidate_patch=patch)
+            except ValueError as e:
+                rec.update({"verdict": "RENDER_FAILURE", "error": str(e)[:200]})
+                rows.append(rec)
+                continue
+            tok = count_tokens(prompt)
+            rec.update({"prompt_tokens": tok,
+                        "code_tokens": count_tokens(code),
+                        "patch_tokens": count_tokens(patch),
+                        "num_predict": NUM_PREDICT, "num_ctx": NUM_CTX,
+                        "margin": NUM_CTX - (tok + NUM_PREDICT),
+                        "verdict": "FIT" if tok + NUM_PREDICT <= NUM_CTX else "OVER_BUDGET",
+                        "prompt_sha256": _sha256_bytes(prompt.encode("utf-8"))})
+            pp = prompt_dir / arm / f"{cve}.txt"
+            write_text_lf(pp, prompt)
+            rec["prompt_path"] = pp.relative_to(out_dir).as_posix()
+            rows.append(rec)
+    doc = {"schema": "v4-g0-prompts/1",
+           "renderer": "cpg/ablation/prompt_renderer.py::render_v4_prompt（草案）",
+           "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT,
+           "n_fit": sum(1 for r in rows if r["verdict"] == "FIT"),
+           "n_over": sum(1 for r in rows if r["verdict"] == "OVER_BUDGET"),
+           "n_render_failure": sum(1 for r in rows if r["verdict"] == "RENDER_FAILURE"),
+           "rows": rows}
+    write_text_lf(out_dir / "v4_g0_prompt_report.json",
+                  json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+    return doc
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate", "feasibility", "all"])
+    ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate", "feasibility", "g0", "all"])
     ap.add_argument("--out-dir", type=Path, default=OUT_DIR)
     ap.add_argument("--canonical-manifest", type=Path, default=None,
                     help="V4 权威 manifest（必须显式传入且等于 v4_manifest 单一来源）")
@@ -730,6 +827,14 @@ def main() -> int:
         f = build_feasibility_table(args.out_dir)
         print(f"[Feasibility] 确定超 num_ctx（patch+输出）: {f['n_firm_over']}/"
               f"{len(f['rows'])} {f['firm_over']}；其余 needs_renderer")
+    if args.step in ("g0", "all"):
+        g = build_g0_prompts(args.out_dir)
+        print(f"[G0] FIT={g['n_fit']} OVER_BUDGET={g['n_over']} "
+              f"RENDER_FAILURE={g['n_render_failure']} / {len(g['rows'])}")
+        for r in g["rows"]:
+            if r["verdict"] != "FIT":
+                print(f"  {r['verdict']} {r['arm']}/{r['sample_id']}: "
+                      f"{r.get('error') or str(r.get('prompt_tokens')) + ' tok'}")
     return 0
 
 

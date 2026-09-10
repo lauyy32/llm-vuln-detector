@@ -68,3 +68,53 @@ def render_prompt(
 
 def prompt_sha256(prompt: str) -> str:
     return _sha256_text(prompt)
+
+
+# ---------------------------------------------------------------------------
+# V4（候选补丁充分性）：SYSTEM 与输出契约的 V4 权威定义（草案，待 reviewer 冻结）
+# ---------------------------------------------------------------------------
+SYSTEM_V4 = (
+    "你是一名资深代码安全审计助手。给定一段存在漏洞的代码与一个**候选补丁**，"
+    "判断：若把该候选补丁应用于给定的代码，是否足以消除目标漏洞。"
+    "判据：补丁是否切断了漏洞路径或引入了必要的安全控制。"
+    "只输出严格 JSON，不要任何解释性文字。"
+)
+
+OUTPUT_CONTRACT_V4 = (
+    "\n# 输出要求\n严格输出如下 JSON，不要任何额外文字：\n"
+    '{"verdict":"benign|vulnerable|abstain","confidence":0.0到1.0的数字,'
+    '"rationale":"一句话依据"}\n'
+    "（benign = 候选补丁足以消除目标漏洞；vulnerable = 不足以消除；"
+    "abstain = 信息不足）"
+)
+
+# V4 表示预算（草案初值；冻结前须由真实 G0 renderer 的 token 测算校准）
+DEFAULT_V4_MAX_CODE_CHARS = 24000
+DEFAULT_V4_MAX_PATCH_CHARS = 60000
+
+
+def render_v4_prompt(
+    *,
+    cve: str | None,
+    cwe: str | None,
+    code_text: str | None,
+    candidate_patch: str | None,
+    max_code_chars: int = DEFAULT_V4_MAX_CODE_CHARS,
+    max_patch_chars: int = DEFAULT_V4_MAX_PATCH_CHARS,
+) -> str:
+    """V4 四臂 prompt 渲染（草案）。超预算抛 ValueError（不截断）。
+
+    除 candidate_patch 外，四臂输入完全一致（A1 契约）。
+    """
+    parts = [SYSTEM_V4, "\n# 审计任务", f"- CVE: {cve or 'unknown'}",
+             f"- 目标 CWE: {cwe or '未指定'}"]
+    if code_text:
+        if len(code_text) > max_code_chars:
+            raise ValueError(f"code_text 超预算 {len(code_text)} > {max_code_chars}")
+        parts.append(f"\n# 相关代码（vuln 状态）\n```\n{code_text}\n```")
+    if candidate_patch:
+        if len(candidate_patch) > max_patch_chars:
+            raise ValueError(f"candidate_patch 超预算 {len(candidate_patch)} > {max_patch_chars}")
+        parts.append(f"\n# 候选补丁\n```diff\n{candidate_patch}\n```")
+    parts.append(OUTPUT_CONTRACT_V4)
+    return "\n".join(parts)

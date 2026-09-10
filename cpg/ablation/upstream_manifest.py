@@ -264,13 +264,18 @@ def read_corpus_v3_file(cve: str, side: str, filename: str):
 
 def content_compare(cve: str, repo: str, parent: str, fix: str,
                     up_py: list, no_fetch: bool) -> dict:
-    """L2 内容级：对每个上游 python 文件比对 corpus 与上游 blob（归一化行尾）。"""
+    """L2 内容级：对每个上游 python 文件比对 corpus 与上游 blob（归一化行尾）。
+
+    并逐文件落盘可审计证据（path / commit / HTTP status+attempts / upstream 与
+    corpus 的 raw+LF 双 SHA），供"fetch 抖动后重跑即通过"类争议独立核对。
+    """
     base_mismatch = []      # corpus vuln ≠ 上游 parent（归一化后仍不等）
     fixed_mismatch = []     # corpus fixed ≠ 上游 fix（归一化后仍不等）
     line_ending_diff = []   # 行尾符不同（CRLF vs LF）
     base_presence = []      # parent 与 corpus vuln 存在性不一致
     fixed_presence = []     # fix 与 corpus fixed 存在性不一致
     fetch_err = []          # raw fetch 失败的文件
+    evidence = []           # 逐文件证据
 
     for filename in up_py:
         c_vuln = read_corpus_v3_file(cve, "vuln", filename)
@@ -279,8 +284,23 @@ def content_compare(cve: str, repo: str, parent: str, fix: str,
             continue
         p_raw = curl_raw(raw_url(repo, parent, filename))
         f_raw = curl_raw(raw_url(repo, fix, filename))
+        ev = {
+            "path": filename, "parent_commit": parent, "fix_commit": fix,
+            "upstream_parent": {"status": p_raw.get("status"),
+                                "attempts": p_raw.get("attempts"),
+                                "raw_sha256": p_raw.get("sha256"),
+                                "lf_sha256": _lf_sha(p_raw.get("body"))},
+            "upstream_fix": {"status": f_raw.get("status"),
+                             "attempts": f_raw.get("attempts"),
+                             "raw_sha256": f_raw.get("sha256"),
+                             "lf_sha256": _lf_sha(f_raw.get("body"))},
+            "corpus_vuln": _blob_evidence(c_vuln),
+            "corpus_fixed": _blob_evidence(c_fixed),
+        }
         if p_raw["status"] not in (200, 404) or f_raw["status"] not in (200, 404):
             fetch_err.append(filename)
+            ev["verdict"] = "FETCH_ERROR"
+            evidence.append(ev)
             continue
         up_base = p_raw["body"] if p_raw["status"] == 200 else None
         up_fix = f_raw["body"] if f_raw["status"] == 200 else None
@@ -302,6 +322,12 @@ def content_compare(cve: str, repo: str, parent: str, fix: str,
                 fixed_mismatch.append(filename)
             if (b"\r\n" in c_fixed) != (b"\r\n" in up_fix):
                 line_ending_diff.append(filename)
+        ev["base_equivalent"] = (up_base is not None and c_vuln is not None
+                                 and norm_eol(c_vuln) == norm_eol(up_base))
+        ev["fixed_equivalent"] = (up_fix is not None and c_fixed is not None
+                                  and norm_eol(c_fixed) == norm_eol(up_fix))
+        ev["verdict"] = "OK" if (ev["base_equivalent"] and ev["fixed_equivalent"]) else "MISMATCH"
+        evidence.append(ev)
 
     content_equivalent = (not base_mismatch and not fixed_mismatch
                           and not base_presence and not fixed_presence
@@ -314,7 +340,26 @@ def content_compare(cve: str, repo: str, parent: str, fix: str,
         "line_ending_diff": sorted(set(line_ending_diff)),
         "fetch_error": sorted(fetch_err),
         "content_equivalent": content_equivalent,
+        "evidence": evidence,
     }
+
+
+def _lf_sha(b) -> str:
+    """LF 归一化后的 SHA-256（None → None）。"""
+    if b is None:
+        return None
+    return hashlib.sha256(b.replace(b"\r\n", b"\n")).hexdigest()
+
+
+def _blob_evidence(b) -> dict:
+    """corpus 侧 blob 的 raw/LF 双 SHA 与 CR 计数。"""
+    if b is None:
+        return {"present": False}
+    return {"present": True,
+            "raw_sha256": hashlib.sha256(b).hexdigest(),
+            "lf_sha256": _lf_sha(b),
+            "cr_count": b.count(b"\r"),
+            "bytes": len(b)}
 
 
 def main() -> int:
