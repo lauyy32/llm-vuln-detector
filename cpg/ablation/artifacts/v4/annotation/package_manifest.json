@@ -1,15 +1,67 @@
 {
-  "schema": "v4-annotation-package/1",
+  "schema": "v4-annotation-package/2",
   "n_entries": 284,
   "reviewers": [
     "reviewer1",
     "reviewer2"
   ],
-  "blind": true,
-  "contains_ai_suggestions": false,
+  "blind_protocol": {
+    "declared_blind": true,
+    "contains_ai_suggestions": false,
+    "submission_rule": "两位标注者的填写结果**必须私下分别收取**；在双方均提交并锁定 SHA 之前，任何一方结果不得出现在另一方可见位置"
+  },
+  "question": "在**完整真实补丁**的背景下，该 hunk 对消除目标漏洞承担什么角色？（DIRECT_SECURITY = 直接切断漏洞路径/引入必要安全控制；SUPPORTING_REQUIRED = 本身不直接修复，但其他 hunk 依赖它才生效；NON_CRITICAL = 与安全无关；UNCERTAIN = 证据不足——**允许并鼓励如实选择**）",
+  "fields": {
+    "criticality": "DIRECT_SECURITY | SUPPORTING_REQUIRED | NON_CRITICAL | UNCERTAIN",
+    "dependency_group": "与本 hunk 存在联合依赖的其它 hunk identity 列表（可为空）",
+    "counterfactual": "反事实检验：仅移除此 hunk、保留其余 hunk，漏洞是否仍存在？（是/否/不确定）",
+    "evidence": "PoC | regression-test | code-reasoning | insufficient",
+    "reason": "一句话依据",
+    "reviewer": "reviewer1 | reviewer2"
+  },
+  "provenance": {
+    "generator_git_commit": "372a9319720fe72c962f3e3110605c87ecf47db3",
+    "selector_impl_sha256": "b2ee35d45e19884adb4303c8cd415f3023f3baf0df63d039a1edb94eccdd51e8",
+    "annotation_generator_impl_sha256": "4ed09a7d8458cded6c4a6e8afdd4b172212a26f25e393d2531dbd192a88092ad",
+    "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
+    "canonical_manifest_sha256": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996",
+    "real_patches_tree_sha256": "d546e38973f326ea9751e6335f43300fb2704d353423aea42ae86dca5b646fff"
+  },
   "artifacts": [
-    "annotation/critical_hunks.reviewer1.jsonl",
-    "annotation/critical_hunks.reviewer2.jsonl",
-    "annotation/标注手册.md"
+    {
+      "name": "annotation/critical_hunks.reviewer1.jsonl",
+      "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer1.jsonl",
+      "bytes": 225215,
+      "lines": 284,
+      "sha256": "50fb99bab4812d6dc549685f145ce84ea0169b92547903d91d149a77d3d36dbf"
+    },
+    {
+      "name": "annotation/critical_hunks.reviewer2.jsonl",
+      "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer2.jsonl",
+      "bytes": 225215,
+      "lines": 284,
+      "sha256": "c93859c8e626fd61dde8a99350adf3f2bd2e285971d01bd733b5f52b65d33b6a"
+    },
+    {
+      "name": "annotation/标注手册.md",
+      "path": "cpg/ablation/artifacts/v4/annotation/标注手册.md",
+      "bytes": 1490146,
+      "lines": 36490,
+      "sha256": "e5a7557c23f1173ce01870148d68d95f68b0ab892529cfc8044f984f608e3a89"
+    },
+    {
+      "name": "critical_hunks.template.json",
+      "path": "cpg/ablation/artifacts/v4/critical_hunks.template.json",
+      "bytes": 113585,
+      "lines": 3700,
+      "sha256": "268f671826f8df02c9ad069edc1e660cba7e0504438326ca17e5b9df70cfaf64"
+    },
+    {
+      "name": "v4_hunk_coverage.json",
+      "path": "cpg/ablation/artifacts/v4/v4_hunk_coverage.json",
+      "bytes": 151288,
+      "lines": 4464,
+      "sha256": "589b768f6d9ece74e22edb7ba6aab6c21a9c4ff7495a28369752c03324aa1b0d"
+    }
   ]
 }

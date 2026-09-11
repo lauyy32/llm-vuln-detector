@@ -8,7 +8,7 @@
     "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH"
   },
   "generated_from": {
-    "git_commit": "fed6b13775ac37ac526035ace89be8692ceb3cba",
+    "git_commit": "372a9319720fe72c962f3e3110605c87ecf47db3",
     "n_candidates": 15,
     "n_confirmation": 14
   },

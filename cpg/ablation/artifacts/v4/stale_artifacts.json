@@ -47,7 +47,7 @@
     {
       "artifact": "cpg/ablation/artifacts/v4/gate_a_report.json",
       "superseded_sha256": "115f54a050fd743556239402288fb2e46ba5e055557030c15c9900547914a0ff",
-      "current_sha256": "c0d0c445d60e8131fe8d856869415902f3526089fbe98523251330634166a81e",
+      "current_sha256": "c49cbe24c74c5548b68e5c6d885aab126b039900aaa145ff9d9ce36d4489b0b1",
       "compared_at_commit": "9f29b8b",
       "status": "REGENERATED_CHANGED"
     },

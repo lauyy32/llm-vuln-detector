@@ -720,48 +720,15 @@ _HUNK_RE = None
 
 
 def excerpt_vuln_for_patch(sample_dir: Path, patch_text: str, window: int = 20,
-                           max_chars: int = 24000) -> str:
-    """按 candidate patch 的 hunk 行号，从 vuln 树做窗口摘录（±window 行）。
+                           max_chars: int = 24000) -> tuple:
+    """委托独立 selector 模块 `v4_selector`（其实现 SHA 被 provenance 冻结）。
 
-    这是 V4 的**表示策略草案**（正式冻结前须由 reviewer 确认）：只给补丁触及位置
-    附近的代码，而非整文件。为满足预算，按 hunk 出现顺序累积，超 max_chars 即停
-    （并标注被裁剪的文件数），避免 RENDER_FAILURE。
+    返回 (code_text, selection_manifest)。sample_dir 传的是样本目录（含 vuln/），
+    内部转成 vuln 目录。
     """
-    import re
-    hunks: dict[str, list] = {}
-    cur = None
-    for ln in patch_text.split("\n"):
-        if ln.startswith("diff --git ") and " b/" in ln:
-            cur = ln.split(" b/", 1)[1].strip()
-            hunks.setdefault(cur, [])
-        elif ln.startswith("@@ ") and cur is not None:
-            m = re.match(r"@@ -(\d+)(?:,(\d+))?", ln)
-            if m:
-                hunks[cur].append((int(m.group(1)), int(m.group(2) or 1)))
-    chunks, total, dropped = [], 0, 0
-    for rel in sorted(hunks):
-        p = sample_dir / "vuln" / rel
-        if not p.exists():
-            continue
-        lines = p.read_text(encoding="utf-8", errors="replace").split("\n")
-        keep: set = set()
-        for start, count in hunks[rel]:
-            lo = max(0, start - 1 - window)
-            hi = min(len(lines), start - 1 + count + window)
-            keep.update(range(lo, hi))
-        if not keep:
-            continue
-        body = "\n".join(lines[i] for i in sorted(keep))
-        chunk = f"// ---- {rel} ----\n{body}"
-        if total + len(chunk) > max_chars:
-            dropped += 1
-            continue
-        chunks.append(chunk)
-        total += len(chunk)
-    out = "\n\n".join(chunks)
-    if dropped:
-        out += f"\n\n// [excerpt note] 另有 {dropped} 个触及文件因预算未纳入本摘录"
-    return out
+    from cpg.ablation import v4_selector as sel
+    return sel.excerpt(sample_dir / "vuln", patch_text, window=window,
+                       max_chars=max_chars)
 
 
 def build_g0_prompts(out_dir: Path) -> dict:
@@ -866,113 +833,15 @@ def build_g0_prompts(out_dir: Path) -> dict:
 
 
 def _parse_patch_hunks(patch_text: str, sample_id: str | None = None) -> dict:
-    """解析 patch → {file: [{old_start, old_count, new_start, new_count, header, _body}]}。
-
-    `_body` 为**完整单个 hunk body**（结束边界 = 全局下一个 `@@ ` 或 `diff --git `）。
-    带上下文 SHA（hunk 头 + 其后 3 行），使 hunk 身份不依赖易漂移的纯行号。
-    malformed hunk header → 抛 ValueError（fail-closed）。
-    """
-    import re
-    out: dict = {}
-    cur = None
-    buf = patch_text.split("\n")
-    starts = []
-    for i, ln in enumerate(buf):
-        if ln.startswith("diff --git ") and " b/" in ln:
-            cur = ln.split(" b/", 1)[1].strip()
-            out.setdefault(cur, [])
-        elif ln.startswith("@@ ") and cur is not None:
-            m = re.match(r"@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@(.*)", ln)
-            if not m:
-                raise ValueError(f"malformed hunk header: {ln[:80]}")
-            out[cur].append({
-                "old_start": int(m.group(1)), "old_count": int(m.group(2) or 1),
-                "new_start": int(m.group(3)), "new_count": int(m.group(4) or 1),
-                "header": ln, "_start_idx": i,
-                "patch_context_sha256": _sha256_bytes(
-                    "\n".join(buf[i:i + 4]).encode("utf-8")),
-            })
-    # 补完整 hunk body（P1-2 身份锚点）。P0-2 修复：结束边界取**全局下一个
-    # `@@ ` 或 `diff --git `** 的最小索引——不能简单用 len(buf) 或"同文件下一 hunk"，
-    # 否则多文件 patch 中前文件最后一个 hunk 会吞入后续文件全部内容。
-    for rel, hs in out.items():
-        for h in hs:
-            i = h["_start_idx"]
-            stop = len(buf)
-            for j in range(i + 1, len(buf)):
-                if buf[j].startswith("@@ ") or buf[j].startswith("diff --git "):
-                    stop = j
-                    break
-            h["_body"] = "\n".join(buf[i + 1:stop])
-    return out
-
-
-def excerpt_vuln_for_patch(sample_dir: Path, patch_text: str, window: int = 20,
-                           max_chars: int = 24000) -> tuple:
-    """按 candidate patch 的 hunk 行号，从 vuln 树做窗口摘录（±window 行）。
-
-    P1-1 修复：返回 **(code_text, selection_manifest)**——manifest 记录每个文件
-    实际纳入的原始行号集合，供 coverage 计算真实的 FULL/PARTIAL/ABSENT
-    （不再用"文件块保留/丢弃"这种近似，使 PARTIAL 成为可达状态）。
-    """
-    import re
-    hunks: dict[str, list] = {}
-    cur = None
-    for ln in patch_text.split("\n"):
-        if ln.startswith("diff --git ") and " b/" in ln:
-            cur = ln.split(" b/", 1)[1].strip()
-            hunks.setdefault(cur, [])
-        elif ln.startswith("@@ ") and cur is not None:
-            m = re.match(r"@@ -(\d+)(?:,(\d+))?", ln)
-            if m:
-                hunks[cur].append((int(m.group(1)), int(m.group(2) or 1)))
-    chunks, selection, total, dropped = [], {}, 0, 0
-    for rel in sorted(hunks):
-        p = sample_dir / "vuln" / rel
-        if not p.exists():
-            continue
-        lines = p.read_text(encoding="utf-8", errors="replace").split("\n")
-        keep: set = set()
-        for start, count in hunks[rel]:
-            lo = max(0, start - 1 - window)
-            hi = min(len(lines), start - 1 + count + window)
-            keep.update(range(lo, hi))
-        if not keep:
-            continue
-        body = "\n".join(lines[i] for i in sorted(keep))
-        chunk = f"// ---- {rel} ----\n{body}"
-        if total + len(chunk) > max_chars:
-            dropped += 1
-            continue
-        chunks.append(chunk)
-        total += len(chunk)
-        selection[rel] = sorted(keep)          # 1-based 行号
-    out = "\n\n".join(chunks)
-    if dropped:
-        out += f"\n\n// [excerpt note] 另有 {dropped} 个触及文件因预算未纳入本摘录"
-    manifest = {"files": selection, "dropped_file_count": dropped}
-    return out, manifest
+    """委托独立 selector 模块（实现 SHA 被冻结）。"""
+    from cpg.ablation import v4_selector as sel
+    return sel.parse_patch_hunks(patch_text)
 
 
 def _file_status(patch_text: str) -> dict:
-    """P0-3：由**文件状态**判定 added（而非 old_count==0）。
-
-    判定依据（任一即 added）：`new file mode` / `--- /dev/null`。
-    已有文件中的纯插入（old_count==0 但非 added）**不得**判为 N/A。
-    """
-    status, cur = {}, None
-    for ln in patch_text.split("\n"):
-        if ln.startswith("diff --git ") and " b/" in ln:
-            cur = ln.split(" b/", 1)[1].strip()
-            status.setdefault(cur, "M")
-        elif cur is not None:
-            if ln.startswith("new file mode"):
-                status[cur] = "A"
-            elif ln.startswith("deleted file mode"):
-                status[cur] = "D"
-            elif ln.startswith("--- /dev/null"):
-                status[cur] = "A"
-    return status
+    """委托独立 selector 模块。"""
+    from cpg.ablation import v4_selector as sel
+    return sel.file_status(patch_text)
 
 
 def _hunk_identity(rel: str, file_status: str, h: dict, body_lf_sha: str) -> dict:
@@ -995,19 +864,38 @@ def build_hunk_coverage(out_dir: Path) -> dict:
               "note": ("detector；criticality 由 frozen registry 提供（与本文件分离）。"
                        "Gate 运行时按 hunk identity 严格 join 二者"),
               "samples": {}}
+    missing_sel: list = []
     for cve in V4_CANDIDATES:
         sd = sample_dir_path(cve)
         patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
-        # P0-3：优先消费 G0 冻结的 selection（若已生成），否则本地计算并标注未绑定
+        # P0-1 fail-closed：必须消费 G0 冻结的 selection，**禁止 fallback 重算**
         sel_path = out_dir / "g0_selection" / f"{cve}.json"
-        bound = sel_path.exists()
-        if bound:
-            sel_doc = json.loads(sel_path.read_text(encoding="utf-8"))
-            manifest = sel_doc["selection_manifest"]
-            bound_sha = sel_doc["selection_manifest_sha256"]
-        else:
-            code, manifest = excerpt_vuln_for_patch(sd, patch)
-            bound_sha = None
+        if not sel_path.exists():
+            missing_sel.append(cve)
+            report["samples"][cve] = {"n_hunks": 0, "FULL": 0, "PARTIAL": 0,
+                                      "ABSENT": 0, "NOT_APPLICABLE_ADDED": 0,
+                                      "hunks": [], "selection_bound": False,
+                                      "selection_error": "g0_selection 缺失（fail-closed）"}
+            continue
+        sel_doc = json.loads(sel_path.read_text(encoding="utf-8"))
+        manifest = sel_doc["selection_manifest"]
+        # 交叉核对（P0-1）
+        sel_errs = []
+        if sel_doc.get("sample_id") != cve:
+            sel_errs.append(f"selection.sample_id={sel_doc.get('sample_id')} != {cve}")
+        recomputed_sel = _sha256_bytes(
+            json.dumps(manifest, sort_keys=True).encode("utf-8"))
+        if recomputed_sel != sel_doc.get("selection_manifest_sha256"):
+            sel_errs.append("selection_manifest_sha256 重算不符")
+        if sel_doc.get("patch_sha256") != _sha256_bytes(patch.encode("utf-8")):
+            sel_errs.append("selection.patch_sha256 与冻结 real patch 不符")
+        # 重新执行 selector 必须得到同一 selection（实现一致性）
+        code2, manifest2 = excerpt_vuln_for_patch(sd, patch)
+        if _sha256_bytes(json.dumps(manifest2, sort_keys=True).encode("utf-8")) != recomputed_sel:
+            sel_errs.append("selector 重算 selection 与冻结值不符（实现漂移）")
+        elif _sha256_bytes(code2.encode("utf-8")) != sel_doc.get("code_text_sha256"):
+            sel_errs.append("selector 重算 code_text_sha256 与冻结值不符")
+        bound_sha = sel_doc["selection_manifest_sha256"]
         kept_lines = {k: set(v) for k, v in manifest["files"].items()}
         fstat = _file_status(patch)
         # P1-1：identity 必须含 sample_id
@@ -1044,10 +932,16 @@ def build_hunk_coverage(out_dir: Path) -> dict:
                 rows.append({"sample_id": cve, "hunk_identity": ident,
                              "coverage": status, "criticality": None})
         report["samples"][cve] = {"n_hunks": len(rows), **n, "hunks": rows,
-                                  "selection_bound": bound,
-                                  "selection_manifest_sha256": bound_sha}
+                                  "selection_bound": not sel_errs,
+                                  "selection_manifest_sha256": bound_sha,
+                                  "selection_errors": sel_errs}
     report["totals"] = {k: sum(s[k] for s in report["samples"].values())
                         for k in ("FULL", "PARTIAL", "ABSENT", "NOT_APPLICABLE_ADDED")}
+    report["n_samples"] = len(report["samples"])
+    report["missing_selection"] = sorted(missing_sel)
+    report["selection_errors"] = {c: s["selection_errors"]
+                                  for c, s in report["samples"].items()
+                                  if s.get("selection_errors")}
     report["mechanical_absent_samples"] = sorted(
         [c for c, s in report["samples"].items() if s["ABSENT"] > 0])
     report["confirmatory_blocking_samples"] = None
@@ -1056,102 +950,155 @@ def build_hunk_coverage(out_dir: Path) -> dict:
     return report
 
 
-def build_annotation_package(out_dir: Path) -> dict:
-    """生成**双盲标注包**：reviewer1/2 空白模板 + 人读手册。
+ANNOTATION_QUESTION = (
+    "在**完整真实补丁**的背景下，该 hunk 对消除目标漏洞承担什么角色？"
+    "（DIRECT_SECURITY = 直接切断漏洞路径/引入必要安全控制；"
+    "SUPPORTING_REQUIRED = 本身不直接修复，但其他 hunk 依赖它才生效；"
+    "NON_CRITICAL = 与安全无关；UNCERTAIN = 证据不足——**允许并鼓励如实选择**）"
+)
 
-    纪律（codex）：
-      - 每条含 **完整 diff hunk + 前后上下文 + 文件状态 + CVE/CWE + 统一判定问题**；
-      - **不含任何 AI 建议标签**（criticality 留空）；
-      - 两位标注者各自独立填写，**互不可见**；
-      - 分歧由第三人仲裁，产出 frozen.json。
+ANNOTATION_FIELDS = {
+    "criticality": "DIRECT_SECURITY | SUPPORTING_REQUIRED | NON_CRITICAL | UNCERTAIN",
+    "dependency_group": "与本 hunk 存在联合依赖的其它 hunk identity 列表（可为空）",
+    "counterfactual": "反事实检验：仅移除此 hunk、保留其余 hunk，漏洞是否仍存在？（是/否/不确定）",
+    "evidence": "PoC | regression-test | code-reasoning | insufficient",
+    "reason": "一句话依据",
+    "reviewer": "reviewer1 | reviewer2",
+}
+
+
+def build_annotation_package(out_dir: Path) -> dict:
+    """生成双盲标注包（**同一 CVE 的完整补丁背景 + 逐 hunk 角色/依赖标注**）。
+
+    科学命题修正（codex P0-2）：不再要求"不看其它 hunk"——那会系统性误判联合依赖。
+    标注者在**完整补丁上下文**下逐 hunk 判定角色，可标注依赖组，且**允许 UNCERTAIN**；
+    证据不足时不得被强迫二选一；第三人仲裁也不能把"证据不足"机械变成确定标签。
+
+    双盲冻结（codex P0-3）：包内声明并给出**全部工件 SHA / 生成器指纹 / 提交锚点**；
+    两位标注者的**填写结果必须私下分别收取**，在双方都提交并锁定 SHA 之前，
+    任何一方结果不得出现在另一方可见的位置。
     """
+    from cpg.ablation import v4_selector as sel
     tpl = json.loads((out_dir / "critical_hunks.template.json").read_text(encoding="utf-8"))
     cm = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
     cwe_by = {s["sample_id"]: ",".join(s.get("cwes") or []) for s in cm["samples"]}
-    # 收集每个 hunk 的可读上下文（完整 body + 前后 N 行源码）
-    ctx_by_key = {}
+    # 每个 CVE 的完整补丁 + 逐 hunk 上下文
+    per_cve = {}
     for cve in V4_CANDIDATES:
         sd = sample_dir_path(cve)
         patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
         parsed = _parse_patch_hunks(patch, sample_id=cve)
         fstat = _file_status(patch)
-        for rel, hs in parsed.items():
+        hunks = []
+        for rel in sorted(parsed):
             p = sd / "vuln" / rel
             lines = (p.read_text(encoding="utf-8", errors="replace").split("\n")
                      if p.exists() else [])
-            for h in hs:
+            for h in parsed[rel]:
                 ident = _hunk_identity(rel, fstat.get(rel, "M"), h,
                                        _lf_sha(h["_body"].encode("utf-8")))
                 ident["sample_id"] = cve
                 lo = max(0, h["old_start"] - 1 - 15)
                 hi = min(len(lines), h["old_start"] - 1 + h["old_count"] + 15)
-                ctx_by_key[_ident_key(ident)] = {
-                    "cve": cve, "cwe": cwe_by.get(cve, ""), "file": rel,
-                    "file_status": fstat.get(rel, "M"),
-                    "hunk_header": h["header"],
+                hunks.append({
+                    "hunk_identity": ident, "file": rel,
+                    "file_status": fstat.get(rel, "M"), "hunk_header": h["header"],
                     "hunk_body": h["_body"],
-                    "source_context_before": "\n".join(lines[lo:h["old_start"] - 1]),
-                    "source_context_windows": "\n".join(
+                    "source_context": "\n".join(
                         f"{i+1:>6}| {lines[i]}" for i in range(lo, hi)),
-                }
-    # 1) 空白标注模板（reviewer1/2 结构完全一致，内容由标注者填写）
+                })
+        per_cve[cve] = {"cwe": cwe_by.get(cve, ""), "patch": patch, "hunks": hunks}
+    # 1) 空白模板（含依赖字段 / counterfactual / evidence，允许 UNCERTAIN）
     for who in ("reviewer1", "reviewer2"):
         rows = []
-        for e in tpl["entries"]:
-            k = _ident_key(e["hunk_identity"])
-            c = ctx_by_key[k]
-            rows.append({
-                "sample_id": e["sample_id"],
-                "hunk_identity": e["hunk_identity"],
-                "question": ("该 hunk 是否为消除目标漏洞所必需的安全关键 hunk？"
-                             "（SECURITY_CRITICAL / NON_CRITICAL）"),
-                "criticality": None,          # 标注者填写
-                "reason": None,               # 标注者填写
-                "oracle": None,               # 可选：PoC/安全回归测试
-                "reviewer": who,
-            })
-        p = out_dir / "annotation" / f"critical_hunks.{who}.jsonl"
-        write_text_lf(p, "\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n")
-    # 2) 人读手册（按 CVE 分组，含完整上下文）
-    md = ["# V4 critical-hunk 双盲标注手册", "",
-          "> **规则**：独立标注，**不要**与他人讨论；分歧交第三人仲裁。",
-          "> 每条只需回答：该 hunk 是否为**消除目标漏洞所必需的安全关键 hunk**。",
-          "> 判定参考：是否切断漏洞路径 / 引入必要安全控制（越权检查、边界校验、协议约束、净化器）。",
-          "> **不要**参考 patch 的其他 hunk 或任何模型输出。", "",
-          "## 记录格式", "",
-          "```json",
-          '{"sample_id":"...","hunk_identity":{...},"criticality":"SECURITY_CRITICAL|NON_CRITICAL",',
-          ' "reason":"一句话","oracle":"可选：PoC/测试","reviewer":"reviewer1|reviewer2"}',
-          "```", ""]
+        for cve in V4_CANDIDATES:
+            for hh in per_cve[cve]["hunks"]:
+                rows.append({
+                    "sample_id": cve,
+                    "hunk_identity": hh["hunk_identity"],
+                    "question": ANNOTATION_QUESTION,
+                    "criticality": None, "dependency_group": None,
+                    "counterfactual": None, "evidence": None,
+                    "reason": None, "reviewer": who,
+                })
+        write_text_lf(out_dir / "annotation" / f"critical_hunks.{who}.jsonl",
+                      "\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n")
+    # 2) 人读手册（**完整补丁背景在前**，再逐 hunk）
+    md = ["# V4 critical-hunk 双盲标注手册（v2：完整补丁背景 + 角色/依赖）", "",
+          "> **规则**：独立标注，不要与他人讨论；分歧交第三人仲裁。",
+          "> **重要**：本版**要求**你查看**完整真实补丁**后再判断每个 hunk 的角色。",
+          "> 某 hunk 单独看可能看似不必要，但它可能是其它 hunk 生效的前提（联合依赖）。",
+          "> **允许**在证据不足时选择 `UNCERTAIN`——不要被迫二选一。", "",
+          "## 标注字段", ""]
+    for k, v in ANNOTATION_FIELDS.items():
+        md.append(f"- `{k}`：{v}")
+    md += ["", "```json",
+           '{"sample_id":"...","hunk_identity":{...},',
+           ' "criticality":"DIRECT_SECURITY|SUPPORTING_REQUIRED|NON_CRITICAL|UNCERTAIN",',
+           ' "dependency_group":["<body_lf_sha256 前缀>", ...],"counterfactual":"是|否|不确定",',
+           ' "evidence":"PoC|regression-test|code-reasoning|insufficient",',
+           ' "reason":"一句话","reviewer":"reviewer1|reviewer2"}', "```", ""]
     for cve in V4_CANDIDATES:
-        md.append(f"\n---\n\n## {cve}（CWE: {cwe_by.get(cve) or '未指定'}）\n")
-        for e in tpl["entries"]:
-            if e["sample_id"] != cve:
-                continue
-            c = ctx_by_key[_ident_key(e["hunk_identity"])]
-            md.append(f"### `{c['file']}`（状态 {c['file_status']}）")
-            md.append(f"- hunk: `{c['hunk_header'].strip()}`")
-            md.append(f"- identity(body_lf_sha256): `{e['hunk_identity']['body_lf_sha256'][:16]}...`\n")
-            md.append("**源码上下文（vuln 侧，含行号）**\n")
-            md.append("```python\n" + c["source_context_windows"] + "\n```\n")
-            md.append("**该 hunk 的 diff**\n")
-            md.append("```diff\n" + c["hunk_header"] + "\n" + c["hunk_body"] + "\n```\n")
-            md.append("**问题**：该 hunk 是否为消除目标漏洞所必需的安全关键 hunk？\n")
-            md.append("- [ ] SECURITY_CRITICAL　- [ ] NON_CRITICAL")
-            md.append("- reason：")
-            md.append("- oracle（可选）：\n")
+        d = per_cve[cve]
+        md.append(f"\n---\n\n## {cve}（CWE: {d['cwe'] or '未指定'}）\n")
+        md.append("### 【完整真实补丁】（判定背景，请先通读）\n")
+        md.append("```diff\n" + d["patch"] + "\n```\n")
+        md.append(f"### 逐 hunk 判定（共 {len(d['hunks'])} 个）\n")
+        for i, hh in enumerate(d["hunks"]):
+            md.append(f"#### hunk {i + 1}/{len(d['hunks'])} — `{hh['file']}`"
+                      f"（{hh['file_status']}）")
+            md.append(f"- `{hh['hunk_header'].strip()}`")
+            md.append(f"- id: `{hh['hunk_identity']['body_lf_sha256'][:16]}...`\n")
+            md.append("```python\n" + hh["source_context"] + "\n```\n")
+            md.append("```diff\n" + hh["hunk_header"] + "\n" + hh["hunk_body"] + "\n```\n")
+            md.append("**角色**：- [ ] DIRECT_SECURITY　- [ ] SUPPORTING_REQUIRED　"
+                      "- [ ] NON_CRITICAL　- [ ] UNCERTAIN")
+            md.append("**依赖组**：")
+            md.append("**反事实（仅移除本 hunk，漏洞是否仍在？）**：- [ ] 是　- [ ] 否　- [ ] 不确定")
+            md.append("**证据等级**：- [ ] PoC　- [ ] regression-test　- [ ] code-reasoning　- [ ] insufficient")
+            md.append("**依据**：\n")
     write_text_lf(out_dir / "annotation" / "标注手册.md", "\n".join(md) + "\n")
-    doc = {"schema": "v4-annotation-package/1",
-           "n_entries": tpl["n_entries"],
-           "reviewers": ["reviewer1", "reviewer2"],
-           "blind": True,
-           "contains_ai_suggestions": False,
-           "artifacts": ["annotation/critical_hunks.reviewer1.jsonl",
-                         "annotation/critical_hunks.reviewer2.jsonl",
-                         "annotation/标注手册.md"]}
+    # 3) provenance：完整 SHA / 指纹 / 提交锚点
+    def _f(rel: str) -> dict:
+        p = out_dir / rel
+        if not p.exists():
+            p = ROOT / "cpg/ablation/artifacts/v4" / rel
+        b = p.read_bytes()
+        return {"name": rel, "path": str(p.relative_to(ROOT).as_posix()),
+                "bytes": len(b), "lines": b.count(b"\n"), "sha256": _sha256_bytes(b)}
+    artifacts = ["annotation/critical_hunks.reviewer1.jsonl",
+                 "annotation/critical_hunks.reviewer2.jsonl",
+                 "annotation/标注手册.md",
+                 "critical_hunks.template.json",
+                 "v4_hunk_coverage.json"]
+    prov = {
+        "schema": "v4-annotation-package/2",
+        "n_entries": sum(len(d["hunks"]) for d in per_cve.values()),
+        "reviewers": ["reviewer1", "reviewer2"],
+        "blind_protocol": {
+            "declared_blind": True,
+            "contains_ai_suggestions": False,
+            "submission_rule": ("两位标注者的填写结果**必须私下分别收取**；在双方均提交并"
+                                "锁定 SHA 之前，任何一方结果不得出现在另一方可见位置"),
+        },
+        "question": ANNOTATION_QUESTION,
+        "fields": ANNOTATION_FIELDS,
+        "provenance": {
+            "generator_git_commit": _git_commit(),
+            "selector_impl_sha256": sel.selector_impl_sha256(),
+            "annotation_generator_impl_sha256": _sha256_bytes(
+                (ROOT / "cpg/ablation/v4_gate_a.py").read_bytes()),
+            "canonical_manifest": str(CANONICAL_MANIFEST.relative_to(ROOT).as_posix()),
+            "canonical_manifest_sha256": _sha256_bytes(CANONICAL_MANIFEST.read_bytes()),
+            "real_patches_tree_sha256": _sha256_bytes("\n".join(
+                f"{PATCHES_REL}/real/{c}.diff:{_sha256_bytes(read_patch(out_dir, f'{PATCHES_REL}/real/{c}.diff').encode('utf-8'))}"
+                for c in V4_CANDIDATES).encode("utf-8")),
+        },
+        "artifacts": [_f(a) for a in artifacts],
+    }
     write_text_lf(out_dir / "annotation" / "package_manifest.json",
-                  json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
-    return doc
+                  json.dumps(prov, ensure_ascii=False, indent=2) + "\n")
+    return prov
 
 
 def build_critical_hunks_template(out_dir: Path) -> dict:
@@ -1181,12 +1128,19 @@ def _ident_key(ident: dict) -> str:
             f"{ident['new_count']}|{ident['body_lf_sha256']}")
 
 
+_HEX_RE = None
 _VALID_COVERAGE = {"FULL", "PARTIAL", "ABSENT", "NOT_APPLICABLE_ADDED"}
-_SHA_RE_HEX = 64
 
 
-def _validate_coverage_schema(coverage: dict) -> list:
-    """P1-3：强 schema 校验（非法 enum / 缺字段 / 错 SHA 格式即 fail-closed）。"""
+def _is_hex64(s) -> bool:
+    """严格 64 位十六进制（原实现只查长度，'z'*64 会误过）。"""
+    import re as _re
+    return isinstance(s, str) and bool(_re.fullmatch(r"[0-9a-f]{64}", s))
+
+
+def _validate_coverage_schema(coverage: dict, expected_ids=None) -> list:
+    """P0-1/P1：强 schema 校验（非法 enum / 缺字段 / 非 hex / sample_id /
+    15 候选集合 / n_hunks 与 totals 一致性）。"""
     errs = []
     if not isinstance(coverage, dict):
         return ["coverage 非 dict"]
@@ -1196,29 +1150,54 @@ def _validate_coverage_schema(coverage: dict) -> list:
     if not isinstance(samples, dict) or not samples:
         errs.append("coverage.samples 缺失或空")
         return errs
+    # 候选集合必须精确等于期望集合（默认 V4_CANDIDATES；测试可注入）
+    exp = set(expected_ids if expected_ids is not None else V4_CANDIDATES)
+    if set(samples) != exp:
+        errs.append(f"coverage 候选集合不符: 缺={sorted(exp - set(samples))} "
+                    f"多={sorted(set(samples) - exp)}")
+    # selection 必须全部绑定
+    if coverage.get("missing_selection"):
+        errs.append(f"缺 g0_selection 的样本（fail-closed）: {coverage['missing_selection']}")
+    if coverage.get("selection_errors"):
+        errs.append(f"selection 交叉核对失败: {sorted(coverage['selection_errors'])}")
     need = ("file", "file_status", "old_start", "old_count",
             "new_start", "new_count", "body_lf_sha256", "sample_id")
+    n_total = 0
+    seen = {k: 0 for k in _VALID_COVERAGE}
     for cve, s in samples.items():
-        for h in s.get("hunks", []):
+        if s.get("selection_bound") is not True:
+            errs.append(f"{cve} selection_bound != True")
+        hunks = s.get("hunks") or []
+        if s.get("n_hunks") != len(hunks):
+            errs.append(f"{cve} n_hunks={s.get('n_hunks')} != 实际 {len(hunks)}")
+        n_total += len(hunks)
+        for h in hunks:
             ident = h.get("hunk_identity") or {}
             miss = [k for k in need if k not in ident]
             if miss:
                 errs.append(f"{cve} identity 缺字段 {miss}")
                 break
-            if h.get("coverage") not in _VALID_COVERAGE:
-                errs.append(f"{cve} 非法 coverage enum: {h.get('coverage')}")
+            cov = h.get("coverage")
+            if cov not in _VALID_COVERAGE:
+                errs.append(f"{cve} 非法 coverage enum: {cov}")
                 break
-            if not isinstance(ident["body_lf_sha256"], str) or \
-                    len(ident["body_lf_sha256"]) != _SHA_RE_HEX:
+            seen[cov] = seen.get(cov, 0) + 1
+            if not _is_hex64(ident["body_lf_sha256"]):
                 errs.append(f"{cve} body_lf_sha256 非 64 位 hex")
                 break
             if ident.get("sample_id") != cve:
                 errs.append(f"{cve} identity.sample_id 不符: {ident.get('sample_id')}")
                 break
+    # totals 与实际行数一致
+    tot = coverage.get("totals") or {}
+    for k in _VALID_COVERAGE:
+        if tot.get(k) != seen.get(k):
+            errs.append(f"totals.{k}={tot.get(k)} != 实际 {seen.get(k)}")
     return errs
 
 
-def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None) -> list:
+def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None,
+                           expected_ids=None) -> list:
     """**生产 Gate 逻辑（纯函数，供测试直接调用）**。
 
     运行时按 hunk identity 严格 join `frozen criticality × current coverage`：
@@ -1229,7 +1208,7 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None) -> list
       - NON_CRITICAL × 任意 → 不阻断。
     **只读 coverage 的当前值**，绝不读 registry 内可能过期的 coverage。
     """
-    errs = _validate_coverage_schema(coverage)
+    errs = _validate_coverage_schema(coverage, expected_ids)
     if errs:
         return errs
     if not frozen_registry or frozen_registry.get("status") != "FROZEN_LABELED":
@@ -1358,10 +1337,12 @@ def main() -> int:
               f"（纯身份，不含标签/coverage）—> 待生成双盲标注包")
     if args.step in ("annotate", "all"):
         pkg = build_annotation_package(args.out_dir)
+        bp = pkg["blind_protocol"]
         print(f"[Annotation] 双盲标注包：{pkg['n_entries']} 条 × {len(pkg['reviewers'])} 位标注者"
-              f" | blind={pkg['blind']} | ai_suggestions={pkg['contains_ai_suggestions']}")
+              f" | declared_blind={bp['declared_blind']} | "
+              f"ai_suggestions={bp['contains_ai_suggestions']}")
         for a in pkg["artifacts"]:
-            print(f"  - {a}")
+            print(f"  - {a['name']} ({a['bytes']}B, {a['lines']}L, sha={a['sha256'][:12]})")
     return 0
 
 
