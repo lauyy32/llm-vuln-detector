@@ -159,7 +159,7 @@ class TestSampleLevelExclusion(unittest.TestCase):
         e = _Env()
         e.subs({"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT},
                {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT})
-        froz = e.freeze(exclusions={"CVE-A": "两标注者均证据不足"})
+        froz = e.freeze(exclusions={"CVE-A": {"reason": "两标注者均证据不足", "adjudicator": "adjudicator1", "evidence": "insufficient", "source_item_ids": ["x"]}})
         self.assertEqual(froz["status"], "FROZEN_WITH_EXCLUSIONS")
         # 不得残留任何 CVE-A entry
         self.assertFalse(any(x["sample_id"] == "CVE-A" for x in froz["entries"]))
@@ -218,7 +218,7 @@ class TestEndToEndGate(unittest.TestCase):
         e = _Env()
         e.subs({"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT},
                {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT})
-        froz = e.freeze(exclusions={"CVE-A": "证据不足"})
+        froz = e.freeze(exclusions={"CVE-A": {"reason": "两标注者均证据不足", "adjudicator": "adjudicator1", "evidence": "insufficient", "source_item_ids": ["x"]}})
         cov = self._cov_for(list(e.ids.values()))     # coverage 仍含 CVE-A
         errs = ga.evaluate_coverage_gate(cov, froz, expected_ids={"CVE-A", "CVE-X"})
         self.assertEqual(errs, [], errs)

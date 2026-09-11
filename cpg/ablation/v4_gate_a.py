@@ -966,12 +966,47 @@ ANNOTATION_QUESTION = (
 
 ANNOTATION_FIELDS = {
     "criticality": "DIRECT_SECURITY | SUPPORTING_REQUIRED | NON_CRITICAL | UNCERTAIN",
-    "dependency_group": "与本 hunk 存在联合依赖的其它 hunk identity 列表（可为空）",
+    "dependency_group": "与本 hunk 存在联合依赖的其它 hunk 的**完整 64 位 hunk_id** 列表"
+                        "（可空；禁止前缀或简称）",
     "counterfactual": "反事实检验：仅移除此 hunk、保留其余 hunk，漏洞是否仍存在？（是/否/不确定）",
     "evidence": "PoC | regression-test | code-reasoning | insufficient",
     "reason": "一句话依据",
     "reviewer": "reviewer1 | reviewer2",
 }
+
+
+def validate_blank_annotation_package(out_dir: Path) -> list:
+    """P0-1 门禁：生成后立即核对两份空白 reviewer 表的 hunk_id 集合与 template 完全相等。
+
+    仅校验**结构**（空白值不参与），防止"生产包与新状态机未接通"类问题再次逃逸。
+    """
+    from cpg.ablation import v4_annotation as va
+    tpl = out_dir / "critical_hunks.template.json"
+    want = {e["hunk_identity"]["hunk_id"]
+            for e in json.loads(tpl.read_text(encoding="utf-8"))["entries"]}
+    errs = []
+    for who in ("reviewer1", "reviewer2"):
+        p = out_dir / "annotation" / f"critical_hunks.{who}.jsonl"
+        if not p.exists():
+            errs.append(f"{who}: 文件缺失"); continue
+        got, dup = set(), []
+        for l in p.read_text(encoding="utf-8").splitlines():
+            if not l.strip():
+                continue
+            r = json.loads(l)
+            hid = (r.get("hunk_identity") or {}).get("hunk_id")
+            if not hid:
+                errs.append(f"{who}: 存在缺 hunk_id 的行"); break
+            if hid in got:
+                dup.append(hid)
+            got.add(hid)
+            if r.get("reviewer") != who:
+                errs.append(f"{who}: reviewer 字段不符"); break
+        if dup:
+            errs.append(f"{who}: 重复 hunk_id {len(dup)} 条")
+        if got != want:
+            errs.append(f"{who}: hunk_id 集合与 template 不符（缺 {len(want - got)}，多 {len(got - want)}）")
+    return errs
 
 
 def build_annotation_package(out_dir: Path) -> dict:
@@ -987,16 +1022,18 @@ def build_annotation_package(out_dir: Path) -> dict:
     """
     from cpg.ablation import v4_selector as sel
     tpl = json.loads((out_dir / "critical_hunks.template.json").read_text(encoding="utf-8"))
+    # P0-1：**直接消费 template 的 identity**（唯一权威），禁止在此第三次重建
+    tpl_by_key = {e["hunk_identity"]["hunk_id"]: e for e in tpl["entries"]}
     cm = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
     cwe_by = {s["sample_id"]: ",".join(s.get("cwes") or []) for s in cm["samples"]}
-    # 每个 CVE 的完整补丁 + 逐 hunk 上下文
+    # 每个 CVE 的完整补丁 + 每个 hunk 的源码上下文（仅**补充可读上下文**，身份来自 template）
     per_cve = {}
     for cve in V4_CANDIDATES:
         sd = sample_dir_path(cve)
         patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
         parsed = _parse_patch_hunks(patch, sample_id=cve)
         fstat = _file_status(patch)
-        hunks = []
+        ctx = {}
         for rel in sorted(parsed):
             p = sd / "vuln" / rel
             lines = (p.read_text(encoding="utf-8", errors="replace").split("\n")
@@ -1005,15 +1042,22 @@ def build_annotation_package(out_dir: Path) -> dict:
                 ident = _hunk_identity(rel, fstat.get(rel, "M"), h,
                                        _lf_sha(h["_body"].encode("utf-8")))
                 ident["sample_id"] = cve
+                ident["hunk_id"] = sel.hunk_id(ident)
                 lo = max(0, h["old_start"] - 1 - 15)
                 hi = min(len(lines), h["old_start"] - 1 + h["old_count"] + 15)
-                hunks.append({
-                    "hunk_identity": ident, "file": rel,
-                    "file_status": fstat.get(rel, "M"), "hunk_header": h["header"],
-                    "hunk_body": h["_body"],
+                ctx[ident["hunk_id"]] = {
+                    "file": rel, "file_status": fstat.get(rel, "M"),
+                    "hunk_header": h["header"], "hunk_body": h["_body"],
                     "source_context": "\n".join(
                         f"{i+1:>6}| {lines[i]}" for i in range(lo, hi)),
-                })
+                }
+        hunks = []
+        for e in tpl["entries"]:
+            if e["sample_id"] != cve:
+                continue
+            hid = e["hunk_identity"]["hunk_id"]
+            c = ctx[hid]     # 必须能对上（否则 template 与 patch 不一致）
+            hunks.append({"hunk_identity": e["hunk_identity"], **c})
         per_cve[cve] = {"cwe": cwe_by.get(cve, ""), "patch": patch, "hunks": hunks}
     # 1) 空白模板（含依赖字段 / counterfactual / evidence，允许 UNCERTAIN）
     for who in ("reviewer1", "reviewer2"):
@@ -1040,11 +1084,13 @@ def build_annotation_package(out_dir: Path) -> dict:
     for k, v in ANNOTATION_FIELDS.items():
         md.append(f"- `{k}`：{v}")
     md += ["", "```json",
-           '{"sample_id":"...","hunk_identity":{...},',
+           '{"sample_id":"...","hunk_identity":{...含 hunk_id...},',
            ' "criticality":"DIRECT_SECURITY|SUPPORTING_REQUIRED|NON_CRITICAL|UNCERTAIN",',
-           ' "dependency_group":["<body_lf_sha256 前缀>", ...],"counterfactual":"是|否|不确定",',
+           ' "dependency_group":["<完整 64 位 hunk_id>", ...],"counterfactual":"是|否|不确定",',
            ' "evidence":"PoC|regression-test|code-reasoning|insufficient",',
-           ' "reason":"一句话","reviewer":"reviewer1|reviewer2"}', "```", ""]
+           ' "reason":"一句话","reviewer":"reviewer1|reviewer2"}', "```", "",
+           "> **依赖引用只能用完整 64 位 `hunk_id`**（页面每条均给出），**禁止任何前缀/简称**；"
+           "前缀会被校验器直接拒绝。", ""]
     for cve in V4_CANDIDATES:
         d = per_cve[cve]
         md.append(f"\n---\n\n## {cve}（CWE: {d['cwe'] or '未指定'}）\n")
@@ -1055,12 +1101,12 @@ def build_annotation_package(out_dir: Path) -> dict:
             md.append(f"#### hunk {i + 1}/{len(d['hunks'])} — `{hh['file']}`"
                       f"（{hh['file_status']}）")
             md.append(f"- `{hh['hunk_header'].strip()}`")
-            md.append(f"- id: `{hh['hunk_identity']['body_lf_sha256'][:16]}...`\n")
+            md.append(f"- **hunk_id**：`{hh['hunk_identity']['hunk_id']}`\n")
             md.append("```python\n" + hh["source_context"] + "\n```\n")
             md.append("```diff\n" + hh["hunk_header"] + "\n" + hh["hunk_body"] + "\n```\n")
             md.append("**角色**：- [ ] DIRECT_SECURITY　- [ ] SUPPORTING_REQUIRED　"
                       "- [ ] NON_CRITICAL　- [ ] UNCERTAIN")
-            md.append("**依赖组**：")
+            md.append("**依赖组**（填**完整 hunk_id**，可留空）：")
             md.append("**反事实（仅移除本 hunk，漏洞是否仍在？）**：- [ ] 是　- [ ] 否　- [ ] 不确定")
             md.append("**证据等级**：- [ ] PoC　- [ ] regression-test　- [ ] code-reasoning　- [ ] insufficient")
             md.append("**依据**：\n")
@@ -1103,6 +1149,13 @@ def build_annotation_package(out_dir: Path) -> dict:
         },
         "artifacts": [_f(a) for a in artifacts],
     }
+    write_text_lf(out_dir / "annotation" / "package_manifest.json",
+                  json.dumps(prov, ensure_ascii=False, indent=2) + "\n")
+    # P0-1 门禁：生成后立即核对空白包与 template 的 hunk_id 集合
+    blank_errs = validate_blank_annotation_package(out_dir)
+    if blank_errs:
+        raise RuntimeError("标注包自检失败: " + "; ".join(blank_errs[:5]))
+    prov["blank_package_check"] = {"ok": True, "errors": []}
     write_text_lf(out_dir / "annotation" / "package_manifest.json",
                   json.dumps(prov, ensure_ascii=False, indent=2) + "\n")
     return prov
@@ -1227,8 +1280,35 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None,
         return errs
     universe = frozen_registry.get("stale_universe_guard") or {}
     active = set(universe.get("active_sample_ids") or [])
-    if not active:
-        errs.append("frozen registry 缺 active_sample_ids（universe 未冻结）")
+    excluded = set(universe.get("excluded_sample_ids") or [])
+    all_sids = set(universe.get("all_sample_ids") or [])
+    if not active or not all_sids:
+        errs.append("frozen registry 缺 all/active_sample_ids（universe 未冻结）")
+        return errs
+    # P0-5：全集恒等式（防空 active 列表绕过）
+    if active & excluded:
+        errs.append(f"active ∩ excluded 非空: {sorted(active & excluded)}")
+    if active | excluded != all_sids:
+        errs.append("active ∪ excluded != all_sample_ids（universe 不闭合）")
+    # universe_sha256 必须与重算一致
+    recomputed = _sha256_bytes(json.dumps(
+        {k: universe.get(k) for k in ("all_sample_ids", "active_sample_ids",
+                                      "excluded_sample_ids", "exclusions")},
+        sort_keys=True).encode("utf-8"))
+    if frozen_registry.get("universe_sha256") != recomputed:
+        errs.append("universe_sha256 重算不符")
+    # 排除记录必须结构化完整
+    for sid in sorted(excluded):
+        rec = (universe.get("exclusions") or {}).get(sid) or {}
+        miss = [f for f in ("reason", "adjudicator", "evidence", "source_item_ids")
+                if not rec.get(f)]
+        if miss:
+            errs.append(f"排除记录 {sid} 缺字段 {miss}")
+    # entries 的样本集必须 == active
+    ent_sids = {e.get("sample_id") for e in frozen_registry.get("entries", [])}
+    if ent_sids != active:
+        errs.append("frozen entries 样本集 != active_sample_ids")
+    if errs:
         return errs
     # 按 active universe 过滤 coverage（P0-1）
     cur, dup = {}, []

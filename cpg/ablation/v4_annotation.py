@@ -287,8 +287,11 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
             raise ValueError(f"仲裁件含未知 kind: {it.get('kind')}")
         adj[k] = it
 
-    # ---- 逐 hunk 判定（先不落地，先发现待排除 CVE）----
-    entries, pending_cve = [], set()
+    # ---- 逐 hunk 判定 ----
+    # P0-3：**分离**两类待处理——普通分歧缺仲裁（必须仲裁，不得靠排除绕过）
+    #        与 UNCERTAIN 未复审（复审后可带证据整例排除）
+    entries = []
+    missing_adjudication, pending_uncertain = set(), set()
     for k, t in tpl.items():
         x, y = r1[k], r2[k]
         same_all = (x["criticality"] == y["criticality"]
@@ -300,23 +303,43 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
             cf, ev, rs = x.get("counterfactual"), x.get("evidence"), x.get("reason")
         else:
             a = adj.get(k)
-            if not a or a.get("final_role") not in VALID_ROLES or not a.get("adjudicator"):
-                pending_cve.add(t["sample_id"])
+            if not a or not a.get("adjudicator"):
+                # 未仲裁：普通分歧与 UNCERTAIN 分别记账
+                if x["criticality"] == ROLE_UNCERTAIN and y["criticality"] == ROLE_UNCERTAIN:
+                    pending_uncertain.add(t["sample_id"])
+                else:
+                    missing_adjudication.add(t["sample_id"])
                 continue
-            # evidence/uncertain 语义
+            # P0-4：final_* 必须完整
+            need = ("final_role", "final_dependency_group", "final_counterfactual",
+                    "final_evidence", "final_reason")
+            miss = [f for f in need if a.get(f) is None]
+            if miss:
+                raise ValueError(f"仲裁项缺 final 字段 {miss}: {str(k)[:12]}")
+            if a["final_role"] not in VALID_ROLES:
+                raise ValueError(f"仲裁 final_role 非法: {a.get('final_role')}")
             if a["final_role"] == ROLE_UNCERTAIN:
-                pending_cve.add(t["sample_id"])
+                pending_uncertain.add(t["sample_id"])
                 continue
-            if a.get("final_evidence") is not None and a["final_evidence"] not in VALID_EVIDENCE:
+            if a["final_evidence"] not in VALID_EVIDENCE:
                 raise ValueError(f"仲裁 final_evidence 非法: {a.get('final_evidence')}")
+            if a["final_counterfactual"] not in VALID_COUNTERFACTUAL:
+                raise ValueError(f"仲裁 final_counterfactual 非法: {a.get('final_counterfactual')}")
             role, src = a["final_role"], "adjudicated"
             dep = a.get("final_dependency_group") or []
             cf, ev, rs = (a.get("final_counterfactual"), a.get("final_evidence"),
                           a.get("final_reason"))
-            # 依赖必须是完整 hunk_id 且存在
+            # P0-4：仲裁后的依赖须完整 hunk_id、存在、同 CVE、不得自引用
             for d in dep:
+                if not (isinstance(d, str) and len(d) == 64
+                        and all(c in "0123456789abcdef" for c in d)):
+                    raise ValueError(f"仲裁依赖非完整 hunk_id: {str(d)[:16]}")
+                if d == k:
+                    raise ValueError("仲裁依赖自引用")
                 if d not in tpl:
-                    raise ValueError(f"仲裁 final_dependency_group 含未知 id {str(d)[:12]}")
+                    raise ValueError(f"仲裁依赖不存在 {d[:12]}")
+                if tpl[d]["sample_id"] != t["sample_id"]:
+                    raise ValueError(f"仲裁依赖跨 CVE: {tpl[d]['sample_id']}")
         entries.append({
             "sample_id": t["sample_id"], "hunk_id": k, "hunk_identity": t["hunk_identity"],
             "role": role, "source": src,
@@ -325,25 +348,41 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
             "dependency_group": dep, "counterfactual": cf,
             "evidence": ev, "reason": rs,
         })
-    # 未处置 UNCERTAIN：须整例排除
-    unhandled = sorted(pending_cve - set(exclusions))
+    # P0-3：普通分歧**不得**靠 exclusions 绕过
+    if missing_adjudication:
+        raise ValueError(f"存在未仲裁的普通分歧（不得以 exclusions 绕过）: "
+                         f"{sorted(missing_adjudication)}")
+    # UNCERTAIN：须复审，或**结构化整例排除**
+    structured = {}
+    for sid, rec in (exclusions or {}).items():
+        if isinstance(rec, str):     # 裸字符串不再接受
+            raise ValueError(f"exclusions[{sid}] 必须是结构化记录"
+                             f"（reason/adjudicator/evidence/source_item_ids）")
+        miss = [f for f in ("reason", "adjudicator", "evidence", "source_item_ids")
+                if not rec.get(f)]
+        if miss:
+            raise ValueError(f"exclusions[{sid}] 缺字段 {miss}")
+        structured[sid] = rec
+    unhandled = sorted(pending_uncertain - set(structured))
     if unhandled:
-        raise ValueError(f"存在未处置 UNCERTAIN（须复审或整例列入 exclusions）: {unhandled}")
-    excluded = set(exclusions)
+        raise ValueError(f"存在未复审 UNCERTAIN（须复审或结构化整例排除）: {unhandled}")
+    excluded = set(structured)
     if excluded:
         entries = [e for e in entries if e["sample_id"] not in excluded]
     all_samples = sorted({t["sample_id"] for t in tpl.values()})
     active = sorted(set(all_samples) - excluded)
-    universe = {"active_sample_ids": active, "excluded_sample_ids": sorted(excluded),
-                "exclusions": {k: exclusions[k] for k in sorted(excluded)}}
-    doc = {"schema": "v4-critical-hunks-frozen/3",
+    universe = {"all_sample_ids": all_samples,
+                "active_sample_ids": active,
+                "excluded_sample_ids": sorted(excluded),
+                "exclusions": {k: structured[k] for k in sorted(excluded)}}
+    doc = {"schema": "v4-critical-hunks-frozen/4",
            "status": "FROZEN_LABELED" if not excluded else "FROZEN_WITH_EXCLUSIONS",
            "template_sha256": _sha(template_path.read_bytes()),
            "submission_sha256": {"reviewer1": _sha(sub1.read_bytes()),
                                  "reviewer2": _sha(sub2.read_bytes())},
            "adjudication_sha256": _sha(adjudicated.read_bytes()),
            "universe_sha256": _sha(json.dumps(universe, sort_keys=True).encode("utf-8")),
-           "stale_universe_guard": {"active_sample_ids": active, "excluded_sample_ids": sorted(excluded)},
+           "stale_universe_guard": universe,
            "n_entries": len(entries), "n_excluded_samples": len(excluded),
            "role_counts": {r: sum(1 for e in entries if e["role"] == r)
                            for r in sorted(VALID_ROLES)},

@@ -45,9 +45,13 @@ def _cov(entries):
 
 
 def _frozen(entries):
+    import hashlib as _h, json as _j
+    uni = {"all_sample_ids": ["CVE-X"], "active_sample_ids": ["CVE-X"],
+           "excluded_sample_ids": [], "exclusions": {}}
     return {"status": "FROZEN_LABELED",
-            "stale_universe_guard": {"active_sample_ids": ["CVE-X"],
-                                     "excluded_sample_ids": []},
+            "stale_universe_guard": uni,
+            "universe_sha256": _h.sha256(
+                _j.dumps(uni, sort_keys=True).encode("utf-8")).hexdigest(),
             "entries": [{"sample_id": "CVE-X", "hunk_identity": i, "criticality": c}
                         for i, c in entries]}
 
@@ -102,9 +106,12 @@ class TestEvaluateCoverageGate(unittest.TestCase):
 
     def test_unadjudicated_criticality_blocks(self):
         i = _ident()
-        reg = {"status": "FROZEN_LABELED",
-               "stale_universe_guard": {"active_sample_ids": ["CVE-X"],
-                                        "excluded_sample_ids": []},
+        import hashlib as _h, json as _j
+        uni = {"all_sample_ids": ["CVE-X"], "active_sample_ids": ["CVE-X"],
+               "excluded_sample_ids": [], "exclusions": {}}
+        reg = {"status": "FROZEN_LABELED", "stale_universe_guard": uni,
+               "universe_sha256": _h.sha256(
+                   _j.dumps(uni, sort_keys=True).encode("utf-8")).hexdigest(),
                "entries": [{"sample_id": "CVE-X", "hunk_identity": i,
                             "criticality": "UNCLEAR"}]}
         errs = _gate(_cov([(i, "FULL")]), reg)
@@ -191,3 +198,57 @@ class TestAnnotationInfra(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestProductionAnnotationPackage(unittest.TestCase):
+    """P0 端到端：**真正调用生产生成器**产出的空白包，填写合法值后必须通过 validator。
+
+    这是此前 171 测试没覆盖的断点（生产生成器 vs 新 validator）。
+    """
+
+    def setUp(self):
+        try:
+            import tokenizers  # noqa: F401
+        except ImportError:
+            self.skipTest("tokenizers 未安装（生产生成器需真实 tokenizer）")
+        self.out = ga.OUT_DIR
+        if not (self.out / "critical_hunks.template.json").exists():
+            self.skipTest("template 未生成")
+
+    def test_blank_package_matches_template_ids(self):
+        errs = ga.validate_blank_annotation_package(self.out)
+        self.assertEqual(errs, [], errs)
+
+    def test_blank_rows_have_hunk_id(self):
+        p = self.out / "annotation" / "critical_hunks.reviewer1.jsonl"
+        import json as _j
+        first = _j.loads(p.read_text(encoding="utf-8").splitlines()[0])
+        self.assertIn("hunk_id", first["hunk_identity"])
+
+    def test_filled_package_passes_validator(self):
+        """把空白包填成合法值 → validate_submission 必须通过（含依赖精确引用）。"""
+        import json as _j, tempfile
+        from cpg.ablation import v4_annotation as va
+        tpl = self.out / "critical_hunks.template.json"
+        blank = self.out / "annotation" / "critical_hunks.reviewer1.jsonl"
+        rows = [_j.loads(l) for l in blank.read_text(encoding="utf-8").splitlines() if l.strip()]
+        # 取同 CVE 的前两条做依赖（不跨 CVE）
+        by_cve = {}
+        for r in rows:
+            by_cve.setdefault(r["sample_id"], []).append(r)
+        cve = next(c for c, rs in by_cve.items() if len(rs) >= 2)
+        dep_ids = [r["hunk_identity"]["hunk_id"] for r in by_cve[cve][:2]]
+        for r in rows:
+            r["criticality"] = "NON_CRITICAL"
+            r["reason"] = "test"
+            r["evidence"] = "code-reasoning"
+            r["counterfactual"] = "否"
+            # 依赖指向**同 CVE 的另一条**（不得自引用）
+            me = r["hunk_identity"]["hunk_id"]
+            others = [d for d in dep_ids if d != me]
+            r["dependency_group"] = others[:1] if me in dep_ids else []
+        with tempfile.TemporaryDirectory() as td:
+            fp = Path(td) / "filled.jsonl"
+            fp.write_text("\n".join(_j.dumps(r, ensure_ascii=False) for r in rows), encoding="utf-8")
+            v = va.validate_submission(fp, tpl)
+            self.assertTrue(v["ok"], v["errors"][:5])
