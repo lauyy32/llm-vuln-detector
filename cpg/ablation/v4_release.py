@@ -44,6 +44,11 @@ INTERNAL_PROVENANCE = [
     OUT / "v4_hunk_coverage.json",     # 内部机械审计，**不发放**
     ROOT / "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
 ]
+# 冻结轮次内允许处于"未提交"状态的产物（同一轮可生成多个）
+FROZEN_OUTPUTS = [
+    OUT / "v4_prereg.json",
+    ANN / "distribution_registry.json",
+]
 GENERATOR_SOURCES = [
     "cpg/ablation/v4_release.py",
     "cpg/ablation/v4_annotation.py",
@@ -147,8 +152,7 @@ def distribution_registry(source_commit: str) -> dict:
         "reviewer2": payload_common + [ANN / "critical_hunks.reviewer2.jsonl"],
     }
     files = sorted({p for v in per_reviewer.values() for p in v} | set(INTERNAL_PROVENANCE))
-    prov = require_source_commit(source_commit, files,
-                                  outputs=[ANN / "distribution_registry.json"])
+    prov = require_source_commit(source_commit, files, outputs=FROZEN_OUTPUTS)
 
     payload_docs, trees = {}, {}
     for who, ps in per_reviewer.items():
@@ -210,8 +214,7 @@ PREREG_STATUS = "DRAFT_PREREG"
 
 def prereg(source_commit: str) -> dict:
     doc_path = ROOT / "cpg/ablation/V4-四臂算法预注册.md"
-    prov = require_source_commit(source_commit, [doc_path],
-                                 outputs=[OUT / "v4_prereg.json"])
+    prov = require_source_commit(source_commit, [doc_path], outputs=FROZEN_OUTPUTS)
     doc = {
         "schema": "v4-prereg/3",
         "status": PREREG_STATUS,
