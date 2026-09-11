@@ -286,11 +286,24 @@ def adjudicate(disagreements: Path, out: Path, template_path: Path,
     if doc.get("submission_sha256") != {"reviewer1": _sha(sub1.read_bytes()),
                                         "reviewer2": _sha(sub2.read_bytes())}:
         raise ValueError("分歧清单 submission SHA 与当前提交不符")
-    # item 集合必须与当前检测一致（防缺/多/重复）
-    fresh = disagreement_list(sub1, sub2, template_path, out)
-    if [i["hunk_id"] for i in fresh["items"]] != [i["hunk_id"] for i in doc.get("items", [])]:
-        raise ValueError("仲裁件 item 集合与当前分歧检测不一致")
-    out.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    # 加固4：直接用**纯函数** expected_disagreements()，执行与编译器相同的规范投影比较
+    exp = expected_disagreements(sub1, sub2, template_path)
+    got = {i.get("hunk_id"): i for i in doc.get("items", [])}
+    if set(got) != set(exp):
+        raise ValueError("仲裁件 item 集合与当前分歧检测不一致（缺/多/重复）")
+    for k, e in exp.items():
+        g = got[k]
+        for f in ("kind", "sample_id", "hunk_identity", "fields_in_dispute"):
+            if g.get(f) != e[f]:
+                raise ValueError(f"仲裁件 {f} 与当前检测不一致: {str(k)[:12]}")
+        for rv in ("reviewer1", "reviewer2"):
+            if _reviewer_projection(g.get(rv) or {}) != e[rv]:
+                raise ValueError(f"仲裁件内嵌 {rv} 与当前提交不符（被篡改）: {str(k)[:12]}")
+    # 原子写盘
+    tmp = out.with_suffix(out.suffix + ".tmp")
+    tmp.parent.mkdir(parents=True, exist_ok=True)
+    tmp.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    tmp.replace(out)
     return doc
 
 
@@ -383,16 +396,12 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
                 raise ValueError(f"仲裁 final_counterfactual 非法: {a.get('final_counterfactual')}")
             if not isinstance(a["final_dependency_group"], list):
                 raise ValueError("仲裁 final_dependency_group 必须为列表")
-            # 校验通过后再按 final_role 分支
-            if a["final_role"] == ROLE_UNCERTAIN:
-                _mark_uncertain(sid, k)
-                continue
-            role, src = a["final_role"], "adjudicated"
-            dep = a["final_dependency_group"]
-            cf, ev, rs = (a["final_counterfactual"], a["final_evidence"],
-                          a["final_reason"])
+            # 加固1：final_reason 必须**非空字符串**
+            if not isinstance(a["final_reason"], str) or not a["final_reason"].strip():
+                raise ValueError(f"仲裁 final_reason 必须为非空字符串: {str(k)[:12]}")
+            # 加固2：**所有角色**统一验证依赖 ID（UNCERTAIN 亦不得夹带非法 ID）
             from cpg.ablation.v4_selector import is_hex64 as _hx3
-            for d in dep:
+            for d in a["final_dependency_group"]:
                 if not _hx3(d):
                     raise ValueError(f"仲裁依赖非完整 hunk_id: {str(d)[:16]}")
                 if d == k:
@@ -401,6 +410,18 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
                     raise ValueError(f"仲裁依赖不存在 {d[:12]}")
                 if tpl[d]["sample_id"] != sid:
                     raise ValueError(f"仲裁依赖跨 CVE: {tpl[d]['sample_id']}")
+            # 校验通过后再按 final_role 分支
+            if a["final_role"] == ROLE_UNCERTAIN:
+                # 加固3：UNCERTAIN 须 evidence=insufficient（与 submission 规则一致）
+                if a["final_evidence"] != "insufficient":
+                    raise ValueError(f"仲裁 final_role=UNCERTAIN 须 final_evidence="
+                                     f"insufficient: {str(k)[:12]}")
+                _mark_uncertain(sid, k)
+                continue
+            role, src = a["final_role"], "adjudicated"
+            dep = a["final_dependency_group"]
+            cf, ev, rs = (a["final_counterfactual"], a["final_evidence"],
+                          a["final_reason"])
         entries.append({
             "sample_id": sid, "hunk_id": k, "hunk_identity": t["hunk_identity"],
             "role": role, "source": src,

@@ -376,5 +376,78 @@ class TestAdjudicationGaps(unittest.TestCase):
         self.assertFalse(any(x["sample_id"] == "CVE-A" for x in froz["entries"]))
 
 
+
+
+class TestCompileHardening(unittest.TestCase):
+    """编译层四项小加固（codex1）。"""
+
+    def _env_and_adj(self, mutate_final):
+        from cpg.ablation.tests.test_v4_annotation import _Env
+        e = _Env()
+        roles = {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_NONCRIT, "x1": va.ROLE_NONCRIT}
+        e.subs(roles, roles)          # a1 双方一致 UNCERTAIN（不进分歧）
+        va.disagreement_list(e.sub1, e.sub2, e.tpl, e.d / "dis.json")
+        doc = json.loads((e.d / "dis.json").read_text(encoding="utf-8"))
+        doc["items"] = [{"kind": "DISAGREEMENT", "hunk_id": e.ids["x1"]["hunk_id"],
+                         "sample_id": "CVE-X", "hunk_identity": e.ids["x1"],
+                         "fields_in_dispute": {"role": True}}]
+        # 让 x1 真的分歧，才能通过集合比对
+        e.subs({"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_NONCRIT, "x1": va.ROLE_DIRECT},
+               roles)
+        va.disagreement_list(e.sub1, e.sub2, e.tpl, e.d / "dis.json")
+        doc = json.loads((e.d / "dis.json").read_text(encoding="utf-8"))
+        mutate_final(doc)
+        (e.d / "adj.json").write_bytes(
+            (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+        return e
+
+    def _good_final(self, it):
+        it.update({"adjudicator": "adj1", "final_role": va.ROLE_DIRECT,
+                   "final_dependency_group": [], "final_counterfactual": "否",
+                   "final_evidence": "code-reasoning", "final_reason": "切断路径"})
+
+    def test_empty_final_reason_fails(self):
+        e = self._env_and_adj(lambda d: [self._good_final(i) for i in d["items"]]
+                              and d["items"][0].update({"final_reason": "   "}))
+        with self.assertRaises(ValueError) as cm:
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, e.d / "adj.json", e.d / "frozen.json")
+        self.assertIn("非空字符串", str(cm.exception))
+
+    def test_uncertain_with_bad_dependency_id_fails(self):
+        """加固2：UNCERTAIN 角色也不得夹带非法依赖 ID。"""
+        def _mut(d):
+            self._good_final(d["items"][0])
+            d["items"][0].update({"final_role": va.ROLE_UNCERTAIN,
+                                  "final_evidence": "insufficient",
+                                  "final_dependency_group": ["zz"]})
+        e = self._env_and_adj(_mut)
+        with self.assertRaises(ValueError) as cm:
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, e.d / "adj.json", e.d / "frozen.json")
+        self.assertIn("hunk_id", str(cm.exception))
+
+    def test_uncertain_with_non_insufficient_evidence_fails(self):
+        """加固3：final_role=UNCERTAIN 须 final_evidence=insufficient。"""
+        def _mut(d):
+            self._good_final(d["items"][0])
+            d["items"][0].update({"final_role": va.ROLE_UNCERTAIN,
+                                  "final_evidence": "code-reasoning"})
+        e = self._env_and_adj(_mut)
+        with self.assertRaises(ValueError) as cm:
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, e.d / "adj.json", e.d / "frozen.json")
+        self.assertIn("insufficient", str(cm.exception))
+
+    def test_adjudicate_uses_pure_function_and_no_write_on_mismatch(self):
+        """加固4：adjudicate 集合不符时**不得写出文件**（原子写盘 + 纯函数校验）。"""
+        e = self._env_and_adj(lambda d: [self._good_final(i) for i in d["items"]])
+        doc = json.loads((e.d / "adj.json").read_text(encoding="utf-8"))
+        doc["items"][0]["kind"] = "BOGUS_KIND"
+        bad = e.d / "bad.json"
+        bad.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+        out = e.d / "out_adj.json"
+        with self.assertRaises(ValueError):
+            va.adjudicate(bad, out, e.tpl, e.sub1, e.sub2)
+        self.assertFalse(out.exists(), "校验失败时不得写出仲裁件")
+
+
 if __name__ == "__main__":
     unittest.main()
