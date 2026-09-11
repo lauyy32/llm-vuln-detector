@@ -1,0 +1,5121 @@
+{
+  "schema": "v4-critical-hunks/1",
+  "status": "DRAFT_UNLABELED",
+  "note": "须由两名独立 reviewer 标注 criticality（SECURITY_CRITICAL/NON_CRITICAL），分歧由第三人仲裁；标注冻结后方可生成 confirmatory_blocking_samples，并据此重写摘录策略",
+  "hunk_identity_note": "定位用 patch_context_sha256（行号会随上游/生成漂移）",
+  "n_entries": 284,
+  "entries": [
+    {
+      "sample_id": "CVE-2026-12482",
+      "file": "keras/src/utils/file_utils.py",
+      "hunk_identity": {
+        "old_start": 41,
+        "old_count": 7,
+        "new_start": 41,
+        "new_count": 7,
+        "patch_context_sha256": "9c588d576ed93e5fef2ebaccc2b284d786dde6a76b8d3ee3f9bee3b5314973ea"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-12482",
+      "file": "keras/src/utils/file_utils_test.py",
+      "hunk_identity": {
+        "old_start": 216,
+        "old_count": 6,
+        "new_start": 216,
+        "new_count": 20,
+        "patch_context_sha256": "6db8018f175fb3ee5616af18fe859f4e567111b521c0e1447a5c06098c5664cd"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-70491",
+      "file": "backend/open_webui/routers/tools.py",
+      "hunk_identity": {
+        "old_start": 446,
+        "old_count": 20,
+        "new_start": 446,
+        "new_count": 22,
+        "patch_context_sha256": "8ccc21dc6d7626ed16fb969a73ba939de034bd4cdeb5b67e529b5e02ce958929"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50558",
+      "file": "penelope.py",
+      "hunk_identity": {
+        "old_start": 16,
+        "old_count": 7,
+        "new_start": 16,
+        "new_count": 7,
+        "patch_context_sha256": "eef9c7898a33bc7aa9cae69aa0262e9920bb82964dcd0825ed5f18e180dcff13"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50558",
+      "file": "penelope.py",
+      "hunk_identity": {
+        "old_start": 39,
+        "old_count": 7,
+        "new_start": 39,
+        "new_count": 6,
+        "patch_context_sha256": "538b083c4228aaf6c314bf8eb82f0af91da873f2cb8e65e981e9f8aa4c3907ac"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50558",
+      "file": "penelope.py",
+      "hunk_identity": {
+        "old_start": 3404,
+        "old_count": 21,
+        "new_start": 3403,
+        "new_count": 12,
+        "patch_context_sha256": "e43f56cd587f757cfd8b01cc0178dbbf56527af74fb475a9fb3ce551ec72c49c"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50558",
+      "file": "penelope.py",
+      "hunk_identity": {
+        "old_start": 5221,
+        "old_count": 6,
+        "new_start": 5211,
+        "new_count": 46,
+        "patch_context_sha256": "fe1c78eb87368d0f588e11082fe5f67314a344f92f3012e93d9095091d7e1466"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/ai/vision_analyze.py",
+      "hunk_identity": {
+        "old_start": 16,
+        "old_count": 6,
+        "new_start": 16,
+        "new_count": 7,
+        "patch_context_sha256": "ddf155444dabba799cdaf9742f43c02cc3032c3f95057f3a56120de57305218c"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/ai/vision_analyze.py",
+      "hunk_identity": {
+        "old_start": 361,
+        "old_count": 6,
+        "new_start": 362,
+        "new_count": 12,
+        "patch_context_sha256": "26faa25e3a4236354653d8577f3d52db37e29597b617e8c1948db4dcb2060765"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/browser/proxy_rotate.py",
+      "hunk_identity": {
+        "old_start": 14,
+        "old_count": 6,
+        "new_start": 14,
+        "new_count": 7,
+        "patch_context_sha256": "03594e7b3299b877f44d420f36088ab11d1382307fe901e959f1dc1b458ade8b"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/browser/proxy_rotate.py",
+      "hunk_identity": {
+        "old_start": 195,
+        "old_count": 6,
+        "new_start": 196,
+        "new_count": 12,
+        "patch_context_sha256": "d3cd5ea3f2c452c391cb392f5257acead9a517480191733a54f4d44f2c6abfd2"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/communication/slack_send.py",
+      "hunk_identity": {
+        "old_start": 10,
+        "old_count": 6,
+        "new_start": 10,
+        "new_count": 7,
+        "patch_context_sha256": "72f1cda89a9c5c60afe355e06cde6c5b5e3b4f11a95cbf5744b3b02a1c27f8bc"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/communication/slack_send.py",
+      "hunk_identity": {
+        "old_start": 100,
+        "old_count": 6,
+        "new_start": 101,
+        "new_count": 13,
+        "patch_context_sha256": "ae0e710c58407254e705d77667022d4b90dc03a35c539b38dbeaf36f51624170"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/graphql/mutation.py",
+      "hunk_identity": {
+        "old_start": 12,
+        "old_count": 6,
+        "new_start": 12,
+        "new_count": 7,
+        "patch_context_sha256": "705eecc16a71542ba4b27fd2f4586f8444016dfb2f610770b74492432986d606"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/graphql/mutation.py",
+      "hunk_identity": {
+        "old_start": 32,
+        "old_count": 6,
+        "new_start": 33,
+        "new_count": 13,
+        "patch_context_sha256": "520479f7add97c36163ee48ee4aa9ec4a23d0cf51b90a308400c0c8be8489d77"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/graphql/query.py",
+      "hunk_identity": {
+        "old_start": 12,
+        "old_count": 6,
+        "new_start": 12,
+        "new_count": 7,
+        "patch_context_sha256": "705eecc16a71542ba4b27fd2f4586f8444016dfb2f610770b74492432986d606"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/graphql/query.py",
+      "hunk_identity": {
+        "old_start": 32,
+        "old_count": 6,
+        "new_start": 33,
+        "new_count": 13,
+        "patch_context_sha256": "5d51968cd07dc0a77d7f788eb482542b3374c61819df176cf67e7c342a350832"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/http/batch.py",
+      "hunk_identity": {
+        "old_start": 15,
+        "old_count": 7,
+        "new_start": 15,
+        "new_count": 12,
+        "patch_context_sha256": "fb191ce7b8398cee57c7e195d6596fc0081631520ebfa9c8b4ee6b13d99b349b"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/http/batch.py",
+      "hunk_identity": {
+        "old_start": 62,
+        "old_count": 9,
+        "new_start": 67,
+        "new_count": 14,
+        "patch_context_sha256": "702e02da1672c7b79c88b63bd415ccbcc8e9312bbe3d9a2db8e75e33427f6089"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/http/batch.py",
+      "hunk_identity": {
+        "old_start": 84,
+        "old_count": 6,
+        "new_start": 94,
+        "new_count": 8,
+        "patch_context_sha256": "49d7ac4e79b938379eb70e0557c5d736834ac8152f689ffbd9d189f0b564093d"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/http/get.py",
+      "hunk_identity": {
+        "old_start": 12,
+        "old_count": 7,
+        "new_start": 12,
+        "new_count": 12,
+        "patch_context_sha256": "1a272814c27456c69384582ea3663b92e90c6ea8737b644120f39120fca7e01c"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/http/get.py",
+      "hunk_identity": {
+        "old_start": 113,
+        "old_count": 11,
+        "new_start": 118,
+        "new_count": 17,
+        "patch_context_sha256": "721536d613bdf3c4e68067889ee08266ec37e3077f0c0cbb611130b100acfcb0"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/http/request.py",
+      "hunk_identity": {
+        "old_start": 13,
+        "old_count": 7,
+        "new_start": 13,
+        "new_count": 12,
+        "patch_context_sha256": "43c09f3ca8ea02afeb23c9be5d519542bbdf888620ca820d763753d4e5f326b7"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/http/request.py",
+      "hunk_identity": {
+        "old_start": 334,
+        "old_count": 7,
+        "new_start": 339,
+        "new_count": 15,
+        "patch_context_sha256": "f7aff713dcd1d4d6a8d582e15e1a5901d2fdabe44c017b0781c5ee3c34706918"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/http/request.py",
+      "hunk_identity": {
+        "old_start": 369,
+        "old_count": 6,
+        "new_start": 382,
+        "new_count": 8,
+        "patch_context_sha256": "e8036963fe04f898d45e839e14254f0c6a2ee974ae5bd7bdf52fcdc1c60c4dcc"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/monitor/http_check.py",
+      "hunk_identity": {
+        "old_start": 16,
+        "old_count": 6,
+        "new_start": 16,
+        "new_count": 7,
+        "patch_context_sha256": "d1e303e4aa3607627dc06b8d5c230ece51ce44365b7b5378664c4d968cecabe7"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/monitor/http_check.py",
+      "hunk_identity": {
+        "old_start": 157,
+        "old_count": 6,
+        "new_start": 158,
+        "new_count": 23,
+        "patch_context_sha256": "f55f3fb56350fdceb1dd79cb3ad88bc90c216d52d64596ce25f89fb99ffc9581"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/verify/visual_diff.py",
+      "hunk_identity": {
+        "old_start": 23,
+        "old_count": 6,
+        "new_start": 23,
+        "new_count": 7,
+        "patch_context_sha256": "2f1cffb96aba9e3a1a6275ea69da4e86643f0434fb7c16039dadbbc0d944179a"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/atomic/verify/visual_diff.py",
+      "hunk_identity": {
+        "old_start": 354,
+        "old_count": 6,
+        "new_start": 355,
+        "new_count": 15,
+        "patch_context_sha256": "24704eb310244bd6336acce1c451628deb813662b4e3853e2c0437978a26a7db"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/communication/messaging/discord.py",
+      "hunk_identity": {
+        "old_start": 13,
+        "old_count": 6,
+        "new_start": 13,
+        "new_count": 7,
+        "patch_context_sha256": "a5d3b67c0a3c3e596353089bfe2c19d6a7ad5c0b6a624ac7416fb2f6c78a30e4"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/communication/messaging/discord.py",
+      "hunk_identity": {
+        "old_start": 128,
+        "old_count": 6,
+        "new_start": 129,
+        "new_count": 18,
+        "patch_context_sha256": "4b2c27ed33df759bbbf840919b0297194acf869d4b661f3b1d7b7e53a91c5755"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/communication/messaging/slack.py",
+      "hunk_identity": {
+        "old_start": 13,
+        "old_count": 6,
+        "new_start": 13,
+        "new_count": 7,
+        "patch_context_sha256": "a5d3b67c0a3c3e596353089bfe2c19d6a7ad5c0b6a624ac7416fb2f6c78a30e4"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/communication/messaging/slack.py",
+      "hunk_identity": {
+        "old_start": 145,
+        "old_count": 6,
+        "new_start": 146,
+        "new_count": 18,
+        "patch_context_sha256": "f214513491f7c93d35f83467ff4610900d4eb9674b1c5ccde44492a76de35060"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/communication/messaging/teams.py",
+      "hunk_identity": {
+        "old_start": 11,
+        "old_count": 6,
+        "new_start": 11,
+        "new_count": 7,
+        "patch_context_sha256": "beefd9a2b9cf11bc151c3661856988c844e04ce622cd09e2f1345ee52afd2973"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/communication/messaging/teams.py",
+      "hunk_identity": {
+        "old_start": 128,
+        "old_count": 6,
+        "new_start": 129,
+        "new_count": 20,
+        "patch_context_sha256": "7a4662a513d006e0ae7d7dd5e311e080d3433ecdd1c94629e1ce94f92d7d79ad"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/developer/http/requests.py",
+      "hunk_identity": {
+        "old_start": 13,
+        "old_count": 6,
+        "new_start": 13,
+        "new_count": 7,
+        "patch_context_sha256": "d155707e5d6191f5b2df82c05a586100fbcb30af57163e2287608ff1c0e277c5"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/developer/http/requests.py",
+      "hunk_identity": {
+        "old_start": 80,
+        "old_count": 6,
+        "new_start": 81,
+        "new_count": 13,
+        "patch_context_sha256": "80bace1da6ad2e43f95b9abd8b418d8dfc01ae30802728be9a1a432c5d5edbea"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/modules/third_party/developer/http/requests.py",
+      "hunk_identity": {
+        "old_start": 172,
+        "old_count": 6,
+        "new_start": 180,
+        "new_count": 13,
+        "patch_context_sha256": "8daf9e3a7783ce040cd29f402adfdd4df9fab3f706a96e22a7ecaa36ebe7c2b3"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/utils.py",
+      "hunk_identity": {
+        "old_start": 594,
+        "old_count": 6,
+        "new_start": 594,
+        "new_count": 77,
+        "patch_context_sha256": "47b7bd937df10cfd33edd8c8780444d08a2b650b1f18b7ac2cb18987326c4e32"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/verification_service.py",
+      "hunk_identity": {
+        "old_start": 12,
+        "old_count": 7,
+        "new_start": 12,
+        "new_count": 9,
+        "patch_context_sha256": "2ae2bdf535bfb58b31e5e23e1e2d454e9b7216db1a94d485080df9a578922b4e"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/verification_service.py",
+      "hunk_identity": {
+        "old_start": 27,
+        "old_count": 6,
+        "new_start": 29,
+        "new_count": 12,
+        "patch_context_sha256": "dfcda9f7d3e4c6eea6ab9dc4cdedfc9fbe650c654921d5f2b2ddbd7ba0d70fb4"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/verification_service.py",
+      "hunk_identity": {
+        "old_start": 320,
+        "old_count": 9,
+        "new_start": 328,
+        "new_count": 63,
+        "patch_context_sha256": "fd83e1459849c02b16395d6c31c718a222b6a635893a907c22f85bc43f7f2bb8"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/verification_service.py",
+      "hunk_identity": {
+        "old_start": 346,
+        "old_count": 10,
+        "new_start": 408,
+        "new_count": 31,
+        "patch_context_sha256": "7444c38b8edac165c8c8c5246b76be1d63399a59928e2bc11f48afde2dcd1015"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "src/core/verification_service.py",
+      "hunk_identity": {
+        "old_start": 361,
+        "old_count": 7,
+        "new_start": 444,
+        "new_count": 7,
+        "patch_context_sha256": "0b7dfe4dc7f13928120e4812fbc459d91f6ebe9fb220537fb3c9108a30be3f07"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67424",
+      "file": "tests/test_verification_service.py",
+      "hunk_identity": {
+        "old_start": 16,
+        "old_count": 26,
+        "new_start": 16,
+        "new_count": 47,
+        "patch_context_sha256": "31ee0f36b269282dc766b0c57cd91d3dd631a8de183f0a7913225dadb5c3683c"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53502",
+      "file": "tests/loaders/test_file_loader.py",
+      "hunk_identity": {
+        "old_start": 7,
+        "old_count": 7,
+        "new_start": 7,
+        "new_count": 9,
+        "patch_context_sha256": "644866d0c4735caacacb7a2346f1f6d16b918d8b5a6d6af0a77b8d64edfc6e49"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53502",
+      "file": "tests/loaders/test_file_loader.py",
+      "hunk_identity": {
+        "old_start": 52,
+        "old_count": 6,
+        "new_start": 54,
+        "new_count": 42,
+        "patch_context_sha256": "4bb67e593eeec2fa376f8e7a7c74ced46992e49723fffa8e2991fdcf6a09db77"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53502",
+      "file": "thumbor/loaders/file_loader.py",
+      "hunk_identity": {
+        "old_start": 9,
+        "old_count": 20,
+        "new_start": 9,
+        "new_count": 28,
+        "patch_context_sha256": "ae05bdfe42094ecc6d04c5777eb269d4c045a3aafddaf8e40a03da41ffbd3c41"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53502",
+      "file": "thumbor/loaders/file_loader.py",
+      "hunk_identity": {
+        "old_start": 31,
+        "old_count": 10,
+        "new_start": 39,
+        "new_count": 15,
+        "patch_context_sha256": "fdcbebadbd362d1093c7a7d8bfc4e07e09092212ce0593d80553e49bd8e9dd4e"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/confluence/attachments.py",
+      "hunk_identity": {
+        "old_start": 149,
+        "old_count": 9,
+        "new_start": 149,
+        "new_count": 10,
+        "patch_context_sha256": "4d377b83a9771a937273d2f8bec67488491a0c92ea6a5014a3ce4ea985b43bc1"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/confluence/client.py",
+      "hunk_identity": {
+        "old_start": 17,
+        "old_count": 6,
+        "new_start": 17,
+        "new_count": 8,
+        "patch_context_sha256": "b2e845c72cf795793e6872dee7e902c2ce12f334a28088fd750b5d3dff55df21"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/confluence/client.py",
+      "hunk_identity": {
+        "old_start": 130,
+        "old_count": 8,
+        "new_start": 132,
+        "new_count": 18,
+        "patch_context_sha256": "3bbe72060c9820cb7dad2f446cf5ee9087b7ae5c418e2066c3146acc48461798"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/confluence/search.py",
+      "hunk_identity": {
+        "old_start": 23,
+        "old_count": 6,
+        "new_start": 23,
+        "new_count": 29,
+        "patch_context_sha256": "12c5a95914976fa51a6329ac0c7c36a7925df59125ed742fcef4497edd6fb026"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/confluence/search.py",
+      "hunk_identity": {
+        "old_start": 33,
+        "old_count": 8,
+        "new_start": 56,
+        "new_count": 9,
+        "patch_context_sha256": "508acab162bffbe34941fdc87b0671c87a3f176462d3710cfbd2761755db7217"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/confluence/search.py",
+      "hunk_identity": {
+        "old_start": 45,
+        "old_count": 27,
+        "new_start": 69,
+        "new_count": 13,
+        "patch_context_sha256": "ee4c93c1d0ab128dfebab112447c8a9d3b653c7298e0336a139f8f4eb64a4b7f"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/attachments.py",
+      "hunk_identity": {
+        "old_start": 42,
+        "old_count": 6,
+        "new_start": 42,
+        "new_count": 17,
+        "patch_context_sha256": "9ff43d1645fac8d12ad0eea5dd4f2f0fe1babc1bda18873ad9a0240824a72af5"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/attachments.py",
+      "hunk_identity": {
+        "old_start": 370,
+        "old_count": 9,
+        "new_start": 381,
+        "new_count": 10,
+        "patch_context_sha256": "496cf8e1b860e67612ae5d69c36ec75acce4b6c9e8c4a8b78a70d08ae2ddb994"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/client.py",
+      "hunk_identity": {
+        "old_start": 23,
+        "old_count": 6,
+        "new_start": 23,
+        "new_count": 8,
+        "patch_context_sha256": "a9b8ba5e80a29f786995d9339443c5cdfffc68513bc234c2132bd015acf6d488"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/client.py",
+      "hunk_identity": {
+        "old_start": 143,
+        "old_count": 8,
+        "new_start": 145,
+        "new_count": 18,
+        "patch_context_sha256": "d5bc680df20da6fa04d06ffc8fc3a6a92e184e7b092270742c5156316e61c68a"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/search.py",
+      "hunk_identity": {
+        "old_start": 21,
+        "old_count": 6,
+        "new_start": 21,
+        "new_count": 57,
+        "patch_context_sha256": "c87f381135b9363c92482869f52aca9eebdbfbeeef4cd75882c844cdba033530"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/search.py",
+      "hunk_identity": {
+        "old_start": 43,
+        "old_count": 7,
+        "new_start": 94,
+        "new_count": 9,
+        "patch_context_sha256": "57e1c69b66eb3d10b06e0c965e9d42b2e4aced3ad61432ab0227f1c32463409a"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/search.py",
+      "hunk_identity": {
+        "old_start": 60,
+        "old_count": 56,
+        "new_start": 113,
+        "new_count": 8,
+        "patch_context_sha256": "82be3109fb193757121e78491ee3478933c4edadb9f39284c0586ece9631db24"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/search.py",
+      "hunk_identity": {
+        "old_start": 240,
+        "old_count": 6,
+        "new_start": 245,
+        "new_count": 9,
+        "patch_context_sha256": "a73a1811b7a09816120d91b9f89a1e6b311f3460186c20d0df9ae7e2c4783c33"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/jira/search.py",
+      "hunk_identity": {
+        "old_start": 298,
+        "old_count": 11,
+        "new_start": 306,
+        "new_count": 20,
+        "patch_context_sha256": "60fb5f12b8103c2026b5af6327f8f8a245735daa6da5dcea4448b8ff4eb909ea"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/confluence.py",
+      "hunk_identity": {
+        "old_start": 20,
+        "old_count": 6,
+        "new_start": 20,
+        "new_count": 7,
+        "patch_context_sha256": "54dd49e2d8f474baf1d8ee56491d6e076077b97ff45f583c334ecc1f5bf4b28d"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/confluence.py",
+      "hunk_identity": {
+        "old_start": 124,
+        "old_count": 15,
+        "new_start": 125,
+        "new_count": 17,
+        "patch_context_sha256": "0df34fae3229f526079315d2e11750e86b6a83843005e028aecf1055351f52a7"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/confluence.py",
+      "hunk_identity": {
+        "old_start": 146,
+        "old_count": 7,
+        "new_start": 149,
+        "new_count": 10,
+        "patch_context_sha256": "0aa4b13cc35363dbd879fa3de6df306159d3f87c904cb723baceb2546cae6761"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/dependencies.py",
+      "hunk_identity": {
+        "old_start": 17,
+        "old_count": 6,
+        "new_start": 17,
+        "new_count": 7,
+        "patch_context_sha256": "161c1e6970025536347a0daa56d65b00bbde5cf5c07f6305af7b87d4f1bc0e6f"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/dependencies.py",
+      "hunk_identity": {
+        "old_start": 508,
+        "old_count": 8,
+        "new_start": 509,
+        "new_count": 10,
+        "patch_context_sha256": "e6d28b3d6e711becef74ea6401a71afaf35c57ced20e45b0b51554cdcff05691"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/dependencies.py",
+      "hunk_identity": {
+        "old_start": 592,
+        "old_count": 6,
+        "new_start": 595,
+        "new_count": 7,
+        "patch_context_sha256": "13bf949d500658bde767bcc9c46f1833088ee415b042caa9e43b777792a5b291"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/dependencies.py",
+      "hunk_identity": {
+        "old_start": 641,
+        "old_count": 6,
+        "new_start": 645,
+        "new_count": 7,
+        "patch_context_sha256": "d3430db1af8a8f403dfa104c0efd3e878ce5c10686d12d41e941511d94c91eb9"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/dependencies.py",
+      "hunk_identity": {
+        "old_start": 663,
+        "old_count": 6,
+        "new_start": 668,
+        "new_count": 17,
+        "patch_context_sha256": "4f920c25cb0305f660ae9c67aadbeee95a84dbfd6ec72cf8c2b7449b6da1dea8"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/main.py",
+      "hunk_identity": {
+        "old_start": 12,
+        "old_count": 6,
+        "new_start": 12,
+        "new_count": 7,
+        "patch_context_sha256": "30aed3e5b73ea138852cda6689d040d6b9ca9e5b4bb31b4e1486000ce2d483df"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/main.py",
+      "hunk_identity": {
+        "old_start": 209,
+        "old_count": 14,
+        "new_start": 210,
+        "new_count": 15,
+        "patch_context_sha256": "669cc91e5f6a0bd0ecf639af5f7b73a309ae7625477c239e6cf1f51b37c0f73b"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/main.py",
+      "hunk_identity": {
+        "old_start": 246,
+        "old_count": 13,
+        "new_start": 248,
+        "new_count": 78,
+        "patch_context_sha256": "a238753ad0c7fe89c4f29e10edc80a9dba0bf988b28a0d2c0a189bbb2ddc22d2"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/main.py",
+      "hunk_identity": {
+        "old_start": 261,
+        "old_count": 64,
+        "new_start": 328,
+        "new_count": 9,
+        "patch_context_sha256": "dfff15cc4d75af72c0359a250c155e761619c192ee31eef39a8559005673e331"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/main.py",
+      "hunk_identity": {
+        "old_start": 328,
+        "old_count": 6,
+        "new_start": 340,
+        "new_count": 21,
+        "patch_context_sha256": "8190da29b1ea1884f463d29ee973739415b06f4507117f5b2be786e95ef9485e"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/servers/main.py",
+      "hunk_identity": {
+        "old_start": 442,
+        "old_count": 6,
+        "new_start": 469,
+        "new_count": 28,
+        "patch_context_sha256": "17ab2665de0b04481d443cacf7643d0cc35469d3497bf5370f785a4e75ae4d62"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/oauth.py",
+      "hunk_identity": {
+        "old_start": 398,
+        "old_count": 9,
+        "new_start": 398,
+        "new_count": 10,
+        "patch_context_sha256": "4869888de97cbd7272931ed9b2fab2d44c05791a7c92d4978fafed6d33181d3a"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/oauth.py",
+      "hunk_identity": {
+        "old_start": 414,
+        "old_count": 8,
+        "new_start": 415,
+        "new_count": 12,
+        "patch_context_sha256": "2e725324bb832251b6eec7935f7c978b57c378b43e7fdcfdca2e4010faaba2e0"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/oauth_setup.py",
+      "hunk_identity": {
+        "old_start": 17,
+        "old_count": 6,
+        "new_start": 17,
+        "new_count": 7,
+        "patch_context_sha256": "ac5edfdaba201d29b3d0397a0dec91c9dfcabcc2589c936aa1bc83c5470627f2"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/oauth_setup.py",
+      "hunk_identity": {
+        "old_start": 85,
+        "old_count": 6,
+        "new_start": 86,
+        "new_count": 10,
+        "patch_context_sha256": "d5e9c3e278f02a0544b2d490767ad6ba841ebb28a4c93f42c3af38bef55b5874"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/oauth_setup.py",
+      "hunk_identity": {
+        "old_start": 122,
+        "old_count": 7,
+        "new_start": 127,
+        "new_count": 7,
+        "patch_context_sha256": "230fe730dd62b4e54553fa34504f72b2f200ba27405c3dba9ce9a7554d40555f"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/ssl.py",
+      "hunk_identity": {
+        "old_start": 9,
+        "old_count": 6,
+        "new_start": 9,
+        "new_count": 8,
+        "patch_context_sha256": "25dc9529b8f1f4980bd81e270c499d44cfb2c7a85f7f8415b6bd96d03bd5dde9"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/ssl.py",
+      "hunk_identity": {
+        "old_start": 48,
+        "old_count": 6,
+        "new_start": 50,
+        "new_count": 14,
+        "patch_context_sha256": "10a7d3acab745760229f07ca4266d60f7c07b8f9c22e9fc3abd3ff31932d136e"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/ssrf_adapter.py",
+      "hunk_identity": {
+        "old_start": 0,
+        "old_count": 0,
+        "new_start": 1,
+        "new_count": 158,
+        "patch_context_sha256": "28f1246ebf83d8decfb7e7b9ce22f03cccc47d939342d5d92ceffb65711cc41b"
+      },
+      "mechanical_coverage": "NOT_APPLICABLE_ADDED",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/urls.py",
+      "hunk_identity": {
+        "old_start": 4,
+        "old_count": 9,
+        "new_start": 4,
+        "new_count": 29,
+        "patch_context_sha256": "306545fdbadf92bdf389dbf59f15fa71832c0c18a52987b67833a28a247f8c6c"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "src/mcp_atlassian/utils/urls.py",
+      "hunk_identity": {
+        "old_start": 89,
+        "old_count": 6,
+        "new_start": 109,
+        "new_count": 12,
+        "patch_context_sha256": "17dd4d566f064c1b9f77e81d3bf458dbd76af2afd308e1941562e55f6abb089d"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/cloud/test_confluence_cloud_operations.py",
+      "hunk_identity": {
+        "old_start": 131,
+        "old_count": 7,
+        "new_start": 131,
+        "new_count": 7,
+        "patch_context_sha256": "a0d0f0c5733e56577e9c34ab43ee6ca4d4a060be7ef53da800307e2c62c75580"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/cloud/test_confluence_cloud_operations.py",
+      "hunk_identity": {
+        "old_start": 141,
+        "old_count": 7,
+        "new_start": 141,
+        "new_count": 7,
+        "patch_context_sha256": "36291390e9a223c3cf0c41a779535d8038539143a602494040276991bdef92d6"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/cloud/test_mcp_tools_cloud.py",
+      "hunk_identity": {
+        "old_start": 306,
+        "old_count": 12,
+        "new_start": 306,
+        "new_count": 12,
+        "patch_context_sha256": "5ef824744c5d3ad76e859566ec212bcd25700358bf20a294289a71089ebd4782"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/conftest.py",
+      "hunk_identity": {
+        "old_start": 8,
+        "old_count": 9,
+        "new_start": 8,
+        "new_count": 12,
+        "patch_context_sha256": "e24c5cec86559f39eb1db3720413b41204cfac0dac72493d0a6af48ca9a5259d"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/conftest.py",
+      "hunk_identity": {
+        "old_start": 24,
+        "old_count": 6,
+        "new_start": 27,
+        "new_count": 21,
+        "patch_context_sha256": "978bf178d164cb73d2ee8364785c2336f3b97690b62d2f508b7ec561934df9c4"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/conftest.py",
+      "hunk_identity": {
+        "old_start": 447,
+        "old_count": 6,
+        "new_start": 465,
+        "new_count": 12,
+        "patch_context_sha256": "f8ff7de5d0ab7ed004fa9fabc1c45746a872d84c11807897cc7239ddf3b1d2f7"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/test_confluence_dc_operations.py",
+      "hunk_identity": {
+        "old_start": 80,
+        "old_count": 7,
+        "new_start": 80,
+        "new_count": 7,
+        "patch_context_sha256": "73f65c735622d63407450c08f917279f1cbd46319908f276940605a84abfe47c"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/test_confluence_dc_operations.py",
+      "hunk_identity": {
+        "old_start": 90,
+        "old_count": 7,
+        "new_start": 90,
+        "new_count": 7,
+        "patch_context_sha256": "58ed62fdcb359b0864792b2ec4f4af73502fd0118b540fc5e0ff9469418b76d4"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/e2e/test_mcp_tools_dc.py",
+      "hunk_identity": {
+        "old_start": 305,
+        "old_count": 12,
+        "new_start": 305,
+        "new_count": 12,
+        "patch_context_sha256": "df2c00bfe03e37cd4302e74f1711553dc369c82680fb942304da36bd4ace579e"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 3,
+        "old_count": 6,
+        "new_start": 3,
+        "new_count": 7,
+        "patch_context_sha256": "d0178f31e6dcac8a3aba6618bfab664d36983fb4c15ba8aa9ee0b89ca8f41fa7"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 123,
+        "old_count": 6,
+        "new_start": 124,
+        "new_count": 10,
+        "patch_context_sha256": "f53943b8f67e482547a38f76306cbb3a352a1e31ff2fe13fdca5366f9953e308"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 176,
+        "old_count": 6,
+        "new_start": 181,
+        "new_count": 7,
+        "patch_context_sha256": "0d76f9047d760923888997144d6ad342ad66e3eed6028e9e69121a2e619e9e21"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 228,
+        "old_count": 33,
+        "new_start": 234,
+        "new_count": 19,
+        "patch_context_sha256": "5daffc8d44c1482c7703c0bada5fa5b15abc045069cd2ce436f44b79a4c1f0ec"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 282,
+        "old_count": 6,
+        "new_start": 274,
+        "new_count": 7,
+        "patch_context_sha256": "7a1e0db6929b118ef71ebc21fb6a5580822138a27733f7492b2134d1999da395"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 311,
+        "old_count": 6,
+        "new_start": 304,
+        "new_count": 7,
+        "patch_context_sha256": "3b1816140e278a2e45e45f3e2bf38ee8bae101afbbfae22411f5850d920ede06"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 378,
+        "old_count": 6,
+        "new_start": 372,
+        "new_count": 7,
+        "patch_context_sha256": "e30e0516d67517cb47d13a206bb06e3223a88bfd4ebce5fcef701b2a9a280fc4"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 1787,
+        "old_count": 6,
+        "new_start": 1782,
+        "new_count": 37,
+        "patch_context_sha256": "a814728a60fc0a3f40ce8a7372242f6a3b8d8104dc26195138ea4a7e24912517"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_client.py",
+      "hunk_identity": {
+        "old_start": 379,
+        "old_count": 6,
+        "new_start": 379,
+        "new_count": 7,
+        "patch_context_sha256": "1a390194d7f372b64f1cd4787777abd5b0ed151a445f188e3beff5bead856bd5"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_search.py",
+      "hunk_identity": {
+        "old_start": 198,
+        "old_count": 14,
+        "new_start": 198,
+        "new_count": 48,
+        "patch_context_sha256": "9598bbf9d2ba387636df31d7c177709a7cc6068c5620f2dab50f6dab7000dd9d"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/confluence/test_search.py",
+      "hunk_identity": {
+        "old_start": 246,
+        "old_count": 13,
+        "new_start": 280,
+        "new_count": 18,
+        "patch_context_sha256": "a7b9675787d6b3121969f54285af20d7d43fec0cf00d8ffa42d47ee00fa01a6c"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 69,
+        "old_count": 7,
+        "new_start": 69,
+        "new_count": 8,
+        "patch_context_sha256": "90d6619806cb142a3a570cedb805f186ecbb013b76f899ea2f9f518fe44ebc81"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 121,
+        "old_count": 20,
+        "new_start": 122,
+        "new_count": 25,
+        "patch_context_sha256": "3486c85a2a5c4e91a81df9e8adaeec6d12514f6d896cc3c90f4b185671d4712a"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 479,
+        "old_count": 6,
+        "new_start": 485,
+        "new_count": 10,
+        "patch_context_sha256": "91981a0ddec7e71125b2de1956105c90fc06e78e22e9795163a30b0868b024eb"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 507,
+        "old_count": 9,
+        "new_start": 517,
+        "new_count": 10,
+        "patch_context_sha256": "21f31b46bcd2f24def1a805a49beba30de41f14f55f4053070f3937d4730dd66"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 517,
+        "old_count": 31,
+        "new_start": 528,
+        "new_count": 16,
+        "patch_context_sha256": "c554cfc394035c2501dfdd01126b30855f634c349c8f3033b5d84b3cb126b80b"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 567,
+        "old_count": 6,
+        "new_start": 563,
+        "new_count": 7,
+        "patch_context_sha256": "c1455ccd70cd0760ad75683921dc1c3948b7eef81ce8049646f4afa80d7e217a"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 592,
+        "old_count": 6,
+        "new_start": 589,
+        "new_count": 7,
+        "patch_context_sha256": "afdbd5381c91c41e80c67ac11f5fe21f1911ac12e848a67656777e1b3c9da412"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 618,
+        "old_count": 6,
+        "new_start": 616,
+        "new_count": 7,
+        "patch_context_sha256": "74d30fbbc03e9f2163489dfa1b54dabf63ab997b2c98ba1659d613f98f93a2bb"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_attachments.py",
+      "hunk_identity": {
+        "old_start": 1316,
+        "old_count": 3,
+        "new_start": 1315,
+        "new_count": 96,
+        "patch_context_sha256": "82ec5484009bb3fc2fcca10e128cb823fb0e9df5b67f40fb74b85883b3011cba"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_client.py",
+      "hunk_identity": {
+        "old_start": 63,
+        "old_count": 6,
+        "new_start": 63,
+        "new_count": 93,
+        "patch_context_sha256": "70af2df71cf098df6bc9a425548a389505f8cd643346968e895f048e329c8dbb"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_search.py",
+      "hunk_identity": {
+        "old_start": 347,
+        "old_count": 10,
+        "new_start": 347,
+        "new_count": 11,
+        "patch_context_sha256": "8c887313962791bed4cbbcd6d0e56e5be0d5667d3773097ae962aa6f3758ccdc"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_search.py",
+      "hunk_identity": {
+        "old_start": 359,
+        "old_count": 12,
+        "new_start": 360,
+        "new_count": 12,
+        "patch_context_sha256": "53cf4c028c25f026bf6c6e9008cdbab04aa7dc1dfae3aef926f75a304c527375"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_search.py",
+      "hunk_identity": {
+        "old_start": 694,
+        "old_count": 10,
+        "new_start": 695,
+        "new_count": 10,
+        "patch_context_sha256": "d261617f8984ddc0c686fda9eb5e8c48b7c304fd59f1dc2bda623f8961bfb07e"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_search.py",
+      "hunk_identity": {
+        "old_start": 729,
+        "old_count": 10,
+        "new_start": 730,
+        "new_count": 12,
+        "patch_context_sha256": "e3e3237eaf30a813bb1a2044cce8418311b480811d94a9f068015970491195d3"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/jira/test_search.py",
+      "hunk_identity": {
+        "old_start": 1204,
+        "old_count": 3,
+        "new_start": 1207,
+        "new_count": 114,
+        "patch_context_sha256": "17a265b3899611545182e157de092f1ea24365e59e35923cadff266195f19b99"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_confluence_server.py",
+      "hunk_identity": {
+        "old_start": 926,
+        "old_count": 11,
+        "new_start": 926,
+        "new_count": 14,
+        "patch_context_sha256": "f1b9155587a6f654896ffb2c7fb2fce698b0788d6e08d0fab5da72074b202b5b"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_confluence_server.py",
+      "hunk_identity": {
+        "old_start": 947,
+        "old_count": 11,
+        "new_start": 950,
+        "new_count": 14,
+        "patch_context_sha256": "cd9af67c7eaf44ef545661aae1a278dd6f51566e072c8ef317ce159534b80bd9"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_confluence_server.py",
+      "hunk_identity": {
+        "old_start": 1072,
+        "old_count": 6,
+        "new_start": 1078,
+        "new_count": 35,
+        "patch_context_sha256": "ef0f1fdc68815186bc8f53baac97c66799e994398f5fedc065f526bf86636a2f"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_confluence_server.py",
+      "hunk_identity": {
+        "old_start": 1081,
+        "old_count": 7,
+        "new_start": 1116,
+        "new_count": 7,
+        "patch_context_sha256": "e02e3c58f06f34d4d2dc4f8e0d0c22e8fbca0871495030872e6b563c68f4927f"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_dependencies.py",
+      "hunk_identity": {
+        "old_start": 788,
+        "old_count": 7,
+        "new_start": 788,
+        "new_count": 13,
+        "patch_context_sha256": "1c130bb01cc2739bd0f668c4c8d084c01535f71035ae05f00e6c6476ed1529f5"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_dependencies.py",
+      "hunk_identity": {
+        "old_start": 1127,
+        "old_count": 7,
+        "new_start": 1133,
+        "new_count": 13,
+        "patch_context_sha256": "23ef154e37aa102036b771a8bde7fd9d52ff3866edb0a55e795570083c70049e"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_dependencies.py",
+      "hunk_identity": {
+        "old_start": 1583,
+        "old_count": 3,
+        "new_start": 1595,
+        "new_count": 216,
+        "patch_context_sha256": "f445c8ac435b1364cc64cd3611968bd165c5452bcae3bfb1cd62c7556a5bc6ef"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_main_server.py",
+      "hunk_identity": {
+        "old_start": 317,
+        "old_count": 6,
+        "new_start": 317,
+        "new_count": 31,
+        "patch_context_sha256": "2559c40c69890c4d1ed46e0959399a1fdbd630808c9ee49d02e0cba4010bb009"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/servers/test_mcp_protocol.py",
+      "hunk_identity": {
+        "old_start": 90,
+        "old_count": 6,
+        "new_start": 90,
+        "new_count": 58,
+        "patch_context_sha256": "0364af94efdb4b144691a025b29b08dc9d7dfaf9a2abd7dec4f666cdbbcf1b74"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/utils/test_oauth.py",
+      "hunk_identity": {
+        "old_start": 440,
+        "old_count": 36,
+        "new_start": 440,
+        "new_count": 28,
+        "patch_context_sha256": "a45865c0e872de687d5d24aa0cf28fd719d87087e4336597f5787d133dfcb0d8"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/utils/test_oauth.py",
+      "hunk_identity": {
+        "old_start": 1219,
+        "old_count": 3,
+        "new_start": 1211,
+        "new_count": 48,
+        "patch_context_sha256": "69a1c1dc7bae1f4b19b087769ca4e5c195d928d4f5bc38312cc9f85aa97a744d"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/utils/test_oauth_setup.py",
+      "hunk_identity": {
+        "old_start": 1,
+        "old_count": 5,
+        "new_start": 1,
+        "new_count": 6,
+        "patch_context_sha256": "79e973fc4f9adc683d1ab4751a39615ca28ed5e2cb01b1edd16adffabb1d5197"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/utils/test_oauth_setup.py",
+      "hunk_identity": {
+        "old_start": 7,
+        "old_count": 6,
+        "new_start": 8,
+        "new_count": 7,
+        "patch_context_sha256": "e83e4445df89e07b746dbc37fe4ca97a7c62573c4c02b7f12b8b14d8e13a50f0"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/utils/test_oauth_setup.py",
+      "hunk_identity": {
+        "old_start": 45,
+        "old_count": 6,
+        "new_start": 47,
+        "new_count": 38,
+        "patch_context_sha256": "1895f8c052fe1aec1ef2c2b3388d234f15d2a0a82aabe765465d97710cf04000"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/utils/test_ssrf_adapter.py",
+      "hunk_identity": {
+        "old_start": 0,
+        "old_count": 0,
+        "new_start": 1,
+        "new_count": 185,
+        "patch_context_sha256": "aa7c3367642d7ae43f78a4f82052cb44f32f2da9ade80a4418c8ab4e81444dc0"
+      },
+      "mechanical_coverage": "NOT_APPLICABLE_ADDED",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-73498",
+      "file": "tests/unit/utils/test_urls.py",
+      "hunk_identity": {
+        "old_start": 328,
+        "old_count": 3,
+        "new_start": 328,
+        "new_count": 42,
+        "patch_context_sha256": "671fd61b5e699fff25070a1eec855336cf128429d44eeee874a1f5ff030e8645"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/_version.py",
+      "hunk_identity": {
+        "old_start": 1,
+        "old_count": 1,
+        "new_start": 1,
+        "new_count": 1,
+        "patch_context_sha256": "2b1a9f44ccc3cdcc4b7116c9066169b9943db39f7770e9d474b5a96d4b23b2f0"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/core/loader.py",
+      "hunk_identity": {
+        "old_start": 9,
+        "old_count": 7,
+        "new_start": 9,
+        "new_count": 7,
+        "patch_context_sha256": "f337376df8e4ae196b694fec989a7d5440c361e29474857479614f466163b827"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/core/loader.py",
+      "hunk_identity": {
+        "old_start": 26,
+        "old_count": 13,
+        "new_start": 26,
+        "new_count": 17,
+        "patch_context_sha256": "cf88b360d45ff17833373459cb6f1dd2c0023066cbd4268386ae91105b3786a8"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/core/loader.py",
+      "hunk_identity": {
+        "old_start": 47,
+        "old_count": 17,
+        "new_start": 51,
+        "new_count": 17,
+        "patch_context_sha256": "9038abbde8cd5bfb0f4a27189b6cf8d4697663d401989cd543e1a7c96e592f61"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/core/loader.py",
+      "hunk_identity": {
+        "old_start": 86,
+        "old_count": 7,
+        "new_start": 90,
+        "new_count": 12,
+        "patch_context_sha256": "9ba5ea7d1b718fb6768eafa038adec4c9607becae6ab81456061e80119f768dd"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/core/loader.py",
+      "hunk_identity": {
+        "old_start": 96,
+        "old_count": 7,
+        "new_start": 105,
+        "new_count": 7,
+        "patch_context_sha256": "8ef0a1ed6b89ac4887dcdebe2d21b5c8c9225d0bbd5dcf753b07100877f49f54"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/core/loader.py",
+      "hunk_identity": {
+        "old_start": 112,
+        "old_count": 7,
+        "new_start": 121,
+        "new_count": 11,
+        "patch_context_sha256": "94b26f12951cc50f2faaeff23252f09aa6b13f8eb99178b5c918cec43060e878"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/core/loader.py",
+      "hunk_identity": {
+        "old_start": 121,
+        "old_count": 6,
+        "new_start": 134,
+        "new_count": 9,
+        "patch_context_sha256": "b9a91cf177d6d69b20c60c56ecdfb320398feb69fbb1dbeb09fb630e63a70ab3"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/prompty/core/loader.py",
+      "hunk_identity": {
+        "old_start": 152,
+        "old_count": 18,
+        "new_start": 168,
+        "new_count": 41,
+        "patch_context_sha256": "45058ecba0ab669f73bb1836b5fcdc4b7a57b93a811fa9d68487e526807311ca"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-53598",
+      "file": "runtime/python/prompty/tests/test_loader.py",
+      "hunk_identity": {
+        "old_start": 343,
+        "old_count": 6,
+        "new_start": 343,
+        "new_count": 67,
+        "patch_context_sha256": "14b36c3791a6b5e9e27c9d485459e47f35debfb58a992fb36b6b1028961c7b37"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/engine/variable_resolver.py",
+      "hunk_identity": {
+        "old_start": 7,
+        "old_count": 9,
+        "new_start": 7,
+        "new_count": 12,
+        "patch_context_sha256": "81342302fef8c594ac3bd46d8f4e01a04b2e2bb8586a151d708029213ca21db3"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/engine/variable_resolver.py",
+      "hunk_identity": {
+        "old_start": 194,
+        "old_count": 6,
+        "new_start": 197,
+        "new_count": 19,
+        "patch_context_sha256": "f2f483b93d9fba542318a2337476072c199ae47cb489cc465670cb6d7f4dce51"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/module_policy.py",
+      "hunk_identity": {
+        "old_start": 108,
+        "old_count": 6,
+        "new_start": 108,
+        "new_count": 44,
+        "patch_context_sha256": "21f8b27f5778f4eb144744ef77dac6a406eab3ff1fece4aa44b0f5b2026f01c2"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/ai/model.py",
+      "hunk_identity": {
+        "old_start": 12,
+        "old_count": 6,
+        "new_start": 12,
+        "new_count": 12,
+        "patch_context_sha256": "0ad88229ad90f8e3b8afe8041f97e09f9574f9e33eed496dcbc21963791018d4"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/ai/model.py",
+      "hunk_identity": {
+        "old_start": 131,
+        "old_count": 7,
+        "new_start": 137,
+        "new_count": 19,
+        "patch_context_sha256": "c4e6154b0e1a2cb247a53107358524f87af8b07ec587c0542d94a21e43809628"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/ai/model.py",
+      "hunk_identity": {
+        "old_start": 142,
+        "old_count": 6,
+        "new_start": 160,
+        "new_count": 18,
+        "patch_context_sha256": "7db05c892a69c15c074caed6a39a854b7536c56605748a6a62d23267f17aaad8"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/browser/pagination.py",
+      "hunk_identity": {
+        "old_start": 16,
+        "old_count": 6,
+        "new_start": 16,
+        "new_count": 8,
+        "patch_context_sha256": "017b5d0796f4d586b1651d28b68911646ac00937c7bd131e14920ce7fea4f308"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/browser/pagination.py",
+      "hunk_identity": {
+        "old_start": 321,
+        "old_count": 6,
+        "new_start": 323,
+        "new_count": 12,
+        "patch_context_sha256": "ea96266e02d6af465216fd518181d43bc30a1871b3ec2d34cc7eddb9dbc620b5"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/document/excel_write.py",
+      "hunk_identity": {
+        "old_start": 11,
+        "old_count": 6,
+        "new_start": 11,
+        "new_count": 8,
+        "patch_context_sha256": "4756cc5a1c60f32c6b789a5623b7ca9f00685094f8bb8964c6e044fbf30dd76e"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/document/excel_write.py",
+      "hunk_identity": {
+        "old_start": 105,
+        "old_count": 6,
+        "new_start": 107,
+        "new_count": 12,
+        "patch_context_sha256": "3a885c33df91c01c3ae73435f10bb55ed99f5024946d75bc7aad9d0404bc5207"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/document/pdf_fill_form.py",
+      "hunk_identity": {
+        "old_start": 11,
+        "old_count": 6,
+        "new_start": 11,
+        "new_count": 8,
+        "patch_context_sha256": "c6affbf05f802d65864d10f80b8fde37e37144c19326bc0f87be3fff7fc62b05"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/document/pdf_fill_form.py",
+      "hunk_identity": {
+        "old_start": 122,
+        "old_count": 6,
+        "new_start": 124,
+        "new_count": 12,
+        "patch_context_sha256": "e994689ba4146f331c7e61835e181749cb6e1bf6cf5fd53d074f333ead104b1d"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/document/pdf_to_word.py",
+      "hunk_identity": {
+        "old_start": 10,
+        "old_count": 6,
+        "new_start": 10,
+        "new_count": 8,
+        "patch_context_sha256": "003b81645a41a4ceab08c747c5fb98d2f8e71ed706a475facbd3b421f29c4fb6"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/document/pdf_to_word.py",
+      "hunk_identity": {
+        "old_start": 107,
+        "old_count": 6,
+        "new_start": 109,
+        "new_count": 12,
+        "patch_context_sha256": "5cb96946b9894c70c6469530c39c62085d7474c86d443ab486a615f9b02cc69e"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/document/word_to_pdf.py",
+      "hunk_identity": {
+        "old_start": 11,
+        "old_count": 6,
+        "new_start": 11,
+        "new_count": 8,
+        "patch_context_sha256": "28ec6bd24e883941634e2476119c023415e1bbc1efeb4808bd06ea84e6f3777f"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/document/word_to_pdf.py",
+      "hunk_identity": {
+        "old_start": 94,
+        "old_count": 6,
+        "new_start": 96,
+        "new_count": 13,
+        "patch_context_sha256": "26280b8606abedb2d66cfb9ec708ec214ff43c7673154fdb7da7ff9d031678b3"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/compress.py",
+      "hunk_identity": {
+        "old_start": 11,
+        "old_count": 6,
+        "new_start": 11,
+        "new_count": 8,
+        "patch_context_sha256": "28ec6bd24e883941634e2476119c023415e1bbc1efeb4808bd06ea84e6f3777f"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/compress.py",
+      "hunk_identity": {
+        "old_start": 167,
+        "old_count": 6,
+        "new_start": 169,
+        "new_count": 12,
+        "patch_context_sha256": "db8339b8aa3497b71ba6ab5edc4561783392e97b1244742aeb4bcaeaed36fb9b"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/convert.py",
+      "hunk_identity": {
+        "old_start": 11,
+        "old_count": 6,
+        "new_start": 11,
+        "new_count": 8,
+        "patch_context_sha256": "5bb3ad2ead18aab0e3d9b1415126f2bfdaced5226d4c0a2b9790a4ac0d4028c8"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/convert.py",
+      "hunk_identity": {
+        "old_start": 53,
+        "old_count": 7,
+        "new_start": 55,
+        "new_count": 6,
+        "patch_context_sha256": "3d7890523551273ee025e7cf1fcc560a5a1f318a4a982ad6594c1001f8e07897"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/convert.py",
+      "hunk_identity": {
+        "old_start": 176,
+        "old_count": 6,
+        "new_start": 177,
+        "new_count": 13,
+        "patch_context_sha256": "bc660dbf770a0a33b77b7143dcbac77a3bc0f13935175451e4a411a34d73046c"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/crop.py",
+      "hunk_identity": {
+        "old_start": 14,
+        "old_count": 6,
+        "new_start": 14,
+        "new_count": 7,
+        "patch_context_sha256": "2ea8f7a18d02929efa51bd97835fb88b4d77d357ef64efcdaff5251124576c56"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/crop.py",
+      "hunk_identity": {
+        "old_start": 188,
+        "old_count": 6,
+        "new_start": 189,
+        "new_count": 12,
+        "patch_context_sha256": "bfb95f8a04d4e71beeaa0816dc3809f6223067dff7c481b1c7c8874c13fa7cf3"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/download.py",
+      "hunk_identity": {
+        "old_start": 14,
+        "old_count": 7,
+        "new_start": 14,
+        "new_count": 13,
+        "patch_context_sha256": "37513ca35ea56b050d8bc137f892bbcc3ca18dc14280f099b8c46a3369e2f139"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/download.py",
+      "hunk_identity": {
+        "old_start": 33,
+        "old_count": 7,
+        "new_start": 39,
+        "new_count": 6,
+        "patch_context_sha256": "ebce71cc72a3f5cbd06ed88f464a816dd8c03ce62827d937bc6c9063824e2888"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/download.py",
+      "hunk_identity": {
+        "old_start": 136,
+        "old_count": 11,
+        "new_start": 141,
+        "new_count": 16,
+        "patch_context_sha256": "bbfc2e021996e066b8d0080197887c73646480b117b8c156a7f3a16200a3f925"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/qrcode_generate.py",
+      "hunk_identity": {
+        "old_start": 10,
+        "old_count": 6,
+        "new_start": 10,
+        "new_count": 8,
+        "patch_context_sha256": "cae2d6c853dd832dc1840585d4b371af5d85c4300e76fc07dd27de56a4612b13"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/qrcode_generate.py",
+      "hunk_identity": {
+        "old_start": 53,
+        "old_count": 6,
+        "new_start": 55,
+        "new_count": 11,
+        "patch_context_sha256": "f82b9321be17e74799bc1b7007c14c5767969938f5bd8772cf8788a8317b4a36"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/resize.py",
+      "hunk_identity": {
+        "old_start": 11,
+        "old_count": 6,
+        "new_start": 11,
+        "new_count": 8,
+        "patch_context_sha256": "a8e8c2fa5710d2a6754c14b3e8e7556769bd4f2ebdead8c67a6fd3be9e455df9"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/resize.py",
+      "hunk_identity": {
+        "old_start": 150,
+        "old_count": 6,
+        "new_start": 152,
+        "new_count": 12,
+        "patch_context_sha256": "0114ae94ea4770ed309f28273af45a9d64946b9603daf92b12b2f23bb1c3adf3"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/rotate.py",
+      "hunk_identity": {
+        "old_start": 14,
+        "old_count": 6,
+        "new_start": 14,
+        "new_count": 7,
+        "patch_context_sha256": "2ea8f7a18d02929efa51bd97835fb88b4d77d357ef64efcdaff5251124576c56"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/rotate.py",
+      "hunk_identity": {
+        "old_start": 175,
+        "old_count": 6,
+        "new_start": 176,
+        "new_count": 12,
+        "patch_context_sha256": "caefbd74ecb2e227122e2c7be9912a3eefe4836d1d9444491a853a6180800996"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/watermark.py",
+      "hunk_identity": {
+        "old_start": 14,
+        "old_count": 6,
+        "new_start": 14,
+        "new_count": 7,
+        "patch_context_sha256": "2ea8f7a18d02929efa51bd97835fb88b4d77d357ef64efcdaff5251124576c56"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/image/watermark.py",
+      "hunk_identity": {
+        "old_start": 246,
+        "old_count": 6,
+        "new_start": 247,
+        "new_count": 12,
+        "patch_context_sha256": "892d2d33fb18236eb002f990ee9a58efbcb224808348417038069db9907321dd"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/llm/agent.py",
+      "hunk_identity": {
+        "old_start": 24,
+        "old_count": 6,
+        "new_start": 24,
+        "new_count": 7,
+        "patch_context_sha256": "9af3b6651fba26ee15cd442093eaa99d9d5cf2222862c9a7b88833d3815a1581"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/llm/agent.py",
+      "hunk_identity": {
+        "old_start": 312,
+        "old_count": 7,
+        "new_start": 313,
+        "new_count": 10,
+        "patch_context_sha256": "c1c3d95b90b91a8b7ad732528754c7ab8d1dd2e691a9a5cbf19a6a9682642553"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/llm/agent.py",
+      "hunk_identity": {
+        "old_start": 879,
+        "old_count": 6,
+        "new_start": 883,
+        "new_count": 8,
+        "patch_context_sha256": "f0fac40802e8edfbf49bc531aa07ff66664d9054b7cf158098455e08a94825ed"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/llm/agent.py",
+      "hunk_identity": {
+        "old_start": 888,
+        "old_count": 6,
+        "new_start": 894,
+        "new_count": 12,
+        "patch_context_sha256": "da51bf8d17fef105e931ef32373e14402060bfbaf9707cf44717e96bc795c844"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/llm/chat.py",
+      "hunk_identity": {
+        "old_start": 13,
+        "old_count": 7,
+        "new_start": 13,
+        "new_count": 12,
+        "patch_context_sha256": "1d0353047da9892068fda8eb5a719fc6a98b39108bae0ea4ecbaca53f35c0d99"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/llm/chat.py",
+      "hunk_identity": {
+        "old_start": 158,
+        "old_count": 6,
+        "new_start": 163,
+        "new_count": 7,
+        "patch_context_sha256": "e26c19edcebfad1f82c7d5f6f07314ca5b4557d5cab1c82a7c896ee9101a47fc"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/llm/chat.py",
+      "hunk_identity": {
+        "old_start": 167,
+        "old_count": 6,
+        "new_start": 173,
+        "new_count": 19,
+        "patch_context_sha256": "5fb9d860cd4127c45f513b380a1a10e4b58a6b3fab871dec8b7745ac52f776cf"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/vector/connector.py",
+      "hunk_identity": {
+        "old_start": 9,
+        "old_count": 7,
+        "new_start": 9,
+        "new_count": 12,
+        "patch_context_sha256": "6cc76479fc956e1fa7446deafbf3b2c51fc9e775236cf56b9ed6976f9ab082d6"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/vector/connector.py",
+      "hunk_identity": {
+        "old_start": 45,
+        "old_count": 6,
+        "new_start": 50,
+        "new_count": 11,
+        "patch_context_sha256": "9911d490a49ed91bdf527e3dd0aede4fa01341e60f767c99f13175df19a9c16f"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/modules/atomic/vector/connector.py",
+      "hunk_identity": {
+        "old_start": 90,
+        "old_count": 6,
+        "new_start": 100,
+        "new_count": 13,
+        "patch_context_sha256": "3451c46b6ed439d7fc344d1d805b246bd347d8846dddafd428407fb53a940504"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/utils.py",
+      "hunk_identity": {
+        "old_start": 10,
+        "old_count": 6,
+        "new_start": 10,
+        "new_count": 7,
+        "patch_context_sha256": "4f7d27d385a78b063647bec2651a0242f0b85ac0f3ec84b469e37b82ed1c2b94"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "src/core/utils.py",
+      "hunk_identity": {
+        "old_start": 593,
+        "old_count": 6,
+        "new_start": 594,
+        "new_count": 63,
+        "patch_context_sha256": "12faf84e706321ce8c6c6a389fd50f0f9407951de18a80d244e3ae90074f040d"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-67425",
+      "file": "tests/modules/test_new_modules.py",
+      "hunk_identity": {
+        "old_start": 591,
+        "old_count": 6,
+        "new_start": 591,
+        "new_count": 13,
+        "patch_context_sha256": "3429e63dc299bd1c26e1d12afce112b1e6f547ccc7d8ee0f0d28ff937840f38a"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 74,
+        "old_count": 6,
+        "new_start": 74,
+        "new_count": 12,
+        "patch_context_sha256": "82f49d03175463f2d3da79e9d6869982b8e3f6917d6bdd96a88697d9bc54a584"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 101,
+        "old_count": 8,
+        "new_start": 107,
+        "new_count": 15,
+        "patch_context_sha256": "832e167ee566e90623c412443f3b6ce44ae9bfd7a6e53583d0251d56eac53aeb"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 110,
+        "old_count": 7,
+        "new_start": 123,
+        "new_count": 7,
+        "patch_context_sha256": "72fad997e13260dce97466c04637094a06ecd333399f10603ba86f06c066abde"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 123,
+        "old_count": 15,
+        "new_start": 136,
+        "new_count": 39,
+        "patch_context_sha256": "da29b58803393be0eb57141a0695c255ec1b31ff36d48adbf30e0d7b95646cd0"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 153,
+        "old_count": 7,
+        "new_start": 190,
+        "new_count": 9,
+        "patch_context_sha256": "1c4d5807e2da8e869364010e1f66841073c56f487e194ad881bc964caa56b5da"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 163,
+        "old_count": 7,
+        "new_start": 202,
+        "new_count": 9,
+        "patch_context_sha256": "cec83118c7483a360513efd746144d7f954e3e96caec7f56640549d50755d81e"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 178,
+        "old_count": 11,
+        "new_start": 219,
+        "new_count": 17,
+        "patch_context_sha256": "a3fd2fa38ddcdee548958fcd8c4e7444776d5688d76ed1bc72261275c1a2c9cc"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 202,
+        "old_count": 6,
+        "new_start": 249,
+        "new_count": 12,
+        "patch_context_sha256": "66efd51aa6a0b5ecd65160f435a116a99911ed2226cbdb76580d3d35bed74988"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/send_base_mode.py",
+      "hunk_identity": {
+        "old_start": 256,
+        "old_count": 11,
+        "new_start": 309,
+        "new_count": 13,
+        "patch_context_sha256": "cfcb1401428c144291ed21667db866a3573cc678526f5aee2565e748b8f80dec"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/share_mode.py",
+      "hunk_identity": {
+        "old_start": 300,
+        "old_count": 9,
+        "new_start": 300,
+        "new_count": 7,
+        "patch_context_sha256": "73d0dfd90995503f9d196b450e3c224b8d81e5ab341d4b1112ccccb958c6e096"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/share_mode.py",
+      "hunk_identity": {
+        "old_start": 349,
+        "old_count": 7,
+        "new_start": 347,
+        "new_count": 9,
+        "patch_context_sha256": "bc569d473a4c5d1d44728eb4c80c3c8c96beb115c51db55649767e35f711411b"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/share_mode.py",
+      "hunk_identity": {
+        "old_start": 576,
+        "old_count": 6,
+        "new_start": 576,
+        "new_count": 14,
+        "patch_context_sha256": "9da3fa039de081c9a4a6151914b7a0e2af3e4cd4b19db4d2ec301e772136dfa2"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/onionshare_cli/web/share_mode.py",
+      "hunk_identity": {
+        "old_start": 585,
+        "old_count": 18,
+        "new_start": 593,
+        "new_count": 25,
+        "patch_context_sha256": "e03c20db5d07583e87ee463a4dcf1a67e461bb79a45d8b4968bf0558cbb9be4f"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54706",
+      "file": "cli/tests/test_cli_web_symlink.py",
+      "hunk_identity": {
+        "old_start": 0,
+        "old_count": 0,
+        "new_start": 1,
+        "new_count": 267,
+        "patch_context_sha256": "4ee05962dfedaec560dbe80bf2f1fff9293b82a883da996b7ae964cd4d009bd7"
+      },
+      "mechanical_coverage": "NOT_APPLICABLE_ADDED",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "file": "setuptools/command/egg_info.py",
+      "hunk_identity": {
+        "old_start": 37,
+        "old_count": 6,
+        "new_start": 37,
+        "new_count": 27,
+        "patch_context_sha256": "45fb16ab91e1347b9e49500b60541762585b080fb2bc341d3787a9489085f3ac"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "file": "setuptools/command/egg_info.py",
+      "hunk_identity": {
+        "old_start": 46,
+        "old_count": 6,
+        "new_start": 67,
+        "new_count": 11,
+        "patch_context_sha256": "8ae9834c59c410c8b3cc365a3c6975796763a4e924ad89f5055812bed49b885e"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "file": "setuptools/command/egg_info.py",
+      "hunk_identity": {
+        "old_start": 117,
+        "old_count": 7,
+        "new_start": 143,
+        "new_count": 7,
+        "patch_context_sha256": "ba0d6b2c35a9e6a835646b9c7f0f142d59ad439a9f2a7694df102d240dd978df"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "file": "setuptools/tests/test_manifest.py",
+      "hunk_identity": {
+        "old_start": 10,
+        "old_count": 6,
+        "new_start": 10,
+        "new_count": 7,
+        "patch_context_sha256": "bb6b638a88fe2889e83a12e8862ac1cfe4b130f07f71e817f143c01976073d67"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "file": "setuptools/tests/test_manifest.py",
+      "hunk_identity": {
+        "old_start": 157,
+        "old_count": 6,
+        "new_start": 158,
+        "new_count": 21,
+        "patch_context_sha256": "9e11fc389fd1820109192e5cf74fb28439edef704f474d2fe99adf787c7c3b82"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "file": "setuptools/tests/test_manifest.py",
+      "hunk_identity": {
+        "old_start": 331,
+        "old_count": 6,
+        "new_start": 347,
+        "new_count": 35,
+        "patch_context_sha256": "4393797b35a8478510d6615b1053f668deea0eaa6d6e4d8f38a226753c0a2164"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-59890",
+      "file": "setuptools/unicode_utils.py",
+      "hunk_identity": {
+        "old_start": 19,
+        "old_count": 6,
+        "new_start": 19,
+        "new_count": 20,
+        "patch_context_sha256": "ba150c3acbd967d3f27a96cf294b7370ca8373062673bd899ffc19f99c4fd5d4"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "cli/onionshare_cli/web/receive_mode.py",
+      "hunk_identity": {
+        "old_start": 22,
+        "old_count": 6,
+        "new_start": 22,
+        "new_count": 7,
+        "patch_context_sha256": "96fa1f34f34ed674e0d2fbaaa944918607b23a6c0a9ed8fc3fcc994ee4abb716"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "cli/onionshare_cli/web/receive_mode.py",
+      "hunk_identity": {
+        "old_start": 91,
+        "old_count": 10,
+        "new_start": 92,
+        "new_count": 12,
+        "patch_context_sha256": "248e812414cab6e0d1a690438a5ff923ab68029195869064b79645bb10a1a4f8"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "cli/onionshare_cli/web/receive_mode.py",
+      "hunk_identity": {
+        "old_start": 133,
+        "old_count": 6,
+        "new_start": 136,
+        "new_count": 18,
+        "patch_context_sha256": "59aab4a333b0cda3ada8d10c82f55079857ef49b9926b1f46339908b94ea51d4"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "cli/onionshare_cli/web/receive_mode.py",
+      "hunk_identity": {
+        "old_start": 194,
+        "old_count": 10,
+        "new_start": 209,
+        "new_count": 10,
+        "patch_context_sha256": "2fda9bdde27b9bff6e3c5302fd65c698905f54c6807106e073dc8bbc3203f6f4"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "cli/onionshare_cli/web/receive_mode.py",
+      "hunk_identity": {
+        "old_start": 228,
+        "old_count": 7,
+        "new_start": 243,
+        "new_count": 9,
+        "patch_context_sha256": "52a11a8cb4c269f38da0362b62bb46cee528c531a24e2c6c0dcb062ae79b91e1"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "cli/onionshare_cli/web/receive_mode.py",
+      "hunk_identity": {
+        "old_start": 377,
+        "old_count": 6,
+        "new_start": 394,
+        "new_count": 7,
+        "patch_context_sha256": "c7c4bd6c01f919df543175c3896d7bbf5e8408766152906e75e95acc2c03b8c4"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "cli/onionshare_cli/web/receive_mode.py",
+      "hunk_identity": {
+        "old_start": 523,
+        "old_count": 6,
+        "new_start": 541,
+        "new_count": 16,
+        "patch_context_sha256": "80c577c1479f2963746f955d88b5a5c640585fd257fe5fae4addfaba6832de42"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "cli/onionshare_cli/web/receive_mode.py",
+      "hunk_identity": {
+        "old_start": 586,
+        "old_count": 9,
+        "new_start": 614,
+        "new_count": 24,
+        "patch_context_sha256": "c8460459343c61c1f35921be5e40c7fec61594efa0780b54a0b31fb4432c967c"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54707",
+      "file": "desktop/tests/test_gui_receive.py",
+      "hunk_identity": {
+        "old_start": 262,
+        "old_count": 7,
+        "new_start": 262,
+        "new_count": 87,
+        "patch_context_sha256": "39fb8edac2c1464e621d4f15153a7a1de741bf79e8a1bd7756e3f2bde62f5363"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54785",
+      "file": "src/__init__.py",
+      "hunk_identity": {
+        "old_start": 2,
+        "old_count": 5,
+        "new_start": 2,
+        "new_count": 5,
+        "patch_context_sha256": "8cb81885a70ada04aba60cf1bca59424a3d1e9a56a385f8d17d8d318df1d2959"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54785",
+      "file": "src/mcp_server.py",
+      "hunk_identity": {
+        "old_start": 1,
+        "old_count": 7,
+        "new_start": 1,
+        "new_count": 7,
+        "patch_context_sha256": "c0d1e24ce968e0cf8cf282e526e64d594e89846e940f3f05e5232285fbdd076e"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54785",
+      "file": "src/mcp_server.py",
+      "hunk_identity": {
+        "old_start": 127,
+        "old_count": 20,
+        "new_start": 127,
+        "new_count": 23,
+        "patch_context_sha256": "f7644618b6b7eed6c1c008b7eca0e51cd0de3b408433250516fbb9dc1becaafa"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54785",
+      "file": "src/mcp_server.py",
+      "hunk_identity": {
+        "old_start": 192,
+        "old_count": 7,
+        "new_start": 195,
+        "new_count": 12,
+        "patch_context_sha256": "f31f62f085a6e6cc5f05cbe102f93eaa2d2c910f3c8433c9f37c645ff87140c7"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54785",
+      "file": "src/mcp_server.py",
+      "hunk_identity": {
+        "old_start": 441,
+        "old_count": 7,
+        "new_start": 449,
+        "new_count": 8,
+        "patch_context_sha256": "48e353ed6c8b562a78ac5dc4be8c668e7a74ef41da23d1c1adc1540777833cfa"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54785",
+      "file": "tests/test_mcp_server.py",
+      "hunk_identity": {
+        "old_start": 298,
+        "old_count": 6,
+        "new_start": 298,
+        "new_count": 98,
+        "patch_context_sha256": "295587425b85dc9fb373054bfe7f4a00538d6ed11abb545b0f7f39dceca08603"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50181",
+      "file": "langroid/agent/tools/file_tools.py",
+      "hunk_identity": {
+        "old_start": 9,
+        "old_count": 7,
+        "new_start": 9,
+        "new_count": 12,
+        "patch_context_sha256": "e19dd8b05b65cf9c9b1f515efaf44af9fd9dedbd48e6e2efbfa3ad415d818507"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50181",
+      "file": "langroid/agent/tools/file_tools.py",
+      "hunk_identity": {
+        "old_start": 58,
+        "old_count": 6,
+        "new_start": 63,
+        "new_count": 10,
+        "patch_context_sha256": "efd2f2b76d7721a8aeb927e8dfe85e29a4ca80ae395c0b59521205c4a44e56f0"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50181",
+      "file": "langroid/agent/tools/file_tools.py",
+      "hunk_identity": {
+        "old_start": 164,
+        "old_count": 6,
+        "new_start": 173,
+        "new_count": 10,
+        "patch_context_sha256": "9041d9064e2b8c843fac12ff405fb3a302a151abed015c5efb86c34fdcd4b85c"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50181",
+      "file": "langroid/agent/tools/file_tools.py",
+      "hunk_identity": {
+        "old_start": 221,
+        "old_count": 6,
+        "new_start": 234,
+        "new_count": 10,
+        "patch_context_sha256": "2e58be50c9d2f60a7df16863ff9f0fc7b18163d2580e9af23075604e385dd260"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50181",
+      "file": "langroid/utils/system.py",
+      "hunk_identity": {
+        "old_start": 187,
+        "old_count": 6,
+        "new_start": 187,
+        "new_count": 34,
+        "patch_context_sha256": "d5d474af00bb18cef0606bf7618d1e14cd5ca405af9e3447b8d34695e901c4ba"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-50181",
+      "file": "tests/main/test_file_tools.py",
+      "hunk_identity": {
+        "old_start": 308,
+        "old_count": 3,
+        "new_start": 308,
+        "new_count": 91,
+        "patch_context_sha256": "e6e5ab74046db05df4a5557cec455e4a265aa8e48efdb102eba830953b39d8b3"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/commands/restore.py",
+      "hunk_identity": {
+        "old_start": 48,
+        "old_count": 6,
+        "new_start": 48,
+        "new_count": 7,
+        "patch_context_sha256": "059fa83e93b2741d8d188430dc3473b6da9b2e3dca300295996f7e331b53a590"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/commands/restore.py",
+      "hunk_identity": {
+        "old_start": 183,
+        "old_count": 6,
+        "new_start": 184,
+        "new_count": 39,
+        "patch_context_sha256": "00a06f9d638ad7a816731fe06354ff0cf9bda9f2235780c0d652407720f84407"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/commands/restore.py",
+      "hunk_identity": {
+        "old_start": 289,
+        "old_count": 6,
+        "new_start": 323,
+        "new_count": 13,
+        "patch_context_sha256": "8decbd48461df072cef0b7e5f51dd827cefa4fd84f593d24a8b94cf563827c12"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/commands/restore.py",
+      "hunk_identity": {
+        "old_start": 317,
+        "old_count": 7,
+        "new_start": 358,
+        "new_count": 15,
+        "patch_context_sha256": "bd5d136794cc4760c8ad8aab436c271c6abd77169ade100af6095e5e22056741"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/build_engine/copy_step.py",
+      "hunk_identity": {
+        "old_start": 49,
+        "old_count": 6,
+        "new_start": 49,
+        "new_count": 7,
+        "patch_context_sha256": "7520a8770f6809a94846366ccecb882d0d7f97cd510fd7ffdf23c35af60199ae"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/build_engine/copy_step.py",
+      "hunk_identity": {
+        "old_start": 430,
+        "old_count": 11,
+        "new_start": 431,
+        "new_count": 26,
+        "patch_context_sha256": "49c2acabd51a3417f997851722e03c676f05f311516830c3a7b3240cfb386d98"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/tar_extract.py",
+      "hunk_identity": {
+        "old_start": 37,
+        "old_count": 13,
+        "new_start": 37,
+        "new_count": 25,
+        "patch_context_sha256": "ece5bc6d753722ceac9a2c09ceed34be729f4c91d4784e33a4f40ee421e7765f"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/tar_extract.py",
+      "hunk_identity": {
+        "old_start": 92,
+        "old_count": 8,
+        "new_start": 104,
+        "new_count": 18,
+        "patch_context_sha256": "34fea886ac733cc3b734897a0a106338d559a56aff94aa0045a7857427e957f9"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/tar_extract.py",
+      "hunk_identity": {
+        "old_start": 133,
+        "old_count": 11,
+        "new_start": 155,
+        "new_count": 15,
+        "patch_context_sha256": "b07c078095bebc072aa2952eb69b51b6dae402b3cface9245b29a3211aa8bf73"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/tar_extract.py",
+      "hunk_identity": {
+        "old_start": 145,
+        "old_count": 6,
+        "new_start": 171,
+        "new_count": 11,
+        "patch_context_sha256": "810b3bd72c9eb495a75d6b4e3e91da8a58ef3ac99bc996188414b6edc400b574"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/tar_extract.py",
+      "hunk_identity": {
+        "old_start": 156,
+        "old_count": 7,
+        "new_start": 187,
+        "new_count": 7,
+        "patch_context_sha256": "1e9567e5a22ea9cfd9f0de896cb12f1878a9bef1e9cac850c9993e6fcfbf928c"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/tar_extract.py",
+      "hunk_identity": {
+        "old_start": 202,
+        "old_count": 7,
+        "new_start": 233,
+        "new_count": 7,
+        "patch_context_sha256": "8ff633d87afa3e7a9d709b172d27b20284cce1cdecd313851a325cfdf4127c7e"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/tar_extract.py",
+      "hunk_identity": {
+        "old_start": 211,
+        "old_count": 6,
+        "new_start": 242,
+        "new_count": 11,
+        "patch_context_sha256": "67669eefe236079af8f455973b96029d5296552500274d94aee0d31b7a7e155d"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-54574",
+      "file": "proot_distro/helpers/tar_extract.py",
+      "hunk_identity": {
+        "old_start": 218,
+        "old_count": 8,
+        "new_start": 254,
+        "new_count": 60,
+        "patch_context_sha256": "a52434ebe01889f54c369ee1e8758ebabc5c68c13bb7368b8f60ecf33fab1f0f"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/config.py",
+      "hunk_identity": {
+        "old_start": 6,
+        "old_count": 6,
+        "new_start": 6,
+        "new_count": 7,
+        "patch_context_sha256": "4b86a073e879b1c4eff6ad1702f1dbba26d06ac8769d460245535baeed5c0ade"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/config.py",
+      "hunk_identity": {
+        "old_start": 17,
+        "old_count": 7,
+        "new_start": 18,
+        "new_count": 7,
+        "patch_context_sha256": "630344aa0b88bc4ea298138f0aadbbe7131f11205c6065108f0056f5e36e408a"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/config.py",
+      "hunk_identity": {
+        "old_start": 148,
+        "old_count": 18,
+        "new_start": 149,
+        "new_count": 37,
+        "patch_context_sha256": "62a50e7090ce40e52b81245f1833506ce61987d26714b2d7316811aa4b52f4d2"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/config.py",
+      "hunk_identity": {
+        "old_start": 297,
+        "old_count": 30,
+        "new_start": 317,
+        "new_count": 96,
+        "patch_context_sha256": "779d33aa9156aef4d9559306d8eb907388f4377a36596b45bc8b8d98b83083e9"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/config.py",
+      "hunk_identity": {
+        "old_start": 624,
+        "old_count": 6,
+        "new_start": 710,
+        "new_count": 89,
+        "patch_context_sha256": "8ae1036730daa20d058fa7e59defec681cc1ebfa7efb92559caebb6285592c73"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/config.py",
+      "hunk_identity": {
+        "old_start": 638,
+        "old_count": 6,
+        "new_start": 807,
+        "new_count": 8,
+        "patch_context_sha256": "c1ebb0d0e446a816738d84e98b688d862550bb58006357465b54cf8948659f53"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/mcp.py",
+      "hunk_identity": {
+        "old_start": 1,
+        "old_count": 10,
+        "new_start": 1,
+        "new_count": 9,
+        "patch_context_sha256": "9512a0ab45cba32886f4fd9e39ae4690f5691f95289be8662eb1f99d3a3b6011"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/mcp.py",
+      "hunk_identity": {
+        "old_start": 29,
+        "old_count": 71,
+        "new_start": 28,
+        "new_count": 277,
+        "patch_context_sha256": "a11ed2a7f3ff247f7203dc5ff4ef6d2d9a01bddbe014d8c3402566024cc48cfa"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 10,
+        "old_count": 7,
+        "new_start": 10,
+        "new_count": 7,
+        "patch_context_sha256": "8f3d18593937910b723a2cf82135df3ed832e99e90370145abcee9d03e4e7fc4"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 875,
+        "old_count": 10,
+        "new_start": 875,
+        "new_count": 24,
+        "patch_context_sha256": "b129c10d8b88ce73024e9e0477ef3cb31295afc8151fc012596f35f47564862e"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 1305,
+        "old_count": 12,
+        "new_start": 1319,
+        "new_count": 112,
+        "patch_context_sha256": "e5913e9e103d9f71cf7ac209adeca5614ecbb63d3b9039bb4029e56dabb8908b"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 1321,
+        "old_count": 15,
+        "new_start": 1435,
+        "new_count": 24,
+        "patch_context_sha256": "0945db42a12f40d1d0ef4ed8c4822b56852daffa98b13e6ea856fe4bb2320cda"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 1351,
+        "old_count": 65,
+        "new_start": 1474,
+        "new_count": 126,
+        "patch_context_sha256": "a2f358e76113bcf17b4d694311dd8021529d6a30f77570e9d81a08e92c2b713b"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 1422,
+        "old_count": 38,
+        "new_start": 1606,
+        "new_count": 90,
+        "patch_context_sha256": "4d824efc38c1dbe0e91f4437cc1c7c82f7b6656d4fbbc044ebe34647ee481334"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 1469,
+        "old_count": 7,
+        "new_start": 1705,
+        "new_count": 17,
+        "patch_context_sha256": "1f9f1ce02c143ccb58f044b111bb1f21d1b2bd24fc8039aecba476c75172d75f"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 1497,
+        "old_count": 21,
+        "new_start": 1743,
+        "new_count": 55,
+        "patch_context_sha256": "0fab7fb64e6cb96e2da956eafa9fe9bbafa039c138162d6a781685a5f4185945"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/server.py",
+      "hunk_identity": {
+        "old_start": 1522,
+        "old_count": 45,
+        "new_start": 1802,
+        "new_count": 101,
+        "patch_context_sha256": "ddd9c3f0f08b88cf3b18a92de52d36345cb5ca45c13245e3359d1113ca5d4d5d"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/session.py",
+      "hunk_identity": {
+        "old_start": 22,
+        "old_count": 6,
+        "new_start": 22,
+        "new_count": 42,
+        "patch_context_sha256": "0dde3d2706a1278b1303fd899ffdb722fbe7fee440d2dfdc11be0334e3c0eea1"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/session.py",
+      "hunk_identity": {
+        "old_start": 45,
+        "old_count": 24,
+        "new_start": 81,
+        "new_count": 7,
+        "patch_context_sha256": "781d90cb0bdb6c34ed5d24f74734a636db66518af87a789dafac7dac47c2a003"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/session.py",
+      "hunk_identity": {
+        "old_start": 370,
+        "old_count": 6,
+        "new_start": 389,
+        "new_count": 38,
+        "patch_context_sha256": "58406821fca724a89ca79266122a7db9b5c3c0291c820b8fccb354d5e34eddea"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/types.py",
+      "hunk_identity": {
+        "old_start": 21,
+        "old_count": 7,
+        "new_start": 21,
+        "new_count": 7,
+        "patch_context_sha256": "75c05012b76e026c2424f2c43d254b4e262813213ad5cd995111d753dbd47664"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/types.py",
+      "hunk_identity": {
+        "old_start": 245,
+        "old_count": 34,
+        "new_start": 245,
+        "new_count": 29,
+        "patch_context_sha256": "ff5ce9c9735485f0b4455a875af52e5426ad5d09da7ea468a0809f4c8b1f87d5"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/chainlit/version.py",
+      "hunk_identity": {
+        "old_start": 1,
+        "old_count": 1,
+        "new_start": 1,
+        "new_count": 1,
+        "patch_context_sha256": "482d3a070eae6e43644f3a691fa62550d4a956c63b3eaf9860446b81661c905f"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/tests/test_config.py",
+      "hunk_identity": {
+        "old_start": 1,
+        "old_count": 10,
+        "new_start": 1,
+        "new_count": 22,
+        "patch_context_sha256": "f8512dc59bacdec51c1996e3545817490bf2d3ad191ada636a87a4891990ff9d"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/tests/test_config.py",
+      "hunk_identity": {
+        "old_start": 125,
+        "old_count": 3,
+        "new_start": 137,
+        "new_count": 501,
+        "patch_context_sha256": "18488ae2c8a25c7077ef147d8d460901ce2e6de07b9c3db8e0168d98d7b928d6"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/tests/test_mcp.py",
+      "hunk_identity": {
+        "old_start": 1,
+        "old_count": 15,
+        "new_start": 1,
+        "new_count": 40,
+        "patch_context_sha256": "98ef46bd7256a6a7d6c5649cb78f561497c324793f71b1ae4d3f06f63f656946"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/tests/test_mcp.py",
+      "hunk_identity": {
+        "old_start": 179,
+        "old_count": 197,
+        "new_start": 204,
+        "new_count": 235,
+        "patch_context_sha256": "809758e13b9f02a517ecffd40502de30cefa1d20013d3b4ee18a146db28ee868"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/tests/test_mcp.py",
+      "hunk_identity": {
+        "old_start": 404,
+        "old_count": 6,
+        "new_start": 467,
+        "new_count": 7,
+        "patch_context_sha256": "e6553608ed9f70e3c9050a88fe5ec30e356239aab76d8854661dbfcf8e4714cd"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/tests/test_mcp.py",
+      "hunk_identity": {
+        "old_start": 432,
+        "old_count": 15,
+        "new_start": 496,
+        "new_count": 1947,
+        "patch_context_sha256": "4a133d3b4696100f9fd66763e77c13c38a9372faf594ab2d4d49764fd1cce341"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "backend/tests/test_session.py",
+      "hunk_identity": {
+        "old_start": 763,
+        "old_count": 3,
+        "new_start": 763,
+        "new_count": 27,
+        "patch_context_sha256": "09b73197ae39cb284ca5326ebe894b77e0ca4a8382472e2232ae9914ec67d2fb"
+      },
+      "mechanical_coverage": "FULL",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "cypress/e2e/config_overrides/main.py",
+      "hunk_identity": {
+        "old_start": 6,
+        "old_count": 6,
+        "new_start": 6,
+        "new_count": 7,
+        "patch_context_sha256": "bc7785c293fc910599bbd0bbe2fba0650536568239f6000ea9ecca1ebeb389d6"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    },
+    {
+      "sample_id": "CVE-2026-45019",
+      "file": "cypress/e2e/config_overrides/main.py",
+      "hunk_identity": {
+        "old_start": 47,
+        "old_count": 9,
+        "new_start": 48,
+        "new_count": 13,
+        "patch_context_sha256": "c5ea81d1712ab4c33ec1362a5f9ccfaf04c868ea9ff4179cc52c74605907b60a"
+      },
+      "mechanical_coverage": "ABSENT",
+      "criticality": "UNCLEAR",
+      "reason": null,
+      "oracle": null,
+      "reviewer_1": null,
+      "reviewer_2": null,
+      "adjudication": null
+    }
+  ]
+}

@@ -5,11 +5,10 @@
     "canonical_manifest_sha256": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996",
     "supersedes": "cpg/ablation/artifacts/canonical_corpus_manifest.json",
     "supersedes_sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
-    "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
-    "stale_policy": "基于旧 manifest 生成的 V4 派生工件（gate_a_report / real|placebo|shuffled_manifest / v4_canonical_manifest / v4_upstream_real_report / v4_feasibility_table / patches/**）已由本次从 v2 的重新生成**完全替换**，无残留旧工件"
+    "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH"
   },
   "generated_from": {
-    "git_commit": "b11e85f4050f0dbd6515e75b12a9687511071a1d",
+    "git_commit": "f5619a90c3de4b912739b4ee4dbeb5574b4b1869",
     "n_candidates": 15,
     "n_confirmation": 14
   },
@@ -195,8 +194,15 @@
   "registry_check": {
     "errors": []
   },
+  "coverage_check": {
+    "errors": [
+      "critical registry 未冻结（status=DRAFT_UNLABELED）→ 无法区分关键/非关键 hunk，暂按保守阻断：['CVE-2026-45019', 'CVE-2026-67424', 'CVE-2026-67425', 'CVE-2026-73498']"
+    ],
+    "detector_is_gate": true
+  },
   "gate_a_pass": false,
   "blockers": [
+    "coverage: [\"critical registry 未冻结（status=DRAFT_UNLABELED）→ 无法区分关键/非关键 hunk，暂按保守阻断：['CVE-2026-45019', 'CVE-2026-67424', 'CVE-2026-67425', 'CVE-2026-73498']\"]",
     "placebo token ratio out of bounds",
     "shuffled token ratio out of bounds",
     "real patch 超 num_ctx: ['CVE-2026-45019']"

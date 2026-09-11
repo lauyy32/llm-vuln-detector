@@ -450,10 +450,6 @@ def build_gate_a_report(out_dir: Path) -> dict:
             "supersedes_sha256": (_sha256_bytes(OLD_CANONICAL_MANIFEST.read_bytes())
                                   if OLD_CANONICAL_MANIFEST.exists() else None),
             "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
-            "stale_policy": ("基于旧 manifest 生成的 V4 派生工件（gate_a_report / "
-                             "real|placebo|shuffled_manifest / v4_canonical_manifest / "
-                             "v4_upstream_real_report / v4_feasibility_table / patches/**）"
-                             "已由本次从 v2 的重新生成**完全替换**，无残留旧工件"),
         },
         "generated_from": {"git_commit": _git_commit(),
                            "n_candidates": cm["n_candidates"],
@@ -511,10 +507,41 @@ def build_gate_a_report(out_dir: Path) -> dict:
             if not p.exists() or _sha256_bytes(p.read_bytes()) != act[0]["sha256"]:
                 registry_errs.append("registry V4 manifest SHA 漂移")
     report["registry_check"] = {"errors": registry_errs}
+    # P0 接线：coverage detector 真正进入 Gate 判定（此前只产报告、未消费）
+    coverage_errs = []
+    cov_path = out_dir / "v4_hunk_coverage.json"
+    if not cov_path.exists():
+        coverage_errs.append("缺 v4_hunk_coverage.json（coverage 门禁不可跳过）")
+    else:
+        cov = json.loads(cov_path.read_text(encoding="utf-8"))
+        if cov.get("kind") != "MECHANICAL_COVERAGE_AUDIT":
+            coverage_errs.append(f"coverage kind 异常: {cov.get('kind')}")
+        # critical registry 未冻结时：任何 ABSENT 一律阻断（保守），并显式标注原因
+        reg_path = out_dir / "critical_hunks.json"
+        reg_frozen = False
+        if reg_path.exists():
+            reg = json.loads(reg_path.read_text(encoding="utf-8"))
+            reg_frozen = reg.get("status") == "FROZEN_LABELED"
+        if cov.get("mechanical_absent_samples"):
+            if not reg_frozen:
+                coverage_errs.append(
+                    f"critical registry 未冻结（status=DRAFT_UNLABELED）→ 无法区分关键/"
+                    f"非关键 hunk，暂按保守阻断：{cov['mechanical_absent_samples']}")
+            else:
+                crit = [e for e in reg.get("entries", [])
+                        if e.get("criticality") == "SECURITY_CRITICAL"
+                        and e.get("mechanical_coverage") == "ABSENT"]
+                if crit:
+                    coverage_errs.append(
+                        f"security-critical hunk ABSENT: "
+                        f"{sorted({c['sample_id'] for c in crit})}")
+    report["coverage_check"] = {"errors": coverage_errs, "detector_is_gate": True}
     # Gate A 总判定
     blockers = []
     if cm["errors"]:
         blockers.append("canonical errors")
+    if coverage_errs:
+        blockers.append(f"coverage: {coverage_errs[:2]}")
     if registry_errs:
         blockers.append(f"registry: {registry_errs}")
     up = report["upstream"]
@@ -835,86 +862,124 @@ def build_g0_prompts(out_dir: Path) -> dict:
     return doc
 
 
-def build_hunk_coverage(out_dir: Path) -> dict:
-    """P0-2 门禁：逐 hunk 报告源码摘录覆盖状态（FULL / PARTIAL / ABSENT）。
+def _parse_patch_hunks(patch_text: str) -> dict:
+    """解析 patch → {file: [{old_start, old_count, new_start, new_count, header, ctx_sha}]}。
 
-    动机：excerpt_vuln_for_patch 有内部字符预算，装不下的文件被静默跳过——可能
-    重现"语料已补全、表示层又删掉核心证据"的旧问题。仅"code_text 非空"远远不够。
-
-    对每个 real-patch hunk：判定其**删除侧（vulnerable 源码）行范围**是否被摘录
-    完整覆盖。security-critical 标注（来自 partial_arm_construction.md）为人工/协议
-    产物，本报告先给机械覆盖；`security_critical` 字段留待录入。
+    带上下文 SHA（hunk 头 + 其后 3 行），使 hunk 身份不依赖易漂移的纯行号。
+    malformed hunk header → 抛 ValueError（fail-closed）。
     """
     import re
-    report = {"schema": "v4-hunk-coverage/1",
-              "note": "security_critical 标注须由协议/人工录入；本表先给机械覆盖",
+    out: dict = {}
+    cur = None
+    buf = patch_text.split("\n")
+    for i, ln in enumerate(buf):
+        if ln.startswith("diff --git ") and " b/" in ln:
+            cur = ln.split(" b/", 1)[1].strip()
+            out.setdefault(cur, [])
+        elif ln.startswith("@@ ") and cur is not None:
+            m = re.match(r"@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@(.*)", ln)
+            if not m:
+                raise ValueError(f"malformed hunk header: {ln[:80]}")
+            ctx = "\n".join(buf[i:i + 4])
+            out[cur].append({
+                "old_start": int(m.group(1)), "old_count": int(m.group(2) or 1),
+                "new_start": int(m.group(3)), "new_count": int(m.group(4) or 1),
+                "header": ln, "patch_context_sha256": _sha256_bytes(ctx.encode("utf-8")),
+            })
+    return out
+
+
+def build_hunk_coverage(out_dir: Path) -> dict:
+    """机械覆盖审计（**detector，非 gate**）：逐 hunk 报告表示覆盖。
+
+    命名纪律（codex）：本产物只给 `mechanical_absent_samples`——即"至少一个 hunk
+    未进入表示"的样本；**不是** `confirmatory_blocking_samples`（后者须待
+    security-critical registry 冻结后才能生成）。
+
+    三分类的诚实边界：当前表示按**整文件**纳入/丢弃，故 PARTIAL 实际不可产生；
+    且 `old_count==0`（纯新增 hunk）在 vulnerable 侧无对应行，单列
+    `NOT_APPLICABLE_ADDED`，不计入 ABSENT。
+    """
+    report = {"schema": "v4-hunk-coverage/2",
+              "kind": "MECHANICAL_COVERAGE_AUDIT",
+              "gate_consumer": None,  # 由 Gate 读取（见 build_gate_a_report）
+              "note": ("本表为机械 detector；security_critical 标注须由冻结 registry 提供，"
+                       "在此之前**不得**据此声称确认性阻断"),
               "samples": {}}
     for cve in V4_CANDIDATES:
         sd = sample_dir_path(cve)
         patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
         code = excerpt_vuln_for_patch(sd, patch)
-        # 记录摘录实际包含的 (文件, 行号集合)
-        covered: dict = {}
-        cur = None
+        kept = set()
         for ln in code.split("\n"):
             if ln.startswith("// ---- ") and ln.endswith(" ----"):
-                cur = ln[len("// ---- "):-len(" ----")]
-                covered.setdefault(cur, set())
-        # 重新精确计算：摘录中每个文件实际保留的原始行号
-        hunks_by_file: dict = {}
-        cur = None
-        for ln in patch.split("\n"):
-            if ln.startswith("diff --git ") and " b/" in ln:
-                cur = ln.split(" b/", 1)[1].strip()
-                hunks_by_file.setdefault(cur, [])
-            elif ln.startswith("@@ ") and cur is not None:
-                m = re.match(r"@@ -(\d+)(?:,(\d+))?", ln)
-                if m:
-                    hunks_by_file[cur].append((int(m.group(1)), int(m.group(2) or 1)))
+                kept.add(ln[len("// ---- "):-len(" ----")])
+        hunks_by_file = _parse_patch_hunks(patch)
         WINDOW = 20
-        # 摘录中**实际保留**的文件集合（被预算丢弃的文件，其 hunk 一律 ABSENT）
-        kept_files = set()
-        for ln in code.split("\n"):
-            if ln.startswith("// ---- ") and ln.endswith(" ----"):
-                kept_files.add(ln[len("// ---- "):-len(" ----")])
         rows = []
-        n_absent = n_partial = n_full = 0
+        n = {"FULL": 0, "PARTIAL": 0, "ABSENT": 0, "NOT_APPLICABLE_ADDED": 0}
         for rel in sorted(hunks_by_file):
             p = sd / "vuln" / rel
             lines = (p.read_text(encoding="utf-8", errors="replace").split("\n")
                      if p.exists() else [])
-            for start, count in hunks_by_file[rel]:
-                want = set(range(start - 1, start - 1 + count))
-                if rel not in kept_files:
-                    status = "ABSENT"          # 文件被预算整体丢弃
+            for h in hunks_by_file[rel]:
+                if h["old_count"] == 0:
+                    status = "NOT_APPLICABLE_ADDED"   # vulnerable 侧无对应行
+                elif rel not in kept:
+                    status = "ABSENT"                 # 文件被预算整体丢弃
                 else:
-                    lo = max(0, start - 1 - WINDOW)
-                    hi = min(len(lines), start - 1 + count + WINDOW)
+                    lo = max(0, h["old_start"] - 1 - WINDOW)
+                    hi = min(len(lines), h["old_start"] - 1 + h["old_count"] + WINDOW)
+                    want = set(range(h["old_start"] - 1, h["old_start"] - 1 + h["old_count"]))
                     inter = len(want & set(range(lo, hi)))
-                    status = ("FULL" if inter == len(want) and want
+                    status = ("FULL" if inter == len(want)
                               else "PARTIAL" if inter > 0 else "ABSENT")
-                if status == "FULL":
-                    n_full += 1
-                elif status == "PARTIAL":
-                    n_partial += 1
-                else:
-                    n_absent += 1
-                rows.append({"file": rel, "old_start": start, "old_count": count,
-                             "file_kept": rel in kept_files,
-                             "coverage": status, "security_critical": None})
-        report["samples"][cve] = {"n_hunks": len(rows), "FULL": n_full,
-                                  "PARTIAL": n_partial, "ABSENT": n_absent,
-                                  "hunks": rows}
-    tot_abs = sum(s["ABSENT"] for s in report["samples"].values())
-    tot_par = sum(s["PARTIAL"] for s in report["samples"].values())
-    report["totals"] = {"FULL": sum(s["FULL"] for s in report["samples"].values()),
-                        "PARTIAL": tot_par, "ABSENT": tot_abs}
-    # 停止条件（机械层）：hunk 的 vulnerable 行范围 ABSENT → 该样本不得进确认性分析
-    report["blocking_samples"] = sorted(
+                n[status] += 1
+                rows.append({"file": rel, "file_kept": rel in kept,
+                             "hunk_identity": {k: h[k] for k in
+                                               ("old_start", "old_count", "new_start",
+                                                "new_count", "patch_context_sha256")},
+                             "coverage": status,
+                             "criticality": "UNCLEAR"})  # 待 registry 录入
+        report["samples"][cve] = {"n_hunks": len(rows), **n, "hunks": rows}
+    report["totals"] = {k: sum(s[k] for s in report["samples"].values())
+                        for k in ("FULL", "PARTIAL", "ABSENT", "NOT_APPLICABLE_ADDED")}
+    report["mechanical_absent_samples"] = sorted(
         [c for c, s in report["samples"].items() if s["ABSENT"] > 0])
+    report["confirmatory_blocking_samples"] = None  # 待 critical registry 冻结
     write_text_lf(out_dir / "v4_hunk_coverage.json",
                   json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     return report
+
+
+def build_critical_hunk_registry(out_dir: Path) -> dict:
+    """冻结前的 registry 骨架（机器可读，供双人标注）。
+
+    关键 hunk 定位用**上下文 SHA**（不依赖易漂移的行号）。criticality 默认 UNCLEAR；
+    reviewer 标注为 SECURITY_CRITICAL / NON_CRITICAL，并填 reason/oracle/adjudication。
+    """
+    cov = json.loads((out_dir / "v4_hunk_coverage.json").read_text(encoding="utf-8"))
+    entries = []
+    for cve, s in cov["samples"].items():
+        for h in s["hunks"]:
+            entries.append({
+                "sample_id": cve, "file": h["file"],
+                "hunk_identity": h["hunk_identity"],
+                "mechanical_coverage": h["coverage"],
+                "criticality": "UNCLEAR",
+                "reason": None, "oracle": None,
+                "reviewer_1": None, "reviewer_2": None, "adjudication": None,
+            })
+    doc = {"schema": "v4-critical-hunks/1",
+           "status": "DRAFT_UNLABELED",
+           "note": ("须由两名独立 reviewer 标注 criticality（SECURITY_CRITICAL/"
+                    "NON_CRITICAL），分歧由第三人仲裁；标注冻结后方可生成 "
+                    "confirmatory_blocking_samples，并据此重写摘录策略"),
+           "hunk_identity_note": "定位用 patch_context_sha256（行号会随上游/生成漂移）",
+           "n_entries": len(entries), "entries": entries}
+    write_text_lf(out_dir / "critical_hunks.json",
+                  json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+    return doc
 
 
 def main() -> int:
@@ -999,8 +1064,11 @@ def main() -> int:
                       f"{r.get('error') or str(r.get('prompt_tokens')) + ' tok'}")
     if args.step in ("coverage", "all"):
         cov = build_hunk_coverage(args.out_dir)
-        print(f"[Coverage] hunk 覆盖 {cov['totals']}；"
-              f"含 ABSENT 的样本 {len(cov['blocking_samples'])}: {cov['blocking_samples']}")
+        reg = build_critical_hunk_registry(args.out_dir)
+        print(f"[Coverage] 机械审计 {cov['totals']}；mechanical_absent_samples="
+              f"{len(cov['mechanical_absent_samples'])}: {cov['mechanical_absent_samples']}")
+        print(f"[CriticalRegistry] {reg['n_entries']} 条，status={reg['status']}"
+              f"（待双人标注）")
     return 0
 
 
