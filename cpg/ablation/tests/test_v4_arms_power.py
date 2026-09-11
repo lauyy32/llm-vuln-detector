@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-"""A-3 步 2/3/4/5 验收：token 匹配 / shuffled 约束 / oracle 判据 / 功效脚本。
-
-纪律：**确定性**（同输入同输出）、**fail-closed**（无候选/未知状态不得静默通过）、
-**已知值校验**（功效与既有 McNemar 口径交叉核对）。
-"""
+"""A-3 步 2/3/4/5（返工版）验收：覆盖评审 2 指出的全部 P0 反例。"""
+import inspect
 import sys
 import unittest
 from pathlib import Path
@@ -13,231 +10,251 @@ sys.path.insert(0, str(ROOT))
 from cpg.ablation import v4_arms as va  # noqa: E402
 from cpg.ablation import v4_power as vp  # noqa: E402
 
-
-# ===========================================================================
-# 步 2：token 匹配搜索
-# ===========================================================================
-class TestTokenMatchSearch(unittest.TestCase):
-    def _cands(self):
-        return [va.Candidate(key=f"c{i}", tokens=t)
-                for i, t in enumerate((80, 100, 120, 160))]
-
-    def test_selects_closest_and_ratio_unrounded(self):
-        r = va.token_match_search(self._cands(), 100)
-        self.assertEqual(r["status"], "OK")
-        self.assertEqual(r["selected"].key, "c1")     # tokens=100
-        self.assertEqual(r["ratio"], 1.0)
-        self.assertTrue(r["in_bounds"])
-
-    def test_deterministic(self):
-        a = va.token_match_search(self._cands(), 110)
-        b = va.token_match_search(self._cands(), 110)
-        self.assertEqual(a["selected"].key, b["selected"].key)
-
-    def test_tie_break_by_key(self):
-        """|ratio-1| 相同时按 key 字典序最小者。"""
-        cands = [va.Candidate(key="zzz", tokens=90), va.Candidate(key="aaa", tokens=110)]
-        r = va.token_match_search(cands, 100)
-        self.assertEqual(r["selected"].key, "aaa")
-
-    def test_out_of_bounds_flagged_not_hidden(self):
-        r = va.token_match_search([va.Candidate(key="far", tokens=1000)], 100)
-        self.assertFalse(r["in_bounds"])
-        self.assertIn("bounds", r)
-
-    def test_empty_candidates_fail_closed(self):
-        r = va.token_match_search([], 100)
-        self.assertEqual(r["status"], "NO_CANDIDATE")
-        self.assertIsNone(r["selected"])
-        self.assertIn("不得静默跳过", r["reason"])
-
-    def test_bad_target_raises(self):
-        with self.assertRaises(ValueError):
-            va.token_match_search(self._cands(), 0)
-
-    def test_trace_present(self):
-        r = va.token_match_search(self._cands(), 100)
-        self.assertEqual(len(r["trace"]), 4)
-        self.assertIn("tie_break", r)
+_HEX = "a" * 64
 
 
-# ===========================================================================
-# 步 3：shuffled 约束
-# ===========================================================================
+def _cand(key, tokens):
+    return va.Candidate(key=key, tokens=tokens, tokenizer_sha256=_HEX,
+                        envelope_sha256=_HEX, prompt_sha256=_HEX)
+
+
+def _apply_ev(target_id="T", donor_id="D", code=0):
+    return {"target_id": target_id, "donor_id": donor_id,
+            "target_tree_sha256": _HEX, "donor_patch_sha256": _HEX,
+            "apply_command": "git apply --check donor.diff",
+            "apply_exit_code": code, "post_apply_tree_sha256": _HEX}
+
+
 def _donor(sid, **kw):
-    d = {"sample_id": sid, "apply_clean": True, "language": "python",
-         "cwe_family": "injection", "patch_tokens": 100, "n_files": 1,
-         "is_composite": False}
+    d = {"sample_id": sid, "language": "python", "cwe_family": "injection",
+         "patch_tokens": 100, "n_files": 1, "is_composite": False,
+         "apply_evidence": _apply_ev("TARGET", sid)}
     d.update(kw)
     return d
 
 
-TARGET = _donor("TARGET", patch_tokens=100)
+TARGET = {"sample_id": "TARGET", "language": "python", "cwe_family": "injection",
+          "patch_tokens": 100, "n_files": 1, "is_composite": False}
 
 
-class TestShuffleConstraints(unittest.TestCase):
-    def test_donor_equal_target_rejected_by_hard(self):
-        r = va.select_donor(TARGET, [_donor("TARGET")])
+def _ev(oracle="still_vulnerable"):
+    return va.OracleEvidence(oracle_type="pytest-regression", oracle_version="1.0",
+                             poc_sha256=_HEX, target_tree_sha256=_HEX,
+                             patch_sha256=_HEX, command="pytest -q tests/security",
+                             exit_code=1, raw_result_sha256=_HEX,
+                             parsed_verdict=oracle)
+
+
+# ===========================================================================
+# P0-2：token 搜索（整数距离；超界是失败状态）
+# ===========================================================================
+class TestTokenSearchReworked(unittest.TestCase):
+    def test_integer_distance_no_float(self):
+        r = va.token_match_search([_cand("a", 90), _cand("b", 111)], 100)
+        self.assertEqual(r["status"], "OK")
+        self.assertEqual(r["selected"].key, "a")      # |90-100|=10 < |111-100|=11
+        self.assertEqual(r["int_distance"], 10)
+
+    def test_tie_break_pure_integer(self):
+        """90 与 110 距 100 都是 10 → 按 key 字典序（整数距离无浮点歧义）。"""
+        r = va.token_match_search([_cand("zzz", 90), _cand("aaa", 110)], 100)
+        self.assertEqual(r["selected"].key, "aaa")
+
+    def test_out_of_bounds_is_failure_status(self):
+        """**评审 P0-2**：超界不得返回 OK。"""
+        r = va.token_match_search([_cand("far", 1000)], 100)
+        self.assertEqual(r["status"], "NO_IN_BOUNDS_CANDIDATE")
+        self.assertIsNone(r["selected"])
+        self.assertIn("不可放宽", r["reason"])
+
+    def test_borderline_in_bounds_ok(self):
+        r = va.token_match_search([_cand("lo", 80), _cand("hi", 125)], 100)
+        self.assertEqual(r["status"], "OK")
+
+    def test_non_integer_tokens_rejected(self):
+        r = va.token_match_search([_cand("x", 100.0)], 100)
+        self.assertEqual(r["status"], "INVALID_CANDIDATES")
+
+    def test_zero_tokens_rejected(self):
+        r = va.token_match_search([_cand("x", 0)], 100)
+        self.assertEqual(r["status"], "INVALID_CANDIDATES")
+
+    def test_duplicate_key_rejected(self):
+        r = va.token_match_search([_cand("dup", 100), _cand("dup", 110)], 100)
+        self.assertEqual(r["status"], "INVALID_CANDIDATES")
+
+    def test_missing_evidence_rejected(self):
+        """候选缺 tokenizer/envelope/prompt SHA → 不采信。"""
+        c = va.Candidate(key="noev", tokens=100)
+        r = va.token_match_search([c], 100)
+        self.assertEqual(r["status"], "INVALID_CANDIDATES")
+
+    def test_bad_bounds_raises(self):
+        for bad in [(1.0, 0.5), (0, 1), "x", (0.8,)]:
+            with self.assertRaises(ValueError):
+                va.token_match_search([_cand("a", 100)], 100, bounds=bad)
+
+    def test_bad_target_raises(self):
+        for bad in (0, -1, 1.5, True):
+            with self.assertRaises(ValueError):
+                va.token_match_search([_cand("a", 100)], bad)
+
+
+# ===========================================================================
+# P0-3：apply_clean 是 target×donor 关系；token_window 为硬约束
+# ===========================================================================
+class TestShuffleReworked(unittest.TestCase):
+    def test_hard_includes_token_window(self):
+        names = {n for n, _ in va.SHUFFLE_HARD_CONSTRAINTS}
+        self.assertIn("token_window", names)
+        self.assertNotIn("token_window", {n for n, _ in va.SHUFFLE_SOFT_CONSTRAINTS})
+
+    def test_apply_evidence_required(self):
+        d = _donor("D1")
+        d.pop("apply_evidence")
+        r = va.select_donor(TARGET, [d])
         self.assertEqual(r["status"], "NO_DONOR")
-        self.assertIn("硬约束", r["reason"])
 
-    def test_not_apply_clean_rejected_by_hard(self):
-        r = va.select_donor(TARGET, [_donor("D1", apply_clean=False)])
+    def test_apply_exit_code_nonzero_rejected(self):
+        r = va.select_donor(TARGET, [_donor("D1", apply_evidence=_apply_ev("TARGET", "D1", 1))])
         self.assertEqual(r["status"], "NO_DONOR")
 
-    def test_exact_match_no_relaxation(self):
+    def test_apply_evidence_target_mismatch_rejected(self):
+        r = va.select_donor(TARGET, [_donor("D1", apply_evidence=_apply_ev("OTHER", "D1"))])
+        self.assertEqual(r["status"], "NO_DONOR")
+
+    def test_apply_evidence_donor_mismatch_rejected(self):
+        r = va.select_donor(TARGET, [_donor("D1", apply_evidence=_apply_ev("TARGET", "OTHER"))])
+        self.assertEqual(r["status"], "NO_DONOR")
+
+    def test_token_window_cannot_be_relaxed(self):
+        """token 超出门禁的 donor 即便其它约束都不满足，也不得被选中。"""
+        far = _donor("FAR", patch_tokens=1000, language="java")
+        r = va.select_donor(TARGET, [far])
+        self.assertEqual(r["status"], "NO_DONOR")
+
+    def test_selects_and_reports_covariates(self):
         r = va.select_donor(TARGET, [_donor("D1")])
         self.assertEqual(r["status"], "OK")
-        self.assertEqual(r["relaxations"], [])
-        self.assertEqual(r["donor"]["sample_id"], "D1")
+        self.assertEqual(set(r["covariates"]), {"target", "donor"})
 
-    def test_relaxation_order_is_reverse_of_priority(self):
-        """只有语言不同的 donor → 必须记录放宽了哪些软约束，且顺序为**逆序**。"""
+    def test_relaxation_recorded_and_reverse_order(self):
         r = va.select_donor(TARGET, [_donor("D1", language="java")])
         self.assertEqual(r["status"], "OK")
-        # 逆序放宽：先放最弱的 not_composite，再 same_file_count，再 token_window，再 same_cwe_family，最后 same_language
-        self.assertTrue(r["relaxations"], r)
         self.assertEqual(r["relaxations"][0], "not_composite")
-        self.assertIn("same_language", r["relaxations"])
 
-    def test_no_donor_after_all_relaxations(self):
-        """唯一候选是目标自己 → 硬约束淘汰 → NO_DONOR（不静默降级）。"""
-        r = va.select_donor(TARGET, [_donor("TARGET", language="java")])
-        self.assertEqual(r["status"], "NO_DONOR")
-        self.assertEqual(r["n_donors"], 1)
-
-    def test_covariates_reported(self):
-        r = va.select_donor(TARGET, [_donor("D1")])
-        self.assertEqual(set(r["covariates"]), {"target", "donor"})
-        for side in ("target", "donor"):
-            self.assertEqual(set(r["covariates"][side]), set(va.COVARIATE_FIELDS))
-
-    def test_tie_break_deterministic(self):
-        ds = [_donor("D2"), _donor("D1"), _donor("D3")]
-        a = va.select_donor(TARGET, ds)
-        b = va.select_donor(TARGET, list(reversed(ds)))
-        self.assertEqual(a["donor"]["sample_id"], b["donor"]["sample_id"])
-
-    def test_registry_lists_constraints(self):
+    def test_evidence_field_list_in_registry(self):
         reg = va.arms_registry()
-        self.assertEqual(reg["schema"], va.ARMS_SCHEMA)
-        self.assertEqual(len(reg["fingerprint"]), 64)
-        hard = {x["name"] for x in reg["shuffle"]["hard"]}
-        soft = {x["name"] for x in reg["shuffle"]["soft_in_relax_order"]}
-        self.assertEqual(hard, {"donor_ne_target", "apply_clean"})
-        self.assertIn("same_language", soft)
-        self.assertEqual(len(soft), len(va.SHUFFLE_SOFT_CONSTRAINTS))
+        self.assertEqual(set(reg["shuffle"]["apply_evidence_fields"]),
+                         set(va.APPLY_EVIDENCE_FIELDS))
 
 
 # ===========================================================================
-# 步 4：oracle 判据
+# P0-4：shuffled 的 ground truth 是**目标**漏洞状态；oracle 需证据链
 # ===========================================================================
-class TestArmOracle(unittest.TestCase):
-    def test_four_arms_registered(self):
-        reg = va.arms_registry()
-        self.assertEqual(reg["n_arms"], 4)
-        self.assertEqual(set(reg["arms"]),
-                         {"annotated-security-complete", "support-only-insufficient",
-                          "placebo", "shuffled"})
+class TestOracleReworked(unittest.TestCase):
+    def test_shuffled_checks_target_not_donor_state(self):
+        """**评审 P0-4**：donor 自身 fixed 也不影响判定 —— 只看目标漏洞状态。"""
+        self.assertTrue(va.evaluate_arm("shuffled", True, "still_vulnerable",
+                                        _ev("still_vulnerable"))["accept"])
+        r = va.evaluate_arm("shuffled", True, "fixed", _ev("fixed"))
+        self.assertFalse(r["accept"], "目标漏洞被意外修复 → 必须拒绝")
+        self.assertIn("目标漏洞", r["reason"])
 
-    def test_complete_arm_requires_fixed(self):
-        self.assertTrue(va.evaluate_arm("annotated-security-complete", True, "fixed")["accept"])
-        self.assertFalse(va.evaluate_arm("annotated-security-complete", True,
-                                         "still_vulnerable")["accept"])
+    def test_no_donor_state_option_in_registry(self):
+        self.assertNotIn("donor_state",
+                         {v["expect_target_oracle"] for v in va.ARM_ORACLE.values()})
 
-    def test_support_only_requires_still_vulnerable(self):
-        self.assertTrue(va.evaluate_arm("support-only-insufficient", True,
-                                        "still_vulnerable")["accept"])
-        self.assertFalse(va.evaluate_arm("support-only-insufficient", True, "fixed")["accept"])
+    def test_oracle_result_enum_enforced(self):
+        """非枚举值（含旧版的 'garbage'）必须拒绝。"""
+        for bad in ("garbage", "donor_state", "", None, 1):
+            r = va.evaluate_arm("shuffled", True, bad, _ev("still_vulnerable"))
+            self.assertFalse(r["accept"], f"{bad!r} 不应通过")
 
-    def test_placebo_requires_state_unchanged(self):
-        """行为中性 → 漏洞必须仍在。"""
-        self.assertTrue(va.evaluate_arm("placebo", True, "still_vulnerable")["accept"])
-        self.assertFalse(va.evaluate_arm("placebo", True, "fixed")["accept"])
+    def test_missing_evidence_rejected(self):
+        r = va.evaluate_arm("placebo", True, "still_vulnerable", None)
+        self.assertFalse(r["accept"])
+        self.assertIn("证据", r["reason"])
 
-    def test_unknown_oracle_fail_closed(self):
-        for arm in va.ARM_ORACLE:
-            r = va.evaluate_arm(arm, True, "unknown")
-            self.assertFalse(r["accept"], arm)
-            self.assertIn("fail-closed", r["reason"])
+    def test_incomplete_evidence_rejected(self):
+        ev = _ev()
+        ev.poc_sha256 = ""
+        self.assertFalse(va.evaluate_arm("placebo", True, "still_vulnerable", ev)["accept"])
 
-    def test_dirty_apply_rejected(self):
-        for arm in va.ARM_ORACLE:
-            self.assertFalse(va.evaluate_arm(arm, False, "fixed")["accept"], arm)
+    def test_evidence_verdict_must_match(self):
+        ev = _ev("fixed")
+        r = va.evaluate_arm("placebo", True, "still_vulnerable", ev)
+        self.assertFalse(r["accept"])
 
-    def test_unknown_arm_raises(self):
-        with self.assertRaises(KeyError):
-            va.evaluate_arm("no_such_arm", True, "fixed")
+    def test_accept_includes_evidence(self):
+        r = va.evaluate_arm("placebo", True, "still_vulnerable", _ev())
+        self.assertTrue(r["accept"], r)
+        self.assertEqual(set(r["oracle_evidence"]), set(va.ORACLE_EVIDENCE_FIELDS))
 
-    def test_shuffled_accepts_donor_state(self):
-        for st in ("fixed", "still_vulnerable"):
-            self.assertTrue(va.evaluate_arm("shuffled", True, st)["accept"], st)
+    def test_all_arms_use_target_oracle_key(self):
+        for spec in va.ARM_ORACLE.values():
+            self.assertIn("expect_target_oracle", spec)
+            self.assertNotIn("expect_oracle", spec)
+
+    def test_registry_lists_oracle_evidence_fields(self):
+        self.assertEqual(set(va.arms_registry()["oracle_evidence_fields"]),
+                         set(va.ORACLE_EVIDENCE_FIELDS))
 
 
 # ===========================================================================
-# 步 5：功效脚本（**与既有 McNemar 口径交叉核对**）
+# P0-5：功效 —— 条件 vs 非条件；无 p 参数；敏感性
 # ===========================================================================
-class TestPower(unittest.TestCase):
-    def test_exact_p_matches_frozen_mcnemar(self):
-        """b=10, c=2, n=12 → 2*(1+12+66)/4096 = 0.03857（与 strict_recompute 口径一致）。"""
+class TestPowerReworked(unittest.TestCase):
+    def test_exact_p_has_no_p_parameter(self):
+        """**评审 P0-5**：'双倍较小尾部'只对 p=0.5 成立 → 不暴露 p 参数。"""
+        sig = inspect.signature(vp.exact_two_sided_p)
+        self.assertNotIn("p", sig.parameters)
+
+    def test_exact_p_known_value(self):
         self.assertAlmostEqual(vp.exact_two_sided_p(2, 12), 0.03857, places=4)
 
-    def test_exact_p_symmetric(self):
-        self.assertAlmostEqual(vp.exact_two_sided_p(1, 7), vp.exact_two_sided_p(6, 7), places=9)
+    def test_conditional_power_named_and_documented(self):
+        rep = vp.power_report()
+        self.assertEqual(rep["quantity_name"], "conditional power given m discordant pairs")
+        self.assertIn("不是", rep["quantity_note"])
+        self.assertTrue(any("m 只有跑完才知道" in c for c in rep["caveats"]))
 
-    def test_zero_discordant_p_is_one(self):
-        self.assertEqual(vp.exact_two_sided_p(0, 0), 1.0)
-
-    def test_power_at_m8_matches_prior_analysis(self):
-        """先前的功效分析：m=8、p1=0.90 → 功效约 0.43。"""
-        p = vp.mcnemar_power(8, 0.90)
-        self.assertAlmostEqual(p, 0.43, delta=0.03)
-
-    def test_required_m_is_12(self):
+    def test_conditional_power_values(self):
+        self.assertAlmostEqual(vp.conditional_power(8, 0.90), 0.4305, places=3)
         self.assertEqual(vp.required_discordant_pairs(0.90, 0.05, 0.80), 12)
 
-    def test_power_not_monotone_small_m_but_rises_after_steps(self):
-        """**精确检验的拒绝域离散** → 功效在小 m 下**非单调**（m=6 高于 m=7）。
+    def test_unconditional_power_uses_N_and_discordance(self):
+        """非条件功效必须随 N 与 discordance 变化（这才是样本量相关量）。"""
+        low = vp.unconditional_power(10, 0.90, 0.3)
+        high = vp.unconditional_power(30, 0.90, 0.7)
+        self.assertLess(low, high)
+        self.assertGreater(vp.unconditional_power(14, 0.90, 0.5), 0.0)
 
-        这**不是实现错误**，而是 McNemar 精确检验的固有性质：拒绝域随 m 阶跃
-        （t=0→1→2），在阶跃之间功效反而下降。本测试**固定该现象**，
-        并要求"每一阶跃之后整体上升"。
-        """
-        ps = {m: vp.mcnemar_power(m, 0.90) for m in range(6, 15)}
-        self.assertGreater(ps[6], ps[7])          # 非单调（离散性）
-        self.assertLess(ps[8], ps[9])             # 阶跃后跃升
-        self.assertLess(ps[11], ps[12])           # 再次阶跃
-        self.assertGreater(ps[12], ps[8])         # 整体上升趋势
+    def test_sensitivity_table_covers_grid(self):
+        rows = vp.sensitivity_table(N_list=(8, 14), p1_list=(0.6, 0.9),
+                                    discordance_list=(0.3, 0.5))
+        self.assertEqual(len(rows), 2 * 2 * 2)
+        for r in rows:
+            self.assertIn("expected_m", r)
+            self.assertIn("unconditional_power", r)
 
-    def test_power_rises_at_least_over_large_range(self):
-        self.assertLess(vp.mcnemar_power(10, 0.90), vp.mcnemar_power(30, 0.90))
+    def test_required_N_monotone_in_discordance(self):
+        """discordance 越低，达到目标功效所需的 N 越大（或不可达 -1）。"""
+        n_low = vp.required_N_for_target(0.90, 0.3)
+        n_high = vp.required_N_for_target(0.90, 0.7)
+        if n_low != -1 and n_high != -1:
+            self.assertGreater(n_low, n_high)
 
-    def test_reject_threshold_is_stepwise(self):
-        ts = [vp.mcnemar_reject_threshold(m) for m in range(6, 15)]
-        self.assertEqual(ts, sorted(ts))          # 阈值单调不减
-        self.assertEqual(len(set(ts)), 3)         # 6..14 内出现 0,1,2 三档
-
-    def test_power_monotone_in_p1(self):
-        ps = [vp.mcnemar_power(20, p1) for p1 in (0.6, 0.7, 0.8, 0.9)]
-        self.assertEqual(ps, sorted(ps))
-
-    def test_power_at_p1_half_is_alpha(self):
-        """p1=0.5 时功效应约等于 α（双侧检验）。"""
-        self.assertAlmostEqual(vp.mcnemar_power(40, 0.5), 0.05, delta=0.03)
-
-    def test_bad_p1_raises(self):
-        with self.assertRaises(ValueError):
-            vp.mcnemar_power(10, 1.5)
-
-    def test_report_declares_all_parameters(self):
+    def test_report_warns_about_V4_size(self):
         rep = vp.power_report()
-        for k in ("test", "h0", "effect_p1", "alpha", "target_power", "unit"):
-            self.assertIn(k, rep, k)
-        self.assertEqual(rep["unit"], "discordant pairs")
-        self.assertEqual(rep["alpha"], 0.05)
-        self.assertEqual(rep["required_m_for_target"], 12)
+        self.assertTrue(any("CVE" in c for c in rep["caveats"]))
         self.assertIn("判别力有限", rep["wording_rule"])
-        self.assertIn("underpowered", rep["wording_rule"])   # 明确禁止当作结论性表述
+
+    def test_bad_inputs(self):
+        with self.assertRaises(ValueError):
+            vp.conditional_power(10, 1.5)
+        with self.assertRaises(ValueError):
+            vp.unconditional_power(10, 0.9, 1.5)
 
 
 if __name__ == "__main__":
