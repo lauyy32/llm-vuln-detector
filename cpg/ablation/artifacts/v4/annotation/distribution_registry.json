@@ -1,33 +1,95 @@
 {
-  "schema": "v4-distribution-registry/2",
-  "source_commit": "34b9f5f8bf455ccebe96f44147efe1fcb70c1f12",
-  "note": "payload 为**实际发放**给标注者的材料（含标注手册）；coverage 等内部工件只进 provenance，不发放",
-  "reviewer_payload": [
-    {
-      "path": "cpg/ablation/artifacts/v4/annotation/标注交接说明.md",
-      "bytes": 6981,
-      "lines": 160,
-      "sha256": "65a9839ca2e6624ab9d281a506bf4ff1dd932f2c7d6c4af3232b4da482c4aa77"
-    },
-    {
-      "path": "cpg/ablation/artifacts/v4/annotation/标注手册.md",
-      "bytes": 1517047,
-      "lines": 36492,
-      "sha256": "ed1333cc59b996ff4ff7cbc7c6cacb17b69f37f01dcce1833f36f435064cfec5"
-    },
-    {
-      "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer1.jsonl",
-      "bytes": 247651,
-      "lines": 284,
-      "sha256": "e36583c5a4e684355024a91adc7937a820f77e6c6b19d0accc949ea72feeab38"
-    },
-    {
-      "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer2.jsonl",
-      "bytes": 247651,
-      "lines": 284,
-      "sha256": "a72e77fa452c984f8e32adccff6d3286b6c519a55c41cee13bda361c52ba9585"
-    }
-  ],
+  "schema": "v4-distribution-registry/3",
+  "source_commit": "6951c2964e93d43ad0f2130bbb263e959dfa22a6",
+  "provenance_check": {
+    "source_commit": "6951c2964e93d43ad0f2130bbb263e959dfa22a6",
+    "head": "6951c2964e93d43ad0f2130bbb263e959dfa22a6",
+    "clean": true,
+    "checked": [
+      {
+        "path": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
+        "blob_sha256_in_commit": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996",
+        "normalized_lf": true
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer1.jsonl",
+        "blob_sha256_in_commit": "e36583c5a4e684355024a91adc7937a820f77e6c6b19d0accc949ea72feeab38",
+        "normalized_lf": true
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer2.jsonl",
+        "blob_sha256_in_commit": "a72e77fa452c984f8e32adccff6d3286b6c519a55c41cee13bda361c52ba9585",
+        "normalized_lf": true
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/标注交接说明.md",
+        "blob_sha256_in_commit": "65a9839ca2e6624ab9d281a506bf4ff1dd932f2c7d6c4af3232b4da482c4aa77",
+        "normalized_lf": true
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/标注手册.md",
+        "blob_sha256_in_commit": "ed1333cc59b996ff4ff7cbc7c6cacb17b69f37f01dcce1833f36f435064cfec5",
+        "normalized_lf": true
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/critical_hunks.template.json",
+        "blob_sha256_in_commit": "7fd12a4488aa1ba19faa467196bc76a4403ad3cce5313d8f8fc0ad1f2ff45099",
+        "normalized_lf": true
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/v4_hunk_coverage.json",
+        "blob_sha256_in_commit": "96c8c029a7c6fc31868026fc4eddbf630e463013b6a37902557aa055bd7a659c",
+        "normalized_lf": true
+      }
+    ]
+  },
+  "note": "每人只收到【交接说明 + 手册 + 自己的 JSONL】；coverage 等内部工件只进 internal_provenance，不发放",
+  "reviewer_payloads": {
+    "reviewer1": [
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/标注交接说明.md",
+        "bytes": 6981,
+        "lines": 160,
+        "sha256": "65a9839ca2e6624ab9d281a506bf4ff1dd932f2c7d6c4af3232b4da482c4aa77"
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/标注手册.md",
+        "bytes": 1517047,
+        "lines": 36492,
+        "sha256": "ed1333cc59b996ff4ff7cbc7c6cacb17b69f37f01dcce1833f36f435064cfec5"
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer1.jsonl",
+        "bytes": 247651,
+        "lines": 284,
+        "sha256": "e36583c5a4e684355024a91adc7937a820f77e6c6b19d0accc949ea72feeab38"
+      }
+    ],
+    "reviewer2": [
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/标注交接说明.md",
+        "bytes": 6981,
+        "lines": 160,
+        "sha256": "65a9839ca2e6624ab9d281a506bf4ff1dd932f2c7d6c4af3232b4da482c4aa77"
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/标注手册.md",
+        "bytes": 1517047,
+        "lines": 36492,
+        "sha256": "ed1333cc59b996ff4ff7cbc7c6cacb17b69f37f01dcce1833f36f435064cfec5"
+      },
+      {
+        "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer2.jsonl",
+        "bytes": 247651,
+        "lines": 284,
+        "sha256": "a72e77fa452c984f8e32adccff6d3286b6c519a55c41cee13bda361c52ba9585"
+      }
+    ]
+  },
+  "reviewer_payload_tree_sha256": {
+    "reviewer1": "c131bfdf67c2cfd7098bd15153256b839b3491139566a28aa70a86ae66bf0fec",
+    "reviewer2": "442de1b5f3cf7f0923caebdade056c8f0316e540f4ff1f1ff0e0f44fb8268107"
+  },
   "internal_provenance": {
     "files": [
       {
@@ -52,7 +114,7 @@
     "generator_sources": [
       {
         "path": "cpg/ablation/v4_release.py",
-        "sha256": "2a3c1e256132c38d575ec64e8f7bf2d2426ba13bb09914e8b7cb8448874b804f"
+        "sha256": "9521bdd39f6dfc78614c6679a1db46ee13608fab28fea8fe2fc90753796dffcc"
       },
       {
         "path": "cpg/ablation/v4_annotation.py",
@@ -134,6 +196,7 @@
   "protocol": {
     "blind": true,
     "contains_ai_suggestions": false,
-    "submission_rule": "两位标注者私下分别提交；先交者结果不得出现在后交者可见位置"
+    "per_reviewer": "两人收到的集合不同（各自的 reviewerN.jsonl）",
+    "submission_rule": "私下分别提交；先交者结果不得出现在后交者可见位置"
   }
 }
