@@ -2,13 +2,14 @@
 """V4 标注发布与回收（A-1 分发登记 / A-2 事务式回收 / A-3 预注册固化）。
 
 设计纪律（来自外部验收）：
-  - **payload 与 provenance 分离**：只把标注者**真正需要的**材料列为 `reviewer_payload`；
-    `v4_hunk_coverage.json` 等内部分析工件**绝不进入**发放清单。
-  - **事务式回收**：所有校验与产物先在内存/唯一临时目录完成，全部成功后才**原子提升**
-    为以两份 submission SHA 命名的运行目录；**失败不改变任何现有正式工件**。
-  - **两提交冻结**：冻结工件记录 `source_commit`（**其代码/文档所在的那个提交**），
-    不用"生成时的当前 commit"自引用。
-  - **不预填**：仲裁模板 `final_*` 全为 null，不含任何建议标签。
+  - **per-reviewer payload**：登记表分别表达 reviewer1 / reviewer2 **各自**收到的集合
+    （交接说明 + 手册 + **自己的** JSONL），并各算一棵 payload tree SHA。
+  - **fail-closed 双提交**：`--source-commit` 必填；校验 SHA 存在、工作树干净、
+    HEAD 与该 commit 一致、源文件 blob SHA 与该 commit 内一致。
+  - **真事务**：唯一临时目录（含 pid+随机后缀）→ try/finally 清理 → 原子提升；
+    **绝不删除**既有成功结果（幂等返回或 fail-closed）。
+  - **registry fail-closed**：registry 缺失/不含 template 条目时，**在建目录前**即失败。
+  - **不预填**：仲裁模板 `final_*` 全 null。
 
 用法：
     python cpg/ablation/v4_release.py prereg --source-commit <sha>
@@ -20,8 +21,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
+import subprocess
 import sys
+import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -32,18 +36,12 @@ OUT = ROOT / "cpg" / "ablation" / "artifacts" / "v4"
 ANN = OUT / "annotation"
 RECOVERY_ROOT = OUT / "recovery"
 
-# ---------------------------------------------------------------------------
-# A-1：分发登记（payload 与 provenance **严格分离**）
-# ---------------------------------------------------------------------------
-REVIEWER_PAYLOAD = [
-    ANN / "标注交接说明.md",
-    ANN / "标注手册.md",              # ← 标注者真正的证据材料（完整补丁 + 上下文 + hunk_id）
-    ANN / "critical_hunks.reviewer1.jsonl",
-    ANN / "critical_hunks.reviewer2.jsonl",
-]
+HANDOVER = ANN / "标注交接说明.md"
+HANDBOOK = ANN / "标注手册.md"
+
 INTERNAL_PROVENANCE = [
     OUT / "critical_hunks.template.json",
-    OUT / "v4_hunk_coverage.json",     # ← 内部机械审计，**不发放**
+    OUT / "v4_hunk_coverage.json",     # 内部机械审计，**不发放**
     ROOT / "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
 ]
 GENERATOR_SOURCES = [
@@ -59,7 +57,6 @@ def _sha(b: bytes) -> str:
 
 
 def _rel(p) -> str:
-    """安全相对路径：不在 ROOT 下时回退绝对路径（**防外部/临时目录导致 ValueError**）。"""
     p = Path(p)
     try:
         return p.resolve().relative_to(ROOT).as_posix()
@@ -69,39 +66,91 @@ def _rel(p) -> str:
 
 def _f(p: Path) -> dict:
     b = p.read_bytes()
-    rel = _rel(p)
-    return {"path": rel, "bytes": len(b), "lines": b.count(b"\n"), "sha256": _sha(b)}
+    return {"path": _rel(p), "bytes": len(b), "lines": b.count(b"\n"), "sha256": _sha(b)}
 
 
-def distribution_registry(source_commit: str | None = None) -> dict:
-    """登记表：**reviewer_payload**（真正发放的）+ **internal_provenance**（内部锚点）。
+def _tree_sha(files: list) -> str:
+    """对 [(name, sha256)] 的确定性序列取 tree SHA。"""
+    return _sha("\n".join(f"{n}:{s}" for n, s in sorted(files)).encode("utf-8"))
 
-    `source_commit` 必须由调用方显式给出（两提交协议），**不用当前 HEAD 自引用**。
+
+# ---------------------------------------------------------------------------
+# fail-closed 双提交校验
+# ---------------------------------------------------------------------------
+def _git(*args: str) -> tuple[int, str]:
+    r = subprocess.run(["git", *args], cwd=str(ROOT), capture_output=True, text=True)
+    return r.returncode, (r.stdout or "").strip()
+
+
+def require_source_commit(source_commit: str | None, files: list) -> dict:
+    """fail-closed：校验 source_commit 存在 / 工作树干净 / HEAD 一致 / blob 一致。
+
+    任一条不成立即抛异常（**不再允许 UNSPECIFIED 或随意传入**）。
     """
-    missing = [str(p) for p in REVIEWER_PAYLOAD + INTERNAL_PROVENANCE if not p.exists()]
-    if missing:
-        raise FileNotFoundError(f"缺登记文件: {missing}")
+    if not source_commit:
+        raise ValueError("缺少 --source-commit（fail-closed，不接受省略）")
+    rc, _ = _git("cat-file", "-e", f"{source_commit}^{{commit}}")
+    if rc != 0:
+        raise ValueError(f"source_commit 不存在: {source_commit}")
+    rc, dirty = _git("status", "--porcelain")
+    if rc != 0 or dirty:
+        raise ValueError(f"工作树不干净，禁止冻结（dirty={dirty[:120]!r}）")
+    rc, head = _git("rev-parse", "HEAD")
+    if rc != 0 or head != source_commit:
+        raise ValueError(f"HEAD({head[:12]}) != source_commit({source_commit[:12]})")
+    # 记录文件的 blob SHA 必须与该 commit 内一致
+    checked = []
+    for p in files:
+        rc, blob = _git("show", f"{source_commit}:{_rel(p)}")
+        if rc != 0:
+            raise ValueError(f"{_rel(p)} 不在 commit {source_commit[:12]} 中")
+        want = _sha(blob.encode("utf-8"))
+        got = _sha(p.read_bytes())
+        if want != got:
+            raise ValueError(f"{_rel(p)} 与 commit 内不一致（工作树已偏离）")
+        checked.append({"path": _rel(p), "blob_sha256_in_commit": want})
+    return {"source_commit": source_commit, "head": head, "clean": True, "checked": checked}
+
+
+# ---------------------------------------------------------------------------
+# A-1：分发登记（per-reviewer payload）
+# ---------------------------------------------------------------------------
+def distribution_registry(source_commit: str) -> dict:
+    """登记表：**per-reviewer payload**（各自精确集合）+ internal provenance。"""
+    payload_common = [HANDOVER, HANDBOOK]
+    per_reviewer = {
+        "reviewer1": payload_common + [ANN / "critical_hunks.reviewer1.jsonl"],
+        "reviewer2": payload_common + [ANN / "critical_hunks.reviewer2.jsonl"],
+    }
+    files = sorted({p for v in per_reviewer.values() for p in v} | set(INTERNAL_PROVENANCE))
+    prov = require_source_commit(source_commit, files)
+
+    payload_docs, trees = {}, {}
+    for who, ps in per_reviewer.items():
+        payload_docs[who] = [_f(p) for p in ps]
+        trees[who] = _tree_sha([(x["path"].split("/")[-1], x["sha256"]) for x in payload_docs[who]])
     real_patches = [{"name": c.name, "sha256": _sha(c.read_bytes())}
                     for c in sorted((OUT / "patches" / "real").glob("*.diff"))]
     doc = {
-        "schema": "v4-distribution-registry/2",
-        "source_commit": source_commit or "UNSPECIFIED",
-        "note": ("payload 为**实际发放**给标注者的材料（含标注手册）；coverage 等内部工件"
-                 "只进 provenance，不发放"),
-        "reviewer_payload": [_f(p) for p in REVIEWER_PAYLOAD],
+        "schema": "v4-distribution-registry/3",
+        "source_commit": prov["source_commit"],
+        "provenance_check": prov,
+        "note": ("每人只收到【交接说明 + 手册 + 自己的 JSONL】；coverage 等内部工件只进 "
+                 "internal_provenance，不发放"),
+        "reviewer_payloads": payload_docs,
+        "reviewer_payload_tree_sha256": trees,
         "internal_provenance": {
             "files": [_f(p) for p in INTERNAL_PROVENANCE],
-            "generator_sources": [
-                {"path": s, "sha256": _sha((ROOT / s).read_bytes())}
-                for s in GENERATOR_SOURCES if (ROOT / s).exists()],
-            "real_patches_tree_sha256": _sha("\n".join(
-                f"{x['name']}:{x['sha256']}" for x in real_patches).encode("utf-8")),
+            "generator_sources": [{"path": s, "sha256": _sha((ROOT / s).read_bytes())}
+                                  for s in GENERATOR_SOURCES if (ROOT / s).exists()],
+            "real_patches_tree_sha256": _tree_sha([(x["name"], x["sha256"]) for x in real_patches]),
             "real_patches": real_patches,
         },
         "protocol": {
             "blind": True,
             "contains_ai_suggestions": False,
-            "submission_rule": "两位标注者私下分别提交；先交者结果不得出现在后交者可见位置",
+            "per_reviewer": "两人收到的集合不同（各自的 reviewerN.jsonl）",
+            "submission_rule": "私下分别提交；先交者结果不得出现在后交者可见位置",
         },
     }
     (ANN / "distribution_registry.json").write_bytes(
@@ -131,25 +180,29 @@ PREREG_PARAMS = {
     "min_n_confirmatory": 8,
     "primary_estimand": "pairwise sufficiency discrimination rate",
 }
-PREREG_STATUS = "DRAFT_PREREG"   # 见 V4-四臂算法预注册.md：placebo/shuffled/oracle 与命名待补
+PREREG_STATUS = "DRAFT_PREREG"
 
 
-def prereg(source_commit: str | None = None) -> dict:
-    """固化预注册（记录 `source_commit` = 其代码与文档所在的提交，**非当前 HEAD**）。"""
+def prereg(source_commit: str) -> dict:
     doc_path = ROOT / "cpg/ablation/V4-四臂算法预注册.md"
+    prov = require_source_commit(source_commit, [doc_path])
     doc = {
-        "schema": "v4-prereg/2",
+        "schema": "v4-prereg/3",
         "status": PREREG_STATUS,
-        "source_commit": source_commit or "UNSPECIFIED",
-        "documents": [_f(doc_path)] if doc_path.exists() else [],
+        "source_commit": prov["source_commit"],
+        "provenance_check": prov,
+        "documents": [_f(doc_path)],
         "params": PREREG_PARAMS,
+        "status_detail": {
+            "done": "设计草案与部分固定参数",
+            "pending": ["placebo 确定性生成算法", "shuffled 硬/软约束·放宽顺序·无候选处置",
+                        "oracle 逐臂机器化判据", "最终统计功效脚本与口径"],
+            "policy": "**不得消费为权威输入**（不得据此生成正式四臂或 RUN_LOCK）",
+        },
         "policy": {
-            "post_recovery": "只允许把标签代入本算法；不得修改任何参数",
+            "post_recovery": "只允许把标签代入已冻结算法；不得修改任何参数",
             "deviation": "必须走 deviation log（原因/影响/作废的已跑结果）",
             "recompute_gate": "双干净目录的四臂 prompt/selection/coverage SHA 必须一致",
-            "status_note": ("DRAFT_PREREG：placebo 生成算法、shuffled 约束与无候选处置、"
-                            "oracle 逐臂接受标准、minimal-real/partial 命名口径尚未冻结；"
-                            "**不得作为 A-4 的权威冻结输入**"),
         },
     }
     (OUT / "v4_prereg.json").write_bytes(
@@ -158,93 +211,132 @@ def prereg(source_commit: str | None = None) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# A-2：事务式回收
+# A-2：真事务回收
 # ---------------------------------------------------------------------------
-def _transaction_dir_name(sub1: Path, sub2: Path) -> str:
+def _run_name(sub1: Path, sub2: Path) -> str:
     h = _sha((_sha(sub1.read_bytes()) + _sha(sub2.read_bytes())).encode("utf-8"))
     return f"run-{h[:16]}"
 
 
+def _require_registry_template(template: Path) -> dict:
+    """fail-closed：registry 必须存在、可解析、且含 template 条目并 SHA 一致。"""
+    reg_path = ANN / "distribution_registry.json"
+    if not reg_path.exists():
+        raise ValueError("缺 distribution_registry.json（分发版本未登记，拒绝回收）")
+    try:
+        reg = json.loads(reg_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        raise ValueError(f"distribution_registry.json 不可解析: {e}")
+    want = None
+    for f in reg.get("internal_provenance", {}).get("files", []):
+        if f["path"].endswith("critical_hunks.template.json"):
+            want = f["sha256"]
+    if want is None:
+        raise ValueError("registry 未列出 template（无法核对分发版本）")
+    got = _sha(template.read_bytes())
+    if want != got:
+        raise ValueError(f"template SHA 与分发登记不符（登记 {want[:12]} vs 当前 {got[:12]}）")
+    return {"registry": _rel(reg_path), "template_match": True,
+            "source_commit": reg.get("source_commit")}
+
+
 def recover(sub1: Path, sub2: Path, template: Path | None = None,
             root: Path | None = None) -> dict:
-    """事务式回收：内存校验 → 唯一临时目录 → **全部成功后原子提升** → 消费 registry。
+    """真事务回收：内存校验 → registry fail-closed → 唯一临时目录 → 原子提升。
 
-    - 失败时**不改变任何现有正式工件**（临时目录被清理）；
-    - 运行目录以两份 submission SHA 命名，天然区分不同轮次；
-    - 与 `distribution_registry.json` 核对 template SHA 与分发版本。
+    - registry 缺失/异常/不含 template → **建目录前**即失败（零落盘）；
+    - 临时目录 **唯一**（pid + uuid），并发同输入不互删；
+    - 写盘包在 try 内，失败时 finally 清理临时目录；
+    - 目标目录已存在：内容一致 → **幂等返回**；不一致 → fail-closed；**绝不删除既有结果**。
     """
     template = template or (OUT / "critical_hunks.template.json")
 
-    # ---- 1) 全部校验在内存完成 ----
+    def _fp(p: Path) -> dict:
+        """**仅指纹**（不含路径）：提交可能来自仓库外，记录绝对路径既无意义也有泄露风险。"""
+        d = _f(p)
+        d.pop("path", None)
+        d["filename"] = p.name
+        return d
+
+    # 1) 内存校验
     v1 = va.validate_submission(sub1, template)
     v2 = va.validate_submission(sub2, template)
     if not (v1["ok"] and v2["ok"]):
         raise ValueError(f"提交校验失败：r1={v1['errors'][:3]} r2={v2['errors'][:3]}")
+    for v in (v1, v2):
+        v.pop("path", None)      # 去绝对路径（含本机用户名）
+    # 2) registry fail-closed（在建目录之前）
+    reg_check = _require_registry_template(template)
     agree = va.agreement_report(sub1, sub2, template)
 
-    # ---- 2) 与分发登记核对 ----
-    reg_path = ANN / "distribution_registry.json"
-    reg_check = {"registry_present": reg_path.exists(), "template_match": None}
-    if reg_path.exists():
-        reg = json.loads(reg_path.read_text(encoding="utf-8"))
-        want = None
-        for f in reg.get("internal_provenance", {}).get("files", []):
-            if f["path"].endswith("critical_hunks.template.json"):
-                want = f["sha256"]
-        got = _sha(template.read_bytes())
-        reg_check["template_match"] = (want == got)
-        reg_check["source_commit"] = reg.get("source_commit")
-        if want is not None and want != got:
-            raise ValueError("当前 template SHA 与分发登记不符（分发版本已变）")
-
-    # ---- 3) 写唯一临时目录（不触碰正式目录） ----
-    root = root or RECOVERY_ROOT     # 测试可传临时目录，**避免合成数据污染正式目录**
-    root.mkdir(parents=True, exist_ok=True)
-    final_dir = root / _transaction_dir_name(sub1, sub2)
-    tmp_dir = root / f".tmp-{_transaction_dir_name(sub1, sub2)}"
-    if tmp_dir.exists():
-        shutil.rmtree(tmp_dir)
-    tmp_dir.mkdir(parents=True)
-
-    dis = va.disagreement_list(sub1, sub2, template, tmp_dir / "disagreements.json")
-    report = {
-        "schema": "v4-recovery/2",
-        "status": "REAL_RECOVERY",          # 与 SYNTHETIC 夹具显式区分
-        "source_commit": reg_check.get("source_commit"),
-        "template": _f(template),
-        "submissions": {"reviewer1": _f(sub1), "reviewer2": _f(sub2)},
-        "validation": {"reviewer1": v1, "reviewer2": v2},
-        "agreement": agree,
-        "registry_check": reg_check,
-        "disagreement": {
-            "n_items": dis["n_items"],
-            "kinds": {k: sum(1 for i in dis["items"] if i["kind"] == k)
-                      for k in ("DISAGREEMENT", "UNANIMOUS_UNCERTAIN",
-                                "PARTIAL_UNCERTAIN")},
-            "artifact": _f(tmp_dir / "disagreements.json"),
-        },
-        "prefilled_final_fields": sum(
-            1 for i in dis["items"]
-            if any(i.get(f) is not None for f in va.FINAL_FIELDS)),
-        "next_step": ("第三人填写 disagreements.json 的 final_*；必要时填 exclusions"
-                      "（结构化，仅限 UNCERTAIN 且须覆盖该样本全部 pending hunk）"),
-    }
-    (tmp_dir / "recovery_report.json").write_bytes(
-        (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-
-    # ---- 4) 原子提升 ----
+    root = root or RECOVERY_ROOT
+    final_dir = root / _run_name(sub1, sub2)
+    # 3) 幂等 / 冲突（不删除既有成功结果）
     if final_dir.exists():
-        shutil.rmtree(final_dir)
-    tmp_dir.replace(final_dir)
-    report["run_dir"] = _rel(final_dir)
+        prev = final_dir / "recovery_report.json"
+        if prev.exists():
+            old = json.loads(prev.read_text(encoding="utf-8"))
+            same = (old.get("submissions", {}).get("reviewer1", {}).get("sha256")
+                    == _fp(sub1)["sha256"]
+                    and old.get("submissions", {}).get("reviewer2", {}).get("sha256")
+                    == _fp(sub2)["sha256"])
+            if same:
+                old["run_dir"] = _rel(final_dir)
+                old["idempotent_replay"] = True
+                return old
+        raise ValueError(f"目标运行目录已存在且内容不匹配，拒绝覆盖: {_rel(final_dir)}")
+
+    tmp_dir = root / f".tmp-{_run_name(sub1, sub2)}-{os.getpid()}-{uuid.uuid4().hex[:8]}"
+    try:
+        root.mkdir(parents=True, exist_ok=True)
+        tmp_dir.mkdir(parents=True)
+        dis = va.disagreement_list(sub1, sub2, template, tmp_dir / "disagreements.json")
+        report = {
+            "schema": "v4-recovery/3",
+            "status": "REAL_RECOVERY",
+            "source_commit": reg_check.get("source_commit"),
+            "template": _f(template),
+            "submissions": {"reviewer1": _fp(sub1), "reviewer2": _fp(sub2)},
+            "validation": {"reviewer1": v1, "reviewer2": v2},
+            "agreement": agree,
+            "registry_check": reg_check,
+            "disagreement": {
+                "n_items": dis["n_items"],
+                "kinds": {k: sum(1 for i in dis["items"] if i["kind"] == k)
+                          for k in ("DISAGREEMENT", "UNANIMOUS_UNCERTAIN",
+                                    "PARTIAL_UNCERTAIN")},
+                # 只记**提升后**仍然成立的信息（**不得记临时路径**）
+                "artifact_relpath": "disagreements.json",
+                "artifact": {k: v for k, v in _f(tmp_dir / "disagreements.json").items()
+                             if k != "path"},
+            },
+            "prefilled_final_fields": sum(
+                1 for i in dis["items"]
+                if any(i.get(f) is not None for f in va.FINAL_FIELDS)),
+            "next_step": ("第三人填写 disagreements.json 的 final_*；必要时填 exclusions"
+                          "（结构化，仅限 UNCERTAIN 且须覆盖该样本全部 pending hunk）"),
+            # run_dir 在提升前即可确定（目录名确定性），故在写盘时一并记录
+            "run_dir": _rel(final_dir),
+        }
+        (tmp_dir / "recovery_report.json").write_bytes(
+            (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+        tmp_dir.replace(final_dir)               # 原子提升
+    except Exception:
+        shutil.rmtree(tmp_dir, ignore_errors=True)   # 失败即清理，零残留
+        # 若 root 是本轮刚创建且已空，一并移除（保持"零落盘"语义）
+        try:
+            if root.exists() and not any(root.iterdir()):
+                root.rmdir()
+        except OSError:
+            pass
+        raise
     return report
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("step", choices=["prereg", "registry", "recover"])
-    ap.add_argument("--source-commit", default=None,
-                    help="两提交协议：其代码/文档所在的提交 SHA（不要用当前 HEAD 自引用）")
+    ap.add_argument("--source-commit", default=None)
     ap.add_argument("--sub1", type=Path)
     ap.add_argument("--sub2", type=Path)
     ap.add_argument("--template", type=Path, default=None)
@@ -253,31 +345,29 @@ def main() -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-    if args.step == "prereg":
-        d = prereg(args.source_commit)
-        print(f"[A-3] v4_prereg.json status={d['status']} source_commit="
-              f"{d['source_commit'][:12]} params={len(d['params'])}")
+    try:
+        if args.step == "prereg":
+            d = prereg(args.source_commit)
+            print(f"[A-3] status={d['status']} source_commit={d['source_commit'][:12]}")
+            return 0
+        if args.step == "registry":
+            d = distribution_registry(args.source_commit)
+            print(f"[A-1] per-reviewer payload @ {d['source_commit'][:12]}")
+            for who, items in d["reviewer_payloads"].items():
+                print(f"  [{who}] tree={d['reviewer_payload_tree_sha256'][who][:12]}")
+                for x in items:
+                    print(f"      {x['path'].split('/')[-1]} ({x['bytes']}B)")
+            return 0
+        if not (args.sub1 and args.sub2):
+            print("[FAIL] recover 需要 --sub1 与 --sub2")
+            return 1
+        r = recover(args.sub1, args.sub2, args.template)
+        print(f"[A-2] → {r['run_dir']} idempotent={r.get('idempotent_replay', False)}")
+        print(f"  prefilled={r['prefilled_final_fields']} registry={r['registry_check']}")
         return 0
-    if args.step == "registry":
-        d = distribution_registry(args.source_commit)
-        print(f"[A-1] payload {len(d['reviewer_payload'])} 项 / provenance "
-              f"{len(d['internal_provenance']['files'])} 项 @ {d['source_commit'][:12]}")
-        for x in d["reviewer_payload"]:
-            print(f"  [PAYLOAD] {x['path']} ({x['bytes']}B, sha={x['sha256'][:12]})")
-        for x in d["internal_provenance"]["files"]:
-            print(f"  [INTERNAL] {x['path']} (sha={x['sha256'][:12]})")
-        return 0
-    if not (args.sub1 and args.sub2):
-        print("[FAIL] recover 需要 --sub1 与 --sub2")
+    except Exception as e:
+        print(f"[FAIL] {e}")
         return 1
-    r = recover(args.sub1, args.sub2, args.template)
-    print(f"[A-2] 事务完成 → {r['run_dir']}")
-    print(f"  κ(role)={r['agreement']['cohen_kappa_role']} "
-          f"raw_role={r['agreement']['raw_agreement_role']} | "
-          f"分歧 {r['disagreement']['n_items']} {r['disagreement']['kinds']}")
-    print(f"  自检：prefilled_final_fields = {r['prefilled_final_fields']}（须 0）| "
-          f"registry.template_match={r['registry_check']['template_match']}")
-    return 0
 
 
 if __name__ == "__main__":

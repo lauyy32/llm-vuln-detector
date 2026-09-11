@@ -24,6 +24,9 @@ KNOWN_SAFE_LINES = {
 }
 
 
+EXCLUDE_PARTS = {".work", "staging", "artifacts", "corpus_src", "fixtures"}
+
+
 def _call_target_name(node: ast.Call) -> str:
     """提取 `X.relative_to(ROOT)` 中 X 的简单标识（不支持则返回 '<expr>'）。"""
     f = node.func
@@ -46,13 +49,16 @@ class TestNoUnguardedRelativeTo(unittest.TestCase):
     def test_scan(self):
         offenders = []
         for p in sorted((ROOT / "cpg" / "ablation").rglob("*.py")):
-            if "tests" in p.parts:
+            # 只扫**本仓第一方源码**：排除 tests 与工作区/语料/生成物
+            if "tests" in p.parts or (EXCLUDE_PARTS & set(p.parts)):
                 continue
             src = p.read_text(encoding="utf-8", errors="replace")
             rel = p.relative_to(ROOT).as_posix()
             try:
                 tree = ast.parse(src)
-            except SyntaxError:
+            except SyntaxError as e:
+                # P1：解析失败**不得静默跳过**（否则门禁形同虚设）
+                offenders.append(f"{rel}: SyntaxError {e.msg} (line {e.lineno})")
                 continue
             # 收集被 try/except 包裹的行号区间
             guarded_lines = set()
