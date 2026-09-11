@@ -26,6 +26,29 @@ def selector_impl_sha256() -> str:
     return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
+def hunk_id(ident: dict) -> str:
+    """**完整唯一 hunk 身份**（P0-4）：对复合 identity 做 SHA-256。
+
+    依赖引用只接受该完整 id，禁止前缀匹配（相同 body 可能出现在不同文件/位置，
+    前缀可能命中多个 hunk）。依赖图由此获得精确、唯一、可校验的引用目标。
+    """
+    payload = "|".join([
+        str(ident.get("sample_id")), str(ident.get("file")),
+        str(ident.get("file_status")), str(ident.get("old_start")),
+        str(ident.get("old_count")), str(ident.get("new_start")),
+        str(ident.get("new_count")), str(ident.get("body_lf_sha256")),
+    ])
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def attach_hunk_ids(coverage: dict) -> dict:
+    """给 coverage 里每条 hunk_identity 补写 `hunk_id`（供 template/标注/依赖使用）。"""
+    for s in coverage["samples"].values():
+        for h in s.get("hunks", []):
+            h["hunk_identity"]["hunk_id"] = hunk_id(h["hunk_identity"])
+    return coverage
+
+
 def parse_patch_hunks(patch_text: str) -> dict:
     """解析 patch → {file: [{old_start, old_count, new_start, new_count, header, _body}]}。
 

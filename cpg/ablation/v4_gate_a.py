@@ -934,6 +934,8 @@ def build_hunk_coverage(out_dir: Path) -> dict:
                     else:
                         status = "ABSENT"
                 n[status] += 1
+                from cpg.ablation import v4_selector as _s2
+                ident["hunk_id"] = _s2.hunk_id(ident)   # P0-4：完整唯一身份
                 rows.append({"sample_id": cve, "hunk_identity": ident,
                              "coverage": status, "criticality": None})
         report["samples"][cve] = {"n_hunks": len(rows), **n, "hunks": rows,
@@ -1127,7 +1129,9 @@ def build_critical_hunks_template(out_dir: Path) -> dict:
 
 
 def _ident_key(ident: dict) -> str:
-    """hunk identity 的稳定键（用于严格 join）——含 sample_id（P1-1）。"""
+    """hunk 身份的稳定键：优先用**完整 hunk_id**（P0-4），否则回退复合字段。"""
+    if ident.get("hunk_id"):
+        return ident["hunk_id"]
     return (f"{ident.get('sample_id')}|{ident['file']}|{ident['file_status']}|"
             f"{ident['old_start']}|{ident['old_count']}|{ident['new_start']}|"
             f"{ident['new_count']}|{ident['body_lf_sha256']}")
@@ -1166,7 +1170,7 @@ def _validate_coverage_schema(coverage: dict, expected_ids=None) -> list:
     if coverage.get("selection_errors"):
         errs.append(f"selection 交叉核对失败: {sorted(coverage['selection_errors'])}")
     need = ("file", "file_status", "old_start", "old_count",
-            "new_start", "new_count", "body_lf_sha256", "sample_id")
+            "new_start", "new_count", "body_lf_sha256", "sample_id", "hunk_id")
     n_total = 0
     seen = {k: 0 for k in _VALID_COVERAGE}
     for cve, s in samples.items():
@@ -1207,20 +1211,30 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None,
 
     运行时按 hunk identity 严格 join `frozen criticality × current coverage`：
       - registry/coverage 缺失、未冻结、schema 非法 → 阻断；
+      - **P0-1**：接受 `FROZEN_WITH_EXCLUSIONS`，但先按 frozen 的 **active universe**
+        过滤 coverage（整例排除），再做严格 join；
       - identity 集合不等（缺/多/重复）→ 阻断；
-      - SECURITY_CRITICAL × FULL → 放行；
-      - SECURITY_CRITICAL × PARTIAL/ABSENT → **阻断**（P0-4：PARTIAL 不得静默放行）；
+      - SECURITY_CRITICAL × FULL → 放行；CRITICAL × PARTIAL/ABSENT → **阻断**；
       - NON_CRITICAL × 任意 → 不阻断。
     **只读 coverage 的当前值**，绝不读 registry 内可能过期的 coverage。
     """
     errs = _validate_coverage_schema(coverage, expected_ids)
     if errs:
         return errs
-    if not frozen_registry or frozen_registry.get("status") != "FROZEN_LABELED":
-        errs.append("frozen registry 缺失或未冻结（status != FROZEN_LABELED）→ 保守阻断")
+    if not frozen_registry or frozen_registry.get("status") not in (
+            "FROZEN_LABELED", "FROZEN_WITH_EXCLUSIONS"):
+        errs.append("frozen registry 缺失或未冻结（status 非法）→ 保守阻断")
         return errs
+    universe = frozen_registry.get("stale_universe_guard") or {}
+    active = set(universe.get("active_sample_ids") or [])
+    if not active:
+        errs.append("frozen registry 缺 active_sample_ids（universe 未冻结）")
+        return errs
+    # 按 active universe 过滤 coverage（P0-1）
     cur, dup = {}, []
-    for s in coverage["samples"].values():
+    for sid, s in coverage["samples"].items():
+        if sid not in active:
+            continue
         for h in s["hunks"]:
             k = _ident_key(h["hunk_identity"])
             if k in cur:
@@ -1230,24 +1244,25 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None,
         errs.append(f"当前 coverage 存在重复 identity {len(dup)} 条")
     froz, fdup = {}, []
     for e in frozen_registry.get("entries", []):
+        if e.get("sample_id") not in active:
+            continue
         if e.get("criticality") not in ("SECURITY_CRITICAL", "NON_CRITICAL"):
             errs.append(f"registry 含未裁决 criticality: {e.get('sample_id')}")
             continue
         k = _ident_key(e["hunk_identity"])
         if k in froz:
             fdup.append(k)
-        froz[k] = e["criticality"]
+        froz[k] = (e["criticality"], e.get("sample_id"))   # 同时保留 sample_id
     if fdup:
         errs.append(f"frozen registry 存在重复 identity {len(fdup)} 条")
     missing = sorted(set(cur) - set(froz))
     extra = sorted(set(froz) - set(cur))
     if missing:
-        errs.append(f"registry 缺少 {len(missing)} 条当前 hunk identity（新 hunk 未标注）")
+        errs.append(f"registry 缺少 {len(missing)} 条 active hunk identity（新 hunk 未标注）")
     if extra:
-        errs.append(f"registry 含 {len(extra)} 条当前 coverage 不存在的 identity（陈旧）")
-    # P0-4：critical 只有 FULL 才放行
-    crit_bad = sorted({k.split("|", 1)[1].split("|")[0] for k, v in froz.items()
-                       if v == "SECURITY_CRITICAL" and cur.get(k) != "FULL"})
+        errs.append(f"registry 含 {len(extra)} 条 coverage 不存在的 identity（陈旧）")
+    crit_bad = sorted({sid for k, (crit, sid) in froz.items()
+                       if crit == "SECURITY_CRITICAL" and cur.get(k) != "FULL"})
     if crit_bad:
         errs.append(f"SECURITY_CRITICAL 但当前覆盖非 FULL（须敏感性分析或签名 override）: {crit_bad}")
     return errs

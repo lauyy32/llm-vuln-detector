@@ -18,9 +18,12 @@ def _sha(s: str) -> str:
 
 
 def _ident(file="x.py", status="M", os_=10, oc=3, ns=10, nc=3, sha="a" * 64):
-    return {"sample_id": "CVE-X", "file": file, "file_status": status,
-            "old_start": os_, "old_count": oc, "new_start": ns, "new_count": nc,
-            "body_lf_sha256": sha}
+    ident = {"sample_id": "CVE-X", "file": file, "file_status": status,
+             "old_start": os_, "old_count": oc, "new_start": ns, "new_count": nc,
+             "body_lf_sha256": sha}
+    from cpg.ablation import v4_selector as _sel
+    ident["hunk_id"] = _sel.hunk_id(ident)
+    return ident
 
 
 def _cov(entries):
@@ -43,6 +46,8 @@ def _cov(entries):
 
 def _frozen(entries):
     return {"status": "FROZEN_LABELED",
+            "stale_universe_guard": {"active_sample_ids": ["CVE-X"],
+                                     "excluded_sample_ids": []},
             "entries": [{"sample_id": "CVE-X", "hunk_identity": i, "criticality": c}
                         for i, c in entries]}
 
@@ -98,6 +103,8 @@ class TestEvaluateCoverageGate(unittest.TestCase):
     def test_unadjudicated_criticality_blocks(self):
         i = _ident()
         reg = {"status": "FROZEN_LABELED",
+               "stale_universe_guard": {"active_sample_ids": ["CVE-X"],
+                                        "excluded_sample_ids": []},
                "entries": [{"sample_id": "CVE-X", "hunk_identity": i,
                             "criticality": "UNCLEAR"}]}
         errs = _gate(_cov([(i, "FULL")]), reg)

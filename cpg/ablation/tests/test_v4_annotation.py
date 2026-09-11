@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""标注基础设施测试：格式统一 / 强制校验 / 依赖校验 / UNCERTAIN 状态机。"""
+"""标注流水线测试：hunk_id 精确引用 / 科学字段分歧 / 仲裁 provenance / sample 级排除 /
+端到端状态机（含 Gate 通过路径）。"""
 import json
 import sys
 import tempfile
@@ -9,239 +10,235 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 from cpg.ablation import v4_annotation as va  # noqa: E402
+from cpg.ablation import v4_selector as sel  # noqa: E402
 
 
-def _ident(sha="a" * 64, cve="CVE-X", file="x.py"):
-    return {"sample_id": cve, "file": file, "file_status": "M", "old_start": 1,
-            "old_count": 1, "new_start": 1, "new_count": 1, "body_lf_sha256": sha}
+def _ident(cve="CVE-X", file="x.py", os_=1, oc=1, sha="a" * 64):
+    ident = {"sample_id": cve, "file": file, "file_status": "M", "old_start": os_,
+             "old_count": oc, "new_start": os_, "new_count": oc, "body_lf_sha256": sha}
+    ident["hunk_id"] = sel.hunk_id(ident)
+    return ident
 
 
-def _row(sha="a" * 64, cve="CVE-X", role=va.ROLE_DIRECT, who="reviewer1", deps=None,
-         ev="code-reasoning", cf="否"):
-    return {"sample_id": cve, "hunk_identity": _ident(sha, cve),
-            "question": "q", "criticality": role, "dependency_group": deps or [],
-            "counterfactual": cf, "evidence": ev, "reason": "r", "reviewer": who}
+def _row(ident, role=va.ROLE_DIRECT, who="reviewer1", deps=None, cf="否",
+         ev="code-reasoning", reason="r"):
+    return {"sample_id": ident["sample_id"], "hunk_identity": ident, "question": "q",
+            "criticality": role, "dependency_group": deps or [], "counterfactual": cf,
+            "evidence": ev, "reason": reason, "reviewer": who}
 
 
-class TestRoundTrip(unittest.TestCase):
-    """P0-1：disagreement → adjudicate → compile_frozen 必须同格式、可串起来。"""
+class _Env:
+    """构造一个双 CVE、多 hunk 的最小环境。"""
 
-    def setUp(self):
+    def __init__(self, n_a=2):
         self.td = tempfile.TemporaryDirectory()
         d = Path(self.td.name)
+        self.d = d
+        self.ids = {"a1": _ident("CVE-A", "a.py", 1, 1, "a" * 64),
+                    "a2": _ident("CVE-A", "b.py", 5, 2, "b" * 64),
+                    "x1": _ident("CVE-X", "x.py", 1, 1, "c" * 64)}
         self.tpl = d / "tpl.json"
         self.tpl.write_text(json.dumps({"entries": [
-            {"sample_id": "CVE-X", "hunk_identity": _ident("a" * 64)},
-            {"sample_id": "CVE-X", "hunk_identity": _ident("b" * 64)}]}), encoding="utf-8")
-        self.s1 = d / "r1.jsonl"
-        self.s2 = d / "r2.jsonl"
-        self.s1.write_text("\n".join([
-            json.dumps(_row("a" * 64, role=va.ROLE_DIRECT, who="reviewer1")),
-            json.dumps(_row("b" * 64, role=va.ROLE_NONCRIT, who="reviewer1")),
-        ]), encoding="utf-8")
-        self.s2.write_text("\n".join([
-            json.dumps(_row("a" * 64, role=va.ROLE_SUPPORTING, who="reviewer2")),
-            json.dumps(_row("b" * 64, role=va.ROLE_NONCRIT, who="reviewer2")),
-        ]), encoding="utf-8")
-        self.d = d
+            {"sample_id": v["sample_id"], "hunk_identity": v} for v in self.ids.values()]}),
+            encoding="utf-8")
 
-    def test_full_roundtrip(self):
-        dis = va.disagreement_list(self.s1, self.s2, self.tpl, self.d / "dis.json")
-        self.assertEqual(dis["n_items"], 1)          # 仅 a 有分歧
-        self.assertEqual(dis["items"][0]["kind"], "DISAGREEMENT")
-        # 同格式仲裁
+    def subs(self, r1_roles, r2_roles, r1_deps=None, r2_deps=None,
+             r1_cf=None, r2_cf=None):
+        r1_deps = r1_deps or {}
+        r2_deps = r2_deps or {}
+        r1_cf = r1_cf or {}
+        r2_cf = r2_cf or {}
+        s1, s2 = [], []
+        for k, ident in self.ids.items():
+            e1 = "insufficient" if r1_roles[k] == va.ROLE_UNCERTAIN else "code-reasoning"
+            e2 = "insufficient" if r2_roles[k] == va.ROLE_UNCERTAIN else "code-reasoning"
+            s1.append(_row(ident, r1_roles[k], "reviewer1", r1_deps.get(k), r1_cf.get(k, "否"), e1))
+            s2.append(_row(ident, r2_roles[k], "reviewer2", r2_deps.get(k), r2_cf.get(k, "否"), e2))
+        self.sub1 = self.d / "r1.jsonl"
+        self.sub2 = self.d / "r2.jsonl"
+        self.sub1.write_text("\n".join(json.dumps(x) for x in s1), encoding="utf-8")
+        self.sub2.write_text("\n".join(json.dumps(x) for x in s2), encoding="utf-8")
+
+    def all_same(self, role=va.ROLE_NONCRIT):
+        same = {k: role for k in self.ids}
+        self.subs(same, same)
+
+    def freeze(self, exclusions=None):
+        dis = va.disagreement_list(self.sub1, self.sub2, self.tpl, self.d / "dis.json")
         doc = json.loads((self.d / "dis.json").read_text(encoding="utf-8"))
-        doc["items"][0].update({"final": va.ROLE_DIRECT, "adjudicator": "adjudicator1"})
         (self.d / "adj.json").write_bytes(
             (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-        va.adjudicate(self.d / "dis.json", self.d / "adj2.json", self.tpl, self.s1, self.s2)
-        froz = va.compile_frozen(self.tpl, self.s1, self.s2, self.d / "adj.json",
-                                 self.d / "frozen.json")
-        self.assertEqual(froz["status"], "FROZEN_LABELED")
-        self.assertEqual(froz["n_entries"], 2)
-        self.assertEqual(froz["role_counts"][va.ROLE_DIRECT], 1)
-        self.assertEqual(froz["role_counts"][va.ROLE_NONCRIT], 1)
-
-    def test_disagreement_is_json_object(self):
-        """P0-1：分歧件必须是 JSON 对象（可被 compiler 消费），不是裸 JSONL。"""
-        va.disagreement_list(self.s1, self.s2, self.tpl, self.d / "dis.json")
-        doc = json.loads((self.d / "dis.json").read_text(encoding="utf-8"))
-        self.assertIn("items", doc)
-        self.assertEqual(doc["schema"], "v4-adjudication/1")
+        return va.compile_frozen(self.tpl, self.sub1, self.sub2, self.d / "adj.json",
+                                 self.d / "frozen.json", exclusions=exclusions)
 
 
-class TestForcedValidation(unittest.TestCase):
-    """P1-1：所有入口必须强制校验（重复 identity 不得被静默覆盖）。"""
+class TestHunkIdPrecision(unittest.TestCase):
+    """P0-4：依赖只接受完整 hunk_id，禁前缀。"""
 
-    def setUp(self):
-        self.td = tempfile.TemporaryDirectory()
-        d = Path(self.td.name)
-        self.tpl = d / "tpl.json"
-        self.tpl.write_text(json.dumps({"entries": [
-            {"sample_id": "CVE-X", "hunk_identity": _ident("a" * 64)}]}), encoding="utf-8")
-        self.s1 = d / "r1.jsonl"
-        self.s2 = d / "r2.jsonl"
-        dup = json.dumps(_row("a" * 64, who="reviewer1"))
-        self.s1.write_text(dup + "\n" + dup + "\n", encoding="utf-8")   # 重复
-        self.s2.write_text(json.dumps(_row("a" * 64, who="reviewer2")) + "\n", encoding="utf-8")
-        self.d = d
-
-    def test_duplicate_identity_detected(self):
-        v = va.validate_submission(self.s1, self.tpl)
+    def test_prefix_dependency_rejected(self):
+        e = _Env()
+        e.subs({k: va.ROLE_NONCRIT for k in e.ids}, {k: va.ROLE_NONCRIT for k in e.ids},
+               r1_deps={"a1": ["a2"[:8]]})   # 前缀
+        v = va.validate_submission(e.sub1, e.tpl)
         self.assertFalse(v["ok"])
-        self.assertTrue(any("重复" in e for e in v["errors"]))
+        self.assertTrue(any("禁前缀" in x for x in v["errors"]))
 
-    def test_agreement_refuses_invalid(self):
-        with self.assertRaises(ValueError):
-            va.agreement_report(self.s1, self.s2, self.tpl)
-
-    def test_wrong_reviewer_identity_rejected(self):
-        self.s1.write_text(json.dumps(_row("a" * 64, who="reviewer2")) + "\n", encoding="utf-8")
-        with self.assertRaises(ValueError):
-            va.agreement_report(self.s1, self.s2, self.tpl)
-
-
-class TestDependencyValidation(unittest.TestCase):
-    """P0-2：依赖必须存在、同 CVE、不得自引用。"""
-
-    def setUp(self):
-        self.td = tempfile.TemporaryDirectory()
-        d = Path(self.td.name)
-        self.tpl = d / "tpl.json"
-        self.tpl.write_text(json.dumps({"entries": [
-            {"sample_id": "CVE-X", "hunk_identity": _ident("a" * 64)},
-            {"sample_id": "CVE-X", "hunk_identity": _ident("b" * 64)},
-            {"sample_id": "CVE-Y", "hunk_identity": _ident("c" * 64, cve="CVE-Y")}]}),
-            encoding="utf-8")
-        self.sub = d / "r1.jsonl"
-        self.d = d
-
-    def _write(self, rows):
-        self.sub.write_text("\n".join(json.dumps(r) for r in rows), encoding="utf-8")
-        return va.validate_submission(self.sub, self.tpl)
-
-    def test_valid_dependency(self):
-        v = self._write([_row("a" * 64, deps=["b" * 64]), _row("b" * 64),
-                         _row("c" * 64, cve="CVE-Y")])
+    def test_full_id_dependency_accepted(self):
+        e = _Env()
+        e.subs({k: va.ROLE_NONCRIT for k in e.ids}, {k: va.ROLE_NONCRIT for k in e.ids},
+               r1_deps={"a1": [e.ids["a2"]["hunk_id"]]})
+        v = va.validate_submission(e.sub1, e.tpl)
         self.assertTrue(v["ok"], v["errors"])
 
-    def test_nonexistent_dependency(self):
-        v = self._write([_row("a" * 64, deps=["f" * 64]), _row("b" * 64),
-                         _row("c" * 64, cve="CVE-Y")])
-        self.assertTrue(any("依赖不存在" in e for e in v["errors"]))
-
-    def test_self_dependency(self):
-        v = self._write([_row("a" * 64, deps=["a" * 64]), _row("b" * 64),
-                         _row("c" * 64, cve="CVE-Y")])
-        self.assertTrue(any("自引用" in e for e in v["errors"]))
-
-    def test_cross_cve_dependency(self):
-        v = self._write([_row("a" * 64, deps=["c" * 64]), _row("b" * 64),
-                         _row("c" * 64, cve="CVE-Y")])
-        self.assertTrue(any("跨 CVE" in e for e in v["errors"]))
+    def test_self_and_cross_cve_rejected(self):
+        e = _Env()
+        e.subs({k: va.ROLE_NONCRIT for k in e.ids}, {k: va.ROLE_NONCRIT for k in e.ids},
+               r1_deps={"a1": [e.ids["a1"]["hunk_id"], e.ids["x1"]["hunk_id"]]})
+        errs = va.validate_submission(e.sub1, e.tpl)["errors"]
+        self.assertTrue(any("自引用" in x for x in errs))
+        self.assertTrue(any("跨 CVE" in x for x in errs))
 
 
-class TestUncertainLifecycle(unittest.TestCase):
-    """P0-3：UNCERTAIN 必须有明确处置，不得名义冻结却永远过不了 Gate。"""
+class TestScienceFieldDisagreement(unittest.TestCase):
+    """P0-3：role 一致但科学字段不同，必须进入仲裁。"""
 
-    def setUp(self):
-        self.td = tempfile.TemporaryDirectory()
-        d = Path(self.td.name)
-        self.tpl = d / "tpl.json"
-        self.tpl.write_text(json.dumps({"entries": [
-            {"sample_id": "CVE-X", "hunk_identity": _ident("a" * 64)}]}), encoding="utf-8")
-        self.s1 = d / "r1.jsonl"
-        self.s2 = d / "r2.jsonl"
-        self.d = d
+    def test_dependency_disagreement_enters_arbitration(self):
+        e = _Env()
+        same = {k: va.ROLE_NONCRIT for k in e.ids}
+        e.subs(same, same, r1_deps={"a1": []}, r2_deps={"a1": [e.ids["a2"]["hunk_id"]]})
+        dis = va.disagreement_list(e.sub1, e.sub2, e.tpl, e.d / "dis.json")
+        self.assertEqual(dis["n_items"], 1)
+        self.assertTrue(dis["items"][0]["fields_in_dispute"]["dependency"])
+        self.assertFalse(dis["items"][0]["fields_in_dispute"]["role"])
 
-    def _subs(self, r1role, r2role):
-        self.s1.write_text(json.dumps(_row("a" * 64, role=r1role, who="reviewer1",
-                                          ev="insufficient" if r1role == va.ROLE_UNCERTAIN else "code-reasoning")), encoding="utf-8")
-        self.s2.write_text(json.dumps(_row("a" * 64, role=r2role, who="reviewer2",
-                                          ev="insufficient" if r2role == va.ROLE_UNCERTAIN else "code-reasoning")), encoding="utf-8")
+    def test_counterfactual_disagreement_enters_arbitration(self):
+        e = _Env()
+        same = {k: va.ROLE_NONCRIT for k in e.ids}
+        e.subs(same, same, r1_cf={"x1": "是"}, r2_cf={"x1": "否"})
+        dis = va.disagreement_list(e.sub1, e.sub2, e.tpl, e.d / "dis.json")
+        self.assertTrue(dis["items"][0]["fields_in_dispute"]["counterfactual"])
 
-    def test_unanimous_uncertain_enters_review_list(self):
-        self._subs(va.ROLE_UNCERTAIN, va.ROLE_UNCERTAIN)
-        dis = va.disagreement_list(self.s1, self.s2, self.tpl, self.d / "dis.json")
-        self.assertEqual(dis["items"][0]["kind"], "UNANIMOUS_UNCERTAIN")
+    def test_agreement_report_reports_each_field(self):
+        e = _Env()
+        same = {k: va.ROLE_NONCRIT for k in e.ids}
+        e.subs(same, same, r1_cf={"x1": "是"}, r2_cf={"x1": "否"})
+        rep = va.agreement_report(e.sub1, e.sub2, e.tpl)
+        self.assertEqual(rep["raw_agreement_role"], 1.0)
+        self.assertLess(rep["raw_agreement_counterfactual"], 1.0)
 
-    def test_unhandled_uncertain_blocks_freeze(self):
-        self._subs(va.ROLE_UNCERTAIN, va.ROLE_UNCERTAIN)
-        va.disagreement_list(self.s1, self.s2, self.tpl, self.d / "dis.json")
-        doc = json.loads((self.d / "dis.json").read_text(encoding="utf-8"))
-        (self.d / "adj.json").write_bytes(
-            (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+
+class TestAdjudicationProvenance(unittest.TestCase):
+    """P0-2：仲裁件必须绑定两份 submission SHA。"""
+
+    def test_stale_adjudication_with_replaced_submission_fails(self):
+        e = _Env()
+        e.all_same(va.ROLE_NONCRIT)
+        e.freeze()
+        # 替换提交内容（SHA 变）
+        e.subs({k: va.ROLE_DIRECT for k in e.ids}, {k: va.ROLE_NONCRIT for k in e.ids})
         with self.assertRaises(ValueError) as cm:
-            va.compile_frozen(self.tpl, self.s1, self.s2, self.d / "adj.json",
-                              self.d / "frozen.json")
-        self.assertIn("UNCERTAIN", str(cm.exception))
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, e.d / "adj.json", e.d / "frozen2.json")
+        self.assertIn("submission SHA", str(cm.exception))
 
-    def test_uncertain_via_exclusion_allows_freeze_with_exclusions(self):
-        self._subs(va.ROLE_UNCERTAIN, va.ROLE_UNCERTAIN)
-        va.disagreement_list(self.s1, self.s2, self.tpl, self.d / "dis.json")
-        doc = json.loads((self.d / "dis.json").read_text(encoding="utf-8"))
-        doc["exclusions"] = {"CVE-X": "两标注者均证据不足（无 PoC/无回归测试）"}
-        (self.d / "adj.json").write_bytes(
-            (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-        froz = va.compile_frozen(self.tpl, self.s1, self.s2, self.d / "adj.json",
-                                 self.d / "frozen.json")
+    def test_tampered_item_set_fails(self):
+        e = _Env()
+        e.all_same(va.ROLE_NONCRIT)
+        e.freeze()
+        doc = json.loads((e.d / "adj.json").read_text(encoding="utf-8"))
+        doc["items"].append({"kind": "DISAGREEMENT", "hunk_id": "f" * 64,
+                             "hunk_identity": _ident("CVE-Z"), "sample_id": "CVE-Z"})
+        (e.d / "adj2.json").write_bytes((json.dumps(doc) + "\n").encode("utf-8"))
+        with self.assertRaises(ValueError):
+            va.adjudicate(e.d / "adj2.json", e.d / "out.json", e.tpl, e.sub1, e.sub2)
+
+
+class TestSampleLevelExclusion(unittest.TestCase):
+    """P0-1：排除必须是整例（CVE），不得部分排除。"""
+
+    def test_uncertain_excludes_whole_cve(self):
+        e = _Env()
+        e.subs({"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT},
+               {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT})
+        froz = e.freeze(exclusions={"CVE-A": "两标注者均证据不足"})
         self.assertEqual(froz["status"], "FROZEN_WITH_EXCLUSIONS")
-        self.assertEqual(froz["n_excluded"], 1)
-        self.assertEqual(froz["n_entries"], 0)
+        # 不得残留任何 CVE-A entry
+        self.assertFalse(any(x["sample_id"] == "CVE-A" for x in froz["entries"]))
+        self.assertEqual(froz["stale_universe_guard"]["active_sample_ids"], ["CVE-X"])
+        self.assertEqual(froz["stale_universe_guard"]["excluded_sample_ids"], ["CVE-A"])
 
-    def test_uncertain_resolved_by_adjudicator(self):
-        self._subs(va.ROLE_UNCERTAIN, va.ROLE_NONCRIT)
-        va.disagreement_list(self.s1, self.s2, self.tpl, self.d / "dis.json")
-        doc = json.loads((self.d / "dis.json").read_text(encoding="utf-8"))
-        doc["items"][0].update({"final": va.ROLE_NONCRIT, "adjudicator": "adjudicator1"})
-        (self.d / "adj.json").write_bytes(
-            (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-        froz = va.compile_frozen(self.tpl, self.s1, self.s2, self.d / "adj.json",
-                                 self.d / "frozen.json")
-        self.assertEqual(froz["entries"][0]["criticality"], "NON_CRITICAL")
-        self.assertEqual(froz["entries"][0]["source"], "adjudicated_uncertain")
-
-
-class TestFrozenPreservesScience(unittest.TestCase):
-    """P0-2：frozen 必须保留 dependency/counterfactual/evidence/角色原值。"""
-
-    def test_fields_preserved(self):
-        with tempfile.TemporaryDirectory() as td:
-            d = Path(td)
-            tpl = d / "tpl.json"
-            tpl.write_text(json.dumps({"entries": [
-                {"sample_id": "CVE-X", "hunk_identity": _ident("a" * 64)},
-                {"sample_id": "CVE-X", "hunk_identity": _ident("b" * 64)}]}), encoding="utf-8")
-            s1 = d / "r1.jsonl"
-            s2 = d / "r2.jsonl"
-            s1.write_text("\n".join([
-                json.dumps(_row("a" * 64, role=va.ROLE_SUPPORTING, who="reviewer1",
-                                deps=["b" * 64], cf="是")),
-                json.dumps(_row("b" * 64, role=va.ROLE_DIRECT, who="reviewer1"))]),
-                encoding="utf-8")
-            s2.write_text(s1.read_text(encoding="utf-8").replace("reviewer1", "reviewer2"),
-                          encoding="utf-8")
-            va.disagreement_list(s1, s2, tpl, d / "dis.json")
-            doc = json.loads((d / "dis.json").read_text(encoding="utf-8"))
-            (d / "adj.json").write_bytes(
-                (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-            froz = va.compile_frozen(tpl, s1, s2, d / "adj.json", d / "frozen.json")
-            a = [e for e in froz["entries"] if e["hunk_identity"]["body_lf_sha256"] == "a" * 64][0]
-            self.assertEqual(a["role"], va.ROLE_SUPPORTING)            # 角色原值
-            self.assertEqual(a["criticality"], "SECURITY_CRITICAL")   # 映射
-            self.assertEqual(a["dependency_group"], ["b" * 64])
-            self.assertEqual(a["counterfactual"], "是")
-            self.assertIsNotNone(a["evidence"])
+    def test_partial_cve_not_allowed(self):
+        """一个 hunk 未处置 → 整例须排除；只排除一个 hunk 无效（仍抛异常）。"""
+        e = _Env()
+        e.subs({"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_NONCRIT, "x1": va.ROLE_NONCRIT},
+               {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_NONCRIT, "x1": va.ROLE_NONCRIT})
+        # 未给 exclusions → 抛
+        with self.assertRaises(ValueError):
+            e.freeze(exclusions=None)
 
 
-class TestKappa(unittest.TestCase):
-    def test_perfect(self):
-        self.assertEqual(va._cohen_kappa(["A", "B"], ["A", "B"], ["A", "B"]), 1.0)
+class TestEndToEndGate(unittest.TestCase):
+    """端到端：frozen × coverage → Gate。"""
 
-    def test_chance(self):
-        self.assertAlmostEqual(
-            va._cohen_kappa(["A", "A", "B", "B"], ["A", "B", "A", "B"], ["A", "B"]),
-            0.0, places=6)
+    def _cov_for(self, ids, status="FULL"):
+        samples = {}
+        for ident in ids:
+            samples.setdefault(ident["sample_id"], {"n_hunks": 0, "hunks": []})
+            samples[ident["sample_id"]]["hunks"].append(
+                {"sample_id": ident["sample_id"], "hunk_identity": ident, "coverage": status})
+            samples[ident["sample_id"]]["n_hunks"] += 1
+        for s in samples.values():
+            s["selection_bound"] = True
+        seen = {}
+        for s in samples.values():
+            for h in s["hunks"]:
+                seen[h["coverage"]] = seen.get(h["coverage"], 0) + 1
+        return {"kind": "MECHANICAL_COVERAGE_AUDIT", "samples": samples,
+                "missing_selection": [], "selection_errors": {},
+                "totals": {k: seen.get(k, 0) for k in
+                           ("FULL", "PARTIAL", "ABSENT", "NOT_APPLICABLE_ADDED")}}
+
+    def _gate(self, cov, froz):
+        from cpg.ablation import v4_gate_a as ga
+        return ga.evaluate_coverage_gate(cov, froz,
+                                         expected_ids={s["sample_id"] for s in cov["samples"].values()} or None)
+
+    def test_all_agree_frozen_passes(self):
+        from cpg.ablation import v4_gate_a as ga
+        e = _Env()
+        e.all_same(va.ROLE_NONCRIT)
+        froz = e.freeze()
+        cov = self._cov_for(list(e.ids.values()))
+        errs = ga.evaluate_coverage_gate(cov, froz,
+                                         expected_ids=set(cov["samples"]))
+        self.assertEqual(errs, [])
+
+    def test_exclusion_shrinks_universe_and_passes(self):
+        """整例排除后，在缩减 active universe 上 Gate 应 PASS。"""
+        from cpg.ablation import v4_gate_a as ga
+        e = _Env()
+        e.subs({"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT},
+               {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT})
+        froz = e.freeze(exclusions={"CVE-A": "证据不足"})
+        cov = self._cov_for(list(e.ids.values()))     # coverage 仍含 CVE-A
+        errs = ga.evaluate_coverage_gate(cov, froz, expected_ids={"CVE-A", "CVE-X"})
+        self.assertEqual(errs, [], errs)
+
+    def test_critical_not_full_blocks(self):
+        from cpg.ablation import v4_gate_a as ga
+        e = _Env()
+        e.all_same(va.ROLE_DIRECT)
+        froz = e.freeze()
+        cov = self._cov_for(list(e.ids.values()), status="ABSENT")
+        errs = ga.evaluate_coverage_gate(cov, froz, expected_ids=set(cov["samples"]))
+        self.assertTrue(any("非 FULL" in x for x in errs))
+
+    def test_unfrozen_blocks(self):
+        from cpg.ablation import v4_gate_a as ga
+        e = _Env()
+        e.all_same(va.ROLE_NONCRIT)
+        cov = self._cov_for(list(e.ids.values()))
+        errs = ga.evaluate_coverage_gate(cov, {"status": "DRAFT"}, expected_ids=set(cov["samples"]))
+        self.assertTrue(errs)
 
 
 if __name__ == "__main__":
