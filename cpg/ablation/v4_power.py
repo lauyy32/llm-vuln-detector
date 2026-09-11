@@ -14,11 +14,20 @@ from __future__ import annotations
 
 import math
 
-POWER_SCHEMA = "v4-power/2"
+POWER_SCHEMA = "v4-power/3"
 DEFAULT_ALPHA = 0.05
 DEFAULT_TARGET_POWER = 0.80
 DEFAULT_P1 = 0.90
-N_CVES_V4 = 14          # 当前语料规模（用于把 N 与 m 联系起来）
+# **计划上限**（当前语料规模）；最终 N 须从 frozen active universe 读取
+PLANNED_MAX_N = 14
+
+# `unconditional_power` 所依赖的**假设**（必须随报告一起给出，不得当作数据事实）
+HOMOGENEITY_ASSUMPTIONS = (
+    "M ~ Binomial(N, discordance_rate)：各配对样本的 discordance 概率同质且相互独立",
+    "判别方向概率 p1 在所有 discordant 对中同质",
+    "p1 与 discordance_rate 相互独立",
+    "不涉及多重性调整（若做多重比较须另行校正）",
+)
 
 
 def _binom_pmf(k: int, n: int, p: float) -> float:
@@ -127,10 +136,24 @@ def required_N_for_target(p1: float = DEFAULT_P1, discordance: float = 0.5,
     return -1
 
 
-def power_report() -> dict:
-    """**准确命名**的功效报告：条件功效 + 非条件敏感性 + 可行性判断。"""
+def power_report(N_active: int | None = None) -> dict:
+    """**准确命名**的功效报告：条件功效 + 非条件敏感性 + 可行性判断。
+
+    `N_active`：**确认性合格样本数**，应由 frozen active universe 提供
+    （例如 corpus 门禁输出的合格集大小）。未提供时退回 `PLANNED_MAX_N`
+    并显式标注 `N_source = "planned_max"`，**不得**被当作最终样本量引用。
+    """
+    if N_active is None:
+        n_use, n_source = PLANNED_MAX_N, "planned_max (未提供 frozen active universe)"
+    else:
+        if not isinstance(N_active, int) or isinstance(N_active, bool) or N_active <= 0:
+            raise ValueError("N_active 必须为正整数")
+        if N_active > PLANNED_MAX_N:
+            raise ValueError(f"N_active={N_active} 超过计划上限 {PLANNED_MAX_N}；"
+                             "若语料扩容请先更新 PLANNED_MAX_N 与冻结协议")
+        n_use, n_source = N_active, "frozen active universe"
+
     need = required_discordant_pairs()
-    reachable = conditional_power(min(N_CVES_V4, need), DEFAULT_P1)
     return {
         "schema": POWER_SCHEMA,
         "quantity_name": "conditional power given m discordant pairs",
@@ -142,20 +165,29 @@ def power_report() -> dict:
         "alpha": DEFAULT_ALPHA,
         "target_power": DEFAULT_TARGET_POWER,
         "unit": "discordant pairs",
+        "N_active": n_use,
+        "N_source": n_source,
+        "planned_max_N": PLANNED_MAX_N,
         "conditional_power_at_m8": round(conditional_power(8), 4),
         "required_m_for_target": need,
         "curve_m6_to_m16": conditional_power_curve(range(6, 17)),
+        "homogeneity_assumptions": list(HOMOGENEITY_ASSUMPTIONS),
+        "assumption_scope_note": ("上列假设**仅**用于 `unconditional_power` 及其敏感性表；"
+                                  "`conditional_power` 不依赖它们（m 为给定值）。"
+                                  "假设不可作为数据事实引用，若与实测 discordance 分布冲突须重算。"),
         "caveats": [
             "m 只有跑完才知道；本报告不能推出'V4 需要 m=12 个样本'",
-            f"V4 当前语料仅约 {N_CVES_V4} 个 CVE → m ≤ {N_CVES_V4}",
+            f"当前 N={n_use}（来源：{n_source}）→ m ≤ {n_use}",
             "p1=0.90 是乐观单点假设，须用敏感性表覆盖 0.6–0.9",
-            f"在 N={N_CVES_V4}、q=0.5 下非条件功效仅 "
-            f"{round(unconditional_power(N_CVES_V4, 0.90, 0.5), 4)}",
+            f"在 N={n_use}、q=0.5 下非条件功效仅 "
+            f"{round(unconditional_power(n_use, 0.90, 0.5), 4)}（该值依赖同质性假设）",
         ],
         "unconditional_required_N": {
             f"q={q}": required_N_for_target(0.90, q) for q in (0.3, 0.5, 0.7)
         },
         "sensitivity_p1_x_discordance_x_N": sensitivity_table(),
-        "wording_rule": ("结论只能写'**判别力有限**'；**不得**把 underpowered 当作结论性表述，"
-                         "功效不足仅在引用本报告时讨论"),
+        "wording_rule": (
+            "在所列 p1 与 discordance-rate 假设下，本实验的统计功效低于预设目标；"
+            "**不得据此单独推断模型真实判别能力**，亦不得把 underpowered 表述为'无效应'。"
+            "可写'判别力有限'；功效数值仅在引用本报告时讨论。"),
     }

@@ -19,6 +19,13 @@ from cpg.ablation import v4_scaffold as sc  # noqa: E402
 
 TOKENIZER = ROOT / "cpg/ablation/artifacts/v4/tokenizer/tokenizer.json"
 
+try:  # 可选依赖：未安装时相关用例降级为 skip（不得让整个套件 ERROR）
+    import tokenizers  # noqa: F401
+    _HAS_TOKENIZERS = True
+except ImportError:  # pragma: no cover
+    _HAS_TOKENIZERS = False
+_HAS_TOKENIZER_ARTIFACT = TOKENIZER.exists()
+
 
 # ---------------------------------------------------------------------------
 # 1) envelope
@@ -59,6 +66,7 @@ class TestEnvelope(unittest.TestCase):
 # 2) tokenizer / context fit
 # ---------------------------------------------------------------------------
 class TestTokenizer(unittest.TestCase):
+    @unittest.skipUnless(_HAS_TOKENIZER_ARTIFACT, "需要 tokenizer.json 工件")
     def test_identity(self):
         ident = sc.tokenizer_identity(TOKENIZER)
         self.assertEqual(len(ident["sha256"]), 64)
@@ -68,6 +76,8 @@ class TestTokenizer(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             sc.tokenizer_identity(Path("no/such/tokenizer.json"))
 
+    @unittest.skipUnless(_HAS_TOKENIZERS and _HAS_TOKENIZER_ARTIFACT,
+                         "需要 tokenizers 包与 tokenizer.json 工件")
     def test_count_tokens_monotonic(self):
         n1 = sc.count_prompt_tokens("hello", TOKENIZER)
         n2 = sc.count_prompt_tokens("hello world this is longer", TOKENIZER)

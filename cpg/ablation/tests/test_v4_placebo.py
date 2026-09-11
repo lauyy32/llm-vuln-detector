@@ -106,6 +106,25 @@ class TestDeadBranchDocstring(unittest.TestCase):
         self.assertIn("行号", op.neutrality_reason)
         self.assertIn("tracing", op.neutrality_reason)
 
+    def test_single_line_body_rejected(self):
+        """单行函数体 `def f(): return 1` —— 行首插入会落到**函数体外**（模块层），
+        作用域错误 → 前置必须直接拒绝，不得留给 verify 兜底。
+        """
+        r = pl.apply_operator("def f(): return 1\n", "dead_branch")
+        self.assertFalse(r["applied"])
+
+    def test_never_produces_module_level_if_false(self):
+        """任何被接受的 dead_branch 变换，`if False` 必须在**函数体内**。"""
+        cases = ('def f():\n    return 1\n',
+                 'async def f():\n    """d"""\n    await g()\n')
+        for src in cases:
+            with self.subTest(src=src):
+                r = pl.apply_operator(src, "dead_branch")
+                self.assertTrue(r["applied"], r)
+                tree = ast.parse(r["new_source"])
+                module_level = [n for n in tree.body if isinstance(n, ast.If)]
+                self.assertEqual(module_level, [], "出现了模块层 if False")
+
 
 # ===========================================================================
 # P0-3：redundant_parens 必须真正插入括号且 AST 不变
@@ -278,6 +297,79 @@ class TestMisc(unittest.TestCase):
 
     def test_registry_schema(self):
         self.assertEqual(pl.operators_registry()["schema"], pl.PLACEBO_SCHEMA)
+
+
+# ===========================================================================
+# 评审 3 P1：跨平台指纹（LF 归一化）/ 行尾继承 / span identity 定位
+# ===========================================================================
+class TestLFNormalizedFingerprint(unittest.TestCase):
+    def test_registry_declares_hash_mode(self):
+        reg = pl.operators_registry()
+        self.assertEqual(pl.HASH_MODE, "lf-normalized-text")
+        self.assertEqual(reg["hash_mode"], pl.HASH_MODE)
+        for op in reg["operators"]:
+            self.assertEqual(op["hash_mode"], pl.HASH_MODE, op["name"])
+
+    def test_sha_lf_ignores_line_ending(self):
+        self.assertEqual(pl._sha_lf(b"a\r\nb\r\n"), pl._sha_lf(b"a\nb\n"))
+
+    def test_module_sha_is_lf_normalized(self):
+        self.assertEqual(pl.operators_registry()["module_sha256"],
+                         pl._sha_lf(pl.MODULE_PATH.read_bytes()))
+
+    def test_fingerprint_stable_across_line_endings(self):
+        """同一内容以 CRLF / LF 两种检出 → 指纹必须相同（此前会漂移）。"""
+        op = pl.OPERATORS["redundant_parens"]
+        self.assertEqual(op.fingerprint(pl._sha_lf(b"x\r\ny\r\n")),
+                         op.fingerprint(pl._sha_lf(b"x\ny\n")))
+
+
+class TestNewlineInheritance(unittest.TestCase):
+    def test_crlf_source_produces_no_bare_lf(self):
+        """CRLF 源文件插入语句后**不得混入裸 LF**（否则整文件行尾不再一致）。"""
+        src = "def f():\r\n    return 1\r\n"
+        r = pl.apply_operator(src, "dead_branch")
+        self.assertTrue(r["applied"], r)
+        body = r["new_source"]
+        self.assertEqual(body.count("\n"), body.count("\r\n"), "混入裸 LF")
+        self.assertIn("if False:\r\n", body)
+
+    def test_lf_source_produces_no_cr(self):
+        r = pl.apply_operator("def f():\n    return 1\n", "dead_branch")
+        self.assertTrue(r["applied"], r)
+        self.assertNotIn("\r", r["new_source"])
+
+
+class TestSpanIdentityFunctionLookup(unittest.TestCase):
+    def test_second_same_name_function_located_by_span(self):
+        """同名函数重定义时，verify 必须按 **span** 定位目标函数（旧版按 name 会错配）。"""
+        src = ("def f():\n"
+               "    return 1\n"
+               "\n"
+               "def f():\n"
+               "    return 2\n")
+        r = pl.apply_operator(src, "dead_branch",
+                              node_selector=lambda n: getattr(n, "lineno", 0) == 4)
+        self.assertTrue(r["applied"], r)
+        fns = [n for n in ast.parse(r["new_source"]).body
+               if isinstance(n, ast.FunctionDef)]
+        self.assertEqual(len(fns), 2)
+
+        def _has_dead(fn):
+            return any(isinstance(s, ast.If) and isinstance(s.test, ast.Constant)
+                       and s.test.value is False for s in fn.body)
+        self.assertFalse(_has_dead(fns[0]), "误插到第一个同名函数")
+        self.assertTrue(_has_dead(fns[1]))
+
+    def test_nested_method_located_by_span(self):
+        src = ("class C:\n"
+               "    def m(self):\n"
+               "        return 1\n")
+        r = pl.apply_operator(src, "dead_branch",
+                              node_selector=lambda n: getattr(n, "name", "") == "m")
+        self.assertTrue(r["applied"], r)
+        cls = ast.parse(r["new_source"]).body[0]
+        self.assertTrue(any(isinstance(s, ast.If) for s in cls.body[0].body))
 
 
 if __name__ == "__main__":

@@ -73,6 +73,27 @@ def _sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
+def _sha_lf(b: bytes) -> str:
+    """**LF 归一化** SHA（跨平台指纹，P1）。
+
+    此前项目多次因 Windows CRLF / Linux LF 导致指纹漂移，故算子与模块指纹
+    统一按 LF 归一化计算，并在 registry 里记录 `hash_mode`。
+    """
+    return hashlib.sha256(b.replace(b"\r\n", b"\n")).hexdigest()
+
+
+HASH_MODE = "lf-normalized-text"
+
+
+def _newline_of(src: str) -> str:
+    """源文件的行尾约定（用于插入时继承，避免 CRLF 文件产生混合行尾）。"""
+    if "\r\n" in src:
+        return "\r\n"
+    if "\r" in src:
+        return "\r"
+    return "\n"
+
+
 # ---------------------------------------------------------------------------
 # 算子协议
 # ---------------------------------------------------------------------------
@@ -96,10 +117,13 @@ class Operator:
             return repr((self.applies, self.make_edit, self.verify_contract))
 
     def fingerprint(self, module_sha: str | None = None) -> str:
-        """指纹**绑定实现源码**（P1）：实现改了，指纹必变。"""
-        ms = module_sha or _sha(MODULE_PATH.read_bytes())
-        payload = "|".join([ms, self.name, f"v{self.version}",
-                            _sha(self.impl_source().encode("utf-8")),
+        """指纹**绑定实现源码**（P1），且**跨平台稳定**（LF 归一化）。
+
+        实现改了 → 指纹必变；Windows/Linux 检出行尾差异**不会**改变指纹。
+        """
+        ms = module_sha or _sha_lf(MODULE_PATH.read_bytes())
+        payload = "|".join([HASH_MODE, ms, self.name, f"v{self.version}",
+                            _sha_lf(self.impl_source().encode("utf-8")),
                             self.precondition_doc, self.neutrality_reason])
         return _sha(payload.encode("utf-8"))
 
@@ -148,7 +172,17 @@ REDUNDANT_PARENS = Operator(
 # 算子 2：dead_branch（插在 **docstring 之后**；__doc__ 必须保持）
 # ---------------------------------------------------------------------------
 def _dead_applies(src: str, node: ast.AST) -> bool:
-    return isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and bool(node.body)
+    """前置：函数定义且**函数体与 def 不同行**、且存在可插入的首条语句。
+
+    单行函数体（`def f(): return 1`）下"在该行行首插入"会把 `if False`
+    落到**函数体外**（模块层），作用域错误 → 直接拒绝，不留给 verify 兜底。
+    函数体仅含 docstring 时无安全插入点 → 同样拒绝。
+    """
+    if not (isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.body):
+        return False
+    if node.body[0].lineno == node.lineno:      # 单行函数体 → 拒绝
+        return False
+    return _func_body_first_lineno(node) > 0
 
 
 def _func_body_first_lineno(fn) -> int:
@@ -169,24 +203,48 @@ def _dead_make_edit(src: str, node: ast.AST):
     lines = src.splitlines(keepends=True)
     target = lines[lineno - 1]
     indent = target[:len(target) - len(target.lstrip())]
-    insert = f"{indent}if False:\n{indent}    pass\n"
-    # 在目标行**起始**插入（span = 该行起点的空区间）
+    nl = _newline_of(src)                    # **继承源文件行尾**（P1，避免混合行尾）
+    insert = f"{indent}if False:{nl}{indent}    pass{nl}"
     offsets = _line_char_offsets(src)
     pos = offsets[lineno - 1]
     return (pos, pos, insert)
 
 
+def _find_function_by_span(tree, span):
+    """按**原始 span** 定位函数（P1）：同名函数/嵌套/方法都能精确定位。
+
+    `span` = 原源码中该函数节点的 `(start, end)` 字符区间；
+    这里用 `(lineno, col_offset, end_lineno, end_col_offset)` 作为**结构身份**匹配。
+    """
+    for n in ast.walk(tree):
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            key = (n.lineno, n.col_offset, n.end_lineno, n.end_col_offset)
+            if key == span:
+                return n
+    return None
+
+
 def _dead_verify(orig_src: str, new_src: str, node: ast.AST) -> list:
     errs = []
     t0, t1 = ast.parse(orig_src), ast.parse(new_src)
-    f0 = next(n for n in ast.walk(t0) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
-              and n.name == node.name)
-    f1 = next(n for n in ast.walk(t1) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
-              and n.name == node.name)
-    # docstring 语义必须保持（P0-2）
+    # **span identity** 定位（不用 name，避免同名函数误配）
+    span = (node.lineno, node.col_offset, node.end_lineno, node.end_col_offset)
+    f0 = _find_function_by_span(t0, span)
+    if f0 is None:
+        return ["无法按 span 定位原函数"]
+    # 新树中函数体**多了一行**，故按"去掉插入的 if False 后"的等价 span 匹配
+    f1 = None
+    for n in ast.walk(t1):
+        if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if n.name == f0.name and (n.lineno, n.col_offset) == (f0.lineno, f0.col_offset):
+            f1 = n
+            break
+    if f1 is None:
+        return ["无法在新源码中定位目标函数"]
     if ast.get_docstring(f0) != ast.get_docstring(f1):
         errs.append(f"docstring 语义变化: {ast.get_docstring(f0)!r} → {ast.get_docstring(f1)!r}")
-    # 恰好新增 1 个 `if False`
+
     def _deads(fn):
         return [n for n in fn.body if isinstance(n, ast.If) and isinstance(n.test, ast.Constant)
                 and n.test.value is False]
@@ -195,7 +253,7 @@ def _dead_verify(orig_src: str, new_src: str, node: ast.AST) -> list:
         errs.append(f"函数体直属 `if False` 数量应为 1，实得 {len(d1)}")
     if _deads(f0):
         errs.append("原函数体已含 `if False`（前置应排除）")
-    # 原函数体语句（除 docstring 与**本次插入的 if False**）必须逐项保持
+
     def _stmts(fn):
         b = list(fn.body)
         if b and isinstance(b[0], ast.Expr) and isinstance(b[0].value, ast.Constant) \
@@ -210,7 +268,8 @@ def _dead_verify(orig_src: str, new_src: str, node: ast.AST) -> list:
 DEAD_BRANCH = Operator(
     name="dead_branch",
     status="OK",
-    precondition_doc=("函数定义且函数体非空；若函数体仅含 docstring 则拒绝（无处安全插入）；"
+    precondition_doc=("函数定义、函数体非空、且**函数体与 def 不同行**；"
+                      "单行函数体或仅含 docstring 的函数体一律拒绝（无安全插入点）；"
                       "插入位置 = **docstring 之后**的首条语句之前"),
     neutrality_reason=("`if False` 恒不执行 → 业务输出不变；且 docstring 仍是首条语句，"
                        "`__doc__` 语义保持。**中性范围限定为业务输出**：会改变源码行号，"
@@ -298,20 +357,22 @@ OPERATORS = {op.name: op for op in (REDUNDANT_PARENS, DEAD_BRANCH, COMMUTATIVE_S
 
 
 def operators_registry() -> dict:
-    """预注册登记表（含**模块 SHA** 与逐算子实现指纹）。"""
-    module_sha = _sha(MODULE_PATH.read_bytes())
+    """预注册登记表（含**模块 SHA** 与逐算子实现指纹；**跨平台稳定**）。"""
+    module_sha = _sha_lf(MODULE_PATH.read_bytes())
     return {
         "schema": PLACEBO_SCHEMA,
+        "hash_mode": HASH_MODE,          # P1：显式声明哈希口径
         "module_sha256": module_sha,
         "n_operators": len(OPERATORS),
         "operators": [
             {"name": op.name, "status": op.status, "version": op.version,
              "precondition": op.precondition_doc,
              "neutrality_reason": op.neutrality_reason,
-             "operator_impl_sha256": _sha(op.impl_source().encode("utf-8")),
+             "hash_mode": HASH_MODE,
+             "operator_impl_sha256": _sha_lf(op.impl_source().encode("utf-8")),
              "fingerprint": op.fingerprint(module_sha)}
             for op in OPERATORS.values()],
-        "policy": ("中性由**构造**保证；指纹绑定实现源码，实现改动即指纹变化；"
+        "policy": ("中性由**构造**保证；指纹绑定实现源码且按 LF 归一化（跨平台稳定）；"
                    "修改一律在源码 span 上进行，span 外逐字节相等"),
     }
 
