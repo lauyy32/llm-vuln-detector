@@ -24,6 +24,8 @@
             "sample_id": "CVE-2026-12482",
             "hunk_id": "aecdc6d69802dd8dd30a5ee5151fa04e9f7d389c3709e102fef95e62e9e8ec58"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -40,6 +42,8 @@
             "sample_id": "CVE-2026-12482",
             "hunk_id": "5100ae86dabc1eaa6fb7d6b891595363e92ca7ca710b4df90b428f8586521672"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -68,6 +72,8 @@
             "sample_id": "CVE-2026-70491",
             "hunk_id": "a4a4e00912cf0283b2427e6a23516a750789a4d1b3e78fb57d01a8a5681ea5b3"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -96,6 +102,8 @@
             "sample_id": "CVE-2026-50558",
             "hunk_id": "28d897f41ffc73e4bf9df5b8d533009812da65b23f814ceb96080aba0e360509"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -112,6 +120,8 @@
             "sample_id": "CVE-2026-50558",
             "hunk_id": "2c25d1c017d428fc3125e078a8892ca7b08f7b02801d8933a32b52d1e092b683"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -128,6 +138,8 @@
             "sample_id": "CVE-2026-50558",
             "hunk_id": "176aa594aa4c1dbb94824f46f0ff62a38be64aed31c14569ad5d9a2585bfa0e4"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -144,6 +156,8 @@
             "sample_id": "CVE-2026-50558",
             "hunk_id": "6015c8724f89a1ada4ad68fa24db621148f9aefd5df359e26b0a6e8832d7edd8"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -172,6 +186,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "58f0af9e2d654faf227761605808414650585697ac90579534c893197615fdd3"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -188,6 +204,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "8a4095cbf08d1c61b1c36c66546680980757cc8e5509c97d82281c95c5ddec0d"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -204,6 +222,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "e7f4da3fe82762f37d78a927ea7877ffc72ad5c58a1beca849af359137ad27ef"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -220,6 +240,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "04beb3f64c7e2919b20ca5e7705ee1d7f4a08547fa1f55650cae90bae6d677ca"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -236,6 +258,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "025a9a8536baacf90ee3a1d00bad5c2201d2325d38c640b53b70d37f255a7582"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -252,6 +276,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "93c040b02b580befe9c1d3347acf6cb6209f589d283962fb0a3a2ef1a1fbb3e7"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -268,6 +294,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "f7bc3e815f2ee87a24540c245ed3d9d6de63d78fcb7befe7cbfc2648e9ae014c"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -284,6 +312,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "ccf379580d4c99ad65573b56ff7d79a894a024a8fca7153f15b4a8151faf335d"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -300,6 +330,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "d7d364bc4583f73355c6c6fd24bd93f26e7d43bebaada2719d973b889e7cce7e"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -316,6 +348,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "8bdbe2a0f0a6d2648c489190ae9cee3714a0bf6e6c4ae70973542ca4746bb7e2"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -332,6 +366,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "5725d2e89518a1165a5fc486d2991e0ad537c79898a739f4fb89c23baafd0931"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -348,6 +384,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "724fd9f2abf73a0db482b156663eb9e784dd84864570535bb75663dd5f167ac1"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -364,6 +402,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "dbd98cafa8e62cd7a82d00e5b40663c72dd32563b3daa882478dae775e70cbb9"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -380,6 +420,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "33d6d58e87aa9c5135142f5b48d0cd61157dc0781f49e935f8fb83763a793114"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -396,6 +438,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "400d7ce959a52c8253c226cc48d325f6cd75927b349fa65fbc6562d0ad013de9"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -412,6 +456,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "ce5916507a117161b28d06c8a3963a0170d39c091141a06509644b241b07ea45"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -428,6 +474,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "2e9351aa04e44100b2ecf94f1bebbba6a7254362ff86e8037846ce63818563e2"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -444,6 +492,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "60f3b922025f9802d1ca70a82f8b4dff846624ca8873701235a70bbfca55a2ee"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -460,6 +510,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "85770549f152b9cc54441626adfb2acda8e73543308d55d7b7086af6e503c566"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -476,6 +528,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "7b24c10105ef8d30fda8caa90bc7d3961766ab7fcd8529972e58f5433af6ca09"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -492,6 +546,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "34ecb1661f8fe76bd2151bab36117a0cfb073a1fd95c3716c7c600b183589498"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -508,6 +564,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "22b1bc2565db5f68efa1edee5834992afb6a80e06a22c9bd7a6b9e4b2c6fc5a9"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -524,6 +582,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "8ef9a1b0a333d1ba2c2d3f26780963796f32fd7c2772187b5c9967dc7153c03c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -540,6 +600,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "6762fbed6d031ae41dd3efd8e574b861e3bd96ca01f611d5b4c694a94a0850eb"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -556,6 +618,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "becf2a14db2f49c0beda4c6f2f335b5295f9dddb2d3703d31517e8e65095301b"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -572,6 +636,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "5ad3a3d5d290aa8c4738a23919a9bf293e95400503a01514a5ffdef71dbd50a8"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -588,6 +654,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "f670a34116cffaa86274ef5bee0c41c95df53f3f5a1a8128c1e1212baee2b5b0"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -604,6 +672,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "f23cdd7ac591874bd65c66fc67068c785b2ea6960947422762d568da52d11cad"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -620,6 +690,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "8dbe225f89c475af3fbeb41d254cd181eab8d929be1594a79fc60d45b0a8cabc"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -636,6 +708,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "8ce48505dfcf9b071c4bc0ac14de84bb84f0b8bec77ada14a73d26d47583eda4"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -652,6 +726,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "cb8e31423716b70c64869be5fffb4def3bbf3736330cc9643af5587ad1c6bc02"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -668,6 +744,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "21fbff0857d257b55181f4e375a039b55c3188519c5c83c24b829049b452646e"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -684,6 +762,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "9fd99fc56a7dd1915a34ba30c362e2d5367526142797ced0c906e4513646953f"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -700,6 +780,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "d4b3027d68f8d34c46e976491e9beafd7bfde6d79eeb2e5353904a81b94e1e21"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -716,6 +798,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "d8bddbb4b12d88f7cd8a5d7f402cf6b47f260ff1966ac9b23d5fe70a827fc47c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -732,6 +816,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "0fb8471a895c186d860eb13ac5ff629d750553af777555439fd6f86286f2c649"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -748,6 +834,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "1c169a15d8646616050fe99ce7975c8699bbe60a102b75df8e7ea99731a8c01c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -764,6 +852,8 @@
             "sample_id": "CVE-2026-67424",
             "hunk_id": "b668612b27cf018247f4541cc8f8cdbda00ff6337efd9fa22dd4e0a4bfbd3307"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         }
@@ -792,6 +882,8 @@
             "sample_id": "CVE-2026-53502",
             "hunk_id": "7e42942589d6d27ebedd61300598b87683d335d037d67ff9a558f425f7d652f0"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -808,6 +900,8 @@
             "sample_id": "CVE-2026-53502",
             "hunk_id": "4274fcfd3ed36d46c3489a62f807d84b71be3fc64d2f3bba0198ee3400ad4d6f"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -824,6 +918,8 @@
             "sample_id": "CVE-2026-53502",
             "hunk_id": "0e067adf58b2421ec9e28d0c28c3d1307acf86d2203b8b5dbd750dd19b89f91f"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -840,6 +936,8 @@
             "sample_id": "CVE-2026-53502",
             "hunk_id": "b494fa35d60fffec9813162876052a66574c8e2567c040e3c605edc78fc01b9d"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -868,6 +966,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "8652d30db2049f7d2adc661dd2b356863fde9018a7c8e171846a80c63722f252"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -884,6 +984,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "016f417211e112f67fa2e9df578ffd7cf15570ed54a2f56148205583cc9d104d"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -900,6 +1002,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "1f29148ff54c046352bad471bcf5da2304ba5d66b436c7224d227abc22a32cf3"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -916,6 +1020,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "828ff27bf0e6f20242258016a8bf58f74b9112c723591b4feb670f6ffae53659"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -932,6 +1038,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "90313a0356c6e1c866d934ab73d21fc4407a1955a4adceb45c56f7a9e12dca7a"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -948,6 +1056,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "7551a29bdaa346b69371c26b893a2b8ea0c1087eaa9ab174ad9e12c08809a191"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -964,6 +1074,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "70665c576c40ecf9fa8836341e1e5918383b83af89aeee5dd4bfe13a7d56080f"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -980,6 +1092,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "9ec0f9442a78899f0a98b687e2dbb447bdfaa0dcec4f92936f46c7be34f56d12"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -996,6 +1110,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "2ce62cd8036f5f3b20fef7e9b08f7f9c566eacdd01e134f6762d92f1adda60ea"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -1012,6 +1128,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "50c8cbb867a48e7862acc2e835326b81fa449c9eafbce2e61ed7a60652fd2248"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -1028,6 +1146,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "59d673eb215a8a9f9d6e7d927b2dc1bdcb4bb9f30b3b1f57f55b5d8a9ad5ea9e"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1044,6 +1164,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "c371b146219be2610cbcf3fabe8dc31e7f45906b69a77c6cb163cf8b1e360299"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1060,6 +1182,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "f854a7be85d56ac1536abe81f9a486114da50f616b145eea59dbf7602dd47c1c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1076,6 +1200,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "650ecca7e8936e72e64cb6292e5fbc225d5691d26f97ff0fa2a2fa66ec0b6a44"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1092,6 +1218,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "ef25ded218d2835118a77218758dd98f8e7624a24bbee1414389aefcef0bed76"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1108,6 +1236,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "6e0a9d24352f55cb2ab28ab10340780f3eb53ca93acaea5f9f4e85335bda95a9"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -1124,6 +1254,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "9f448195c71050192cc6cf4980abf8aca9a344acb3cb19a6ec7ec935178375e2"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -1140,6 +1272,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "ef7fed93d7c3b9ddd12cef593eb7d60308a936cf0611dc3aa84541945646523e"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -1156,6 +1290,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "d1c88e6fffc2bf5dfdb91705d4628ca7cc6b0854068b2b93051793c147bb0bb8"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1172,6 +1308,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "7ab412bbf3704abb68266cce2bfbc425fa7a1aea2d288c18332da3127c11dff6"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1188,6 +1326,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "c1a5fdc9da258e6b34bf9762a41fac80c78f631f5789b51a2b04256fd00226eb"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1204,6 +1344,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "4f161f3c33e3276a26077d5445445b771ec93a0bde8e53730755ae127e7da055"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1220,6 +1362,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "39871c5fcb682be754796391b52279a6d1ab6070f10edaf5acc401fced7daa52"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1236,6 +1380,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "9f4e2b35bd76f504df3ab2d765c881ec1209f7b3169d53ad3cd062251786f84a"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1252,6 +1398,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "8a2cc7487993eec1a90c8b3857486751aa18d0bece876fb86e72418d6cc15084"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1268,6 +1416,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "3f8f037033f4cc7256c1b88ace6ade5b6d5cfcc1a180b1be9d81478e08880954"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1284,6 +1434,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "046e3690ba29827ca5a1a353517445a6e1dd9782134447f52e350019eef23452"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1300,6 +1452,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "a4d2e4db5cca27cb94c8b943ab2549f72f25a4521fa06b582b30841a137d05ad"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1316,6 +1470,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "c0fa3c8433ac49ce44330d8bd30afa08545e372c4cd9acfc6185e7559fe00e9f"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1332,6 +1488,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "a74c9c609f7e655843c67dff7bc4957ed05b7d21f3213b0403b447ebe03de98b"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -1348,6 +1506,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "f137a858f2f3c03e8fdc157c43a51f2ec1d3ce769f875a3c20257c73433a0578"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -1364,6 +1524,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "045b5811d731ffdae1381ceade2d5f903f345c89b9a082e40954ab2fd237bd72"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1380,6 +1542,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "5a253a624a1c3490fb96ebcaab26114458f93cbeb74e78e2ea988d815019415e"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1396,6 +1560,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "a3375c6eddd9c8147a7b630d23e97ccccf9ee36a15768441e70e212c34f7b774"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1412,6 +1578,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "69445ebdd20bbd1f16c47b16a50aa77c522a0b3876dcc8138db89fd8aad0912e"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1428,6 +1596,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "94088c3a8fec40411ea3abb3f9ff74f1473180324aca7e3edf3640cc5b7065ff"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1444,6 +1614,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "3d2b8d1203445594f4ae5f71275a69ff5ae6b0cfbd8cb84a710aa1b2e26dff08"
           },
+          "source_context_coverage": "NOT_APPLICABLE_ADDED",
+          "candidate_patch_coverage": "FULL",
           "coverage": "NOT_APPLICABLE_ADDED",
           "criticality": null
         },
@@ -1460,6 +1632,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "2a3e3bfcc838b0ee698a233e9d30ea8a871a2871e6940760c3ca352ffd62e252"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1476,6 +1650,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "27c434483e3946b0e4f85a288f4eaf85bb3a13924d53d149487cd3ec0eaf9db8"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1492,6 +1668,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "58396841e67c997f1b8124488a1a5a7472d194e261819ea6df2ade7df3ee23c0"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1508,6 +1686,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "c5c1a1095fc00029e0c192aa4aabc026409c46d68bce8e448dfa11465f5fcae3"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1524,6 +1704,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "caa70686835e1e7e0cccd73492f4f4e3bc2fe892c547bee4b7d554db8a04360b"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1540,6 +1722,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "c8c3507a0759065b1b092cff569e9342b758e70d59710fd39814b9518e09f388"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1556,6 +1740,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "68457f4ea861d6135d463b4791baf1d53ae5eb4e7e50e4e28e27d518048e2d1d"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1572,6 +1758,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "2fe8cfd9acebe95990a17986084cb61f96adaffd59e9bb446bf22116b942b98b"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1588,6 +1776,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "2a28319b1f4a2dcc17fe0e925127f5dd1f71e5f5182b1e36f7172a0d0d40dc6b"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1604,6 +1794,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "72ce2b571fe93f76a929ec6fb994fb846ed78de2ec0104f2a4716a8d8fc92134"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1620,6 +1812,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "49aebf74de2505af9e4b5e21baa4999c424d9f06e5903150441290939b81eb5f"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1636,6 +1830,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "5cdacd7fa81440ffc58e06a6e597f61d0e560f7b3671a7b2bccc91feb5a13b4c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1652,6 +1848,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "11ed37b36d18621a1bcea3f7e9235214f7ac7cf0d98ee2223c8632d7612eff9d"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1668,6 +1866,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "e7617e45d105886b7422536ad5c1595212ec8861f62e5990487882ffd01a292c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1684,6 +1884,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "84bf877a768aae8ffefd0b71b87de79ede48b195773616fcdf2a8d1a0d9a8b0b"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1700,6 +1902,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "19eef4ad6746a123cfa17eaf3b1763e34ad4a8711f43d132d4d0e5aaabf63356"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1716,6 +1920,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "ddb43fe575c21510875ff96b2eab1d22f82e9da882ec59a961277f942d92b533"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1732,6 +1938,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "f5b83d2b3c46d810a9da02a6a42f4cbedc0b6d9cc59b60523d692c79a18efc81"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1748,6 +1956,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "ca4f9b78b649176ee1aa2b7f4213f13af40002e42fcf7ecefa31d3796e54c43a"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1764,6 +1974,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "a401c97fa766b24675ecfe11997ff227e8acc472990002520d84fcc5ebb9b9c5"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1780,6 +1992,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "a6dc18f79f0bff2382808ff9e560f007c0d08f6584c22bdc253cb309cc29249f"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1796,6 +2010,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "2c5cd431a1f81c1217eb7c95fca1ee71f2366a363f02a740eab1e9d03f8ddf3e"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1812,6 +2028,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "f4cc8b5d18c545d72de1467950d85d08eb3607bd6b17db03b034bc42b3c935ec"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1828,6 +2046,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "9135a23f77e4a104b06cf01e403f9167db11ee305403415d92bce9c35fdf04ce"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1844,6 +2064,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "3c568837e3ce094cbabf27d0569aac3eb1b5445fd497441a37aef11122e28911"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1860,6 +2082,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "d1d1da644053a8184ab8c7f056600f07bf88311ca1e891fd68acf23bd97651d7"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1876,6 +2100,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "1c503a24f2c9edbcf7897dec27f036f829e3f1bac0819cfd59e954be1dee4a15"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1892,6 +2118,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "9a2bcaba426d1ab3f888001bb37bcb1d7bc8e136e4b313719fd84475405e1bf8"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1908,6 +2136,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "8a61c3560c409d630d91c1507f74dbb05b5b74629820470a2270803338595688"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1924,6 +2154,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "ab0f837b20b5b6b9a8eca3b01179f0519cbb6a41cef658d0c16546c16650f58d"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1940,6 +2172,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "315c6e1e845c8231654f6c3841426a8c274d79feb74cb8086ca0046cb305d6b9"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1956,6 +2190,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "5687695ebe74896bddd4748659ee27828f3a01f25c13e653d15381fdfbe1c00c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1972,6 +2208,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "455e31684d23f089383acdd9ef88818523f1e846ca459eaa5fbcd14e57737532"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -1988,6 +2226,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "e5f86274f4f213fca8786bc65c744f413178ee4ef7cb329d64721b0440516974"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2004,6 +2244,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "535b7e5c11121432615e5e5adac2578cd85a8729f8b14287ec3bf2c9e2d36dda"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2020,6 +2262,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "6990ff83100e66553d1133a888bc6130eec9e271b20b7756e3956794689ad4b4"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2036,6 +2280,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "aa5698f846bf927c0b90071c88779722c50ac45ed4fb1d0760eb5e54f02f759e"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2052,6 +2298,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "1b13225792ea0ac626b9421d98855c3f72fff4a4bafa80945e9e0a91db057b9e"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2068,6 +2316,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "6e74163d1471245c969520f1c441bdef144d493d737c13464b81a58141489cd8"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2084,6 +2334,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "dc17df77f3146c2ac232c4071308fab3659ec31f8d0c958474772ae79ba79b1b"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2100,6 +2352,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "bce4d3798fe88d1e986f5fd7bd86da40e3c305fbdb39ef88fb7c6da3490e2ffe"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2116,6 +2370,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "45c53c40f014e4d655c478121eb167242ae502b6f2214b80cf33d4ab750e77f7"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2132,6 +2388,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "22bf9d9c91733b571c3e2d73e023327dae47f8ecd225ed1e2c0f0071d5f4bfb0"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2148,6 +2406,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "0c163c1dcadff702cc64d6e6c7f9880342a59762598a86f41ff0a8bb7046aa77"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2164,6 +2424,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "e5fe0b064f78465e1adf023420736b67249de93962862328c36d6998c94521f8"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2180,6 +2442,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "f2363ee92a4c062d1a080ab7c58fa9d6463859d4b15ddb4d9485bd961e41722c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2196,6 +2460,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "493629537b0cd6d4e780eadfa3e90f8c3e9a668cf3739e8fda931cd09d05516d"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2212,6 +2478,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "7ad29c782bc34587c38cf9388cc968ddce8f456478923749166dd4627835a55d"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2228,6 +2496,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "006d80027f53a1ab80413b298ba82801876449b1da39e81bd9e65285472c80ea"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2244,6 +2514,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "7ddb8f639a4393eedcb143bb67c0da490ca36f9a477d559e8edd00387fd57596"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2260,6 +2532,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "2c0cd51b336727a74094441d2b2d1a2e2aec660026c5070520525d1402955fd7"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2276,6 +2550,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "98eeb607b5aad2dabd6b7acef56cfc5ad2f6ca326398f3b7d7c7a0d6708b72d7"
           },
+          "source_context_coverage": "NOT_APPLICABLE_ADDED",
+          "candidate_patch_coverage": "FULL",
           "coverage": "NOT_APPLICABLE_ADDED",
           "criticality": null
         },
@@ -2292,6 +2568,8 @@
             "sample_id": "CVE-2026-73498",
             "hunk_id": "bd6ae40b7e1bb35d40ec015181940fb820069847912dc144e33fb95754aa60b0"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         }
@@ -2320,6 +2598,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "94e79c595f821f3c75e8ae02215097bdff189fb65f19d4eb6beffb1b7017a347"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2336,6 +2616,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "c45ec6c73888d11dc24d0c3b7261dc4f8fe753499f627dd0b35bb559b033b5f2"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2352,6 +2634,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "96cf9fade2da62d9b5962ec724d01ead789c1883567da906d120a68581d3099c"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2368,6 +2652,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "36e5171e60c91e2454d78d18cde8d356458ef4962e372e4f91f8da6ffc678d8c"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2384,6 +2670,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "af36f65ec6ccc3282ffd2e64c285b95a10fc109dcaf4a7079940bfb38a030d65"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2400,6 +2688,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "9187426e505be2cf894c24775387870d1edb94a8d11a8f1e458a54569f5fef0b"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2416,6 +2706,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "3ee988c4568b4d282356043be2a978fc3bca059b2f0fcab00e1b3627baa3c3fc"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2432,6 +2724,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "2a421f325786c1c659c28f3c7da57fb958c8517922f5056170655345a72b7cb0"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2448,6 +2742,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "80d6a07142e0ed283166f7ddd564fb2ed85f80523e74668c874682c2fbdbc6d7"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2464,6 +2760,8 @@
             "sample_id": "CVE-2026-53598",
             "hunk_id": "33068845d884edde1c57929096b051e2e94a20df11aebabda2c2b01076a7cc09"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -2492,6 +2790,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "ff5fd1814139e4bc71935e65aa81d799850ed20ec65b281c8ddedf1df9483c78"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2508,6 +2808,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "ec77bd8f3fbbac5c91e93fe17024007e8ae016a86e9ea3f8a3deb2878665e0b5"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2524,6 +2826,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "c8684d85740e31a058b6bb50b67e1de351e254b7616da87c4f9e5fe290a44dee"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2540,6 +2844,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "d0da7e29129ce82fd1272ee2a24dac4735db127de09e6f31a14ffb2157bc54a6"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2556,6 +2862,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "2dfd17e3e394c5b7b83e2c45e382192174089277115c74fdd65dbad3f2e28008"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2572,6 +2880,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "8f23c5e941c77ca8613b3ee3aa253c6977731cbe7b8ef3b1389b95528f889215"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2588,6 +2898,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "e34e2d692dd431c9ee7cecd3cfbef1bdd4824fd78cdf502886990d59bca81dbb"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2604,6 +2916,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "3b54baa3ea533a2b846b7929faa820c49e387c3902b42e214974361a1d17a4a6"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2620,6 +2934,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "00d9282f1b57a9b408fbe840d84f3b3a33b11d06ca55950d25e0f3c860d91f12"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2636,6 +2952,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "5cfc47c5acdf810032ba13e4ab0e079d7fc1ef10de85c43a1f7e8934b4ea7d13"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2652,6 +2970,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "2301ed23c0a9e97ddbb5af170d8e8b307e4697d4e1f9e0be3f2de3ff37950ca9"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2668,6 +2988,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "107ee09a546783e7c3dabede9863bf7a19eb3254d2f07df375206e9fae448c16"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2684,6 +3006,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "ddb5c480446457773193981dcdf964c6f281bc048e506f72477e7fed032c8051"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2700,6 +3024,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "1f0c62993d7f25fb016c88cc495484ef3ff24c4deacfaa8a08fb6f16105cf0c6"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2716,6 +3042,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "40e6c879cc5e24a34232ac4d3cb32f42b5cc7589359481482d6e83a245302d30"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2732,6 +3060,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "e0f4eaa71ed2f1c6c94848f61f6bcad45eb25c4712748c38f62f59c97213f3a9"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2748,6 +3078,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "2f6ed4d736155bdcab001916df6f80585c9ea90dd6dc56d0e6d001d645424484"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2764,6 +3096,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "a4be5ee90ce3a96cb530b7f851b15c385b925817657b7d20840f308a6d80ad7f"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2780,6 +3114,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "740203bd589c118c4aee52cc13186ef69dfa4450dcce12d815310e55586dad95"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2796,6 +3132,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "0d2ac44269edd3961e1b9c9ad4e0ff2e7cf8a15aa8af52b83f7015609a3f7849"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2812,6 +3150,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "06205b5ee03457495c78e205b4611656a1def3a71c16b05f626ed1119c958404"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2828,6 +3168,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "b7f5561e9e47ae36bc34c81a48ae2616b9929a71d0f47aa112eaa12f261ea3cd"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2844,6 +3186,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "c360565a6a7a668eed7f413801aef1120e65b800a82b83c66532dc1f985442aa"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2860,6 +3204,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "467b469dcc9fd6255efd001502197486dc7fe69f556ebf34d5e24c9b0d1b60d2"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2876,6 +3222,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "c2edb2641b39ca58138d07ee57a7a4f32610dfcb1bbf339b7e92b2b34d644157"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2892,6 +3240,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "4aabe6ef3610a1e6c5bd1d906448ae1b6ba12ea63c0edab967581896bc4f1d83"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2908,6 +3258,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "3acbe8466265a6784391ee5a8b23866105d9a8287ab49c7070377b267e268e3d"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2924,6 +3276,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "bd1797046bde177113ddaa3db59eb1f18d7f13a3cd690fd7fee78c86cf451c9b"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -2940,6 +3294,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "3e3dd042e720b212964de52f43af7ecb8fb2e0866e18ec2b97dcce4125210b82"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2956,6 +3312,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "e57230800f13278a1793d04ca81a1a109c7be1d92fda9f6200476f95a27be943"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2972,6 +3330,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "ab84c3e625ebcf7581fed1ab50d15edcdef55faff24efb6b9eb20991b5ac7599"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -2988,6 +3348,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "00f19843be5b2e726e74dbbb82bdee2dff538059b1f6d4b7486b7e5b674823ce"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3004,6 +3366,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "158531b71d08b1c439fd7dd8080b003a0463c713560b2516aa4ef934b5cf2379"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3020,6 +3384,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "784cb8c5c575eed169851697811faeeacd926129e1faef9101dbd380a4786b1c"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3036,6 +3402,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "5b42440d0b064b27f7f79d971470f6cffcbc084c63fae447430eb1fcdee77678"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3052,6 +3420,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "907fbb658b608d046fe75bfc37a16f4fd0d0cb5415802346b3c2d6cfc21c3a4b"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3068,6 +3438,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "e4ab9af3daa70b54db5ae0b1fc9deb5f5758a568fd2977df60964836efdcf840"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3084,6 +3456,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "580adc230a61555ae7a2baa484db073bcead095955d90fcbe123309a7f3fb5db"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3100,6 +3474,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "44637a017ec894ccb7991fc4a8b3d33eba449f60bc40a5a8315b9f0e0bb09204"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3116,6 +3492,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "7c3c0f213f1521623240407f0f1d00af9e4ccfff71811732349acc0bf6d5c8f5"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3132,6 +3510,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "9ebb8ca9aa9cc1a6f73cca98e62f267f37c666e16f59eb83f9cf446c85fdbda8"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3148,6 +3528,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "73971e2915976f84d99f8e6f352e9219c80d6445ceff6cc7afad936b047fe24d"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3164,6 +3546,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "28eaf04d95d33049fff2abac956229eadd78acbcca16df8f32c68df355921ee4"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3180,6 +3564,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "144f8478183866075b2f7b578437b0d485c3b63b768f78f63f5b7cbd64794871"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3196,6 +3582,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "37fc3d7e9917067051b7c643e4c82cb8bff93099b18b082a5f623025613bb7fb"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3212,6 +3600,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "e02244282a6b82ede86e34cf97e38244383e3a770c5fffb71da0b508056aba3a"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -3228,6 +3618,8 @@
             "sample_id": "CVE-2026-67425",
             "hunk_id": "81d3db8837c3c6eb7cfb970d883b8d28fe74f0e39667bae2559e0aa53ea720ea"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         }
@@ -3256,6 +3648,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "ea61a793bb1ebb351c39c033abf8ac157eb8a6320629b77988b363a3f9475e0d"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3272,6 +3666,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "1f84a3191f47d815671f3aea4b53213796389497a2951fdd545067c48f1276ab"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3288,6 +3684,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "86772a68efed567ef10c20a583ff879fc40963f67ab7531f5750dda056df7d7b"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3304,6 +3702,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "170e2543749237f73763567ecccc3562555272b1f3c7b2120c8a6cd9d7497143"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3320,6 +3720,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "7e1eef0f6736f54b72d93827bbb684614e45779e1433250a23237d0fbc86e4cf"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3336,6 +3738,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "6679cb50a45256e418697bec9a674b55e535e19c2b09bccb34d23b88d4803016"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3352,6 +3756,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "3e335f1d3913297dd81f2df08c5ca8bb3ec61307824196249f8b825c8e1c8f16"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3368,6 +3774,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "4086274d6c50d5199c86fa81c85771d4807dfb0f56a76d6dcaea96464bedb6b3"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3384,6 +3792,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "a75c1c5f754aaa576592e2cd61f69861d36911f048f2f88fb32c8d1bd06da0a7"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3400,6 +3810,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "7903c13eecda406629ee24c6047e3a1160905937dd6f846fb5d6d8147fa86b56"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3416,6 +3828,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "15d38f36a4d3b454d45836a8e7e5fd252ebe06ea7a45a951549077ce2eca2685"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3432,6 +3846,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "b217f6e06503b12b68f505844c8a3cc5794eced06f9fabefa7456a748af3705f"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3448,6 +3864,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "b8dbfa127b41b91d585de0373657c8f48f6a2d551273823fdbd6e8363d4f387f"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3464,6 +3882,8 @@
             "sample_id": "CVE-2026-54706",
             "hunk_id": "337fbf8e25a21464926f87450b63399dfee2e5728299b14d765a9dbc5ac963ab"
           },
+          "source_context_coverage": "NOT_APPLICABLE_ADDED",
+          "candidate_patch_coverage": "FULL",
           "coverage": "NOT_APPLICABLE_ADDED",
           "criticality": null
         }
@@ -3492,6 +3912,8 @@
             "sample_id": "CVE-2026-59890",
             "hunk_id": "e44c57ca2f618e313e0c5ba2f2f97525a32a55c4b11cc302d2f92740d0f55133"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3508,6 +3930,8 @@
             "sample_id": "CVE-2026-59890",
             "hunk_id": "c10f8e406c7402d230a0d5e255def037ecebf6b8507be3ebd8e8ac0d9be75c49"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3524,6 +3948,8 @@
             "sample_id": "CVE-2026-59890",
             "hunk_id": "ba232c1a38ae283419cf34e1494c12682815ac78ad23363711663d457e362b62"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3540,6 +3966,8 @@
             "sample_id": "CVE-2026-59890",
             "hunk_id": "477b5328332d9905e0ff326e6c43fbe80a9e1e8bc1361200251b329c3f1e801b"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3556,6 +3984,8 @@
             "sample_id": "CVE-2026-59890",
             "hunk_id": "c0a5c813028ac2bc2585bde707b7096ce06afa4ae83013916860c87f9966f6a1"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3572,6 +4002,8 @@
             "sample_id": "CVE-2026-59890",
             "hunk_id": "cf34b97f6bc8aa8b6b4fd32e08283468849c9518973c7dde2a1a437a137e45ce"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3588,6 +4020,8 @@
             "sample_id": "CVE-2026-59890",
             "hunk_id": "35f2a73fa84684b1970182751351554baa4380e49deb1ea395578be39b7968a0"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -3616,6 +4050,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "cb95df46b06b268b6c953823bf14e701e2e833acdfed186843deb0fc93bd5643"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3632,6 +4068,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "ce2642f474b7704f89ee45bdc4d7899dd78c5b0a7142cd91d298cd5af6de1ff7"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3648,6 +4086,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "9ae3612013f8768276358ed5ee4e6389cbd77d218b4c5660e2d11010b7fa1291"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3664,6 +4104,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "dc3c07328d5c1237edd82a9e2d2c0dbdc2c8339c4959e8ced5f2d131125578f2"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3680,6 +4122,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "ade051f9a00200ff16aa5087886073d1d370e8bda3f9554bcea3c1972b12ff5c"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3696,6 +4140,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "be47c618bc26cc9c1f9cd8f68af23b5de38097018d30c5b9f6e4cf74d35e4160"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3712,6 +4158,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "69d7e8f2a91e8d36e96e43cc994ff21cbaaa91886ae836352d6371a34a02a2ce"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3728,6 +4176,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "99296f8eaf7e7b015c878b9c2e46e9f8f883631ae3a8da7c3faf39fd4d6c47c8"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3744,6 +4194,8 @@
             "sample_id": "CVE-2026-54707",
             "hunk_id": "030a9a5a93b48bc2386f239fbe40a552ea4e491227a28ab9a9fcb0ebb3975038"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -3772,6 +4224,8 @@
             "sample_id": "CVE-2026-54785",
             "hunk_id": "d74eae96f8e6c84d38fe0dfe098bff0cf8b0ee878baa872277b2cac768f9443e"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3788,6 +4242,8 @@
             "sample_id": "CVE-2026-54785",
             "hunk_id": "0897187a657dfb36291ba2f0dbb76e898d1db1b8a86aa9cdb028f2ff6fa4afce"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3804,6 +4260,8 @@
             "sample_id": "CVE-2026-54785",
             "hunk_id": "0ebd4cf0f951fa89bb3103c1b911a3a94f045da42f70a922ac0cf37874e6a51f"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3820,6 +4278,8 @@
             "sample_id": "CVE-2026-54785",
             "hunk_id": "4134dd0d3ec4bbb634a4ad0179fe0082d52ee505212ea6815658072ac0c0d5ba"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3836,6 +4296,8 @@
             "sample_id": "CVE-2026-54785",
             "hunk_id": "6daa2e67adbcb1318791ee95a127f12b9fa368663025534e22d77d0872f3afde"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3852,6 +4314,8 @@
             "sample_id": "CVE-2026-54785",
             "hunk_id": "c8cb6c503050048ae6c1a663a1ac59892ecf2f68df9305d91ee3fe35cdcb2047"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -3880,6 +4344,8 @@
             "sample_id": "CVE-2026-50181",
             "hunk_id": "5f1f4dd31fe9f761288b5ecc8412ca42d0ef84d3bee6127ccba7e59dfe3b5bc5"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3896,6 +4362,8 @@
             "sample_id": "CVE-2026-50181",
             "hunk_id": "918c965b5bde9298af474578a11ab466a92a9bf18e6e0e2720d0780f7255d2d7"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3912,6 +4380,8 @@
             "sample_id": "CVE-2026-50181",
             "hunk_id": "8b0f134f83c93abc06246ec5e50553ad4d6e72a69aae4747adf733a275417ce2"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3928,6 +4398,8 @@
             "sample_id": "CVE-2026-50181",
             "hunk_id": "89f1feb2293348aadbed32da0e6165af5614cc3a8f3eba7ef1a6454eeb8398e5"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3944,6 +4416,8 @@
             "sample_id": "CVE-2026-50181",
             "hunk_id": "d051e5bcc0c2b11410d5f962a13239fe4cb6c305698f9cc9a8c17ee3764393eb"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -3960,6 +4434,8 @@
             "sample_id": "CVE-2026-50181",
             "hunk_id": "a3034280d7ae056f8b511e877d9678f97fb96cfb2660ec808d5557ceac798333"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -3988,6 +4464,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "851d942065204c5261bda25694c9e2d30b08b987c89170f0176479270d258145"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4004,6 +4482,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "fcd02dbf5201285dbe7efd98e79404c77f2e98e2f269f5fedb4ce257b1b27489"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4020,6 +4500,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "53678bacc91d251bcbad300ab1bc99bdca847c48c4649253c25029a705cf1a30"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4036,6 +4518,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "74a42807bc5188b746e67f289535e6119e62353812dac647d86694235c83cdb2"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4052,6 +4536,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "60b84927d6caa3033c4ff03c533f40e4e63ffeca50e4227c47624ecf3c7e6d5c"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4068,6 +4554,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "c2b87efaf989cfdb7f171db4183ecb9ed53796a852e41e3c4dd44378a8c952c4"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4084,6 +4572,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "eb156d25ce7cc88ad0fe7b202474300edac5d549fabf81ae13021cd0f3351829"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4100,6 +4590,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "e9cb782d5a4c6f0a6739294772e96f0fd7700e0e79cf288a7864c502fa15fcea"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4116,6 +4608,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "d45f8df2c752b6a4af7ff9934ef074aeebe20c5954aaa487bf8d1417462529a1"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4132,6 +4626,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "865154a8f8f03d1ae5395b5f14fe63e76e8d9cb655bb05b91e9caaa010b0ec9b"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4148,6 +4644,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "f03f32e53623c914064318186a97601704ff691ce52adb0c6601de86c2eccb76"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4164,6 +4662,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "9f41985e55c2577277ebe7b280f28b63ea24c25c4503e56029dc51f649063663"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4180,6 +4680,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "85bebb42af24e91a46dd40d6c84f7567c8445ab5205b9529e8a9a22808094187"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4196,6 +4698,8 @@
             "sample_id": "CVE-2026-54574",
             "hunk_id": "0db0e69c8c221e6ffd45458cd3f2622b8e8e627042ba203c8f76c8cbf256ee0c"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         }
@@ -4224,6 +4728,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "1d2434e91bfea95b49a6067b48a701f9590f8ce182dc0173337ecc41fefef95c"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4240,6 +4746,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "c2d4c6b412c7005bc94e77674836f22d781c638cb5ebd585ff713113fbf7fee3"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4256,6 +4764,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "ccc37243e82560f7dddb8671efe942416a05984f78a16bff02fe77279450fb8b"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4272,6 +4782,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "59d4583c073e46f340877efd79a1a941aba3008183050a160d28b3caee867148"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4288,6 +4800,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "1fa93e1ee125d89efc8702bec1f6ca7f79f7a25cdc03919f7c972efdcbff11d9"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4304,6 +4818,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "dadfb24bc397e0b702db0fff0d8d4a12ee5701d6d633d8f445b4a8aeb192119f"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4320,6 +4836,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "2826399935fb6c814eeb783c13f1fae53074cc9848225a6ec4e7e6a8ec5b8508"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4336,6 +4854,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "006372530ad2990897f863dd0d869c3501755bc84c7587d88dfa04fdb7b7b093"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4352,6 +4872,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "69d65dce18829510e5173743bd605c722e94b4bff39e0c97263db482115886bc"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4368,6 +4890,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "0668cc3226feade3d7767432506206d7e168b508c225f4fe1aebff423c7a90fd"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4384,6 +4908,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "df99c8b6cc2524e3ef1b94486e346466ab7b04f61a2c348a8c586a2687f4d1af"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4400,6 +4926,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "71d739ebd4a6ce1fa0ba53e24da73e8383c81d5fc7e8dd696950e3926b9c4fef"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4416,6 +4944,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "7d2aa6ee246404d8b9ced5d583f2dc2ac2de16856332ad29cc68265a0726748e"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4432,6 +4962,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "1623fefb85e4c66731392cbc2bbd5b9c3b0872b6d87b732d8bf63386342cfc21"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4448,6 +4980,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "062733e335dc20f6a23860833e3d3df1db5205515eac03882a98664a4264a0fc"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4464,6 +4998,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "edd4c72952ee37c7ba8df1ccd979a8e846082a00dc56c06b8939407cab27c996"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4480,6 +5016,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "dd5f486e500d0edfbd9d4c24b6d8468d3e438465cb0ceeb17f58f501c417c471"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4496,6 +5034,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "c35fc24a95569a276fa3f1ec56edbb612a9c0812ae55f6d40b59aa3f2817470b"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4512,6 +5052,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "091c4ba41f4cf77787fc60af903e7f53a664e29e874ebfddaa8c7da37cff3c76"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4528,6 +5070,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "717c3ef771deba1792c18df7e8b332792a1b9125b7c24607d25c3c16b3db7b42"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4544,6 +5088,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "74ecede48400b920e774cf9eef261b8e30109edc1ddfba899e64127b6ca6f7c6"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4560,6 +5106,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "c11ea973dd9f02997af762d5ba24363a84bec3036ccdf8e89d1f9776296881bc"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4576,6 +5124,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "d1021aebd457c287ccba668134e6f618eb827a3a52a80171c1c8a7ce1b2199a4"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4592,6 +5142,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "65ff55d0a5f37b108e5b1c5f786f410cedc7763b6060202f025cfe8cb3c39269"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4608,6 +5160,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "3199d8a70a6e00aff93db3533ade8d215e79d40be1e14a235251db62b100d07d"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4624,6 +5178,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "d0b85facffdbc0bb08321ad7aef1265164e2c85c225d1cf788aca8ba465cbc56"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4640,6 +5196,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "85b7f20b68829f17af2ec4107d684e60a36c94d28fb768c4eb8c8dc533cf5628"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4656,6 +5214,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "f9b0495196170f446e23aa637b6d95e1c5d0eba838331f5fe0f8a5662cc01701"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4672,6 +5232,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "18d603c93b69ad5caba5d6b68b0adeb191a9c22b6cf1535d193107e41a23fb55"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4688,6 +5250,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "3b709bc3f9b20570b5be6d67e8eca5c12883740dcdb4209c5b099b88d3eb5d6c"
           },
+          "source_context_coverage": "FULL",
+          "candidate_patch_coverage": "FULL",
           "coverage": "FULL",
           "criticality": null
         },
@@ -4704,6 +5268,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "9b6b3e84cac4d307aa7fa18ec61c5d2fa34747cbe18c42b4b5be3695d64dedf8"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         },
@@ -4720,6 +5286,8 @@
             "sample_id": "CVE-2026-45019",
             "hunk_id": "e99ff99b61987b075fd573013c0c772fc94f260911b45b02f6e48d07c854493a"
           },
+          "source_context_coverage": "ABSENT",
+          "candidate_patch_coverage": "ABSENT",
           "coverage": "ABSENT",
           "criticality": null
         }

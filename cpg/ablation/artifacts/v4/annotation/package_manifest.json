@@ -20,9 +20,9 @@
     "reviewer": "reviewer1 | reviewer2"
   },
   "provenance": {
-    "generator_git_commit": "d82f0b9f3fa7aeab010b3c7bd302558402307b4b",
-    "selector_impl_sha256": "9ff1356f0be13f344dd490c99540bf031960dfcb93c511bb44ea2dd3bc101d22",
-    "annotation_generator_impl_sha256": "b8c7e558ef5c41c9899adc03b825ef29c86e1901445a992bfede6c1a4496155e",
+    "generator_git_commit": "3c2f1387caa553a28e32a1622c7c46ffd5cba0c7",
+    "selector_impl_sha256": "5825861f3ccacb22572a92e55b6e36617d5432dc2f6b1adcf64cdcd10bdea26c",
+    "annotation_generator_impl_sha256": "45f7c5b847501a38bad676d82328c8b472912587d92dd3e875c60b2222d6ba69",
     "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
     "canonical_manifest_sha256": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996",
     "real_patches_tree_sha256": "d546e38973f326ea9751e6335f43300fb2704d353423aea42ae86dca5b646fff"
@@ -59,9 +59,9 @@
     {
       "name": "v4_hunk_coverage.json",
       "path": "cpg/ablation/artifacts/v4/v4_hunk_coverage.json",
-      "bytes": 177132,
-      "lines": 4748,
-      "sha256": "0793056e9ae2a2fe3c763fc8149c625d7ceae9462e870d2295f2b8d834d31a47"
+      "bytes": 203564,
+      "lines": 5316,
+      "sha256": "96c8c029a7c6fc31868026fc4eddbf630e463013b6a37902557aa055bd7a659c"
     }
   ],
   "blank_package_check": {
