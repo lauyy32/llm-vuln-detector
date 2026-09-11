@@ -77,9 +77,15 @@ def _tree_sha(files: list) -> str:
 # ---------------------------------------------------------------------------
 # fail-closed 双提交校验
 # ---------------------------------------------------------------------------
-def _git(*args: str) -> tuple[int, str]:
-    r = subprocess.run(["git", *args], cwd=str(ROOT), capture_output=True, text=True)
-    return r.returncode, (r.stdout or "").strip()
+def _git(*args: str, raw: bool = False):
+    """运行 git。默认返回 (rc, str)——**必须显式 utf-8 解码**：
+    Windows 下 text=True 会用 locale(cp936) 解码中文，导致 blob 比对误判。
+    raw=True 时返回 (rc, bytes)。
+    """
+    r = subprocess.run(["git", *args], cwd=str(ROOT), capture_output=True)
+    if raw:
+        return r.returncode, (r.stdout or b"")
+    return r.returncode, (r.stdout or b"").decode("utf-8", errors="replace").strip()
 
 
 def require_source_commit(source_commit: str | None, files: list) -> dict:
@@ -101,13 +107,14 @@ def require_source_commit(source_commit: str | None, files: list) -> dict:
     # 记录文件的 blob SHA 必须与该 commit 内一致
     checked = []
     for p in files:
-        rc, blob = _git("show", f"{source_commit}:{_rel(p)}")
+        rc, blob_b = _git("show", f"{source_commit}:{_rel(p)}", raw=True)
         if rc != 0:
             raise ValueError(f"{_rel(p)} 不在 commit {source_commit[:12]} 中")
-        # 行尾归一化（Windows 检出会把 LF 变 CRLF，不能因此误判"工作树偏离"）
-        _crlf = chr(13) + chr(10)
-        want = _sha(blob.replace(_crlf, chr(10)).encode("utf-8"))
-        got = _sha(p.read_bytes().replace(_crlf.encode("utf-8"), chr(10).encode("utf-8")))
+        # 用 **bytes** 比对并按行尾归一化（Windows 检出 LF→CRLF 不得误判偏离）
+        _crlf = chr(13).encode("utf-8") + chr(10).encode("utf-8")
+        _lf = chr(10).encode("utf-8")
+        want = _sha(blob_b.replace(_crlf, _lf))
+        got = _sha(p.read_bytes().replace(_crlf, _lf))
         if want != got:
             raise ValueError(f"{_rel(p)} 与 commit 内不一致（工作树已偏离）")
         checked.append({"path": _rel(p), "blob_sha256_in_commit": want,
