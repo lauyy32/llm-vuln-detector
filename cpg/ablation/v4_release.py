@@ -104,11 +104,14 @@ def require_source_commit(source_commit: str | None, files: list) -> dict:
         rc, blob = _git("show", f"{source_commit}:{_rel(p)}")
         if rc != 0:
             raise ValueError(f"{_rel(p)} 不在 commit {source_commit[:12]} 中")
-        want = _sha(blob.encode("utf-8"))
-        got = _sha(p.read_bytes())
+        # 行尾归一化（Windows 检出会把 LF 变 CRLF，不能因此误判"工作树偏离"）
+        _crlf = chr(13) + chr(10)
+        want = _sha(blob.replace(_crlf, chr(10)).encode("utf-8"))
+        got = _sha(p.read_bytes().replace(_crlf.encode("utf-8"), chr(10).encode("utf-8")))
         if want != got:
             raise ValueError(f"{_rel(p)} 与 commit 内不一致（工作树已偏离）")
-        checked.append({"path": _rel(p), "blob_sha256_in_commit": want})
+        checked.append({"path": _rel(p), "blob_sha256_in_commit": want,
+                        "normalized_lf": True})
     return {"source_commit": source_commit, "head": head, "clean": True, "checked": checked}
 
 
