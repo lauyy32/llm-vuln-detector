@@ -58,12 +58,18 @@ def _sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
+def _rel(p) -> str:
+    """安全相对路径：不在 ROOT 下时回退绝对路径（**防外部/临时目录导致 ValueError**）。"""
+    p = Path(p)
+    try:
+        return p.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return p.resolve().as_posix()
+
+
 def _f(p: Path) -> dict:
     b = p.read_bytes()
-    try:
-        rel = p.resolve().relative_to(ROOT).as_posix()
-    except ValueError:
-        rel = p.as_posix()
+    rel = _rel(p)
     return {"path": rel, "bytes": len(b), "lines": b.count(b"\n"), "sha256": _sha(b)}
 
 
@@ -159,7 +165,8 @@ def _transaction_dir_name(sub1: Path, sub2: Path) -> str:
     return f"run-{h[:16]}"
 
 
-def recover(sub1: Path, sub2: Path, template: Path | None = None) -> dict:
+def recover(sub1: Path, sub2: Path, template: Path | None = None,
+            root: Path | None = None) -> dict:
     """事务式回收：内存校验 → 唯一临时目录 → **全部成功后原子提升** → 消费 registry。
 
     - 失败时**不改变任何现有正式工件**（临时目录被清理）；
@@ -191,9 +198,10 @@ def recover(sub1: Path, sub2: Path, template: Path | None = None) -> dict:
             raise ValueError("当前 template SHA 与分发登记不符（分发版本已变）")
 
     # ---- 3) 写唯一临时目录（不触碰正式目录） ----
-    RECOVERY_ROOT.mkdir(parents=True, exist_ok=True)
-    final_dir = RECOVERY_ROOT / _transaction_dir_name(sub1, sub2)
-    tmp_dir = RECOVERY_ROOT / f".tmp-{_transaction_dir_name(sub1, sub2)}"
+    root = root or RECOVERY_ROOT     # 测试可传临时目录，**避免合成数据污染正式目录**
+    root.mkdir(parents=True, exist_ok=True)
+    final_dir = root / _transaction_dir_name(sub1, sub2)
+    tmp_dir = root / f".tmp-{_transaction_dir_name(sub1, sub2)}"
     if tmp_dir.exists():
         shutil.rmtree(tmp_dir)
     tmp_dir.mkdir(parents=True)
@@ -228,7 +236,7 @@ def recover(sub1: Path, sub2: Path, template: Path | None = None) -> dict:
     if final_dir.exists():
         shutil.rmtree(final_dir)
     tmp_dir.replace(final_dir)
-    report["run_dir"] = final_dir.relative_to(ROOT).as_posix()
+    report["run_dir"] = _rel(final_dir)
     return report
 
 
