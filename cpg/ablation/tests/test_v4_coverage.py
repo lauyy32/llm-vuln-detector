@@ -12,8 +12,9 @@ from cpg.ablation import v4_gate_a as ga  # noqa: E402
 
 
 def _ident(file="x.py", status="M", os_=10, oc=3, ns=10, nc=3, sha="a" * 64):
-    return {"file": file, "file_status": status, "old_start": os_, "old_count": oc,
-            "new_start": ns, "new_count": nc, "body_lf_sha256": sha}
+    return {"sample_id": "CVE-X", "file": file, "file_status": status,
+            "old_start": os_, "old_count": oc, "new_start": ns, "new_count": nc,
+            "body_lf_sha256": sha}
 
 
 def _cov(entries):
@@ -64,7 +65,20 @@ class TestEvaluateCoverageGate(unittest.TestCase):
         i = _ident()
         errs = ga.evaluate_coverage_gate(_cov([(i, "ABSENT")]),
                                          _frozen([(i, "SECURITY_CRITICAL")]))
-        self.assertTrue(any("SECURITY_CRITICAL × ABSENT" in e for e in errs))
+        self.assertTrue(any("非 FULL" in e for e in errs))
+
+    def test_critical_partial_blocks(self):
+        """P0-4：SECURITY_CRITICAL × PARTIAL 也必须阻断（协议要求敏感性分析/override）。"""
+        i = _ident()
+        errs = ga.evaluate_coverage_gate(_cov([(i, "PARTIAL")]),
+                                         _frozen([(i, "SECURITY_CRITICAL")]))
+        self.assertTrue(any("非 FULL" in e for e in errs))
+
+    def test_schema_invalid_enum_blocks(self):
+        i = _ident()
+        c = _cov([(i, "BOGUS")])
+        errs = ga.evaluate_coverage_gate(c, _frozen([(i, "NON_CRITICAL")]))
+        self.assertTrue(any("非法 coverage enum" in e for e in errs))
 
     def test_noncritical_absent_does_not_block(self):
         i = _ident()
@@ -88,7 +102,7 @@ class TestEvaluateCoverageGate(unittest.TestCase):
         reg["entries"][0]["mechanical_coverage"] = "FULL"
         # 当前 coverage 是 ABSENT → 必须阻断（证明没有读 registry 里的旧值）
         errs = ga.evaluate_coverage_gate(_cov([(i, "ABSENT")]), reg)
-        self.assertTrue(any("ABSENT" in e for e in errs))
+        self.assertTrue(any("非 FULL" in e for e in errs))
 
     def test_current_coverage_full_with_stale_registry_full_still_ok(self):
         i = _ident()

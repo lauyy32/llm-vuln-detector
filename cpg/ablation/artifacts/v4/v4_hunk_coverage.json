@@ -20,7 +20,8 @@
             "old_count": 7,
             "new_start": 41,
             "new_count": 7,
-            "body_lf_sha256": "c7c19ef4f9904e06b808b8084aadd3a717a8fe334c543c37800aa5d1420e14e6"
+            "body_lf_sha256": "37524f1a5a3f2355d37ec56e6b921bfd4b09ba42832aef86747be8667771acc1",
+            "sample_id": "CVE-2026-12482"
           },
           "coverage": "FULL",
           "criticality": null
@@ -34,12 +35,15 @@
             "old_count": 6,
             "new_start": 216,
             "new_count": 20,
-            "body_lf_sha256": "5591e1530e65a3cb13b02b6681897817d4465c639f6a087c391659475a175f96"
+            "body_lf_sha256": "5591e1530e65a3cb13b02b6681897817d4465c639f6a087c391659475a175f96",
+            "sample_id": "CVE-2026-12482"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "fb5765cdec2b122ac07fae2babae780aefe5a03d04e0f608bd5d05b1db74d4bd"
     },
     "CVE-2026-70491": {
       "n_hunks": 1,
@@ -57,12 +61,15 @@
             "old_count": 20,
             "new_start": 446,
             "new_count": 22,
-            "body_lf_sha256": "6daefc203846970c44954ccb4377f94ecb5a083c39a3892c0d22a4dc60a73479"
+            "body_lf_sha256": "6daefc203846970c44954ccb4377f94ecb5a083c39a3892c0d22a4dc60a73479",
+            "sample_id": "CVE-2026-70491"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "a186a877412ae9c77e9fd2bd2cfbc53e414a9b96d8468d6dc18ba514e8964534"
     },
     "CVE-2026-50558": {
       "n_hunks": 4,
@@ -80,7 +87,8 @@
             "old_count": 7,
             "new_start": 16,
             "new_count": 7,
-            "body_lf_sha256": "434f0e9af50133b57e151169ea576dd0a544aac6d871cef36c0940371579bfed"
+            "body_lf_sha256": "434f0e9af50133b57e151169ea576dd0a544aac6d871cef36c0940371579bfed",
+            "sample_id": "CVE-2026-50558"
           },
           "coverage": "FULL",
           "criticality": null
@@ -94,7 +102,8 @@
             "old_count": 7,
             "new_start": 39,
             "new_count": 6,
-            "body_lf_sha256": "03de1cd64418fcebb35f0e902d57baff4f346d93d84ac8632cbecbc2673660b0"
+            "body_lf_sha256": "03de1cd64418fcebb35f0e902d57baff4f346d93d84ac8632cbecbc2673660b0",
+            "sample_id": "CVE-2026-50558"
           },
           "coverage": "FULL",
           "criticality": null
@@ -108,7 +117,8 @@
             "old_count": 21,
             "new_start": 3403,
             "new_count": 12,
-            "body_lf_sha256": "e20e8c6ee0266083447fe3786c08fc51478a910c05b91e16748b65ccfa45eb1a"
+            "body_lf_sha256": "e20e8c6ee0266083447fe3786c08fc51478a910c05b91e16748b65ccfa45eb1a",
+            "sample_id": "CVE-2026-50558"
           },
           "coverage": "FULL",
           "criticality": null
@@ -122,12 +132,15 @@
             "old_count": 6,
             "new_start": 5211,
             "new_count": 46,
-            "body_lf_sha256": "7b01de25025344cfce61c22bfa2fec863a5b1da1ae72d20ed7fe541c51fe4a28"
+            "body_lf_sha256": "7b01de25025344cfce61c22bfa2fec863a5b1da1ae72d20ed7fe541c51fe4a28",
+            "sample_id": "CVE-2026-50558"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "08a5c3db9a060f8be7a9cc82dd521a8f564fa0e48634d62801f0d44e0657cc0d"
     },
     "CVE-2026-67424": {
       "n_hunks": 38,
@@ -145,7 +158,8 @@
             "old_count": 6,
             "new_start": 16,
             "new_count": 7,
-            "body_lf_sha256": "986b1fbf308d88a9d28ce013adbae0ebfa3999e8947648b274be0ffcb1e86a17"
+            "body_lf_sha256": "986b1fbf308d88a9d28ce013adbae0ebfa3999e8947648b274be0ffcb1e86a17",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -159,7 +173,8 @@
             "old_count": 6,
             "new_start": 362,
             "new_count": 12,
-            "body_lf_sha256": "0d1b99edf14a3b4f7bea3e4ab55d2b0f0c7300e2e99c2f9485454fc4597e66c1"
+            "body_lf_sha256": "f8b75d3eadf72d769b2f9544514f4f4daea22f1e90dec9d44ee220597162023b",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -173,7 +188,8 @@
             "old_count": 6,
             "new_start": 14,
             "new_count": 7,
-            "body_lf_sha256": "19dbc1d2bfd413301733a521bc460107541d942f5206bf623520a89881f49a26"
+            "body_lf_sha256": "19dbc1d2bfd413301733a521bc460107541d942f5206bf623520a89881f49a26",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -187,7 +203,8 @@
             "old_count": 6,
             "new_start": 196,
             "new_count": 12,
-            "body_lf_sha256": "09169f80da64bcc6ce7ba315a5c20209a00f01577a66eb577f6d5ae7b7fe7c1c"
+            "body_lf_sha256": "f47a1fd6a8503b7758f7e595110e86c6f13aa113ef5fb64f84af91bd02c9e75d",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -201,7 +218,8 @@
             "old_count": 6,
             "new_start": 10,
             "new_count": 7,
-            "body_lf_sha256": "313b66c97015a95ae96ce412370055245b87fcc18664a60b0c91512c634dc658"
+            "body_lf_sha256": "313b66c97015a95ae96ce412370055245b87fcc18664a60b0c91512c634dc658",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -215,7 +233,8 @@
             "old_count": 6,
             "new_start": 101,
             "new_count": 13,
-            "body_lf_sha256": "b8aa68ab229b10d98b12285b50a3be9bd0fa288114b34b5395aa8fd4091f977f"
+            "body_lf_sha256": "f90c39e9f0e2e7a007be3fc4b379e60bd06caac6395c4ea83d8ce1ec8c7f5036",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -229,7 +248,8 @@
             "old_count": 6,
             "new_start": 12,
             "new_count": 7,
-            "body_lf_sha256": "89085c3d84bf145c7645970024172628f854e2ced64533f90a95395568b6a180"
+            "body_lf_sha256": "89085c3d84bf145c7645970024172628f854e2ced64533f90a95395568b6a180",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -243,7 +263,8 @@
             "old_count": 6,
             "new_start": 33,
             "new_count": 13,
-            "body_lf_sha256": "7413c6081bd921f0208bd77485a6d0138862353aa2ad2ad50678ca0a725f8cd6"
+            "body_lf_sha256": "207043fa0a90efd0815f9987126a57c4a0a44d472086d9a2b557df257e804d3a",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -257,7 +278,8 @@
             "old_count": 6,
             "new_start": 12,
             "new_count": 7,
-            "body_lf_sha256": "89085c3d84bf145c7645970024172628f854e2ced64533f90a95395568b6a180"
+            "body_lf_sha256": "89085c3d84bf145c7645970024172628f854e2ced64533f90a95395568b6a180",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -271,7 +293,8 @@
             "old_count": 6,
             "new_start": 33,
             "new_count": 13,
-            "body_lf_sha256": "28d3b3aa070f660d5d22bedc25377048f5582d0ca1e1d8a6a664c62f3d7475d3"
+            "body_lf_sha256": "207043fa0a90efd0815f9987126a57c4a0a44d472086d9a2b557df257e804d3a",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -285,7 +308,8 @@
             "old_count": 7,
             "new_start": 15,
             "new_count": 12,
-            "body_lf_sha256": "73e5fc7cee318cf48c9fa299e8759bf7ce8623f11b5ea8d39f0244a300836b75"
+            "body_lf_sha256": "73e5fc7cee318cf48c9fa299e8759bf7ce8623f11b5ea8d39f0244a300836b75",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -299,7 +323,8 @@
             "old_count": 9,
             "new_start": 67,
             "new_count": 14,
-            "body_lf_sha256": "6b981ae204824bb7e9a0969f72b95e4cb109f2b29fe7f1e45efb38d98914a246"
+            "body_lf_sha256": "6b981ae204824bb7e9a0969f72b95e4cb109f2b29fe7f1e45efb38d98914a246",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -313,7 +338,8 @@
             "old_count": 6,
             "new_start": 94,
             "new_count": 8,
-            "body_lf_sha256": "5b080d41733e5123ef96118dcc1bd96705ff92322c6662b09d4582635d0b5a46"
+            "body_lf_sha256": "832cbe412e742d25db2002556479536bb9a46a683b0c0d9e7fb36d0511623d3d",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -327,7 +353,8 @@
             "old_count": 7,
             "new_start": 12,
             "new_count": 12,
-            "body_lf_sha256": "3b2318b98a30517cc1951a905f43c109e1b0c4f4c7176fb19b7e849bc9c9aba7"
+            "body_lf_sha256": "3b2318b98a30517cc1951a905f43c109e1b0c4f4c7176fb19b7e849bc9c9aba7",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -341,7 +368,8 @@
             "old_count": 11,
             "new_start": 118,
             "new_count": 17,
-            "body_lf_sha256": "4d927391f93ef622e944eab60aae61b464ff5132433b64e64189deaa66134926"
+            "body_lf_sha256": "f8f0ebdec8584af312e10143804c0734e4823bcbb6b2dbb21034ecafbaf2c90c",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -355,7 +383,8 @@
             "old_count": 7,
             "new_start": 13,
             "new_count": 12,
-            "body_lf_sha256": "52647bdffbf9f5979d14ed2713b5564e421a29d067cbde01c2bc42efeaccd665"
+            "body_lf_sha256": "52647bdffbf9f5979d14ed2713b5564e421a29d067cbde01c2bc42efeaccd665",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -369,7 +398,8 @@
             "old_count": 7,
             "new_start": 339,
             "new_count": 15,
-            "body_lf_sha256": "7e2c0197478965e713a446c905f190a6e1c6827e629f45ca8b28f7ca3d1a75ef"
+            "body_lf_sha256": "7e2c0197478965e713a446c905f190a6e1c6827e629f45ca8b28f7ca3d1a75ef",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -383,7 +413,8 @@
             "old_count": 6,
             "new_start": 382,
             "new_count": 8,
-            "body_lf_sha256": "d108bc44ad88b97de5cb38b506909875ed0f2cc153e920d1273ffeacfd4987fa"
+            "body_lf_sha256": "cdae1be381db64ebcad9eb3ddd14560cb8697a6edf75520bf11085aa4352f5f3",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "FULL",
           "criticality": null
@@ -397,7 +428,8 @@
             "old_count": 6,
             "new_start": 16,
             "new_count": 7,
-            "body_lf_sha256": "c7aead04bc123496a5ab41e4db3f9aa0d4876e8e87cd987ffcb96f7348488498"
+            "body_lf_sha256": "c7aead04bc123496a5ab41e4db3f9aa0d4876e8e87cd987ffcb96f7348488498",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -411,7 +443,8 @@
             "old_count": 6,
             "new_start": 158,
             "new_count": 23,
-            "body_lf_sha256": "691fab82c8af590514c2790423993d8594b6dd369c9d0b9dc3a5d181bab5f1e0"
+            "body_lf_sha256": "ee8251b05329fa0498b54caf3e183e447115f8f21c0c32d721faaf29ae767259",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -425,7 +458,8 @@
             "old_count": 6,
             "new_start": 23,
             "new_count": 7,
-            "body_lf_sha256": "0606fe9fe252c51af273e733e5b368d67b15e0b1ac6c4004bf3ec19a9c97d97f"
+            "body_lf_sha256": "0606fe9fe252c51af273e733e5b368d67b15e0b1ac6c4004bf3ec19a9c97d97f",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -439,7 +473,8 @@
             "old_count": 6,
             "new_start": 355,
             "new_count": 15,
-            "body_lf_sha256": "882bc236c06f981da6d2bcec92302e83dfeb37f8c4358d2d856ebd3a29780370"
+            "body_lf_sha256": "d5b91a01e4e4f44f6f604b8828bea1f7689a9952ff8e99bc8ea013e22d0a5ea5",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -453,7 +488,8 @@
             "old_count": 6,
             "new_start": 13,
             "new_count": 7,
-            "body_lf_sha256": "655c59ebffc1345bd8fb40e86b32af276235a0634ba74937c79fcd1d6f4d8837"
+            "body_lf_sha256": "655c59ebffc1345bd8fb40e86b32af276235a0634ba74937c79fcd1d6f4d8837",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -467,7 +503,8 @@
             "old_count": 6,
             "new_start": 129,
             "new_count": 18,
-            "body_lf_sha256": "3e34efd785a7b85ea48f513b3210af335c3a4dad412bcc5ffb0135dd7bcdd44e"
+            "body_lf_sha256": "2734ac9427b0e46a4839c68b17ca78bf5c34d908bc024ddb12fb9268ff309028",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -481,7 +518,8 @@
             "old_count": 6,
             "new_start": 13,
             "new_count": 7,
-            "body_lf_sha256": "655c59ebffc1345bd8fb40e86b32af276235a0634ba74937c79fcd1d6f4d8837"
+            "body_lf_sha256": "655c59ebffc1345bd8fb40e86b32af276235a0634ba74937c79fcd1d6f4d8837",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -495,7 +533,8 @@
             "old_count": 6,
             "new_start": 146,
             "new_count": 18,
-            "body_lf_sha256": "184e2aaf41df7af23f3bb06e03bde68e8cdf7017eb8b538716f35b637a674f04"
+            "body_lf_sha256": "92b31f1a644bb186bf79423612264e72753e4c0af91ae9b68c80704451201865",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -509,7 +548,8 @@
             "old_count": 6,
             "new_start": 11,
             "new_count": 7,
-            "body_lf_sha256": "1a62a4a634bbb498d7cc5e05c1ccd349c2458199deacc8718fe0dc880a88b107"
+            "body_lf_sha256": "1a62a4a634bbb498d7cc5e05c1ccd349c2458199deacc8718fe0dc880a88b107",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -523,7 +563,8 @@
             "old_count": 6,
             "new_start": 129,
             "new_count": 20,
-            "body_lf_sha256": "0e6958c7e6722dfedc7080feed4dc79b47f90376f54282b7fffc32cc9f278a08"
+            "body_lf_sha256": "61b73b9b566822b90dbc44849cfa6f55cf9da823f1def659fbd26f140ac66a1b",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -537,7 +578,8 @@
             "old_count": 6,
             "new_start": 13,
             "new_count": 7,
-            "body_lf_sha256": "7d0130a3a182fb77991335908e0bd5232d55317a6057697fc94a9d8055127d66"
+            "body_lf_sha256": "7d0130a3a182fb77991335908e0bd5232d55317a6057697fc94a9d8055127d66",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -551,7 +593,8 @@
             "old_count": 6,
             "new_start": 81,
             "new_count": 13,
-            "body_lf_sha256": "a0f9e36bff96ef2cf03cb14103c787ac876e70925a767c1065ebbce31b92b2b5"
+            "body_lf_sha256": "a0f9e36bff96ef2cf03cb14103c787ac876e70925a767c1065ebbce31b92b2b5",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -565,7 +608,8 @@
             "old_count": 6,
             "new_start": 180,
             "new_count": 13,
-            "body_lf_sha256": "4caaa942f6ec7de912e63bfbe6b30edc1235a9b541df77c8f26169b267600226"
+            "body_lf_sha256": "1195646572264dc517886309377d646b8f7b4c37cf87562c56ebfe33154f7fdf",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -579,7 +623,8 @@
             "old_count": 6,
             "new_start": 594,
             "new_count": 77,
-            "body_lf_sha256": "28e16186559b39d6641c4e07be72bec6ec5d68b2c41b7873df2bd50fe8079bf6"
+            "body_lf_sha256": "f0a54b3280262b37332248ca0111f6a98c692b37186d6d410333121c585aee3d",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -593,7 +638,8 @@
             "old_count": 7,
             "new_start": 12,
             "new_count": 9,
-            "body_lf_sha256": "e22d227d8aa6452690f86005b053e558369fd57875347ed2682d91d664c63840"
+            "body_lf_sha256": "e22d227d8aa6452690f86005b053e558369fd57875347ed2682d91d664c63840",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -607,7 +653,8 @@
             "old_count": 6,
             "new_start": 29,
             "new_count": 12,
-            "body_lf_sha256": "0f6d8b7a4ebaa42269e7775305a09fb96418cf570bb5e314efcdbc4bf44d6fc2"
+            "body_lf_sha256": "0f6d8b7a4ebaa42269e7775305a09fb96418cf570bb5e314efcdbc4bf44d6fc2",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -621,7 +668,8 @@
             "old_count": 9,
             "new_start": 328,
             "new_count": 63,
-            "body_lf_sha256": "d765da533c9da44ab3b0f5db0c72cb47a2c1c4ec77e08812ee49874703ed8686"
+            "body_lf_sha256": "d765da533c9da44ab3b0f5db0c72cb47a2c1c4ec77e08812ee49874703ed8686",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -635,7 +683,8 @@
             "old_count": 10,
             "new_start": 408,
             "new_count": 31,
-            "body_lf_sha256": "d1a2470ea2ff0b0f350e50e438ed9e807a0b772fb7770129d4ede0086a3cb557"
+            "body_lf_sha256": "d1a2470ea2ff0b0f350e50e438ed9e807a0b772fb7770129d4ede0086a3cb557",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -649,7 +698,8 @@
             "old_count": 7,
             "new_start": 444,
             "new_count": 7,
-            "body_lf_sha256": "df517c7c96c0fa3aaaec836f2e35d6a30c05097e361859cf82561257b839b4e0"
+            "body_lf_sha256": "f1bee0bbbbd42ac833cfb6b78a87d067d6b0f42ecf61f6d3d8f1f1bf1eb48ae1",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -663,12 +713,15 @@
             "old_count": 26,
             "new_start": 16,
             "new_count": 47,
-            "body_lf_sha256": "c8caba2097fb417431798d53d891bc6fb8481eb621b0ff32285b97cdca5d60fd"
+            "body_lf_sha256": "c8caba2097fb417431798d53d891bc6fb8481eb621b0ff32285b97cdca5d60fd",
+            "sample_id": "CVE-2026-67424"
           },
           "coverage": "ABSENT",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "4fb6f141b63d1812ee47a5e79293cb988a93cf984ccb6ad2bcce0acb795648e9"
     },
     "CVE-2026-53502": {
       "n_hunks": 4,
@@ -686,7 +739,8 @@
             "old_count": 7,
             "new_start": 7,
             "new_count": 9,
-            "body_lf_sha256": "74b818f450820c961252e2fb7152678d3257261c9d7252f624a4b6e49355b886"
+            "body_lf_sha256": "74b818f450820c961252e2fb7152678d3257261c9d7252f624a4b6e49355b886",
+            "sample_id": "CVE-2026-53502"
           },
           "coverage": "FULL",
           "criticality": null
@@ -700,7 +754,8 @@
             "old_count": 6,
             "new_start": 54,
             "new_count": 42,
-            "body_lf_sha256": "315cdb5e20642716f8a397fe958b1170c7242c3fad1e9760a0b5e050689c1a7a"
+            "body_lf_sha256": "0b696b5ba750d73f7d5fa481233643db1711de7b4ef0dbd608e586724fc34ca1",
+            "sample_id": "CVE-2026-53502"
           },
           "coverage": "FULL",
           "criticality": null
@@ -714,7 +769,8 @@
             "old_count": 20,
             "new_start": 9,
             "new_count": 28,
-            "body_lf_sha256": "8138430a4ca59cf0cb4fabb7eb3396dc5b5bce4cff5223c086eef498c33b36b2"
+            "body_lf_sha256": "8138430a4ca59cf0cb4fabb7eb3396dc5b5bce4cff5223c086eef498c33b36b2",
+            "sample_id": "CVE-2026-53502"
           },
           "coverage": "FULL",
           "criticality": null
@@ -728,12 +784,15 @@
             "old_count": 10,
             "new_start": 39,
             "new_count": 15,
-            "body_lf_sha256": "cf2ba94c0f17f6d0c30dc728ecd10a05ea152d7a46a9ba3e168c9d4e26d44ab0"
+            "body_lf_sha256": "cf2ba94c0f17f6d0c30dc728ecd10a05ea152d7a46a9ba3e168c9d4e26d44ab0",
+            "sample_id": "CVE-2026-53502"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "2b24c065a43590932dfb4b06e96e0930cd67dcc9d570a61ec0e425f51c25f709"
     },
     "CVE-2026-73498": {
       "n_hunks": 90,
@@ -751,7 +810,8 @@
             "old_count": 9,
             "new_start": 149,
             "new_count": 10,
-            "body_lf_sha256": "50293704eada508b6ab7f240113473c049cbd554faaeca058177370bc1de1936"
+            "body_lf_sha256": "216306cc8721715b2fcc4668b46b520e5ea6f3f5f1cd23f7602f8667dc3fa2e9",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -765,7 +825,8 @@
             "old_count": 6,
             "new_start": 17,
             "new_count": 8,
-            "body_lf_sha256": "33f10a5350f486bfac156df91075ad574ce988f74417c7c880fa5b20c5952946"
+            "body_lf_sha256": "33f10a5350f486bfac156df91075ad574ce988f74417c7c880fa5b20c5952946",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -779,7 +840,8 @@
             "old_count": 8,
             "new_start": 132,
             "new_count": 18,
-            "body_lf_sha256": "b3a038bae8b54287edd7f1990f3fcc5bbaa6cf6d207f944198d68dbee0e19347"
+            "body_lf_sha256": "b9d2f8bb644977240afa970166b7bfab5a0f4e900d1310fdaf79d0268f61c549",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -793,7 +855,8 @@
             "old_count": 6,
             "new_start": 23,
             "new_count": 29,
-            "body_lf_sha256": "b92c74e58e412caa5c64b81641ac90df1afcfe507f7629b9fde6df56dd5090f8"
+            "body_lf_sha256": "b92c74e58e412caa5c64b81641ac90df1afcfe507f7629b9fde6df56dd5090f8",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -807,7 +870,8 @@
             "old_count": 8,
             "new_start": 56,
             "new_count": 9,
-            "body_lf_sha256": "29fb77c380a6767db6f40764b7130ba6fffada40f6b5f805eb183e4c745dea99"
+            "body_lf_sha256": "29fb77c380a6767db6f40764b7130ba6fffada40f6b5f805eb183e4c745dea99",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -821,7 +885,8 @@
             "old_count": 27,
             "new_start": 69,
             "new_count": 13,
-            "body_lf_sha256": "34df911940bffd330fb1531f9c9e59086dc8126191bb8dde8e3a9f758525f6b8"
+            "body_lf_sha256": "f7450efac94cd9c55255bca9618dfce5e64a91f0830606348b6b575723b6cc16",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -835,7 +900,8 @@
             "old_count": 6,
             "new_start": 42,
             "new_count": 17,
-            "body_lf_sha256": "79d2e2adf7bfb5dfdff61d7fb452d1e03ab2e8dc312d08ec1444b7db482067b5"
+            "body_lf_sha256": "79d2e2adf7bfb5dfdff61d7fb452d1e03ab2e8dc312d08ec1444b7db482067b5",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -849,7 +915,8 @@
             "old_count": 9,
             "new_start": 381,
             "new_count": 10,
-            "body_lf_sha256": "435380112fca40b14e4c3b49e20f848da07d63d38d23ee17aa9cc70b64a12b57"
+            "body_lf_sha256": "216306cc8721715b2fcc4668b46b520e5ea6f3f5f1cd23f7602f8667dc3fa2e9",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -863,7 +930,8 @@
             "old_count": 6,
             "new_start": 23,
             "new_count": 8,
-            "body_lf_sha256": "c3a16087b93fa44ce0c0b33e66d75a98a13470fe1b8b7a64ed58fe4ce56c2dfb"
+            "body_lf_sha256": "c3a16087b93fa44ce0c0b33e66d75a98a13470fe1b8b7a64ed58fe4ce56c2dfb",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -877,7 +945,8 @@
             "old_count": 8,
             "new_start": 145,
             "new_count": 18,
-            "body_lf_sha256": "be1767d06ebbce982aa1fbad6e496802b33c6bb4b1614091f906c45276f272d2"
+            "body_lf_sha256": "393360919bd66afa620986db2b1b96372efbbead52dba78e5a485500fc2d616f",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -891,7 +960,8 @@
             "old_count": 6,
             "new_start": 21,
             "new_count": 57,
-            "body_lf_sha256": "5ba100305edd88d037e5bfcd4f0b405243669880cc43382902815f4b6e0e0e08"
+            "body_lf_sha256": "5ba100305edd88d037e5bfcd4f0b405243669880cc43382902815f4b6e0e0e08",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -905,7 +975,8 @@
             "old_count": 7,
             "new_start": 94,
             "new_count": 9,
-            "body_lf_sha256": "7b319323b7475d42f49c4419b00063da34e3863a9743bcaf8d062b16dba1456f"
+            "body_lf_sha256": "7b319323b7475d42f49c4419b00063da34e3863a9743bcaf8d062b16dba1456f",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -919,7 +990,8 @@
             "old_count": 56,
             "new_start": 113,
             "new_count": 8,
-            "body_lf_sha256": "82854cdbbd97dffd675c94c1ec8eb3e0b0707c15a77f22485647988d3a855dce"
+            "body_lf_sha256": "82854cdbbd97dffd675c94c1ec8eb3e0b0707c15a77f22485647988d3a855dce",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -933,7 +1005,8 @@
             "old_count": 6,
             "new_start": 245,
             "new_count": 9,
-            "body_lf_sha256": "5bbbba6fd05f083f6d71bfb816aa8bb23b6a3ab470155e3d40459a1a2671c809"
+            "body_lf_sha256": "5bbbba6fd05f083f6d71bfb816aa8bb23b6a3ab470155e3d40459a1a2671c809",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -947,7 +1020,8 @@
             "old_count": 11,
             "new_start": 306,
             "new_count": 20,
-            "body_lf_sha256": "1533fe7debb5a276ce5caa25b7472eb109387bacdfdb943e1623b100a3059802"
+            "body_lf_sha256": "850abf42c2e4b6ef1c0da1539498f2411b9e1eac225db7c127f9fef184bd7888",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -961,7 +1035,8 @@
             "old_count": 6,
             "new_start": 20,
             "new_count": 7,
-            "body_lf_sha256": "e0678f528bf63a3deaadc60d439f4410e8ff2a90df0b2e5d127a6c283b628878"
+            "body_lf_sha256": "e0678f528bf63a3deaadc60d439f4410e8ff2a90df0b2e5d127a6c283b628878",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -975,7 +1050,8 @@
             "old_count": 15,
             "new_start": 125,
             "new_count": 17,
-            "body_lf_sha256": "70aa72955c4e35334a1c6e347b1b55a93253d2ecf34f5fa7cab024258f3003b2"
+            "body_lf_sha256": "70aa72955c4e35334a1c6e347b1b55a93253d2ecf34f5fa7cab024258f3003b2",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -989,7 +1065,8 @@
             "old_count": 7,
             "new_start": 149,
             "new_count": 10,
-            "body_lf_sha256": "6e6d69199c787076e07f358680457d7f66566f1b6628deace830dbb6dceed1be"
+            "body_lf_sha256": "9c89ea8de320a2a28b0537eab38ed8a520523b3d01ce9ce6e333b3f1837544cd",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -1003,7 +1080,8 @@
             "old_count": 6,
             "new_start": 17,
             "new_count": 7,
-            "body_lf_sha256": "1387fd735f3316eae36d245e1382e8833e34717d6c592ae4a0f6cda87195b135"
+            "body_lf_sha256": "1387fd735f3316eae36d245e1382e8833e34717d6c592ae4a0f6cda87195b135",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1017,7 +1095,8 @@
             "old_count": 8,
             "new_start": 509,
             "new_count": 10,
-            "body_lf_sha256": "032b20178fc7d7564b6bd27a9912162aaa067ba2068a8d7a6208364f3d27460a"
+            "body_lf_sha256": "032b20178fc7d7564b6bd27a9912162aaa067ba2068a8d7a6208364f3d27460a",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1031,7 +1110,8 @@
             "old_count": 6,
             "new_start": 595,
             "new_count": 7,
-            "body_lf_sha256": "ebbf6ccd4e5ce025a8b9dc23bfa65a1d6158540f570e2fc3388652483dad98e7"
+            "body_lf_sha256": "ebbf6ccd4e5ce025a8b9dc23bfa65a1d6158540f570e2fc3388652483dad98e7",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1045,7 +1125,8 @@
             "old_count": 6,
             "new_start": 645,
             "new_count": 7,
-            "body_lf_sha256": "eb3b2a67d807c7f8a1928eefab5ae3ed4ae85665ff491191c1e435175be17da8"
+            "body_lf_sha256": "eb3b2a67d807c7f8a1928eefab5ae3ed4ae85665ff491191c1e435175be17da8",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1059,7 +1140,8 @@
             "old_count": 6,
             "new_start": 668,
             "new_count": 17,
-            "body_lf_sha256": "4db5989b91f333f2cb9cef0874431dcd525a5c54b1970a317828b6550c822715"
+            "body_lf_sha256": "066a0362157bf2dc74e1fd3eeb80a8fcc6a31df3442ede5a4d03ded40778703c",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1073,7 +1155,8 @@
             "old_count": 6,
             "new_start": 12,
             "new_count": 7,
-            "body_lf_sha256": "c90a0c6da95774b5b7c89b0beaa9d13167f53a9426346dbd1ca5aa4d0d75392b"
+            "body_lf_sha256": "c90a0c6da95774b5b7c89b0beaa9d13167f53a9426346dbd1ca5aa4d0d75392b",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1087,7 +1170,8 @@
             "old_count": 14,
             "new_start": 210,
             "new_count": 15,
-            "body_lf_sha256": "d115638e58ac44786fb5722a63e2d68521e9ac9ccc430f4e60f3b9abd948544a"
+            "body_lf_sha256": "d115638e58ac44786fb5722a63e2d68521e9ac9ccc430f4e60f3b9abd948544a",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1101,7 +1185,8 @@
             "old_count": 13,
             "new_start": 248,
             "new_count": 78,
-            "body_lf_sha256": "3e4c8156601981212cc70f6454a29ff4086ea67553cdb1b7a59c5ec02e8f89b5"
+            "body_lf_sha256": "3e4c8156601981212cc70f6454a29ff4086ea67553cdb1b7a59c5ec02e8f89b5",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1115,7 +1200,8 @@
             "old_count": 64,
             "new_start": 328,
             "new_count": 9,
-            "body_lf_sha256": "65d49162f59d976d4cbe7e935a64107e9d1958bbe22bee01d9072b66840db890"
+            "body_lf_sha256": "65d49162f59d976d4cbe7e935a64107e9d1958bbe22bee01d9072b66840db890",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1129,7 +1215,8 @@
             "old_count": 6,
             "new_start": 340,
             "new_count": 21,
-            "body_lf_sha256": "ada3ca5135608ca9a32a93284aef6bbdcf816c595d87b52197f82f23b529bd9e"
+            "body_lf_sha256": "ada3ca5135608ca9a32a93284aef6bbdcf816c595d87b52197f82f23b529bd9e",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1143,7 +1230,8 @@
             "old_count": 6,
             "new_start": 469,
             "new_count": 28,
-            "body_lf_sha256": "0357b7eee2763ff3c943dbe6ab56bc843728af882e98a1675e52be2157189f5f"
+            "body_lf_sha256": "a0a845422b816c022bda3ad35d2a39938b889678bdabc944b9ec12380e63a2a7",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1157,7 +1245,8 @@
             "old_count": 9,
             "new_start": 398,
             "new_count": 10,
-            "body_lf_sha256": "9c4a7712947b078532781384d9a7f8a6ebb1facffcc850e61c13e5ed8134abd8"
+            "body_lf_sha256": "9c4a7712947b078532781384d9a7f8a6ebb1facffcc850e61c13e5ed8134abd8",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -1171,7 +1260,8 @@
             "old_count": 8,
             "new_start": 415,
             "new_count": 12,
-            "body_lf_sha256": "cebb83c2613bdbed5d744065fb6745b985f2382d479c8f3c3c940af6e76a3a93"
+            "body_lf_sha256": "039fd0170d8523808c603b6c82b485c36b20178424d15daed486640a49d51675",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "FULL",
           "criticality": null
@@ -1185,7 +1275,8 @@
             "old_count": 6,
             "new_start": 17,
             "new_count": 7,
-            "body_lf_sha256": "5e194883e589edf1e0ee193c21b78866e35ca55be31072147f3919a8b33f583b"
+            "body_lf_sha256": "5e194883e589edf1e0ee193c21b78866e35ca55be31072147f3919a8b33f583b",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1199,7 +1290,8 @@
             "old_count": 6,
             "new_start": 86,
             "new_count": 10,
-            "body_lf_sha256": "c429a9aaa8615748cbb326c2dbe9cced74b84c8161c6c3aeca96c529bfd0a15d"
+            "body_lf_sha256": "c429a9aaa8615748cbb326c2dbe9cced74b84c8161c6c3aeca96c529bfd0a15d",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1213,7 +1305,8 @@
             "old_count": 7,
             "new_start": 127,
             "new_count": 7,
-            "body_lf_sha256": "771924bcccee23b31c6027fd3123b02fec5a99a2757a439402eff3727d8b232d"
+            "body_lf_sha256": "f30e236bdfdd1fe676f2800732e08ca3d5915057ee0a5697df8cf52282753d3f",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1227,7 +1320,8 @@
             "old_count": 6,
             "new_start": 9,
             "new_count": 8,
-            "body_lf_sha256": "8e55c3f28ed8e5277e51494068131bd4783c92212f84f32ccc384583ebc6e68d"
+            "body_lf_sha256": "8e55c3f28ed8e5277e51494068131bd4783c92212f84f32ccc384583ebc6e68d",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1241,7 +1335,8 @@
             "old_count": 6,
             "new_start": 50,
             "new_count": 14,
-            "body_lf_sha256": "fa2122a7023b94d490e0094278a2d002dba3fd7a8dbd2b33c249fb250c28acfb"
+            "body_lf_sha256": "bc1321a4b128fa831ec2f53fcfe1853ec2a98c9d01d21701fc93c8401aeeea8b",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1255,7 +1350,8 @@
             "old_count": 0,
             "new_start": 1,
             "new_count": 158,
-            "body_lf_sha256": "ca122b5a7a3e68de119d59a0242d6db1448eb5dfbfad828fc1b435f054580387"
+            "body_lf_sha256": "ac3df00b36b9a465f15ded3b262bf547bfbe8909d56e01c97a704480260a17e1",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "NOT_APPLICABLE_ADDED",
           "criticality": null
@@ -1269,7 +1365,8 @@
             "old_count": 9,
             "new_start": 4,
             "new_count": 29,
-            "body_lf_sha256": "344d4fbe89639288c4a98a252a861247a794388647a3573512cd030ee1b5efee"
+            "body_lf_sha256": "344d4fbe89639288c4a98a252a861247a794388647a3573512cd030ee1b5efee",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1283,7 +1380,8 @@
             "old_count": 6,
             "new_start": 109,
             "new_count": 12,
-            "body_lf_sha256": "28ec102480d401bac21fe58490066a021932fa0f2256365513a3a9667311a799"
+            "body_lf_sha256": "313fb9414edfcb4b625060528c9c9e8653dac803baa913c8af83b88dd60b943d",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1297,7 +1395,8 @@
             "old_count": 7,
             "new_start": 131,
             "new_count": 7,
-            "body_lf_sha256": "692496b3a2a66c05ab2069898cde1beb7e30b44634835b01cba8875324d18b74"
+            "body_lf_sha256": "692496b3a2a66c05ab2069898cde1beb7e30b44634835b01cba8875324d18b74",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1311,7 +1410,8 @@
             "old_count": 7,
             "new_start": 141,
             "new_count": 7,
-            "body_lf_sha256": "22bde547c93c0a47e7a7fd1bcb80fa7a95517ede0cd1bcf573e77487732b6ff4"
+            "body_lf_sha256": "d4c27f72e38d41372aad58883c7ff336663123c28b8768e1eb077c542064ea11",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1325,7 +1425,8 @@
             "old_count": 12,
             "new_start": 306,
             "new_count": 12,
-            "body_lf_sha256": "5e7487376cb657b05153019a974b8b7ddf5a6d393ab9af66561bdd03565bd58a"
+            "body_lf_sha256": "48f44011e1f1ed6ac0a4f0027ee2e7caae18ee70b876afa6fd84bb7531b915b0",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1339,7 +1440,8 @@
             "old_count": 9,
             "new_start": 8,
             "new_count": 12,
-            "body_lf_sha256": "37443d9c4e3cdf942c07139e9b40b257f8444a5406a9eb2942d630963737bc6a"
+            "body_lf_sha256": "37443d9c4e3cdf942c07139e9b40b257f8444a5406a9eb2942d630963737bc6a",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1353,7 +1455,8 @@
             "old_count": 6,
             "new_start": 27,
             "new_count": 21,
-            "body_lf_sha256": "552b7e9f276a8daec4c59972b1ed800ed8625f5e47e788437dc485aacf8ce7aa"
+            "body_lf_sha256": "552b7e9f276a8daec4c59972b1ed800ed8625f5e47e788437dc485aacf8ce7aa",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1367,7 +1470,8 @@
             "old_count": 6,
             "new_start": 465,
             "new_count": 12,
-            "body_lf_sha256": "3731e7df1763c846f4139a04a94c194ee2f7b8c0e1ebf82d2561af06e2030611"
+            "body_lf_sha256": "4661d09769831e5441a036259f36945c1c9268f6f3259e34d01915965622e1ab",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1381,7 +1485,8 @@
             "old_count": 7,
             "new_start": 80,
             "new_count": 7,
-            "body_lf_sha256": "e7585c9abb396a3d24f891cfc3ca9fcaed5045830a99219732c00040f1d29f9d"
+            "body_lf_sha256": "e7585c9abb396a3d24f891cfc3ca9fcaed5045830a99219732c00040f1d29f9d",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1395,7 +1500,8 @@
             "old_count": 7,
             "new_start": 90,
             "new_count": 7,
-            "body_lf_sha256": "1b2fd68c6f218bf21d17932a19aabde116d5c19c240e0982dd5323c18c59f341"
+            "body_lf_sha256": "7e61323654589f395352201baafe874eceb3bc2df444c0fd348c9a94080adfa6",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1409,7 +1515,8 @@
             "old_count": 12,
             "new_start": 305,
             "new_count": 12,
-            "body_lf_sha256": "919e81531807ad94240abcfc2e498b7fc5439899cafba9f1980c32ecdda7edd0"
+            "body_lf_sha256": "0581d5dee43f9145de8d19e27028b77869eaa153f32d36b964ce4fc1a371e8e2",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1423,7 +1530,8 @@
             "old_count": 6,
             "new_start": 3,
             "new_count": 7,
-            "body_lf_sha256": "f93770bb8f0e261827156d0eee25ecee1b5a5607ab915161b841f4dfda9bb8fb"
+            "body_lf_sha256": "f93770bb8f0e261827156d0eee25ecee1b5a5607ab915161b841f4dfda9bb8fb",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1437,7 +1545,8 @@
             "old_count": 6,
             "new_start": 124,
             "new_count": 10,
-            "body_lf_sha256": "4cf22ebfdfde461351d27842d14cfccc7e1d92436f51f1e5a7d8f7199108d012"
+            "body_lf_sha256": "4cf22ebfdfde461351d27842d14cfccc7e1d92436f51f1e5a7d8f7199108d012",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1451,7 +1560,8 @@
             "old_count": 6,
             "new_start": 181,
             "new_count": 7,
-            "body_lf_sha256": "5c4bdac9ac9f92b9efe3a4c3ac5afa1245025d7a0dd76995a159b832120a3ce2"
+            "body_lf_sha256": "5c4bdac9ac9f92b9efe3a4c3ac5afa1245025d7a0dd76995a159b832120a3ce2",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1465,7 +1575,8 @@
             "old_count": 33,
             "new_start": 234,
             "new_count": 19,
-            "body_lf_sha256": "361b3b86893e24ce0783dad4e09342becf0b66e1c939eb9e699da3099ccd2602"
+            "body_lf_sha256": "361b3b86893e24ce0783dad4e09342becf0b66e1c939eb9e699da3099ccd2602",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1479,7 +1590,8 @@
             "old_count": 6,
             "new_start": 274,
             "new_count": 7,
-            "body_lf_sha256": "b419620c836226419a700b74f3171902fe18dc6a5738b8b0eb33a6fc5c6e455b"
+            "body_lf_sha256": "b419620c836226419a700b74f3171902fe18dc6a5738b8b0eb33a6fc5c6e455b",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1493,7 +1605,8 @@
             "old_count": 6,
             "new_start": 304,
             "new_count": 7,
-            "body_lf_sha256": "847be9005fa175f4c26defe447d7cb3c3c65584886715c3a85105262529153bd"
+            "body_lf_sha256": "847be9005fa175f4c26defe447d7cb3c3c65584886715c3a85105262529153bd",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1507,7 +1620,8 @@
             "old_count": 6,
             "new_start": 372,
             "new_count": 7,
-            "body_lf_sha256": "e075630e4baa9e4a70a7c5f6544c949e18ddfd59f6efbd2464d7b9ca95c6d6cd"
+            "body_lf_sha256": "e075630e4baa9e4a70a7c5f6544c949e18ddfd59f6efbd2464d7b9ca95c6d6cd",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1521,7 +1635,8 @@
             "old_count": 6,
             "new_start": 1782,
             "new_count": 37,
-            "body_lf_sha256": "e051ad23b0c5bf8b6245ddfaa98c79ad412b0f322cd4516995506bbab8099eee"
+            "body_lf_sha256": "b6ee257ff029f86a07b184494889318fc99e26827dda46205260de335fc7775e",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1535,7 +1650,8 @@
             "old_count": 6,
             "new_start": 379,
             "new_count": 7,
-            "body_lf_sha256": "159642619871c72de39bda5ef821c49fbb06cf0e758edf1960ad298bf69a7f2d"
+            "body_lf_sha256": "cea459bea3496ec1e7d47eee40964a7546de6e3cf6b78051f823fda2290b7b85",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1549,7 +1665,8 @@
             "old_count": 14,
             "new_start": 198,
             "new_count": 48,
-            "body_lf_sha256": "f8bbf2b2f87a6708dbbc2d7e6ba1856a549f5bed80445472d9f18a635cb69c12"
+            "body_lf_sha256": "f8bbf2b2f87a6708dbbc2d7e6ba1856a549f5bed80445472d9f18a635cb69c12",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1563,7 +1680,8 @@
             "old_count": 13,
             "new_start": 280,
             "new_count": 18,
-            "body_lf_sha256": "c757434f0f8295f292476e6b03f926cc76b501a47f4996bd51e07ae4d427eb07"
+            "body_lf_sha256": "aee2e4268111e90981a289f47ce7950f813e57b0b57893b369ad811797ff586d",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1577,7 +1695,8 @@
             "old_count": 7,
             "new_start": 69,
             "new_count": 8,
-            "body_lf_sha256": "1a5ee5dcd738ff639dd97308903b0e785fec4976188c6945c33df221d100ec2c"
+            "body_lf_sha256": "1a5ee5dcd738ff639dd97308903b0e785fec4976188c6945c33df221d100ec2c",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1591,7 +1710,8 @@
             "old_count": 20,
             "new_start": 122,
             "new_count": 25,
-            "body_lf_sha256": "fcd600b119b02f3ec18b13a40321e3a78ed32577768ca670be43e1d3bdf3ac87"
+            "body_lf_sha256": "fcd600b119b02f3ec18b13a40321e3a78ed32577768ca670be43e1d3bdf3ac87",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1605,7 +1725,8 @@
             "old_count": 6,
             "new_start": 485,
             "new_count": 10,
-            "body_lf_sha256": "4cf22ebfdfde461351d27842d14cfccc7e1d92436f51f1e5a7d8f7199108d012"
+            "body_lf_sha256": "4cf22ebfdfde461351d27842d14cfccc7e1d92436f51f1e5a7d8f7199108d012",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1619,7 +1740,8 @@
             "old_count": 9,
             "new_start": 517,
             "new_count": 10,
-            "body_lf_sha256": "585f0a0936827384bad9e7d88f2595557490916a2277fb0045a11342359cdcba"
+            "body_lf_sha256": "585f0a0936827384bad9e7d88f2595557490916a2277fb0045a11342359cdcba",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1633,7 +1755,8 @@
             "old_count": 31,
             "new_start": 528,
             "new_count": 16,
-            "body_lf_sha256": "e46ac4a6ae2237557507fde4de75e3c5b151eedfb5cfaca8106a176f788e686e"
+            "body_lf_sha256": "e46ac4a6ae2237557507fde4de75e3c5b151eedfb5cfaca8106a176f788e686e",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1647,7 +1770,8 @@
             "old_count": 6,
             "new_start": 563,
             "new_count": 7,
-            "body_lf_sha256": "b419620c836226419a700b74f3171902fe18dc6a5738b8b0eb33a6fc5c6e455b"
+            "body_lf_sha256": "b419620c836226419a700b74f3171902fe18dc6a5738b8b0eb33a6fc5c6e455b",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1661,7 +1785,8 @@
             "old_count": 6,
             "new_start": 589,
             "new_count": 7,
-            "body_lf_sha256": "847be9005fa175f4c26defe447d7cb3c3c65584886715c3a85105262529153bd"
+            "body_lf_sha256": "847be9005fa175f4c26defe447d7cb3c3c65584886715c3a85105262529153bd",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1675,7 +1800,8 @@
             "old_count": 6,
             "new_start": 616,
             "new_count": 7,
-            "body_lf_sha256": "847be9005fa175f4c26defe447d7cb3c3c65584886715c3a85105262529153bd"
+            "body_lf_sha256": "847be9005fa175f4c26defe447d7cb3c3c65584886715c3a85105262529153bd",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1689,7 +1815,8 @@
             "old_count": 3,
             "new_start": 1315,
             "new_count": 96,
-            "body_lf_sha256": "c36e948d8f5fa2dbf89cd4fbf0d64b76d9d96b2781c6e6d6e79aeeb4dc5dd420"
+            "body_lf_sha256": "6d6f5ae0cb2450b596f3ec7f9a2ba2089ae9b43484518fbb62374fe851943d99",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1703,7 +1830,8 @@
             "old_count": 6,
             "new_start": 63,
             "new_count": 93,
-            "body_lf_sha256": "3ed78f855d7970ea2101a3d28eeb3057f68d61c0bf53602b59b2bc13929e3e37"
+            "body_lf_sha256": "69fb39f537a408dea0473323113325e4278b5382328cce9b22055597ac93aec1",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1717,7 +1845,8 @@
             "old_count": 10,
             "new_start": 347,
             "new_count": 11,
-            "body_lf_sha256": "7e047d84260a0db24279b6fedf8b328bd69805685f672fdc0d3f1d25fbfe7fcf"
+            "body_lf_sha256": "7e047d84260a0db24279b6fedf8b328bd69805685f672fdc0d3f1d25fbfe7fcf",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1731,7 +1860,8 @@
             "old_count": 12,
             "new_start": 360,
             "new_count": 12,
-            "body_lf_sha256": "55f3035ba079250650af8a6d39496a4eb4562b84e30135f9ed7b2df486b9f5c1"
+            "body_lf_sha256": "55f3035ba079250650af8a6d39496a4eb4562b84e30135f9ed7b2df486b9f5c1",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1745,7 +1875,8 @@
             "old_count": 10,
             "new_start": 695,
             "new_count": 10,
-            "body_lf_sha256": "7da5ca03dae381eb21fab2cde0acf0236b4874c192d0e3ee186b82ff0dc47d0b"
+            "body_lf_sha256": "7da5ca03dae381eb21fab2cde0acf0236b4874c192d0e3ee186b82ff0dc47d0b",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1759,7 +1890,8 @@
             "old_count": 10,
             "new_start": 730,
             "new_count": 12,
-            "body_lf_sha256": "1944ef17d0959e64587d73dcd75a56cfdc196f85d4f5c901bc2db76990ecebbb"
+            "body_lf_sha256": "1944ef17d0959e64587d73dcd75a56cfdc196f85d4f5c901bc2db76990ecebbb",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1773,7 +1905,8 @@
             "old_count": 3,
             "new_start": 1207,
             "new_count": 114,
-            "body_lf_sha256": "caaedd0ea3b6d3868a56c94059241f2b8395445cb5364d5fd7e8b8ef3f15e656"
+            "body_lf_sha256": "2731b93798d8d9a72ccb78ed21d16c47e5ffa4f228aca01d9f0fe679c0464fa0",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1787,7 +1920,8 @@
             "old_count": 11,
             "new_start": 926,
             "new_count": 14,
-            "body_lf_sha256": "03fb7d6a350dc4077ac25499735a9e48aa324fec51620ae7854e15f385756165"
+            "body_lf_sha256": "03fb7d6a350dc4077ac25499735a9e48aa324fec51620ae7854e15f385756165",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1801,7 +1935,8 @@
             "old_count": 11,
             "new_start": 950,
             "new_count": 14,
-            "body_lf_sha256": "6e5b41807f1d4b7fc188e04799f772c279b5c101ad8615899267128c69e231dc"
+            "body_lf_sha256": "6e5b41807f1d4b7fc188e04799f772c279b5c101ad8615899267128c69e231dc",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1815,7 +1950,8 @@
             "old_count": 6,
             "new_start": 1078,
             "new_count": 35,
-            "body_lf_sha256": "3421ceb3ff75d3be763c75a11aacd8593c5a9cf306452c1cd889fb05034cb1c5"
+            "body_lf_sha256": "3421ceb3ff75d3be763c75a11aacd8593c5a9cf306452c1cd889fb05034cb1c5",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1829,7 +1965,8 @@
             "old_count": 7,
             "new_start": 1116,
             "new_count": 7,
-            "body_lf_sha256": "302dbfddfebf9fe9ef7ee07c6df40144cd908a04cdce8c0a335001da86964b71"
+            "body_lf_sha256": "b0c1b55ab83b62cab2ba8c08e5d0f4777df91add2e4b502ea2661f0832be1891",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1843,7 +1980,8 @@
             "old_count": 7,
             "new_start": 788,
             "new_count": 13,
-            "body_lf_sha256": "ef036cee8b5b862751c727ff13a9fd8d21f4dba54a061f6b56a56dc5cbdc7c52"
+            "body_lf_sha256": "ef036cee8b5b862751c727ff13a9fd8d21f4dba54a061f6b56a56dc5cbdc7c52",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1857,7 +1995,8 @@
             "old_count": 7,
             "new_start": 1133,
             "new_count": 13,
-            "body_lf_sha256": "15dcdcc2d0c36a36ac2f34a9c66e3ff4f37dfc30b258914a84d991b37d3c6815"
+            "body_lf_sha256": "15dcdcc2d0c36a36ac2f34a9c66e3ff4f37dfc30b258914a84d991b37d3c6815",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1871,7 +2010,8 @@
             "old_count": 3,
             "new_start": 1595,
             "new_count": 216,
-            "body_lf_sha256": "524746970d6518157ade9694e9e947bdd9054f0083d62a16b484a1057f90d906"
+            "body_lf_sha256": "301ab48b655cff1ce9fc71d176831f6e82e7d9d6d977b26f7945f06cbbe18ddd",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1885,7 +2025,8 @@
             "old_count": 6,
             "new_start": 317,
             "new_count": 31,
-            "body_lf_sha256": "e80f67540648c1a8d3a1d2c1413b6b1b1283508b587426ccba54fbefa079317f"
+            "body_lf_sha256": "0a735f2798f8b42805ffc5a229022b0f7c7d43c70d858b0207e1ec60bb9702c6",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1899,7 +2040,8 @@
             "old_count": 6,
             "new_start": 90,
             "new_count": 58,
-            "body_lf_sha256": "07161bcc72e46c38af0d76ae30e4ecd4da9decfbc489b1f1edd530060f50adbe"
+            "body_lf_sha256": "feab6165f2e83531ba9cd6ce45e990975c6de4cb9053de2ad215f9a3739d2572",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1913,7 +2055,8 @@
             "old_count": 36,
             "new_start": 440,
             "new_count": 28,
-            "body_lf_sha256": "753f20ff1457aa28219fe1accaeda7fc704334be88977999f68ba9456de17849"
+            "body_lf_sha256": "753f20ff1457aa28219fe1accaeda7fc704334be88977999f68ba9456de17849",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1927,7 +2070,8 @@
             "old_count": 3,
             "new_start": 1211,
             "new_count": 48,
-            "body_lf_sha256": "cba672efa7d91425ba99e8105b2b2153936fa6b251659465940341b5d4947fea"
+            "body_lf_sha256": "36ef89787492d12fa392a1881a8a64d87c4b90e2c5de61a66e97c80f6d3223be",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1941,7 +2085,8 @@
             "old_count": 5,
             "new_start": 1,
             "new_count": 6,
-            "body_lf_sha256": "02c0fded635c62b092a5edb57bef2f40324a036a5c70fae86f0b73ea35f6f342"
+            "body_lf_sha256": "02c0fded635c62b092a5edb57bef2f40324a036a5c70fae86f0b73ea35f6f342",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1955,7 +2100,8 @@
             "old_count": 6,
             "new_start": 8,
             "new_count": 7,
-            "body_lf_sha256": "27ecaf7cac8c05f79a9e193fce6f71175f906625f6d97995cb936359607c4738"
+            "body_lf_sha256": "27ecaf7cac8c05f79a9e193fce6f71175f906625f6d97995cb936359607c4738",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1969,7 +2115,8 @@
             "old_count": 6,
             "new_start": 47,
             "new_count": 38,
-            "body_lf_sha256": "f1055882c9b115840dbe3cba8b33be3205bab4bdb0a4997d0a75e84744fb0adf"
+            "body_lf_sha256": "5231985d4baedf86f6523de085e8384da0310092f585a00a9ebd62566d51a9bd",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -1983,7 +2130,8 @@
             "old_count": 0,
             "new_start": 1,
             "new_count": 185,
-            "body_lf_sha256": "ebbdb911daf0038cd6e437bbc24e6a22bc103473e778b17aaa40360608585e7a"
+            "body_lf_sha256": "7d453c786cbf31fb0fb6fdeab1abb0cccac511d4b934f3709aa6243f9632ef92",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "NOT_APPLICABLE_ADDED",
           "criticality": null
@@ -1997,12 +2145,15 @@
             "old_count": 3,
             "new_start": 328,
             "new_count": 42,
-            "body_lf_sha256": "2da33bd648df1f0f8c9bed715a5a10044cd3c4aaf83b19fe9c8f6581bf0056fb"
+            "body_lf_sha256": "2da33bd648df1f0f8c9bed715a5a10044cd3c4aaf83b19fe9c8f6581bf0056fb",
+            "sample_id": "CVE-2026-73498"
           },
           "coverage": "ABSENT",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "63d9f49778a23183b01d63374f899ed54d591bc84ac87f1d7e7f9501e6787624"
     },
     "CVE-2026-53598": {
       "n_hunks": 10,
@@ -2020,7 +2171,8 @@
             "old_count": 1,
             "new_start": 1,
             "new_count": 1,
-            "body_lf_sha256": "0dccbb0a18cf3abee832515e38b931e42069dca24e2a1b8e2bf3c93e113b843b"
+            "body_lf_sha256": "0145a839008765ddd2d365e7fbe5f62b1ebc26a91f8040f4f8a196235937f812",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2034,7 +2186,8 @@
             "old_count": 7,
             "new_start": 9,
             "new_count": 7,
-            "body_lf_sha256": "4a4c101ded8f53588539e26b388acf893d4e93987f3431b690d8a79c83422178"
+            "body_lf_sha256": "4a4c101ded8f53588539e26b388acf893d4e93987f3431b690d8a79c83422178",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2048,7 +2201,8 @@
             "old_count": 13,
             "new_start": 26,
             "new_count": 17,
-            "body_lf_sha256": "8072182d38fa9775492992ab6270577eb3fbabf6c2828684c4e16fe33d4e083b"
+            "body_lf_sha256": "8072182d38fa9775492992ab6270577eb3fbabf6c2828684c4e16fe33d4e083b",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2062,7 +2216,8 @@
             "old_count": 17,
             "new_start": 51,
             "new_count": 17,
-            "body_lf_sha256": "910a0b11d5ddcf148b2b65e4d054e7672bb1e6ad5b9b4890d19de9ac8fbefbbc"
+            "body_lf_sha256": "910a0b11d5ddcf148b2b65e4d054e7672bb1e6ad5b9b4890d19de9ac8fbefbbc",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2076,7 +2231,8 @@
             "old_count": 7,
             "new_start": 90,
             "new_count": 12,
-            "body_lf_sha256": "d432c9a52931c697ef2326760231c50943374f38e0772979b9bd595e3e8fa20d"
+            "body_lf_sha256": "d432c9a52931c697ef2326760231c50943374f38e0772979b9bd595e3e8fa20d",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2090,7 +2246,8 @@
             "old_count": 7,
             "new_start": 105,
             "new_count": 7,
-            "body_lf_sha256": "cde7540b3344c9fe4c8cef01095c920b202ac5fdcb2395008cce0f82f6fb7161"
+            "body_lf_sha256": "cde7540b3344c9fe4c8cef01095c920b202ac5fdcb2395008cce0f82f6fb7161",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2104,7 +2261,8 @@
             "old_count": 7,
             "new_start": 121,
             "new_count": 11,
-            "body_lf_sha256": "bd657021f9f198ba35c666789edb48d8768ad362c5f3caa7d7460858359addda"
+            "body_lf_sha256": "bd657021f9f198ba35c666789edb48d8768ad362c5f3caa7d7460858359addda",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2118,7 +2276,8 @@
             "old_count": 6,
             "new_start": 134,
             "new_count": 9,
-            "body_lf_sha256": "d908f4fa878bb515080771124f1c22938f1a5766bf1e201e8c6bc82669e36bbf"
+            "body_lf_sha256": "d908f4fa878bb515080771124f1c22938f1a5766bf1e201e8c6bc82669e36bbf",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2132,7 +2291,8 @@
             "old_count": 18,
             "new_start": 168,
             "new_count": 41,
-            "body_lf_sha256": "d7b3c3723f2e4eb3d1ed3a4ba7c449c2df5c814a6009cbe114c48b7309e9baa4"
+            "body_lf_sha256": "7e7d2c7c37552544e4a9c27c6c5173b5d0f4db2da4f63977dc7860e9c7eaee15",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2146,12 +2306,15 @@
             "old_count": 6,
             "new_start": 343,
             "new_count": 67,
-            "body_lf_sha256": "a37c6a7214756ea59bef83a66dbd351a97a75e36aca38852eb808784412ce621"
+            "body_lf_sha256": "a37c6a7214756ea59bef83a66dbd351a97a75e36aca38852eb808784412ce621",
+            "sample_id": "CVE-2026-53598"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "e1cab48e97abd9408c6ad5cf59eead29a3c0a28ddc9a9765b9358bba23e18604"
     },
     "CVE-2026-67425": {
       "n_hunks": 47,
@@ -2169,7 +2332,8 @@
             "old_count": 9,
             "new_start": 7,
             "new_count": 12,
-            "body_lf_sha256": "fc566a04a5a25ad815c76240055c87372a5289fef4fd517095834a1fd14841bf"
+            "body_lf_sha256": "fc566a04a5a25ad815c76240055c87372a5289fef4fd517095834a1fd14841bf",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2183,7 +2347,8 @@
             "old_count": 6,
             "new_start": 197,
             "new_count": 19,
-            "body_lf_sha256": "889890bba7f91e0e44398305da3f70576164a3389bd98cf6648cb795cb4e790d"
+            "body_lf_sha256": "fcad40793aa1f6252f54869f5cc0cbb532d1d70e83ef638c27e9327bc5abb5bd",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2197,7 +2362,8 @@
             "old_count": 6,
             "new_start": 108,
             "new_count": 44,
-            "body_lf_sha256": "83ef88c3c20c8d1829a3108a4a9c2b9180b51307ee2afe8c052b5df4ee8af077"
+            "body_lf_sha256": "fc9a065a506c6963e214c4225088cf213ea18b145d5eb5c4163c7b39ac3e0bfa",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2211,7 +2377,8 @@
             "old_count": 6,
             "new_start": 12,
             "new_count": 12,
-            "body_lf_sha256": "78f09ad32b2e023cd0bd6cd5ffa7e435d659e54679050363e05fb6021f147aec"
+            "body_lf_sha256": "78f09ad32b2e023cd0bd6cd5ffa7e435d659e54679050363e05fb6021f147aec",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2225,7 +2392,8 @@
             "old_count": 7,
             "new_start": 137,
             "new_count": 19,
-            "body_lf_sha256": "efc774660ad774853e0b07611f550b3dcb81abe0b419614167af10db6e6d175c"
+            "body_lf_sha256": "efc774660ad774853e0b07611f550b3dcb81abe0b419614167af10db6e6d175c",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2239,7 +2407,8 @@
             "old_count": 6,
             "new_start": 160,
             "new_count": 18,
-            "body_lf_sha256": "b8d560e0bbc8aae9762553f46576a3d718a63f73d17366cb0fa68e491627ec3f"
+            "body_lf_sha256": "191f4810edc7ea0eaa5116e0dbfc9d013aa4693a9d95f072a7367cb27862c465",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2253,7 +2422,8 @@
             "old_count": 6,
             "new_start": 16,
             "new_count": 8,
-            "body_lf_sha256": "cf8ff6b58a23d022848e84876ea9a9d53f7c076eddc9225326562923dd6adecf"
+            "body_lf_sha256": "cf8ff6b58a23d022848e84876ea9a9d53f7c076eddc9225326562923dd6adecf",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2267,7 +2437,8 @@
             "old_count": 6,
             "new_start": 323,
             "new_count": 12,
-            "body_lf_sha256": "e02dadca2af253867b0a1e0ca24bd813141ee7ff5c6ffbb03e6da6ee3331c1ba"
+            "body_lf_sha256": "1330da4c588b100921e5841bdce019b6b179fce7b7171d769ed734de9efcdb49",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2281,7 +2452,8 @@
             "old_count": 6,
             "new_start": 11,
             "new_count": 8,
-            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64"
+            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2295,7 +2467,8 @@
             "old_count": 6,
             "new_start": 107,
             "new_count": 12,
-            "body_lf_sha256": "e5e048a9414c3dee9a4b5cff3ef3c70f098ac6309db44682ffad90a75fbf55bb"
+            "body_lf_sha256": "81c25c093fadbf0db30de458ebfc2a2b89f46f8d60767744ed61d306480a4a4e",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2309,7 +2482,8 @@
             "old_count": 6,
             "new_start": 11,
             "new_count": 8,
-            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64"
+            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2323,7 +2497,8 @@
             "old_count": 6,
             "new_start": 124,
             "new_count": 12,
-            "body_lf_sha256": "bd6d4b55f445a5ac3992108beb9e0131767c7ddf0ba977dedf470fd9b2cf0a1b"
+            "body_lf_sha256": "12ccdeaa4d56d399c1d3fb5b9f81fbf56ec2a6e516f9815e217c8a92f4352488",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2337,7 +2512,8 @@
             "old_count": 6,
             "new_start": 10,
             "new_count": 8,
-            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64"
+            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2351,7 +2527,8 @@
             "old_count": 6,
             "new_start": 109,
             "new_count": 12,
-            "body_lf_sha256": "dd0fd72a99ff5d07dc5a0335d6adc348d8a31e00ae118b4ea1e4a7bf53a29f42"
+            "body_lf_sha256": "efc6d41f2cddcf04e1195e65509502b266d60f46919dfa8ab5eb3711af38dc18",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2365,7 +2542,8 @@
             "old_count": 6,
             "new_start": 11,
             "new_count": 8,
-            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64"
+            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2379,7 +2557,8 @@
             "old_count": 6,
             "new_start": 96,
             "new_count": 13,
-            "body_lf_sha256": "baff57655561ea395df7b206420d3a626e7a8ee8e4541fd41841c4e91378d74d"
+            "body_lf_sha256": "96278a3564134da34c0a8e8c893b71095469b597c2d14a67ed9f6f6deb79bfbe",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2393,7 +2572,8 @@
             "old_count": 6,
             "new_start": 11,
             "new_count": 8,
-            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64"
+            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2407,7 +2587,8 @@
             "old_count": 6,
             "new_start": 169,
             "new_count": 12,
-            "body_lf_sha256": "fafff6dbdd4a9b9cbd2ff9498c7e5c8869d05e87eca1a120444fb8b9d0247160"
+            "body_lf_sha256": "31a0faee48d9b7609313574be9db192aab322ab903a1ab331cfeae0b61c2a8ed",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2421,7 +2602,8 @@
             "old_count": 6,
             "new_start": 11,
             "new_count": 8,
-            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64"
+            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2435,7 +2617,8 @@
             "old_count": 7,
             "new_start": 55,
             "new_count": 6,
-            "body_lf_sha256": "cda871fd52c2ed5280e92bfbe998fa414d426dcdc325ccd871402896593ea4a6"
+            "body_lf_sha256": "cda871fd52c2ed5280e92bfbe998fa414d426dcdc325ccd871402896593ea4a6",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2449,7 +2632,8 @@
             "old_count": 6,
             "new_start": 177,
             "new_count": 13,
-            "body_lf_sha256": "87ec615bb3c8f103969100246ff6f88591449dd147623a49a4fe06b67fe41734"
+            "body_lf_sha256": "cd207457ee7ec586628621137a82c970c4f39290a4d6c8d10c68aed043ed7d91",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2463,7 +2647,8 @@
             "old_count": 6,
             "new_start": 14,
             "new_count": 7,
-            "body_lf_sha256": "dd78e122ce31bc26a6f1d2fafa77d3150dd5c23cae67c21a4bf6b1cb380140ce"
+            "body_lf_sha256": "dd78e122ce31bc26a6f1d2fafa77d3150dd5c23cae67c21a4bf6b1cb380140ce",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2477,7 +2662,8 @@
             "old_count": 6,
             "new_start": 189,
             "new_count": 12,
-            "body_lf_sha256": "e500b79f77146345336098ee520df37295cb474352dc4d46f49633c7f1988030"
+            "body_lf_sha256": "ca1886dbe0dd75bf50545d3a3816c251f0e4e49b7c3cb02230a0f7894eec131a",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2491,7 +2677,8 @@
             "old_count": 7,
             "new_start": 14,
             "new_count": 13,
-            "body_lf_sha256": "745667119f1ae1a167c979b7cc960397502524bf1a9eeccbc0104c084303de14"
+            "body_lf_sha256": "745667119f1ae1a167c979b7cc960397502524bf1a9eeccbc0104c084303de14",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2505,7 +2692,8 @@
             "old_count": 7,
             "new_start": 39,
             "new_count": 6,
-            "body_lf_sha256": "50b2260557d93ef70348643e4ca93e1b837bde49e311e456d27a4cbf1775450a"
+            "body_lf_sha256": "50b2260557d93ef70348643e4ca93e1b837bde49e311e456d27a4cbf1775450a",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2519,7 +2707,8 @@
             "old_count": 11,
             "new_start": 141,
             "new_count": 16,
-            "body_lf_sha256": "7556b6481009eeb1ebe87029c025966da2292d65ff1487dd119bee66b7690e27"
+            "body_lf_sha256": "5176d80760919c71243110f43fb2caec73f149dd5a259eb85fac951f5f627a43",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2533,7 +2722,8 @@
             "old_count": 6,
             "new_start": 10,
             "new_count": 8,
-            "body_lf_sha256": "63c3cd6f7caaf0d0df4f810c0d11b96abf6524d08895feb978cbdb2282fc7032"
+            "body_lf_sha256": "63c3cd6f7caaf0d0df4f810c0d11b96abf6524d08895feb978cbdb2282fc7032",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2547,7 +2737,8 @@
             "old_count": 6,
             "new_start": 55,
             "new_count": 11,
-            "body_lf_sha256": "a4868a29c1f96168e19e391c441882e330a9bb49e871582e48274d5f4d568d7e"
+            "body_lf_sha256": "668caadddf64a2eeae1436a22f0bc721effa3692b3e68d0777b8d5e426dcf059",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2561,7 +2752,8 @@
             "old_count": 6,
             "new_start": 11,
             "new_count": 8,
-            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64"
+            "body_lf_sha256": "4fa69d35386f6b059690407cef4035d5730261a8157323e60d3aaa6574f6fe64",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2575,7 +2767,8 @@
             "old_count": 6,
             "new_start": 152,
             "new_count": 12,
-            "body_lf_sha256": "896f9b847d1a7b6092ddf4954221cfa731bfa6f5c2f1856a68b89a7ffd97b7dd"
+            "body_lf_sha256": "1878e1c8972d529959644ab659935751c79faa0cbe10f9702396739d8076d656",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2589,7 +2782,8 @@
             "old_count": 6,
             "new_start": 14,
             "new_count": 7,
-            "body_lf_sha256": "dd78e122ce31bc26a6f1d2fafa77d3150dd5c23cae67c21a4bf6b1cb380140ce"
+            "body_lf_sha256": "dd78e122ce31bc26a6f1d2fafa77d3150dd5c23cae67c21a4bf6b1cb380140ce",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2603,7 +2797,8 @@
             "old_count": 6,
             "new_start": 176,
             "new_count": 12,
-            "body_lf_sha256": "0f3d0faa449f7e3982eba05762df419ea0dfadb53ce1e82c4699023c6ceda0f2"
+            "body_lf_sha256": "58769ca6c3e0dc04a05f4d3bbd8cb0f07192346478c124b0da541c249b7c4878",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2617,7 +2812,8 @@
             "old_count": 6,
             "new_start": 14,
             "new_count": 7,
-            "body_lf_sha256": "dd78e122ce31bc26a6f1d2fafa77d3150dd5c23cae67c21a4bf6b1cb380140ce"
+            "body_lf_sha256": "dd78e122ce31bc26a6f1d2fafa77d3150dd5c23cae67c21a4bf6b1cb380140ce",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2631,7 +2827,8 @@
             "old_count": 6,
             "new_start": 247,
             "new_count": 12,
-            "body_lf_sha256": "9fc42f3bc3ea427c60c72afdb06aa21a20d4bcc8d0cd8b7a5cfec9f86310ff1e"
+            "body_lf_sha256": "0ce0dbd6d887577735e9709df12da080ef08a9ed9a8ece7296fa6352f1e8b844",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2645,7 +2842,8 @@
             "old_count": 6,
             "new_start": 24,
             "new_count": 7,
-            "body_lf_sha256": "3691f98c2050175b4e26cef7c08324e04c00f02c8adb1cee010d6a10763b41ea"
+            "body_lf_sha256": "3691f98c2050175b4e26cef7c08324e04c00f02c8adb1cee010d6a10763b41ea",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2659,7 +2857,8 @@
             "old_count": 7,
             "new_start": 313,
             "new_count": 10,
-            "body_lf_sha256": "5a7cc9bb8e9edaf52e04e25cc431671f97e50a86d2d8b0f21476a311e4f4bc01"
+            "body_lf_sha256": "5a7cc9bb8e9edaf52e04e25cc431671f97e50a86d2d8b0f21476a311e4f4bc01",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2673,7 +2872,8 @@
             "old_count": 6,
             "new_start": 883,
             "new_count": 8,
-            "body_lf_sha256": "47e357e869c9f2a06d3db0cce6fa21ca1f7346bf1b684362c9c61c36877e6f51"
+            "body_lf_sha256": "47e357e869c9f2a06d3db0cce6fa21ca1f7346bf1b684362c9c61c36877e6f51",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2687,7 +2887,8 @@
             "old_count": 6,
             "new_start": 894,
             "new_count": 12,
-            "body_lf_sha256": "47c3873e37afedcac6d91a3099105b5fb6d204b46134e74d5b9bf202ba67e086"
+            "body_lf_sha256": "a7825d751c72174bbd9a9bfbaa245458f4b227999367339b7fc37f5be9c9a0ed",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2701,7 +2902,8 @@
             "old_count": 7,
             "new_start": 13,
             "new_count": 12,
-            "body_lf_sha256": "2cd4a5fdb68370b7e5be75e28e5b2910dea5f1fee345cf8eaae27a033f68d444"
+            "body_lf_sha256": "2cd4a5fdb68370b7e5be75e28e5b2910dea5f1fee345cf8eaae27a033f68d444",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2715,7 +2917,8 @@
             "old_count": 6,
             "new_start": 163,
             "new_count": 7,
-            "body_lf_sha256": "3403d2c395fdb304e2fe6294adefecd478d1700f6ece71bf9b2690af09543ae8"
+            "body_lf_sha256": "3403d2c395fdb304e2fe6294adefecd478d1700f6ece71bf9b2690af09543ae8",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2729,7 +2932,8 @@
             "old_count": 6,
             "new_start": 173,
             "new_count": 19,
-            "body_lf_sha256": "40df47629321f9c3976e14888af5b084ad2425c3c22d6c321ee984bd87ae5898"
+            "body_lf_sha256": "ce95273fcbdfb8f08261c920b412a022534a1d83147545f69aec0282d6578eb2",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2743,7 +2947,8 @@
             "old_count": 7,
             "new_start": 9,
             "new_count": 12,
-            "body_lf_sha256": "efccb7f888ab69af3f761f5561ffd86371f3a75b5c2fbc27f7a3df88bbf71c44"
+            "body_lf_sha256": "efccb7f888ab69af3f761f5561ffd86371f3a75b5c2fbc27f7a3df88bbf71c44",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2757,7 +2962,8 @@
             "old_count": 6,
             "new_start": 50,
             "new_count": 11,
-            "body_lf_sha256": "7a34d9c4a1ad9f4f12d9e93e57ec5769bb299a6438a27333eec9083595ce9d7f"
+            "body_lf_sha256": "7a34d9c4a1ad9f4f12d9e93e57ec5769bb299a6438a27333eec9083595ce9d7f",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2771,7 +2977,8 @@
             "old_count": 6,
             "new_start": 100,
             "new_count": 13,
-            "body_lf_sha256": "7c0393e1106d0d473aaf946bd5f1d25c56b2ba177ba93e24b120b2f07d9fb0de"
+            "body_lf_sha256": "8bec387643f74403f1ec310691d381e203c45c61bc3aa02772692bd44741d87f",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2785,7 +2992,8 @@
             "old_count": 6,
             "new_start": 10,
             "new_count": 7,
-            "body_lf_sha256": "e039ec9ba1fc2d8e43e94aabaa82626ec42c9a958719428d6ac44cd00e55d328"
+            "body_lf_sha256": "e039ec9ba1fc2d8e43e94aabaa82626ec42c9a958719428d6ac44cd00e55d328",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2799,7 +3007,8 @@
             "old_count": 6,
             "new_start": 594,
             "new_count": 63,
-            "body_lf_sha256": "2ea41a94a455f149c55e0348ea0d782472ef79b456b2568bd7c3de60a516bb7f"
+            "body_lf_sha256": "b0ec26e80b39056d226288d6aca02bf8461bcfe282adcc0464aa36e282789adf",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -2813,12 +3022,15 @@
             "old_count": 6,
             "new_start": 591,
             "new_count": 13,
-            "body_lf_sha256": "c90cff9dc6fc72125ebf5613924b9ce694389416152140a1164a7c2e271a6551"
+            "body_lf_sha256": "c90cff9dc6fc72125ebf5613924b9ce694389416152140a1164a7c2e271a6551",
+            "sample_id": "CVE-2026-67425"
           },
           "coverage": "ABSENT",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "d689ee3b81421b23d92492b58eb2f48e2ce272ba186f1a04c5a26df4a695b51a"
     },
     "CVE-2026-54706": {
       "n_hunks": 14,
@@ -2836,7 +3048,8 @@
             "old_count": 6,
             "new_start": 74,
             "new_count": 12,
-            "body_lf_sha256": "598076d66b816d83e3e0900c804dcbc3ad1fd2f04663915fc948bcaa0c03b249"
+            "body_lf_sha256": "598076d66b816d83e3e0900c804dcbc3ad1fd2f04663915fc948bcaa0c03b249",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2850,7 +3063,8 @@
             "old_count": 8,
             "new_start": 107,
             "new_count": 15,
-            "body_lf_sha256": "0ae37dd72e78f08bf83ddaeab2d554952dd9dced898abd2bf910be8689e60e64"
+            "body_lf_sha256": "0ae37dd72e78f08bf83ddaeab2d554952dd9dced898abd2bf910be8689e60e64",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2864,7 +3078,8 @@
             "old_count": 7,
             "new_start": 123,
             "new_count": 7,
-            "body_lf_sha256": "3110abf434dd3a7141fdf598e6bd522c93e74bc597e27d73d8ef4369a402526c"
+            "body_lf_sha256": "3110abf434dd3a7141fdf598e6bd522c93e74bc597e27d73d8ef4369a402526c",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2878,7 +3093,8 @@
             "old_count": 15,
             "new_start": 136,
             "new_count": 39,
-            "body_lf_sha256": "19950ee73849c2f185ea98b4a8aff5112dde997104b9ed1645a5c1146075bc21"
+            "body_lf_sha256": "19950ee73849c2f185ea98b4a8aff5112dde997104b9ed1645a5c1146075bc21",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2892,7 +3108,8 @@
             "old_count": 7,
             "new_start": 190,
             "new_count": 9,
-            "body_lf_sha256": "89130e1988d72091382dd95df7a62340f48a87f23b5dc1170f3cb3579283240c"
+            "body_lf_sha256": "89130e1988d72091382dd95df7a62340f48a87f23b5dc1170f3cb3579283240c",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2906,7 +3123,8 @@
             "old_count": 7,
             "new_start": 202,
             "new_count": 9,
-            "body_lf_sha256": "4ca4b4bf8b8e8a778b835bf6bade77f4c36a93b3580baaf9b7a35e997db9214d"
+            "body_lf_sha256": "4ca4b4bf8b8e8a778b835bf6bade77f4c36a93b3580baaf9b7a35e997db9214d",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2920,7 +3138,8 @@
             "old_count": 11,
             "new_start": 219,
             "new_count": 17,
-            "body_lf_sha256": "40beaec918657c4c40de7424ae87c1fa735fb347e9407b8daf4430301be4446e"
+            "body_lf_sha256": "40beaec918657c4c40de7424ae87c1fa735fb347e9407b8daf4430301be4446e",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2934,7 +3153,8 @@
             "old_count": 6,
             "new_start": 249,
             "new_count": 12,
-            "body_lf_sha256": "a008aa9c834b2f57edc3cf36356347ff1f07e37d3f19c9c3822ebd01ecc5a87b"
+            "body_lf_sha256": "a008aa9c834b2f57edc3cf36356347ff1f07e37d3f19c9c3822ebd01ecc5a87b",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2948,7 +3168,8 @@
             "old_count": 11,
             "new_start": 309,
             "new_count": 13,
-            "body_lf_sha256": "e609d5644f7f7ba0071ff5b0818bf48c6b9ad8e04ed3ab14c31e61116ce364b1"
+            "body_lf_sha256": "2e92f2a47b54cad572ffe975892c5b7e99453d0474fc40652e89c2b1c98fca25",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2962,7 +3183,8 @@
             "old_count": 9,
             "new_start": 300,
             "new_count": 7,
-            "body_lf_sha256": "74f38b44fc52fc07c1ce03383103acf54f4f685fafd2e150e9a1f7732694a39c"
+            "body_lf_sha256": "74f38b44fc52fc07c1ce03383103acf54f4f685fafd2e150e9a1f7732694a39c",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2976,7 +3198,8 @@
             "old_count": 7,
             "new_start": 347,
             "new_count": 9,
-            "body_lf_sha256": "94a7a99390858fd299aa84fd4b1551ae7572da7213bf625b5c80d1b2458c6644"
+            "body_lf_sha256": "94a7a99390858fd299aa84fd4b1551ae7572da7213bf625b5c80d1b2458c6644",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -2990,7 +3213,8 @@
             "old_count": 6,
             "new_start": 576,
             "new_count": 14,
-            "body_lf_sha256": "097f8c6969bb36763e7887189be0c8bcedad9b0ebd7a8a5fe234255be69d2982"
+            "body_lf_sha256": "097f8c6969bb36763e7887189be0c8bcedad9b0ebd7a8a5fe234255be69d2982",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3004,7 +3228,8 @@
             "old_count": 18,
             "new_start": 593,
             "new_count": 25,
-            "body_lf_sha256": "58d30c389ec7fee3ac2acec230b87c0e3e4671e176f2af92c57c7ee1ca715b2c"
+            "body_lf_sha256": "62896e040c977739776a3fe89e21edc4aa5599459af8e79d93152adcd7b64482",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3018,12 +3243,15 @@
             "old_count": 0,
             "new_start": 1,
             "new_count": 267,
-            "body_lf_sha256": "0f6e0f68aa47a96832b4e5b54d61c973ec6d1d7409f20ad98437be8931ccbdb7"
+            "body_lf_sha256": "0f6e0f68aa47a96832b4e5b54d61c973ec6d1d7409f20ad98437be8931ccbdb7",
+            "sample_id": "CVE-2026-54706"
           },
           "coverage": "NOT_APPLICABLE_ADDED",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "b0cff36ab9d6b0a9cf1ddabfd215b5120b153b3088076717555b376646d8cb5e"
     },
     "CVE-2026-59890": {
       "n_hunks": 7,
@@ -3041,7 +3269,8 @@
             "old_count": 6,
             "new_start": 37,
             "new_count": 27,
-            "body_lf_sha256": "4b036da35c53ac0a5c49b03186315d2e75da369bacc7a4f4c7040d87b8767d3a"
+            "body_lf_sha256": "4b036da35c53ac0a5c49b03186315d2e75da369bacc7a4f4c7040d87b8767d3a",
+            "sample_id": "CVE-2026-59890"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3055,7 +3284,8 @@
             "old_count": 6,
             "new_start": 67,
             "new_count": 11,
-            "body_lf_sha256": "513c13fb9ce0a09ffd6b9f8270c1dd25eba35ed7475c6b51c3072ae7dbd71261"
+            "body_lf_sha256": "513c13fb9ce0a09ffd6b9f8270c1dd25eba35ed7475c6b51c3072ae7dbd71261",
+            "sample_id": "CVE-2026-59890"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3069,7 +3299,8 @@
             "old_count": 7,
             "new_start": 143,
             "new_count": 7,
-            "body_lf_sha256": "f3908b15b894a585c7141e7333478767ab8a122422e251bcdf6aef065c1a38fa"
+            "body_lf_sha256": "deb1bccec29ed091df90a22d1c78c202809360d9bc9029431ca2e956c3e852a3",
+            "sample_id": "CVE-2026-59890"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3083,7 +3314,8 @@
             "old_count": 6,
             "new_start": 10,
             "new_count": 7,
-            "body_lf_sha256": "be00f611dac1f62d5ee9d8f898b5200ae2f97e0e736a4b46a39decb012302c07"
+            "body_lf_sha256": "be00f611dac1f62d5ee9d8f898b5200ae2f97e0e736a4b46a39decb012302c07",
+            "sample_id": "CVE-2026-59890"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3097,7 +3329,8 @@
             "old_count": 6,
             "new_start": 158,
             "new_count": 21,
-            "body_lf_sha256": "3e6ef23abc9bc69a2da8842ed3e23eecc4427623353c8cb1774264824800f56b"
+            "body_lf_sha256": "3e6ef23abc9bc69a2da8842ed3e23eecc4427623353c8cb1774264824800f56b",
+            "sample_id": "CVE-2026-59890"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3111,7 +3344,8 @@
             "old_count": 6,
             "new_start": 347,
             "new_count": 35,
-            "body_lf_sha256": "4f844ea87c276fd9080bd9d469bf60001698cfa2877ebb7f2d5324c0a058bf0e"
+            "body_lf_sha256": "d047db1aa96759ee22c45d8de75959f7c2a1abbcea8980e82bfa5c2a13b3f187",
+            "sample_id": "CVE-2026-59890"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3125,12 +3359,15 @@
             "old_count": 6,
             "new_start": 19,
             "new_count": 20,
-            "body_lf_sha256": "7cf18ae1d0b936c89ce49db98006738fbbe0d3931b7b9459ab011d7bdf7f8817"
+            "body_lf_sha256": "7cf18ae1d0b936c89ce49db98006738fbbe0d3931b7b9459ab011d7bdf7f8817",
+            "sample_id": "CVE-2026-59890"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "233d17fed1fd6208253c4313d6c5945c72a40d5576bb1aa8b33b522c5fc623fe"
     },
     "CVE-2026-54707": {
       "n_hunks": 9,
@@ -3148,7 +3385,8 @@
             "old_count": 6,
             "new_start": 22,
             "new_count": 7,
-            "body_lf_sha256": "92947359c7dea10b923e93cc44eea0df539553d4adcff5933a9b7d179ffdbf40"
+            "body_lf_sha256": "92947359c7dea10b923e93cc44eea0df539553d4adcff5933a9b7d179ffdbf40",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3162,7 +3400,8 @@
             "old_count": 10,
             "new_start": 92,
             "new_count": 12,
-            "body_lf_sha256": "22726a516c2db862ddbdccd37e40001f90f136581598f06ac513051e5d0b5b79"
+            "body_lf_sha256": "22726a516c2db862ddbdccd37e40001f90f136581598f06ac513051e5d0b5b79",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3176,7 +3415,8 @@
             "old_count": 6,
             "new_start": 136,
             "new_count": 18,
-            "body_lf_sha256": "e6cafd415b59486411e1673d69f34f2fa81e7bfa6602f437c868437d327893ec"
+            "body_lf_sha256": "e6cafd415b59486411e1673d69f34f2fa81e7bfa6602f437c868437d327893ec",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3190,7 +3430,8 @@
             "old_count": 10,
             "new_start": 209,
             "new_count": 10,
-            "body_lf_sha256": "d88fff31bf8044103a49ab581791c08cef36dd020461064351a7005708231903"
+            "body_lf_sha256": "d88fff31bf8044103a49ab581791c08cef36dd020461064351a7005708231903",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3204,7 +3445,8 @@
             "old_count": 7,
             "new_start": 243,
             "new_count": 9,
-            "body_lf_sha256": "373022ed1b60c819dbc58fa47dd3b7ca0c11ee2494280c82051bae1d21e582e4"
+            "body_lf_sha256": "373022ed1b60c819dbc58fa47dd3b7ca0c11ee2494280c82051bae1d21e582e4",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3218,7 +3460,8 @@
             "old_count": 6,
             "new_start": 394,
             "new_count": 7,
-            "body_lf_sha256": "45a91ab076e4884f5df516a6eba73449db752c998d373156c5d216236793f5fa"
+            "body_lf_sha256": "45a91ab076e4884f5df516a6eba73449db752c998d373156c5d216236793f5fa",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3232,7 +3475,8 @@
             "old_count": 6,
             "new_start": 541,
             "new_count": 16,
-            "body_lf_sha256": "588eeb22f8f89cba84ee10af0666e9c0eae5a535456143af7265fb1d3a9149eb"
+            "body_lf_sha256": "588eeb22f8f89cba84ee10af0666e9c0eae5a535456143af7265fb1d3a9149eb",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3246,7 +3490,8 @@
             "old_count": 9,
             "new_start": 614,
             "new_count": 24,
-            "body_lf_sha256": "cd14cc58e2b60c2897ba2db9fd6ecc06496f5bf4740171e5e2293275d71747b6"
+            "body_lf_sha256": "d76fa84b44f6689f9fd26517e1d470a73a99ea77b074f730addd9ef1bdc03f23",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3260,12 +3505,15 @@
             "old_count": 7,
             "new_start": 262,
             "new_count": 87,
-            "body_lf_sha256": "94650a91d8855422e6014052433237399ab31647f1bf59a5758866f2c432b564"
+            "body_lf_sha256": "94650a91d8855422e6014052433237399ab31647f1bf59a5758866f2c432b564",
+            "sample_id": "CVE-2026-54707"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "4f55cdfaa0b06950d53f7713c6819c814fbb273315cd70bfd053da90fc9e8e76"
     },
     "CVE-2026-54785": {
       "n_hunks": 6,
@@ -3283,7 +3531,8 @@
             "old_count": 5,
             "new_start": 2,
             "new_count": 5,
-            "body_lf_sha256": "057db1e4829316ca81181b8b16cdf16f2182fd3d9e2bc1f13932ca4a620b76d6"
+            "body_lf_sha256": "0f9a6e6b226b68426658602c800d2664ade31a217a4eb9e09379f07f30dc3400",
+            "sample_id": "CVE-2026-54785"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3297,7 +3546,8 @@
             "old_count": 7,
             "new_start": 1,
             "new_count": 7,
-            "body_lf_sha256": "8a6646174ada612a6a58e63578344aaed044577e8d39ee78f23fb7df39cba78b"
+            "body_lf_sha256": "8a6646174ada612a6a58e63578344aaed044577e8d39ee78f23fb7df39cba78b",
+            "sample_id": "CVE-2026-54785"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3311,7 +3561,8 @@
             "old_count": 20,
             "new_start": 127,
             "new_count": 23,
-            "body_lf_sha256": "bb2e5808503f0d60376e5de97dab033598cd4fa921294f45640f3966656338ac"
+            "body_lf_sha256": "bb2e5808503f0d60376e5de97dab033598cd4fa921294f45640f3966656338ac",
+            "sample_id": "CVE-2026-54785"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3325,7 +3576,8 @@
             "old_count": 7,
             "new_start": 195,
             "new_count": 12,
-            "body_lf_sha256": "03f7f7bf243fa8a4d084c3bd626f88443669a0ff8a28f3ff419e820e6371b047"
+            "body_lf_sha256": "03f7f7bf243fa8a4d084c3bd626f88443669a0ff8a28f3ff419e820e6371b047",
+            "sample_id": "CVE-2026-54785"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3339,7 +3591,8 @@
             "old_count": 7,
             "new_start": 449,
             "new_count": 8,
-            "body_lf_sha256": "a6b1529366c8f114f40d8bda24f59fae25aeec4455ff4592a227fe972ecb9f0d"
+            "body_lf_sha256": "1785da03401cd9710a6642005e9860b70694e1e7ebe4b04802670ac7178274ab",
+            "sample_id": "CVE-2026-54785"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3353,12 +3606,15 @@
             "old_count": 6,
             "new_start": 298,
             "new_count": 98,
-            "body_lf_sha256": "1912f3e96e93e929b0d8ef05c9b51c223ee97d1fab6cfd88e26d2db8997acc64"
+            "body_lf_sha256": "1912f3e96e93e929b0d8ef05c9b51c223ee97d1fab6cfd88e26d2db8997acc64",
+            "sample_id": "CVE-2026-54785"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "71bb251b07674a7712c7efe5b22118f6798a3131d370e13bd8986b551b54299a"
     },
     "CVE-2026-50181": {
       "n_hunks": 6,
@@ -3376,7 +3632,8 @@
             "old_count": 7,
             "new_start": 9,
             "new_count": 12,
-            "body_lf_sha256": "d90b53ad2ca896bdd1877401cd0d0fc664cef9165f76ec5deaa7dfc54a2411b7"
+            "body_lf_sha256": "d90b53ad2ca896bdd1877401cd0d0fc664cef9165f76ec5deaa7dfc54a2411b7",
+            "sample_id": "CVE-2026-50181"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3390,7 +3647,8 @@
             "old_count": 6,
             "new_start": 63,
             "new_count": 10,
-            "body_lf_sha256": "7000a08c433c683fbbbe402038f835197600f80158f7e09fdc3c666127b421ac"
+            "body_lf_sha256": "7000a08c433c683fbbbe402038f835197600f80158f7e09fdc3c666127b421ac",
+            "sample_id": "CVE-2026-50181"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3404,7 +3662,8 @@
             "old_count": 6,
             "new_start": 173,
             "new_count": 10,
-            "body_lf_sha256": "f75eb0ab67e0f9181d307493b31c1dfc7d60f9f708c32d554d99e9b9374f960f"
+            "body_lf_sha256": "f75eb0ab67e0f9181d307493b31c1dfc7d60f9f708c32d554d99e9b9374f960f",
+            "sample_id": "CVE-2026-50181"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3418,7 +3677,8 @@
             "old_count": 6,
             "new_start": 234,
             "new_count": 10,
-            "body_lf_sha256": "754ee7af97ac9ac24cc7df7cbdf5bf0617849eb0739af4d9a5ca4b86daa31da4"
+            "body_lf_sha256": "125c7861d23e93b0d74f15366295a44827339d43a0990db7c79a9f98659eda88",
+            "sample_id": "CVE-2026-50181"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3432,7 +3692,8 @@
             "old_count": 6,
             "new_start": 187,
             "new_count": 34,
-            "body_lf_sha256": "8e823326a54814fba2e0322ca2a52eadcab5be99f621ecae6c22c909b0d8acbf"
+            "body_lf_sha256": "db7e2a7e6d5383a7037655937a0236ac0b01f140d9d5501f69990f460f49942e",
+            "sample_id": "CVE-2026-50181"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3446,12 +3707,15 @@
             "old_count": 3,
             "new_start": 308,
             "new_count": 91,
-            "body_lf_sha256": "b334fb2216114ab8ae616926dc901d4a146425b95c683d3cebbf503407b8d3cd"
+            "body_lf_sha256": "b334fb2216114ab8ae616926dc901d4a146425b95c683d3cebbf503407b8d3cd",
+            "sample_id": "CVE-2026-50181"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "9eff812d00f1c5d7eeb5674e60c498f752c03995cc65fd428f35679ef980f9fb"
     },
     "CVE-2026-54574": {
       "n_hunks": 14,
@@ -3469,7 +3733,8 @@
             "old_count": 6,
             "new_start": 48,
             "new_count": 7,
-            "body_lf_sha256": "86eb032e64d7bfa99e6970e72ec2585711e0330670cd503267a97aa0f3713b06"
+            "body_lf_sha256": "86eb032e64d7bfa99e6970e72ec2585711e0330670cd503267a97aa0f3713b06",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3483,7 +3748,8 @@
             "old_count": 6,
             "new_start": 184,
             "new_count": 39,
-            "body_lf_sha256": "e5678f428c053f70b0b2974dc8c2b8673695ac17855685b6933d21f1441cf4b6"
+            "body_lf_sha256": "e5678f428c053f70b0b2974dc8c2b8673695ac17855685b6933d21f1441cf4b6",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3497,7 +3763,8 @@
             "old_count": 6,
             "new_start": 323,
             "new_count": 13,
-            "body_lf_sha256": "2282600a54281dbf179903e10922379bdf1bc01d31efcdd612c387c720b6beff"
+            "body_lf_sha256": "2282600a54281dbf179903e10922379bdf1bc01d31efcdd612c387c720b6beff",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3511,7 +3778,8 @@
             "old_count": 7,
             "new_start": 358,
             "new_count": 15,
-            "body_lf_sha256": "a9ed06d86b43ef51af2ec7fa1318ff509dd83120c69dd165358381793ab19ace"
+            "body_lf_sha256": "2b7d5b329f8ca2d4fff0fd03e24247940825b735fb6c69d5987125900e92d42d",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3525,7 +3793,8 @@
             "old_count": 6,
             "new_start": 49,
             "new_count": 7,
-            "body_lf_sha256": "16db15450c5f9daaa5329f6be84423bd67a1f2ccfb6de38ece56d5c20f9de3a8"
+            "body_lf_sha256": "16db15450c5f9daaa5329f6be84423bd67a1f2ccfb6de38ece56d5c20f9de3a8",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3539,7 +3808,8 @@
             "old_count": 11,
             "new_start": 431,
             "new_count": 26,
-            "body_lf_sha256": "cf70ea11bb2590295cf45e14f87ca3bb28ca6896eb749091b2265da8b9354868"
+            "body_lf_sha256": "5d7e3fb398b3dc018b68599321d6fa1656a6418606950b3c79cc2ecbe1725856",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3553,7 +3823,8 @@
             "old_count": 13,
             "new_start": 37,
             "new_count": 25,
-            "body_lf_sha256": "b7f839e6f50400e47632bcdc56c7fc319d8106d3b329784fd908a3646338030e"
+            "body_lf_sha256": "b7f839e6f50400e47632bcdc56c7fc319d8106d3b329784fd908a3646338030e",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3567,7 +3838,8 @@
             "old_count": 8,
             "new_start": 104,
             "new_count": 18,
-            "body_lf_sha256": "373a627b257a337ab8738e3e6f29e2a6511bd27740d6b6b249b88e4b2fa58ead"
+            "body_lf_sha256": "373a627b257a337ab8738e3e6f29e2a6511bd27740d6b6b249b88e4b2fa58ead",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3581,7 +3853,8 @@
             "old_count": 11,
             "new_start": 155,
             "new_count": 15,
-            "body_lf_sha256": "d8b881e7e96788d84a91e8a287d81ae2aa86dd48c49ec6ec451027023c187ae6"
+            "body_lf_sha256": "d8b881e7e96788d84a91e8a287d81ae2aa86dd48c49ec6ec451027023c187ae6",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3595,7 +3868,8 @@
             "old_count": 6,
             "new_start": 171,
             "new_count": 11,
-            "body_lf_sha256": "45e63902fc3c32398e7a11806dbbe913f8cd7b3368452575860e9fa307e517c5"
+            "body_lf_sha256": "45e63902fc3c32398e7a11806dbbe913f8cd7b3368452575860e9fa307e517c5",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3609,7 +3883,8 @@
             "old_count": 7,
             "new_start": 187,
             "new_count": 7,
-            "body_lf_sha256": "b5bf0e0174d2fae682805ceeade952388929e8869f4d1bf6d0bdc53c6717ec27"
+            "body_lf_sha256": "b5bf0e0174d2fae682805ceeade952388929e8869f4d1bf6d0bdc53c6717ec27",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3623,7 +3898,8 @@
             "old_count": 7,
             "new_start": 233,
             "new_count": 7,
-            "body_lf_sha256": "60066cf1d42051348359856e3bf5c750de193ce25dc6e89a88b8424cb8fd2234"
+            "body_lf_sha256": "60066cf1d42051348359856e3bf5c750de193ce25dc6e89a88b8424cb8fd2234",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3637,7 +3913,8 @@
             "old_count": 6,
             "new_start": 242,
             "new_count": 11,
-            "body_lf_sha256": "9073b0cc1339de28f50cc042b8969da0fe0d26b6a0c02cbc8cbe85e07268d31e"
+            "body_lf_sha256": "9073b0cc1339de28f50cc042b8969da0fe0d26b6a0c02cbc8cbe85e07268d31e",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3651,12 +3928,15 @@
             "old_count": 8,
             "new_start": 254,
             "new_count": 60,
-            "body_lf_sha256": "9ba84e25c87427abe05bd154014ed6c0542165a6ee9e95d10292cd47e553f062"
+            "body_lf_sha256": "9ba84e25c87427abe05bd154014ed6c0542165a6ee9e95d10292cd47e553f062",
+            "sample_id": "CVE-2026-54574"
           },
           "coverage": "FULL",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "7c55419bfa2d0159ce1d97df495e6e2fce6d50a03791551395869aadf7e67059"
     },
     "CVE-2026-45019": {
       "n_hunks": 32,
@@ -3674,7 +3954,8 @@
             "old_count": 6,
             "new_start": 6,
             "new_count": 7,
-            "body_lf_sha256": "c49ffa1b5c4449a672c0e25ecdf8e8723a15c39a6d3b7c5e4b7b2588c8ca6436"
+            "body_lf_sha256": "c49ffa1b5c4449a672c0e25ecdf8e8723a15c39a6d3b7c5e4b7b2588c8ca6436",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3688,7 +3969,8 @@
             "old_count": 7,
             "new_start": 18,
             "new_count": 7,
-            "body_lf_sha256": "3de02ecb4e8be9d802ff5f6a3a2d28956c9c783404e4e54d41a6e10deff27262"
+            "body_lf_sha256": "3de02ecb4e8be9d802ff5f6a3a2d28956c9c783404e4e54d41a6e10deff27262",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3702,7 +3984,8 @@
             "old_count": 18,
             "new_start": 149,
             "new_count": 37,
-            "body_lf_sha256": "2e0d4caa3eeb6a833b533196bccf8785b5d027bda10a800a4ad3327e3695a0af"
+            "body_lf_sha256": "2e0d4caa3eeb6a833b533196bccf8785b5d027bda10a800a4ad3327e3695a0af",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3716,7 +3999,8 @@
             "old_count": 30,
             "new_start": 317,
             "new_count": 96,
-            "body_lf_sha256": "3805e32a66b3c5e40512aec66b14b9e0d63bee0cd6108bbab8009331c882257d"
+            "body_lf_sha256": "3805e32a66b3c5e40512aec66b14b9e0d63bee0cd6108bbab8009331c882257d",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3730,7 +4014,8 @@
             "old_count": 6,
             "new_start": 710,
             "new_count": 89,
-            "body_lf_sha256": "367bb7e900736699b2bf5cdec8ecd58f841bb6a70f37fd6b0c23f61325e3db39"
+            "body_lf_sha256": "367bb7e900736699b2bf5cdec8ecd58f841bb6a70f37fd6b0c23f61325e3db39",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3744,7 +4029,8 @@
             "old_count": 6,
             "new_start": 807,
             "new_count": 8,
-            "body_lf_sha256": "23e3b18ab85d4f3edbf2c6d07a8cc13964609a92534cf8cdba8387f2333bea90"
+            "body_lf_sha256": "998eca0092517dde85530b9786bd3d848544360dfc0458597730f2de4627e806",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3758,7 +4044,8 @@
             "old_count": 10,
             "new_start": 1,
             "new_count": 9,
-            "body_lf_sha256": "f3fac88df0e4ec1394844b4130c93a35b209bf60be00bc15fdcbb3b64dc630d1"
+            "body_lf_sha256": "f3fac88df0e4ec1394844b4130c93a35b209bf60be00bc15fdcbb3b64dc630d1",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3772,7 +4059,8 @@
             "old_count": 71,
             "new_start": 28,
             "new_count": 277,
-            "body_lf_sha256": "44276b368b68a08a7035c3e45cf15de461c381a4edfd1ae033c3569efd3a338f"
+            "body_lf_sha256": "f24839d804a623d54768884c7efcaaebf5df60f04f75eba55fd8b3a29025af9e",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3786,7 +4074,8 @@
             "old_count": 7,
             "new_start": 10,
             "new_count": 7,
-            "body_lf_sha256": "6161b969baeeaae7f56708929c363928c92fba0f89c802d51cef241d2d3072b7"
+            "body_lf_sha256": "6161b969baeeaae7f56708929c363928c92fba0f89c802d51cef241d2d3072b7",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3800,7 +4089,8 @@
             "old_count": 10,
             "new_start": 875,
             "new_count": 24,
-            "body_lf_sha256": "92678534cbd101854baa95bc4379f793ced0ec9fb75f7f84d9ce03cc6e127438"
+            "body_lf_sha256": "92678534cbd101854baa95bc4379f793ced0ec9fb75f7f84d9ce03cc6e127438",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3814,7 +4104,8 @@
             "old_count": 12,
             "new_start": 1319,
             "new_count": 112,
-            "body_lf_sha256": "95470596c68aeccf3210e09e9a12de4187772411b94fd1d38a2714661c58ef20"
+            "body_lf_sha256": "95470596c68aeccf3210e09e9a12de4187772411b94fd1d38a2714661c58ef20",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3828,7 +4119,8 @@
             "old_count": 15,
             "new_start": 1435,
             "new_count": 24,
-            "body_lf_sha256": "510079b3d9df9f064855174fcd7fcb62ffc6cd0235ae6f4507c957876272a909"
+            "body_lf_sha256": "510079b3d9df9f064855174fcd7fcb62ffc6cd0235ae6f4507c957876272a909",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3842,7 +4134,8 @@
             "old_count": 65,
             "new_start": 1474,
             "new_count": 126,
-            "body_lf_sha256": "f5248accf7712476a97632c87a5e1a11042f500c39fb46d1eff55cdba384e278"
+            "body_lf_sha256": "f5248accf7712476a97632c87a5e1a11042f500c39fb46d1eff55cdba384e278",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3856,7 +4149,8 @@
             "old_count": 38,
             "new_start": 1606,
             "new_count": 90,
-            "body_lf_sha256": "17b7d9dd80601237f844c5e3171d79482fca52b613b331d8d9b12dc6abde3e01"
+            "body_lf_sha256": "17b7d9dd80601237f844c5e3171d79482fca52b613b331d8d9b12dc6abde3e01",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3870,7 +4164,8 @@
             "old_count": 7,
             "new_start": 1705,
             "new_count": 17,
-            "body_lf_sha256": "8e81cbdbf4b54d7233f9bc57ad6cf290bedd759284eef3e1a0608c122aadb449"
+            "body_lf_sha256": "8e81cbdbf4b54d7233f9bc57ad6cf290bedd759284eef3e1a0608c122aadb449",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3884,7 +4179,8 @@
             "old_count": 21,
             "new_start": 1743,
             "new_count": 55,
-            "body_lf_sha256": "2c1ae24769d1a24ada7b5314f5eadaa2ca8d9132138bd7eb8b87091e116870f0"
+            "body_lf_sha256": "2c1ae24769d1a24ada7b5314f5eadaa2ca8d9132138bd7eb8b87091e116870f0",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3898,7 +4194,8 @@
             "old_count": 45,
             "new_start": 1802,
             "new_count": 101,
-            "body_lf_sha256": "9c2cc2283bcc54948efd4043cc7a1a43207926b7216a48524c208054c36163c3"
+            "body_lf_sha256": "b5c8cc6cd4c2e8c154b638fe03b50faf23f01ecd18fc4687436b871b36e3102c",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3912,7 +4209,8 @@
             "old_count": 6,
             "new_start": 22,
             "new_count": 42,
-            "body_lf_sha256": "6bbc5f916250942718cb8ef9ad6d44a5d70cb3d9bd29e6992a44870cabbb8921"
+            "body_lf_sha256": "6bbc5f916250942718cb8ef9ad6d44a5d70cb3d9bd29e6992a44870cabbb8921",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -3926,7 +4224,8 @@
             "old_count": 24,
             "new_start": 81,
             "new_count": 7,
-            "body_lf_sha256": "eaf25bc9f86222ad8cc559a683e9575483a9b147a8d0c4397c58f8434b88e163"
+            "body_lf_sha256": "eaf25bc9f86222ad8cc559a683e9575483a9b147a8d0c4397c58f8434b88e163",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -3940,7 +4239,8 @@
             "old_count": 6,
             "new_start": 389,
             "new_count": 38,
-            "body_lf_sha256": "4910ffc31cac98e61b297a035867ff73b85df57df799ef289d66160a51df5286"
+            "body_lf_sha256": "5b24616b5c71ae8e99c61dd3bb2220c1a0defddf3fa207897c5ad5f975e088ea",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -3954,7 +4254,8 @@
             "old_count": 7,
             "new_start": 21,
             "new_count": 7,
-            "body_lf_sha256": "10ea7b4f7f9ebd151678c65daa277b447ee688e081c14bf2c63ddfea85bb338d"
+            "body_lf_sha256": "10ea7b4f7f9ebd151678c65daa277b447ee688e081c14bf2c63ddfea85bb338d",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -3968,7 +4269,8 @@
             "old_count": 34,
             "new_start": 245,
             "new_count": 29,
-            "body_lf_sha256": "11b49599fc345116400976070f1b137a48dc982fb832ffac36b5e24cd804fa71"
+            "body_lf_sha256": "8addfd568cdf31ead1d3b82a7fdb578656ef8b6d4cf21df8543fb88fc5cae77c",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -3982,7 +4284,8 @@
             "old_count": 1,
             "new_start": 1,
             "new_count": 1,
-            "body_lf_sha256": "af676a2cf10ab0bdbaceb78391556e69868cf75d856885cfc6ab24f14d4156a6"
+            "body_lf_sha256": "e00b977ad9a5c3e679e4ea7e28222bbb476ea723b347d818d64bf4c6b6d4177d",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -3996,7 +4299,8 @@
             "old_count": 10,
             "new_start": 1,
             "new_count": 22,
-            "body_lf_sha256": "2bca2d56883b3b005e9f34b83b34d279ffb2f8f994973240912294afcb97eb34"
+            "body_lf_sha256": "2bca2d56883b3b005e9f34b83b34d279ffb2f8f994973240912294afcb97eb34",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -4010,7 +4314,8 @@
             "old_count": 3,
             "new_start": 137,
             "new_count": 501,
-            "body_lf_sha256": "269464ac383011d20489d81f7b7e82e5249c4a9049f8ac0964418ba68be997b3"
+            "body_lf_sha256": "ee7dbd4b00a378f62c1082f5c53fa755ee199101ce31df76309e721a83a32111",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -4024,7 +4329,8 @@
             "old_count": 15,
             "new_start": 1,
             "new_count": 40,
-            "body_lf_sha256": "abf05ffd6027fbc931e254ad4edb4943c5394152d29489bd0d5644a1a6ae4a98"
+            "body_lf_sha256": "abf05ffd6027fbc931e254ad4edb4943c5394152d29489bd0d5644a1a6ae4a98",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -4038,7 +4344,8 @@
             "old_count": 197,
             "new_start": 204,
             "new_count": 235,
-            "body_lf_sha256": "cc742e4d673a25e71f08869c285bc9a58ade0b99b9dc4f20cbf5f187fc82e03b"
+            "body_lf_sha256": "cc742e4d673a25e71f08869c285bc9a58ade0b99b9dc4f20cbf5f187fc82e03b",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -4052,7 +4359,8 @@
             "old_count": 6,
             "new_start": 467,
             "new_count": 7,
-            "body_lf_sha256": "d6f7bfb1946b9ececf3537434759178c81ac0063b276fd818dd237ed4b896138"
+            "body_lf_sha256": "d6f7bfb1946b9ececf3537434759178c81ac0063b276fd818dd237ed4b896138",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -4066,7 +4374,8 @@
             "old_count": 15,
             "new_start": 496,
             "new_count": 1947,
-            "body_lf_sha256": "f1e3e81850bdc24dabba1f4a295889ac1d4091beb4bd80a1c9539445050073fe"
+            "body_lf_sha256": "baf744a4f7d371af2aa4a69dcdccf70e7e7a3cac5bf14c469c63d92ddf351cfc",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -4080,7 +4389,8 @@
             "old_count": 3,
             "new_start": 763,
             "new_count": 27,
-            "body_lf_sha256": "00867686c3ee8fd3d0c71d203313a19c6ddcd2218022c636f0c78eb670fe1dec"
+            "body_lf_sha256": "55d7a4654bb7866baa59222edba70e959a11a73e4b23eb032a00e4e6d01dea88",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "FULL",
           "criticality": null
@@ -4094,7 +4404,8 @@
             "old_count": 6,
             "new_start": 6,
             "new_count": 7,
-            "body_lf_sha256": "81e3ffa851f39754477bba8d3b3b837387c215c64a33c9ca866a3860cf771d9a"
+            "body_lf_sha256": "81e3ffa851f39754477bba8d3b3b837387c215c64a33c9ca866a3860cf771d9a",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
@@ -4108,12 +4419,15 @@
             "old_count": 9,
             "new_start": 48,
             "new_count": 13,
-            "body_lf_sha256": "8c531d959cb3abed8cfa2fb0e8e9130863fdb29fe74f6bc6c89a40878eeeb240"
+            "body_lf_sha256": "8c531d959cb3abed8cfa2fb0e8e9130863fdb29fe74f6bc6c89a40878eeeb240",
+            "sample_id": "CVE-2026-45019"
           },
           "coverage": "ABSENT",
           "criticality": null
         }
-      ]
+      ],
+      "selection_bound": true,
+      "selection_manifest_sha256": "d215bd5b0e44ee1bb22067562194084a5777628677313f2e4fde513fff5c5700"
     }
   },
   "totals": {

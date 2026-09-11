@@ -782,8 +782,18 @@ def build_g0_prompts(out_dir: Path) -> dict:
         sd = sample_dir_path(cve)
         # —— 单次、与 arm 无关的源码上下文（基于 real patch 的 hunk 位置）——
         real_patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
-        code = excerpt_vuln_for_patch(sd, real_patch)
+        code, selection = excerpt_vuln_for_patch(sd, real_patch)   # P0-1：解包 tuple
         code_sha = _sha256_bytes(code.encode("utf-8"))
+        sel_sha = _sha256_bytes(json.dumps(selection, sort_keys=True).encode("utf-8"))
+        # P0-3：selection 落盘为冻结工件，coverage 只消费它（不再各自重算）
+        write_text_lf(out_dir / "g0_selection" / f"{cve}.json",
+                      json.dumps({"sample_id": cve, "code_text_sha256": code_sha,
+                                  "selection_manifest": selection,
+                                  "selection_manifest_sha256": sel_sha,
+                                  "renderer_impl_sha256": _sha256_bytes(
+                                      (ROOT / "cpg/ablation/prompt_renderer.py").read_bytes()),
+                                  "patch_sha256": _sha256_bytes(real_patch.encode("utf-8"))},
+                                 ensure_ascii=False, indent=2) + "\n")
         if not code.strip():
             group_errors.append(f"{cve}: code_text 为空（预注册选择未命中任何文件）")
         for arm in ("real", "placebo", "shuffled"):
@@ -793,10 +803,12 @@ def build_g0_prompts(out_dir: Path) -> dict:
             except FileNotFoundError as e:
                 rows.append({"sample_id": cve, "arm": arm, "patch_path": rel,
                              "code_text_sha256": code_sha,
+                             "selection_manifest_sha256": sel_sha,
                              "verdict": "RENDER_FAILURE", "error": str(e)[:200]})
                 continue
             rec = {"sample_id": cve, "arm": arm, "patch_path": rel,
-                   "code_text_sha256": code_sha}
+                   "code_text_sha256": code_sha,
+                   "selection_manifest_sha256": sel_sha}
             prompt = pr.render_v4_prompt(cve=cve, cwe=cwe_by.get(cve),
                                          code_text=code, candidate_patch=patch)
             tok = count_tokens(prompt)
@@ -853,9 +865,10 @@ def build_g0_prompts(out_dir: Path) -> dict:
     return doc
 
 
-def _parse_patch_hunks(patch_text: str) -> dict:
-    """解析 patch → {file: [{old_start, old_count, new_start, new_count, header, ctx_sha}]}。
+def _parse_patch_hunks(patch_text: str, sample_id: str | None = None) -> dict:
+    """解析 patch → {file: [{old_start, old_count, new_start, new_count, header, _body}]}。
 
+    `_body` 为**完整单个 hunk body**（结束边界 = 全局下一个 `@@ ` 或 `diff --git `）。
     带上下文 SHA（hunk 头 + 其后 3 行），使 hunk 身份不依赖易漂移的纯行号。
     malformed hunk header → 抛 ValueError（fail-closed）。
     """
@@ -879,12 +892,18 @@ def _parse_patch_hunks(patch_text: str) -> dict:
                 "patch_context_sha256": _sha256_bytes(
                     "\n".join(buf[i:i + 4]).encode("utf-8")),
             })
-    # 补完整 hunk body（P1-2：身份锚点用完整 body 的 LF-normalized SHA）
+    # 补完整 hunk body（P1-2 身份锚点）。P0-2 修复：结束边界取**全局下一个
+    # `@@ ` 或 `diff --git `** 的最小索引——不能简单用 len(buf) 或"同文件下一 hunk"，
+    # 否则多文件 patch 中前文件最后一个 hunk 会吞入后续文件全部内容。
     for rel, hs in out.items():
-        for j, h in enumerate(hs):
-            end = hs[j + 1]["_start_idx"] if j + 1 < len(hs) else len(buf)
-            body = "\n".join(buf[h["_start_idx"] + 1:end])
-            h["_body"] = body
+        for h in hs:
+            i = h["_start_idx"]
+            stop = len(buf)
+            for j in range(i + 1, len(buf)):
+                if buf[j].startswith("@@ ") or buf[j].startswith("diff --git "):
+                    stop = j
+                    break
+            h["_body"] = "\n".join(buf[i + 1:stop])
     return out
 
 
@@ -979,10 +998,20 @@ def build_hunk_coverage(out_dir: Path) -> dict:
     for cve in V4_CANDIDATES:
         sd = sample_dir_path(cve)
         patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
-        code, manifest = excerpt_vuln_for_patch(sd, patch)
+        # P0-3：优先消费 G0 冻结的 selection（若已生成），否则本地计算并标注未绑定
+        sel_path = out_dir / "g0_selection" / f"{cve}.json"
+        bound = sel_path.exists()
+        if bound:
+            sel_doc = json.loads(sel_path.read_text(encoding="utf-8"))
+            manifest = sel_doc["selection_manifest"]
+            bound_sha = sel_doc["selection_manifest_sha256"]
+        else:
+            code, manifest = excerpt_vuln_for_patch(sd, patch)
+            bound_sha = None
         kept_lines = {k: set(v) for k, v in manifest["files"].items()}
         fstat = _file_status(patch)
-        parsed = _parse_patch_hunks(patch)
+        # P1-1：identity 必须含 sample_id
+        parsed = _parse_patch_hunks(patch, sample_id=cve)
         rows = []
         n = {"FULL": 0, "PARTIAL": 0, "ABSENT": 0, "NOT_APPLICABLE_ADDED": 0}
         for rel in sorted(parsed):
@@ -992,12 +1021,12 @@ def build_hunk_coverage(out_dir: Path) -> dict:
             for h in parsed[rel]:
                 ident = _hunk_identity(rel, fstat.get(rel, "M"), h,
                                        _lf_sha(h["_body"].encode("utf-8")))
+                ident["sample_id"] = cve   # P1-1
                 if fstat.get(rel) == "A":
-                    status = "NOT_APPLICABLE_ADDED"      # 真正的新增文件
+                    status = "NOT_APPLICABLE_ADDED"
                 else:
-                    # 覆盖按 selection manifest 的真实行集合计算 → PARTIAL 可达
                     if h["old_count"] == 0:
-                        lo, hi = h["old_start"] - 1, h["old_start"]  # 插入边界
+                        lo, hi = h["old_start"] - 1, h["old_start"]
                     else:
                         lo, hi = h["old_start"] - 1, h["old_start"] - 1 + h["old_count"]
                     want = set(range(max(0, lo), min(nlines, hi)))
@@ -1013,8 +1042,10 @@ def build_hunk_coverage(out_dir: Path) -> dict:
                         status = "ABSENT"
                 n[status] += 1
                 rows.append({"sample_id": cve, "hunk_identity": ident,
-                             "coverage": status, "criticality": None})  # 由 frozen registry 提供
-        report["samples"][cve] = {"n_hunks": len(rows), **n, "hunks": rows}
+                             "coverage": status, "criticality": None})
+        report["samples"][cve] = {"n_hunks": len(rows), **n, "hunks": rows,
+                                  "selection_bound": bound,
+                                  "selection_manifest_sha256": bound_sha}
     report["totals"] = {k: sum(s[k] for s in report["samples"].values())
                         for k in ("FULL", "PARTIAL", "ABSENT", "NOT_APPLICABLE_ADDED")}
     report["mechanical_absent_samples"] = sorted(
@@ -1046,32 +1077,67 @@ def build_critical_hunks_template(out_dir: Path) -> dict:
 
 
 def _ident_key(ident: dict) -> str:
-    """hunk identity 的稳定键（用于严格 join）。"""
-    return (f"{ident['file']}|{ident['file_status']}|{ident['old_start']}|"
-            f"{ident['old_count']}|{ident['new_start']}|{ident['new_count']}|"
-            f"{ident['body_lf_sha256']}")
+    """hunk identity 的稳定键（用于严格 join）——含 sample_id（P1-1）。"""
+    return (f"{ident.get('sample_id')}|{ident['file']}|{ident['file_status']}|"
+            f"{ident['old_start']}|{ident['old_count']}|{ident['new_start']}|"
+            f"{ident['new_count']}|{ident['body_lf_sha256']}")
+
+
+_VALID_COVERAGE = {"FULL", "PARTIAL", "ABSENT", "NOT_APPLICABLE_ADDED"}
+_SHA_RE_HEX = 64
+
+
+def _validate_coverage_schema(coverage: dict) -> list:
+    """P1-3：强 schema 校验（非法 enum / 缺字段 / 错 SHA 格式即 fail-closed）。"""
+    errs = []
+    if not isinstance(coverage, dict):
+        return ["coverage 非 dict"]
+    if coverage.get("kind") != "MECHANICAL_COVERAGE_AUDIT":
+        errs.append(f"coverage kind 异常: {coverage.get('kind')}")
+    samples = coverage.get("samples")
+    if not isinstance(samples, dict) or not samples:
+        errs.append("coverage.samples 缺失或空")
+        return errs
+    need = ("file", "file_status", "old_start", "old_count",
+            "new_start", "new_count", "body_lf_sha256", "sample_id")
+    for cve, s in samples.items():
+        for h in s.get("hunks", []):
+            ident = h.get("hunk_identity") or {}
+            miss = [k for k in need if k not in ident]
+            if miss:
+                errs.append(f"{cve} identity 缺字段 {miss}")
+                break
+            if h.get("coverage") not in _VALID_COVERAGE:
+                errs.append(f"{cve} 非法 coverage enum: {h.get('coverage')}")
+                break
+            if not isinstance(ident["body_lf_sha256"], str) or \
+                    len(ident["body_lf_sha256"]) != _SHA_RE_HEX:
+                errs.append(f"{cve} body_lf_sha256 非 64 位 hex")
+                break
+            if ident.get("sample_id") != cve:
+                errs.append(f"{cve} identity.sample_id 不符: {ident.get('sample_id')}")
+                break
+    return errs
 
 
 def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None) -> list:
     """**生产 Gate 逻辑（纯函数，供测试直接调用）**。
 
     运行时按 hunk identity 严格 join `frozen criticality × current coverage`：
-      - registry 缺失 / 未冻结 → 阻断；
+      - registry/coverage 缺失、未冻结、schema 非法 → 阻断；
       - identity 集合不等（缺/多/重复）→ 阻断；
-      - SECURITY_CRITICAL × ABSENT → 阻断；
-      - NON_CRITICAL × ABSENT → 不阻断。
+      - SECURITY_CRITICAL × FULL → 放行；
+      - SECURITY_CRITICAL × PARTIAL/ABSENT → **阻断**（P0-4：PARTIAL 不得静默放行）；
+      - NON_CRITICAL × 任意 → 不阻断。
     **只读 coverage 的当前值**，绝不读 registry 内可能过期的 coverage。
     """
-    errs = []
-    if not isinstance(coverage, dict) or coverage.get("kind") != "MECHANICAL_COVERAGE_AUDIT":
-        errs.append("coverage 工件缺失或 kind 异常")
+    errs = _validate_coverage_schema(coverage)
+    if errs:
         return errs
     if not frozen_registry or frozen_registry.get("status") != "FROZEN_LABELED":
         errs.append("frozen registry 缺失或未冻结（status != FROZEN_LABELED）→ 保守阻断")
         return errs
-    # 当前 coverage 的 identity → 状态
-    cur = {}
-    dup = []
+    cur, dup = {}, []
     for s in coverage["samples"].values():
         for h in s["hunks"]:
             k = _ident_key(h["hunk_identity"])
@@ -1080,7 +1146,6 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None) -> list
             cur[k] = h["coverage"]
     if dup:
         errs.append(f"当前 coverage 存在重复 identity {len(dup)} 条")
-    # frozen registry 的 identity → criticality
     froz, fdup = {}, []
     for e in frozen_registry.get("entries", []):
         if e.get("criticality") not in ("SECURITY_CRITICAL", "NON_CRITICAL"):
@@ -1092,18 +1157,17 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None) -> list
         froz[k] = e["criticality"]
     if fdup:
         errs.append(f"frozen registry 存在重复 identity {len(fdup)} 条")
-    # 集合严格相等
     missing = sorted(set(cur) - set(froz))
     extra = sorted(set(froz) - set(cur))
     if missing:
         errs.append(f"registry 缺少 {len(missing)} 条当前 hunk identity（新 hunk 未标注）")
     if extra:
         errs.append(f"registry 含 {len(extra)} 条当前 coverage 不存在的 identity（陈旧）")
-    # 关键 hunk × 当前覆盖
-    crit_absent = sorted({k.split("|")[0] for k, v in froz.items()
-                          if v == "SECURITY_CRITICAL" and cur.get(k) == "ABSENT"})
-    if crit_absent:
-        errs.append(f"SECURITY_CRITICAL × ABSENT（当前覆盖）: {crit_absent}")
+    # P0-4：critical 只有 FULL 才放行
+    crit_bad = sorted({k.split("|", 1)[1].split("|")[0] for k, v in froz.items()
+                       if v == "SECURITY_CRITICAL" and cur.get(k) != "FULL"})
+    if crit_bad:
+        errs.append(f"SECURITY_CRITICAL 但当前覆盖非 FULL（须敏感性分析或签名 override）: {crit_bad}")
     return errs
 
 
