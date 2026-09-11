@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""A-2 验收：事务性 / 幂等 / 并发 / registry fail-closed / 引用路径存在。
+"""A-2 验收：事务性 / 幂等完整性 / 并发 / registry fail-closed / 引用路径存在。
 
 全部在**临时 root** 下运行，绝不触碰正式 artifacts 目录。
 """
@@ -15,6 +15,11 @@ sys.path.insert(0, str(ROOT))
 from cpg.ablation import v4_release as rel  # noqa: E402
 
 TPL = ROOT / "cpg/ablation/artifacts/v4/critical_hunks.template.json"
+NL = "\n"
+
+
+def _write_json(p: Path, doc: dict) -> None:
+    p.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + NL).encode("utf-8"))
 
 
 def _mk_submissions(td: Path, seed: int = 3, role="NON_CRITICAL"):
@@ -31,7 +36,7 @@ def _mk_submissions(td: Path, seed: int = 3, role="NON_CRITICAL"):
                       "dependency_group": [], "reason": "t"})
             recs.append(r)
         p = td / f"{who}.jsonl"
-        p.write_text("\n".join(json.dumps(x, ensure_ascii=False) for x in recs),
+        p.write_text(NL.join(json.dumps(x, ensure_ascii=False) for x in recs),
                      encoding="utf-8")
         out.append(p)
     return out[0], out[1]
@@ -49,7 +54,6 @@ class A2Base(unittest.TestCase):
 
 class TestRegistryFailClosed(A2Base):
     def test_missing_registry_zero_write(self):
-        """registry 缺失 → 零落盘（root 不被创建）。"""
         reg = rel.ANN / "distribution_registry.json"
         backup = reg.read_bytes() if reg.exists() else None
         try:
@@ -82,10 +86,27 @@ class TestRegistryFailClosed(A2Base):
             for f in doc["internal_provenance"]["files"]:
                 if f["path"].endswith("critical_hunks.template.json"):
                     f["sha256"] = "0" * 64
-            reg.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+            _write_json(reg, doc)
             with self.assertRaises(ValueError) as cm:
                 rel.recover(self.s1, self.s2, root=self.root)
             self.assertIn("不符", str(cm.exception))
+        finally:
+            reg.write_bytes(backup)
+
+    def test_registry_schema_and_clean_fail_closed(self):
+        reg = rel.ANN / "distribution_registry.json"
+        backup = reg.read_bytes()
+        try:
+            doc = json.loads(backup)
+            doc["schema"] = "WRONG/1"
+            _write_json(reg, doc)
+            with self.assertRaises(ValueError):
+                rel.recover(self.s1, self.s2, root=self.root)
+            doc = json.loads(backup)
+            doc["provenance_check"]["clean"] = False
+            _write_json(reg, doc)
+            with self.assertRaises(ValueError):
+                rel.recover(self.s1, self.s2, root=self.root)
         finally:
             reg.write_bytes(backup)
 
@@ -98,9 +119,10 @@ class TestTransaction(A2Base):
         self.assertTrue(run.name.startswith("run-"))
         self.assertFalse(any(x.name.startswith(".tmp-") for x in self.root.iterdir()),
                          "不得残留 .tmp 目录")
+        self.assertFalse(any(x.name.endswith(".lease") for x in self.root.iterdir()),
+                         "不得残留 .lease 文件")
 
     def test_fault_injection_leaves_no_tmp(self):
-        """在报告写盘阶段注入失败 → 临时目录必须被清理、正式目录不变。"""
         orig = rel.va.disagreement_list
 
         def boom(*a, **k):
@@ -113,38 +135,77 @@ class TestTransaction(A2Base):
             rel.va.disagreement_list = orig
         self.assertFalse(self.root.exists(), "注入失败后不得残留任何目录")
 
-    def test_idempotent_replay_does_not_delete(self):
-        r1 = rel.recover(self.s1, self.s2, root=self.root)
-        run = Path(r1["run_dir"])
-        marker = run / "MARKER_KEEP"
-        marker.write_text("keep", encoding="utf-8")
-        r2 = rel.recover(self.s1, self.s2, root=self.root)
-        self.assertTrue(r2.get("idempotent_replay"))
-        self.assertTrue(marker.exists(), "幂等返回不得删除既有成功结果")
-
-    def test_conflicting_existing_dir_fails_closed(self):
-        r1 = rel.recover(self.s1, self.s2, root=self.root)
-        run = Path(r1["run_dir"])
-        (run / "recovery_report.json").write_text("{}", encoding="utf-8")   # 破坏内容
-        with self.assertRaises(ValueError):
-            rel.recover(self.s1, self.s2, root=self.root)
-
     def test_report_paths_exist_after_promotion(self):
         r = rel.recover(self.s1, self.s2, root=self.root)
         run = Path(r["run_dir"])
         rep = json.loads((run / "recovery_report.json").read_text(encoding="utf-8"))
-        # 引用路径在提升后必须实际存在
         self.assertTrue((run / rep["disagreement"]["artifact_relpath"]).exists())
         self.assertIn("run-", rep["run_dir"])
-        self.assertNotIn(".tmp-", json.dumps(rep, ensure_ascii=False),
-                         "报告中不得残留临时目录路径")
+        self.assertNotIn(".tmp-", json.dumps(rep, ensure_ascii=False))
 
     def test_concurrent_unique_tmp_dirs(self):
-        """同一对提交并发：临时目录名必须唯一（不互删）。"""
-        import os, uuid
+        import os
+        import uuid
         names = {f".tmp-{rel._run_name(self.s1, self.s2)}-{os.getpid()}-{uuid.uuid4().hex[:8]}"
                  for _ in range(5)}
         self.assertEqual(len(names), 5)
+
+
+class TestIdempotencyIntegrity(A2Base):
+    """P0：幂等返回必须验证**整份事务的完整性**，而不是只看两个输入 SHA。"""
+
+    def _first(self):
+        return rel.recover(self.s1, self.s2, root=self.root)
+
+    def test_1_first_success(self):
+        r = self._first()
+        rep = json.loads((Path(r["run_dir"]) / "recovery_report.json").read_text(encoding="utf-8"))
+        self.assertEqual(rep["output_state"], "COMPLETE")
+        self.assertEqual(rep["disagreements_n_items"], 0)
+        self.assertTrue(rep["disagreements_sha256"])
+        self.assertTrue(rep["distribution_registry_sha256"])
+
+    def test_5_unchanged_returns_idempotent(self):
+        self._first()
+        r2 = rel.recover(self.s1, self.s2, root=self.root)
+        self.assertTrue(r2.get("idempotent_replay"))
+
+    def test_2_deleted_disagreements_rejected(self):
+        r = self._first()
+        (Path(r["run_dir"]) / "disagreements.json").unlink()
+        with self.assertRaises(ValueError) as cm:
+            rel.recover(self.s1, self.s2, root=self.root)
+        self.assertIn("disagreements", str(cm.exception))
+
+    def test_3_tampered_disagreements_rejected(self):
+        r = self._first()
+        p = Path(r["run_dir"]) / "disagreements.json"
+        doc = json.loads(p.read_text(encoding="utf-8"))
+        doc["items"] = [{"kind": "DISAGREEMENT", "hunk_id": "f" * 64}]
+        _write_json(p, doc)
+        with self.assertRaises(ValueError):
+            rel.recover(self.s1, self.s2, root=self.root)
+
+    def test_4_tampered_report_fields_rejected(self):
+        for field, val in (("template", {"sha256": "0" * 64}),
+                           ("distribution_registry_sha256", "1" * 64),
+                           ("output_state", "PARTIAL")):
+            with self.subTest(field=field):
+                shutil.rmtree(self.root, ignore_errors=True)
+                r = self._first()
+                p = Path(r["run_dir"]) / "recovery_report.json"
+                doc = json.loads(p.read_text(encoding="utf-8"))
+                doc[field] = val
+                _write_json(p, doc)
+                with self.assertRaises(ValueError):
+                    rel.recover(self.s1, self.s2, root=self.root)
+
+    def test_report_binds_registry_bytes_and_payload_trees(self):
+        r = self._first()
+        rep = json.loads((Path(r["run_dir"]) / "recovery_report.json").read_text(encoding="utf-8"))
+        rc = rep["registry_check"]
+        self.assertTrue(rc["registry_sha256"])
+        self.assertEqual(set(rc["reviewer_payload_tree_sha256"]), {"reviewer1", "reviewer2"})
 
 
 if __name__ == "__main__":

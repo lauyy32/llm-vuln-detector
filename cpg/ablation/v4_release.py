@@ -74,6 +74,14 @@ def _f(p: Path) -> dict:
     return {"path": _rel(p), "bytes": len(b), "lines": b.count(b"\n"), "sha256": _sha(b)}
 
 
+def _fp(p: Path) -> dict:
+    """**仅指纹**（不含路径）：提交可能来自仓库外，记绝对路径既无意义也有泄露风险。"""
+    d = _f(p)
+    d.pop("path", None)
+    d["filename"] = p.name
+    return d
+
+
 def _tree_sha(files: list) -> str:
     """对 [(name, sha256)] 的确定性序列取 tree SHA。"""
     return _sha("\n".join(f"{n}:{s}" for n, s in sorted(files)).encode("utf-8"))
@@ -247,15 +255,28 @@ def _run_name(sub1: Path, sub2: Path) -> str:
     return f"run-{h[:16]}"
 
 
+REGISTRY_SCHEMA = "v4-distribution-registry/3"
+
+
 def _require_registry_template(template: Path) -> dict:
-    """fail-closed：registry 必须存在、可解析、且含 template 条目并 SHA 一致。"""
+    """fail-closed 全量校验 registry：schema / provenance.clean / 自身 SHA / payload tree SHA。
+
+    返回绑定信息（含 **registry 字节 SHA** 与两位 reviewer 的 **payload tree SHA**），
+    供写入 recovery report —— 仅记路径不足以证明"用的是哪份登记"。
+    """
     reg_path = ANN / "distribution_registry.json"
     if not reg_path.exists():
         raise ValueError("缺 distribution_registry.json（分发版本未登记，拒绝回收）")
+    reg_bytes = reg_path.read_bytes()
     try:
-        reg = json.loads(reg_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as e:
+        reg = json.loads(reg_bytes.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
         raise ValueError(f"distribution_registry.json 不可解析: {e}")
+    if reg.get("schema") != REGISTRY_SCHEMA:
+        raise ValueError(f"registry schema 不符: {reg.get('schema')} != {REGISTRY_SCHEMA}")
+    prov = reg.get("provenance_check") or {}
+    if prov.get("clean") is not True:
+        raise ValueError("registry.provenance_check.clean != true（生成时工作树不干净）")
     want = None
     for f in reg.get("internal_provenance", {}).get("files", []):
         if f["path"].endswith("critical_hunks.template.json"):
@@ -265,8 +286,65 @@ def _require_registry_template(template: Path) -> dict:
     got = _sha(template.read_bytes())
     if want != got:
         raise ValueError(f"template SHA 与分发登记不符（登记 {want[:12]} vs 当前 {got[:12]}）")
+    trees = reg.get("reviewer_payload_tree_sha256") or {}
+    for who in ("reviewer1", "reviewer2"):
+        if not trees.get(who):
+            raise ValueError(f"registry 缺 {who} 的 payload tree SHA")
+    return {"registry": _rel(reg_path), "registry_sha256": _sha(reg_bytes),
+            "template_match": True, "source_commit": reg.get("source_commit"),
+            "schema": REGISTRY_SCHEMA,
+            "reviewer_payload_tree_sha256": {k: trees[k] for k in ("reviewer1", "reviewer2")}}
     return {"registry": _rel(reg_path), "template_match": True,
             "source_commit": reg.get("source_commit")}
+
+
+def _verify_existing_run(final_dir: Path, sub1: Path, sub2: Path,
+                         template: Path, reg_sha: str) -> dict:
+    """校验既有运行目录是否是**同一完整事务**的结果；不满足即 fail-closed。
+
+    必须同时满足：report 存在且 output_state=COMPLETE、两份输入 SHA 一致、
+    template/registry SHA 一致、disagreements.json **存在且 SHA 与 n_items 与记录一致**。
+    （原实现只比对两个输入 SHA，损坏或缺失的 disagreements.json 会被当作成功返回。）
+    """
+    rep_p = final_dir / "recovery_report.json"
+    dis_p = final_dir / "disagreements.json"
+    if not rep_p.exists():
+        raise ValueError(f"既有目录缺 recovery_report.json: {_rel(final_dir)}")
+    old = json.loads(rep_p.read_text(encoding="utf-8"))
+    if old.get("output_state") != "COMPLETE":
+        raise ValueError(f"既有结果 output_state != COMPLETE: {old.get('output_state')}")
+    if old.get("submissions", {}).get("reviewer1", {}).get("sha256") != _fp(sub1)["sha256"]             or old.get("submissions", {}).get("reviewer2", {}).get("sha256") != _fp(sub2)["sha256"]:
+        raise ValueError("既有目录的输入提交与当前不同（拒绝复用）")
+    if old.get("template", {}).get("sha256") != _sha(template.read_bytes()):
+        raise ValueError("既有目录记录的 template SHA 与当前不符")
+    if old.get("distribution_registry_sha256") != reg_sha:
+        raise ValueError("既有目录记录的 registry SHA 与当前不符")
+    if not dis_p.exists():
+        raise ValueError("既有目录缺 disagreements.json（事务不完整，拒绝幂等返回）")
+    if _sha(dis_p.read_bytes()) != old.get("disagreements_sha256"):
+        raise ValueError("既有 disagreements.json 已被篡改（SHA 不符）")
+    try:
+        n = len(json.loads(dis_p.read_text(encoding="utf-8")).get("items", []))
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        raise ValueError(f"既有 disagreements.json 不可解析: {e}")
+    if n != old.get("disagreements_n_items"):
+        raise ValueError("既有 disagreements.json 的 n_items 与记录不符")
+    return old
+
+
+def _acquire_publish_lease(final_dir: Path) -> bool:
+    """原子发布租约（O_EXCL）：跨平台明确语义，避免两进程竞争 rename。
+
+    返回 True 表示本进程获得发布权；False 表示已有发布者（应转为幂等验证）。
+    """
+    lease = final_dir.parent / (final_dir.name + ".lease")
+    try:
+        fd = os.open(str(lease), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        os.write(fd, f"{os.getpid()} {uuid.uuid4().hex}".encode("utf-8"))
+        os.close(fd)
+        return True
+    except FileExistsError:
+        return False
 
 
 def recover(sub1: Path, sub2: Path, template: Path | None = None,
@@ -279,13 +357,6 @@ def recover(sub1: Path, sub2: Path, template: Path | None = None,
     - 目标目录已存在：内容一致 → **幂等返回**；不一致 → fail-closed；**绝不删除既有结果**。
     """
     template = template or (OUT / "critical_hunks.template.json")
-
-    def _fp(p: Path) -> dict:
-        """**仅指纹**（不含路径）：提交可能来自仓库外，记录绝对路径既无意义也有泄露风险。"""
-        d = _f(p)
-        d.pop("path", None)
-        d["filename"] = p.name
-        return d
 
     # 1) 内存校验
     v1 = va.validate_submission(sub1, template)
@@ -300,20 +371,13 @@ def recover(sub1: Path, sub2: Path, template: Path | None = None,
 
     root = root or RECOVERY_ROOT
     final_dir = root / _run_name(sub1, sub2)
-    # 3) 幂等 / 冲突（不删除既有成功结果）
+    reg_sha = reg_check["registry_sha256"]
+    # 3) 幂等 / 冲突：**必须重新计算并验证完整性**（不只看两个输入 SHA）
     if final_dir.exists():
-        prev = final_dir / "recovery_report.json"
-        if prev.exists():
-            old = json.loads(prev.read_text(encoding="utf-8"))
-            same = (old.get("submissions", {}).get("reviewer1", {}).get("sha256")
-                    == _fp(sub1)["sha256"]
-                    and old.get("submissions", {}).get("reviewer2", {}).get("sha256")
-                    == _fp(sub2)["sha256"])
-            if same:
-                old["run_dir"] = _rel(final_dir)
-                old["idempotent_replay"] = True
-                return old
-        raise ValueError(f"目标运行目录已存在且内容不匹配，拒绝覆盖: {_rel(final_dir)}")
+        old = _verify_existing_run(final_dir, sub1, sub2, template, reg_sha)
+        old["run_dir"] = _rel(final_dir)
+        old["idempotent_replay"] = True
+        return old
 
     tmp_dir = root / f".tmp-{_run_name(sub1, sub2)}-{os.getpid()}-{uuid.uuid4().hex[:8]}"
     try:
@@ -339,6 +403,11 @@ def recover(sub1: Path, sub2: Path, template: Path | None = None,
                 "artifact": {k: v for k, v in _f(tmp_dir / "disagreements.json").items()
                              if k != "path"},
             },
+            # 完整性锚点（幂等复验时逐项重算比对）
+            "output_state": "COMPLETE",
+            "distribution_registry_sha256": reg_check["registry_sha256"],
+            "disagreements_sha256": _sha((tmp_dir / "disagreements.json").read_bytes()),
+            "disagreements_n_items": dis["n_items"],
             "prefilled_final_fields": sum(
                 1 for i in dis["items"]
                 if any(i.get(f) is not None for f in va.FINAL_FIELDS)),
