@@ -20,9 +20,9 @@
     "reviewer": "reviewer1 | reviewer2"
   },
   "provenance": {
-    "generator_git_commit": "372a9319720fe72c962f3e3110605c87ecf47db3",
+    "generator_git_commit": "b1bf5649a76d5ef4156da4af79375ce32b5060a5",
     "selector_impl_sha256": "b2ee35d45e19884adb4303c8cd415f3023f3baf0df63d039a1edb94eccdd51e8",
-    "annotation_generator_impl_sha256": "4ed09a7d8458cded6c4a6e8afdd4b172212a26f25e393d2531dbd192a88092ad",
+    "annotation_generator_impl_sha256": "f19505a4a9da6c451a0d9786adfad7a043d3c37259e47bfc014501cc88fcbc49",
     "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
     "canonical_manifest_sha256": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996",
     "real_patches_tree_sha256": "d546e38973f326ea9751e6335f43300fb2704d353423aea42ae86dca5b646fff"

@@ -17,7 +17,7 @@
   "empty_code_groups": [],
   "group_errors": [],
   "provenance": {
-    "generator_git_commit": "372a9319720fe72c962f3e3110605c87ecf47db3",
+    "generator_git_commit": "b1bf5649a76d5ef4156da4af79375ce32b5060a5",
     "renderer_impl_sha256": "fca2e4e63315633a6a1734297b962a9d0ef395224882675e8f64cbdb5e981efd",
     "tokenizer_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
     "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
