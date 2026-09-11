@@ -91,6 +91,7 @@ def verify_lock_chain(run_dir: Path | None = None) -> dict:
     if state.get("state") != "VERIFIED":
         errs.append(f"state.state != VERIFIED: {state.get('state')}")
 
+    # lock_request.json 是文本 → LF 归一化（hash_mode=lf-normalized-text）
     lr_sha = _sha_lf((d / "lock_request.json").read_bytes())
     for label, v in (("review", review.get("lock_request_sha256")),
                      ("state", state.get("lock_request_sha256"))):
@@ -112,14 +113,18 @@ def verify_lock_chain(run_dir: Path | None = None) -> dict:
             errs.append(f"files.{name} 不存在: {base}:{rel}")
             continue
         raw = p.read_bytes()
-        got_lf = _sha_lf(raw)
-        ok = got_lf == spec.get("sha256")
+        # CRLF 说明：锁件声明为文本（JSON/JSONL）才允许 LF 归一化；
+        # 二进制/其它文件必须 raw-bytes（P1：不得无条件归一化）。
+        is_text = p.suffix.lower() in (".json", ".jsonl", ".txt", ".md")
+        got = _sha_lf(raw) if is_text else _sha(raw)
+        ok = got == spec.get("sha256")
         if not ok:
             errs.append(f"files.{name} SHA 不符（登记 {str(spec.get('sha256'))[:12]} "
-                        f"vs 归一实算 {got_lf[:12]}）")
+                        f"vs 实算 {got[:12]}）")
         file_checks.append({"name": name, "base": base, "ok": ok,
                             "sha256": spec.get("sha256"),
-                            "normalized_lf": True,
+                            "hash_mode": "lf-normalized-text" if is_text else "raw-bytes",
+                            "normalized_lf": is_text,
                             "crlf_present": b"\r\n" in raw})
 
     if errs:
@@ -161,27 +166,58 @@ def contingency_3x3(pairs: dict) -> dict:
 
 
 def classify_pairs(pairs: dict) -> dict:
-    """主结果 + same-verdict + abstain-assisted 分解。"""
-    n = strict = same = abstain_assisted = 0
+    """主结果 + same-verdict + **abstain 三类分解**（P0-2 修复）。
+
+    `abstain-assisted` 的**冻结定义**是"另一侧作出**正确方向**判断、这一侧弃权"：
+
+      * `vulnerable → abstain`（vuln 侧认出漏洞、fixed 侧弃权）计入；
+      * `abstain → benign`（vuln 侧弃权、fixed 侧认出已修复）计入；
+      * `abstain ↔ abstain`（**两侧都弃权**）**不计入**——它没有任何方向判断。
+
+    旧实现用 `"abstain" in (a, b)` 把三类合并成 13，**改变了既定指标语义**；现拆为：
+    `any_abstain_pairs` / `double_abstain_pairs` / `directionally_abstain_assisted`。
+    """
+    n = strict = same = 0
     strict_ids = []
+    any_ab = dbl_ab = dir_ab = 0
+    v2a = a2b = 0
     for sid, v in pairs.items():
         a, b = v.get("vuln"), v.get("fixed")
         if a is None or b is None:
             continue
         n += 1
         if "abstain" in (a, b):
-            abstain_assisted += 1
+            any_ab += 1
+        if a == "abstain" and b == "abstain":
+            dbl_ab += 1
+        if a == "vulnerable" and b == "abstain":
+            v2a += 1
+            dir_ab += 1
+        if a == "abstain" and b == "benign":
+            a2b += 1
+            dir_ab += 1
         if a == b:
             same += 1
         if a == "vulnerable" and b == "benign":
             strict += 1
             strict_ids.append(sid)
-    return {"n_pairs": n, "strict_success": strict, "strict_ids": sorted(strict_ids),
-            "rate": round(strict / n, 6) if n else None,
-            "same_verdict": same,
-            "same_verdict_rate": round(same / n, 6) if n else None,
-            "abstain_assisted": abstain_assisted,
-            "abstain_assisted_rate": round(abstain_assisted / n, 6) if n else None}
+    return {
+        "n_pairs": n, "strict_success": strict, "strict_ids": sorted(strict_ids),
+        "rate": round(strict / n, 6) if n else None,
+        "same_verdict": same,
+        "same_verdict_rate": round(same / n, 6) if n else None,
+        # 三类 abstain 指标（互斥可加：any = double + directional）
+        "any_abstain_pairs": any_ab,
+        "double_abstain_pairs": dbl_ab,
+        "directionally_abstain_assisted": dir_ab,
+        "abstain_assisted_breakdown": {
+            "vulnerable_then_abstain": v2a,
+            "abstain_then_benign": a2b,
+        },
+        "abstain_assisted_definition": (
+            "方向性弃权协助 = 另一侧作出正确方向判断、这一侧弃权；"
+            "双侧弃权不计入"),
+    }
 
 
 def reconcile_with_summary(main: dict, summary: dict) -> list:
@@ -225,9 +261,41 @@ def cpg_stratification(results: list, pairs: dict) -> dict:
 # ---------------------------------------------------------------------------
 # 4) 报告
 # ---------------------------------------------------------------------------
+def marginal_summary(tbl: dict) -> dict:
+    """由 3×3 表算**边际分布**与对角线率（P0-1 修复）。
+
+    旧版把**单元格** `(vuln=benign, fixed=vulnerable)=0` 误读成"fixed 侧判 vulnerable 为 0"，
+    实际 fixed 列合计为 15。边际与对角线才是正确证据。
+    """
+    row = {a: sum(tbl[a].values()) for a in VERDICT_ORDER}
+    col = {b: sum(tbl[a][b] for a in VERDICT_ORDER) for b in VERDICT_ORDER}
+    total = sum(row.values())
+    diag = sum(tbl[k][k] for k in VERDICT_ORDER)
+    return {
+        "row_marginal_by_vuln_verdict": row,
+        "col_marginal_by_fixed_verdict": col,
+        "n_total": total,
+        "vuln_side_vulnerable": row["vulnerable"],
+        "fixed_side_vulnerable": col["vulnerable"],
+        "diagonal_pairs": diag,
+        "diagonal_rate": round(diag / total, 6) if total else None,
+        "interpretation": (
+            f"两侧 vulnerable 判定分别为 {row['vulnerable']} 与 {col['vulnerable']}，"
+            f"边际差异小；{diag}/{total} 位于对角线 → 主要表现为配对内同判，"
+            "支持'对版本变化不敏感'的解释"),
+    }
+
+
 def build_report(publish: bool = False) -> dict:
     run_dir = RUN_DIR
     chain = verify_lock_chain(run_dir)
+    # P0-3：必须**复用 production verify-results**（不另写弱验证）；
+    # 否则篡改 verdict 但保持 strict_success 不变时，仍能生成另一张列联表。
+    from cpg.ablation.run_experiment import verify_results_core
+    verr = verify_results_core(run_dir)
+    if verr:
+        raise ValueError(f"production verify-results 未通过（fail-closed）: {verr[:3]}")
+
     proto = _read_json(run_dir / "protocol.json")
     summary = _read_json(run_dir / "summary.json")
     results = _read_jsonl(run_dir / "results.jsonl")
@@ -277,6 +345,8 @@ def build_report(publish: bool = False) -> dict:
         "main_result": main,
         "exact_ci95": [lo, hi],
         "contingency_vuln_x_fixed": contingency_3x3(pairs),
+        "contingency_marginals": marginal_summary(contingency_3x3(pairs)),
+        "production_verify_results": {"passed": True, "checker": "run_experiment.verify_results_core"},
         "summary_reconciled": True,
         "summary_source": summary,
         "cpg_stratification": cpg_stratification(results, pairs),
@@ -345,7 +415,10 @@ def write_publishable_ledger(out_dir: Path | None = None) -> dict:
         "ledger_fields": list(LEDGER_FIELDS),
         "expected_main_result": {k: main[k] for k in
                                  ("n_pairs", "strict_success", "rate", "strict_ids",
-                                  "same_verdict", "abstain_assisted")},
+                                  "same_verdict", "any_abstain_pairs",
+                                  "double_abstain_pairs",
+                                  "directionally_abstain_assisted",
+                                  "abstain_assisted_breakdown")},
         "summary_source": summary,
         "lock_chain": {
             "git_commit": chain["git_commit"], "reviewer": chain["reviewer"],
@@ -376,22 +449,76 @@ def reproduce_from_ledger(ledger_path: Path | None = None) -> dict:
 
 
 def verify_ledger_reproduces() -> dict:
-    """账本复算结果必须与 manifest.expected_main_result 一致（fail-closed）。"""
+    """账本**完整性与复算**双重验证（fail-closed）。
+
+    P1 修复：旧版只复算数字，没有验证账本自身。现逐项校验：
+      1. 账本实际 SHA == `manifest.ledger.sha256`；
+      2. `manifest.schema` 正确；
+      3. 行数 == manifest 记录值；
+      4. 每个样本恰有 vuln/fixed 各一条（82 个样本）；
+      5. verdict 均在合法枚举内；
+      6. 关键 SHA 字段为 64 位 hex 且同一样本两侧一致（system/model）；
+      7. 复算出的主结果 == `manifest.expected_main_result`。
+    """
     mf = OUT / "rq1r_canonical_manifest.json"
     if not mf.exists():
         raise FileNotFoundError("缺 manifest（请先 write_publishable_ledger）")
     doc = json.loads(mf.read_text(encoding="utf-8"))
-    got = reproduce_from_ledger(OUT / doc["ledger"]["name"])
-    want = doc["expected_main_result"]
-    errs = [f"{k}: 账本 {got.get(k)} != 期望 {want[k]}"
-            for k in ("n_pairs", "strict_success", "strict_ids",
-                      "same_verdict", "abstain_assisted")
-            if got.get(k) != want[k]]
+    errs = []
+    if doc.get("schema") != MANIFEST_SCHEMA:
+        errs.append(f"manifest.schema 不符: {doc.get('schema')}")
+    lp = OUT / doc["ledger"]["name"]
+    if not lp.exists():
+        errs.append("账本文件不存在")
+    else:
+        raw = lp.read_bytes()
+        actual = _sha(raw)
+        if actual != doc["ledger"]["sha256"]:
+            errs.append(f"账本 SHA 不符（manifest {doc['ledger']['sha256'][:12]} vs 实际 {actual[:12]}）")
+        rows = [json.loads(l) for l in raw.decode("utf-8").splitlines() if l.strip()]
+        if len(rows) != doc["ledger"]["lines"]:
+            errs.append(f"账本行数 {len(rows)} != manifest {doc['ledger']['lines']}")
+        per = {}
+        sys_shas, model_shas = set(), set()
+        for r in rows:
+            if r.get("verdict") not in ("vulnerable", "benign", "abstain"):
+                errs.append(f"非法 verdict: {r.get('verdict')!r}")
+                break
+            for f in ("raw_response_sha256", "prompt_sha256", "system_sha256"):
+                v = r.get(f)
+                if v and not (isinstance(v, str) and len(v) == 64
+                              and all(c in "0123456789abcdef" for c in v)):
+                    errs.append(f"{f} 非 64 位 hex: {str(v)[:16]}")
+                    break
+            if r.get("system_sha256"):
+                sys_shas.add(r["system_sha256"])
+            if r.get("model_digest"):
+                model_shas.add(r["model_digest"])
+            per.setdefault(r.get("sample_id"), set()).add(r.get("side"))
+        bad = [s for s, sides in per.items() if sides != {"vuln", "fixed"}]
+        if bad:
+            errs.append(f"{len(bad)} 个样本缺 vuln/fixed 之一（示例 {bad[:3]}）")
+        if len(sys_shas) > 1:
+            errs.append(f"system_sha256 不唯一（{len(sys_shas)} 个值）")
+        if len(model_shas) > 1:
+            errs.append(f"model_digest 不唯一（{len(model_shas)} 个值）")
     if errs:
-        raise ValueError("账本复算失败（fail-closed）: " + "; ".join(errs))
-    return {"ok": True, "reproduced": {k: got[k] for k in
-                                       ("n_pairs", "strict_success", "rate",
-                                        "strict_ids")}}
+        raise ValueError("账本验证失败（fail-closed）: " + "; ".join(errs[:5]))
+
+    got = reproduce_from_ledger(lp)
+    want = doc["expected_main_result"]
+    cerrs = [f"{k}: 账本 {got.get(k)} != 期望 {want[k]}"
+             for k in ("n_pairs", "strict_success", "strict_ids",
+                       "same_verdict", "double_abstain_pairs",
+                       "directionally_abstain_assisted")
+             if k in want and got.get(k) != want[k]]
+    if cerrs:
+        raise ValueError("账本复算失败（fail-closed）: " + "; ".join(cerrs))
+    return {"ok": True, "ledger_sha256_verified": True,
+            "reproduced": {k: got[k] for k in
+                           ("n_pairs", "strict_success", "rate", "strict_ids",
+                            "same_verdict", "any_abstain_pairs",
+                            "double_abstain_pairs", "directionally_abstain_assisted")}}
 
 
 def write_reports() -> dict:

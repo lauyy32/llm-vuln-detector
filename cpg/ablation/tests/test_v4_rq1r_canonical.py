@@ -109,11 +109,30 @@ class TestMainResult(unittest.TestCase):
         tbl = rc.contingency_3x3(self.pairs)
         self.assertEqual(tbl["vulnerable"]["benign"], self.main["strict_success"])
 
-    def test_same_and_abstain_accounting(self):
-        self.assertEqual(self.main["same_verdict"] + 0, 76)
-        self.assertEqual(self.main["abstain_assisted"], 13)
-        for k in ("same_verdict_rate", "abstain_assisted_rate"):
-            self.assertTrue(0.0 <= self.main[k] <= 1.0)
+    def test_abstain_decomposition_frozen_semantics(self):
+        """P0-2：必须拆成 any / double / directional 三类，且 any == double + directional。"""
+        m = self.main
+        self.assertEqual(m["same_verdict"], 76)
+        self.assertEqual(m["any_abstain_pairs"], 13)
+        self.assertEqual(m["double_abstain_pairs"], 8)
+        self.assertEqual(m["directionally_abstain_assisted"], 5)   # 1 + 4
+        self.assertEqual(m["abstain_assisted_breakdown"],
+                         {"vulnerable_then_abstain": 1, "abstain_then_benign": 4})
+        self.assertEqual(m["any_abstain_pairs"],
+                         m["double_abstain_pairs"] + m["directionally_abstain_assisted"])
+        self.assertNotIn("abstain_assisted", m)   # 旧字段不得再存在
+        for k in ("same_verdict_rate",):
+            self.assertTrue(0.0 <= m[k] <= 1.0)
+
+    def test_marginals_correct(self):
+        """P0-1：边际必须正确（vuln 侧 17 / fixed 侧 15 / 对角线 76）。"""
+        doc = rc.build_report(publish=False)
+        mg = doc["contingency_marginals"]
+        self.assertEqual(mg["vuln_side_vulnerable"], 17)
+        self.assertEqual(mg["fixed_side_vulnerable"], 15)
+        self.assertEqual(mg["diagonal_pairs"], 76)
+        self.assertEqual(mg["n_total"], 82)
+        self.assertIn("边际差异小", mg["interpretation"])
 
     def test_pairs_have_both_sides(self):
         bad = [sid for sid, v in self.pairs.items() if set(v) != {"vuln", "fixed"}]

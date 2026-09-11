@@ -35,6 +35,7 @@
         "base": "repo",
         "ok": true,
         "sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": false
       },
@@ -43,6 +44,7 @@
         "base": "run",
         "ok": true,
         "sha256": "3a663e981adb02b35a5f7f698032c3cd3c658c32361a9ae182103aafbd5ac553",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": true
       },
@@ -51,6 +53,7 @@
         "base": "run",
         "ok": true,
         "sha256": "b475ccdb3ec8eb6551937a64bc8641759914906ee1dc8256f836af3e6b681e6a",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": true
       },
@@ -59,6 +62,7 @@
         "base": "run",
         "ok": true,
         "sha256": "0e0de5f3ebf986e5ec54f079303515e218071ad6acc5abd1898c5952ab6ef6cf",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": true
       },
@@ -67,6 +71,7 @@
         "base": "run",
         "ok": true,
         "sha256": "ce4abf4bf7dda7ae3aa7c2467ed2aed0e95a77da001673174f10bdce53b2c226",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": true
       }
@@ -127,8 +132,14 @@
     "rate": 0.012195,
     "same_verdict": 76,
     "same_verdict_rate": 0.926829,
-    "abstain_assisted": 13,
-    "abstain_assisted_rate": 0.158537
+    "any_abstain_pairs": 13,
+    "double_abstain_pairs": 8,
+    "directionally_abstain_assisted": 5,
+    "abstain_assisted_breakdown": {
+      "vulnerable_then_abstain": 1,
+      "abstain_then_benign": 4
+    },
+    "abstain_assisted_definition": "方向性弃权协助 = 另一侧作出正确方向判断、这一侧弃权；双侧弃权不计入"
   },
   "exact_ci95": [
     0.000309,
@@ -150,6 +161,28 @@
       "benign": 4,
       "abstain": 8
     }
+  },
+  "contingency_marginals": {
+    "row_marginal_by_vuln_verdict": {
+      "vulnerable": 17,
+      "benign": 53,
+      "abstain": 12
+    },
+    "col_marginal_by_fixed_verdict": {
+      "vulnerable": 15,
+      "benign": 58,
+      "abstain": 9
+    },
+    "n_total": 82,
+    "vuln_side_vulnerable": 17,
+    "fixed_side_vulnerable": 15,
+    "diagonal_pairs": 76,
+    "diagonal_rate": 0.926829,
+    "interpretation": "两侧 vulnerable 判定分别为 17 与 15，边际差异小；76/82 位于对角线 → 主要表现为配对内同判，支持'对版本变化不敏感'的解释"
+  },
+  "production_verify_results": {
+    "passed": true,
+    "checker": "run_experiment.verify_results_core"
   },
   "summary_reconciled": true,
   "summary_source": {

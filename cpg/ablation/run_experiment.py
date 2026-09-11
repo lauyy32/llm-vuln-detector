@@ -710,7 +710,11 @@ def _run_invoke_loop(run_dir: Path, client, schedule: list, pmap: dict) -> int:
 
 
 def verify_results(args) -> int:
-    """严格验证结果完整性（fail-closed）。COMPLETE → VERIFIED。"""
+    """严格验证结果完整性（fail-closed）。COMPLETE → VERIFIED。
+
+    验证主体在 ``verify_results_core()``（纯函数），**与报告生成共用同一实现**，
+    避免出现第三套弱验证逻辑。
+    """
     run_dir = args.run_dir
     if _read_state(run_dir) != "COMPLETE":
         return _reject(f"verify-results 要求 COMPLETE，当前 {_read_state(run_dir)}")
@@ -721,6 +725,21 @@ def verify_results(args) -> int:
     integ_errs = _verify_inputs_integrity(run_dir)
     if integ_errs:
         return _fail(run_dir, f"verify-results 输入完整性复核失败: {integ_errs[:3]}")
+    errors = verify_results_core(run_dir)
+    if errors:
+        return _fail(run_dir, f"verify-results {len(errors)} 错误: {errors[:5]}")
+    n = sum(1 for l in (run_dir / "results.jsonl").read_text(encoding="utf-8").splitlines()
+            if l.strip())
+    _write_state(run_dir, "VERIFIED", {"n_results": n})
+    print(f"[verify-results] PASS {n} 项结果完整")
+    return 0
+
+
+def verify_results_core(run_dir: Path) -> list:
+    """**验证主体**（纯函数，不改状态）：返回错误列表（空 = PASS）。
+
+    由 CLI `verify-results` 与后续报告生成**共同调用**，避免出现第三套弱验证逻辑。
+    """
     schedule = json.loads((run_dir / "run_schedule.json").read_text(encoding="utf-8"))
     prot = json.loads((run_dir / "protocol.json").read_text(encoding="utf-8"))
     pmap = {}
@@ -846,10 +865,15 @@ def verify_results(args) -> int:
         extra = got - expected
         errors.append(f"结果集合不符: 缺 {len(missing)} 项 {sorted(missing)[:3]}，"
                       f"多 {len(extra)} 项 {sorted(extra)[:3]}")
+    return errors
+
+
+    errors = verify_results_core(run_dir)
     if errors:
         return _fail(run_dir, f"verify-results {len(errors)} 错误: {errors[:5]}")
-    _write_state(run_dir, "VERIFIED", {"n_results": len(results)})
-    print(f"[verify-results] PASS {len(results)} 项结果完整")
+    n = sum(1 for l in (run_dir / "results.jsonl").read_text(encoding="utf-8").splitlines() if l.strip())
+    _write_state(run_dir, "VERIFIED", {"n_results": n})
+    print(f"[verify-results] PASS {n} 项结果完整")
     return 0
 
 

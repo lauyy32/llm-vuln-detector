@@ -29,7 +29,13 @@
       "CVE-2026-67435"
     ],
     "same_verdict": 76,
-    "abstain_assisted": 13
+    "any_abstain_pairs": 13,
+    "double_abstain_pairs": 8,
+    "directionally_abstain_assisted": 5,
+    "abstain_assisted_breakdown": {
+      "vulnerable_then_abstain": 1,
+      "abstain_then_benign": 4
+    }
   },
   "summary_source": {
     "n_pairs": 82,
@@ -46,6 +52,7 @@
         "base": "repo",
         "ok": true,
         "sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": false
       },
@@ -54,6 +61,7 @@
         "base": "run",
         "ok": true,
         "sha256": "3a663e981adb02b35a5f7f698032c3cd3c658c32361a9ae182103aafbd5ac553",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": true
       },
@@ -62,6 +70,7 @@
         "base": "run",
         "ok": true,
         "sha256": "b475ccdb3ec8eb6551937a64bc8641759914906ee1dc8256f836af3e6b681e6a",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": true
       },
@@ -70,6 +79,7 @@
         "base": "run",
         "ok": true,
         "sha256": "0e0de5f3ebf986e5ec54f079303515e218071ad6acc5abd1898c5952ab6ef6cf",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": true
       },
@@ -78,6 +88,7 @@
         "base": "run",
         "ok": true,
         "sha256": "ce4abf4bf7dda7ae3aa7c2467ed2aed0e95a77da001673174f10bdce53b2c226",
+        "hash_mode": "lf-normalized-text",
         "normalized_lf": true,
         "crlf_present": true
       }

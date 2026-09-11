@@ -26,11 +26,63 @@ from pathlib import Path
 SCAFFOLD_ONLY = True
 SCAFFOLD_TAG = "SCAFFOLD_ONLY"
 
-VALID_VERDICTS = {"vulnerable", "benign", "abstain", "RENDER_FAILURE"}
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def _sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
+
+
+def _rel(p) -> str:
+    """安全相对路径：不在 ROOT 下（如测试用临时目录）时回退绝对路径。"""
+    p = Path(p)
+    try:
+        return p.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return p.resolve().as_posix()
+
+
+def _fp(p: Path) -> dict:
+    """**仅指纹**（不含路径）。"""
+    b = p.read_bytes()
+    return {"name": p.name, "bytes": len(b), "lines": b.count(b"\n"), "sha256": _sha(b)}
+
+
+# 模型判定枚举（**干净判定**；RENDER_FAILURE 是运行错误，不在此列）
+VALID_VERDICTS = {"vulnerable", "benign", "abstain"}
+# 运行错误状态（与模型判定分离，不得混入结果枚举）
+RUN_ERROR_STATES = {"RENDER_FAILURE", "INVOKE_ERROR"}
+
+# verdict 解析规则（**顺序敏感**，P0-4 修复）：
+#   旧实现让 `\bvulnerable\b` 命中 `not vulnerable` 内部，同时 benign 正则也命中，
+#   于是 `not vulnerable` 被解析成"歧义→abstain"，与函数宣称的行为不符。
+#   现改为：**先否定模式**，且 vulnerable 模式用负向断言排除前置 `not`。
+_VERDICT_PATTERNS = (
+    ("benign", re.compile(r"\bnot\s+vulnerable\b|\bnon-?vulnerable\b|\bbenign\b", re.I)),
+    ("vulnerable", re.compile(r"(?<!not\s)(?<!not\s{2})\bvulnerable\b", re.I)),
+)
+
+
+def parse_verdict(raw_response_text: str) -> str:
+    """从**原始响应**解析 verdict（禁止只看派生字段）。
+
+    `not vulnerable` / `non-vulnerable` → `benign`（优先匹配否定式）；
+    仅 `vulnerable` → `vulnerable`；两者皆无 → `abstain`。
+    仍同时命中两种（真正的歧义，如两个分句各说一端）才返回 `abstain`。
+    """
+    t = raw_response_text or ""
+    neg = bool(re.search(r"\bnot\s+vulnerable\b|\bnon-?vulnerable\b", t, re.I))
+    hit_b = bool(re.search(r"\bbenign\b", t, re.I)) or neg
+    # 去掉否定式后再找裸 vulnerable，避免把 `not vulnerable` 里的词算成肯定
+    stripped = re.sub(r"\bnot\s+vulnerable\b|\bnon-?vulnerable\b", " ", t, flags=re.I)
+    hit_v = bool(re.search(r"\bvulnerable\b", stripped, re.I))
+    if hit_v and hit_b:
+        return "abstain"          # 真歧义（肯定与否定并存）
+    if hit_v:
+        return "vulnerable"
+    if hit_b:
+        return "benign"
+    return "abstain"
 
 
 # ===========================================================================
@@ -189,7 +241,7 @@ def load_done_ids(results_path: Path) -> dict:
             errs.append(f"line {i}: {e.msg}（中间损坏行，拒绝静默跳过）")
             continue
         if rec.get("sample_id") and rec.get("arm"):
-            done.add((rec["sample_id"], rec["arm"]))
+            done.add(_result_key(rec))          # 含 repeat（P0-4.2）
     if errs:
         raise ValueError("结果文件存在损坏行: " + "; ".join(errs[:3]))
     return {"done": done, "truncated_tail": truncated_tail}
@@ -333,30 +385,6 @@ RESULT_REQUIRED = ("sample_id", "arm", "model", "verdict", "raw_response_text",
                    "raw_response_sha256", "envelope_sha256")
 
 # verdict 解析规则（与既有 RQ1-R 口径一致：只在显式出现时判定，否则 abstain）
-_VERDICT_PATTERNS = (
-    ("vulnerable", re.compile(r"\bvulnerable\b", re.I)),
-    ("benign", re.compile(r"\bbenign\b|\bnot\s+vulnerable\b", re.I)),
-)
-
-
-def parse_verdict(raw_response_text: str) -> str:
-    """从**原始响应**解析 verdict（禁止只看派生字段）。
-
-    规则：显式 `vulnerable` 优先；显式 `benign`/`not vulnerable` 次之；两者皆无 → `abstain`。
-    出现歧义（同时含两者）时返回 `abstain` 并标注，交由人工复核。
-    """
-    t = raw_response_text or ""
-    hit_v = bool(_VERDICT_PATTERNS[0][1].search(t))
-    hit_b = bool(_VERDICT_PATTERNS[1][1].search(t))
-    if hit_v and hit_b:
-        return "abstain"          # 歧义 → 不擅自判定
-    if hit_v:
-        return "vulnerable"
-    if hit_b:
-        return "benign"
-    return "abstain"
-
-
 def verify_result(rec: dict) -> list:
     """单条结果校验（**真 fail-closed**，P0-3 修复）。
 
@@ -395,8 +423,17 @@ def verify_result(rec: dict) -> list:
     return errs
 
 
+def _result_key(rec: dict) -> tuple:
+    """结果唯一键：`(sample_id, arm, repeat)`（P0-4.2）。
+
+    旧实现只取 `(sample_id, arm)` → `repeats > 1` 时**合法重复运行会被判为重复结果**。
+    与调度器 `plan_runs()` 生成的三元组保持一致。
+    """
+    return (rec.get("sample_id"), rec.get("arm"), rec.get("repeat"))
+
+
 def verify_results_file(results_path: Path, expected_pairs: set | None = None) -> dict:
-    """整份结果文件校验：逐条 + 覆盖率 + 重复。"""
+    """整份结果文件校验：逐条 + 覆盖率 + 重复（键含 `repeat`）。"""
     errs, seen, dup, n = [], set(), [], 0
     if not results_path.exists():
         return {"ok": False, "errors": ["结果文件不存在"], "n": 0}
@@ -411,16 +448,18 @@ def verify_results_file(results_path: Path, expected_pairs: set | None = None) -
         n += 1
         for e in verify_result(rec):
             errs.append(f"line {i}: {e}")
-        key = (rec.get("sample_id"), rec.get("arm"))
+        key = _result_key(rec)
         if key in seen:
             dup.append(key)
         seen.add(key)
     if dup:
         errs.append(f"重复条目 {len(dup)} 条")
-    missing = sorted((expected_pairs or set()) - seen)
+    # expected_pairs 也按三元组比较（含 repeat）
+    exp = set(expected_pairs) if expected_pairs else None
+    missing = sorted(exp - seen) if exp else []
     if missing:
         errs.append(f"缺 {len(missing)} 条期望结果（示例 {missing[:3]}）")
-    extra = sorted(seen - (expected_pairs or seen))
+    extra = sorted(seen - exp) if exp else []
     if extra:
         errs.append(f"多 {len(extra)} 条非期望结果")
     return {"ok": not errs, "errors": errs[:20], "n": n}

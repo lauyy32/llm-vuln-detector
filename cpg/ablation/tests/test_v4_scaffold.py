@@ -104,7 +104,7 @@ class TestScheduler(unittest.TestCase):
                 + '{"sample_id": "B", "arm": "part',          # 末尾半行（可容忍）
                 encoding="utf-8")
             r = sc.load_done_ids(p)
-            self.assertEqual(r["done"], {("A", "real"), ("C", "partial")})
+            self.assertEqual(r["done"], {("A", "real", None), ("C", "partial", None)})
             self.assertTrue(r["truncated_tail"])
 
     def test_resume_rejects_middle_corruption(self):
@@ -126,7 +126,7 @@ class TestScheduler(unittest.TestCase):
             p.write_text(json.dumps({"sample_id": "A", "arm": "real"}) + "\n",
                          encoding="utf-8")
             r = sc.load_done_ids(p)
-            self.assertEqual(r["done"], {("A", "real")})
+            self.assertEqual(r["done"], {("A", "real", None)})
             self.assertFalse(r["truncated_tail"])
 
     def test_append_result_is_atomic_and_appendable(self):
@@ -216,7 +216,9 @@ class TestVerifier(unittest.TestCase):
     def test_parse_verdict_rules(self):
         self.assertEqual(sc.parse_verdict("this is vulnerable"), "vulnerable")
         self.assertEqual(sc.parse_verdict("this is benign"), "benign")
-        self.assertEqual(sc.parse_verdict("not vulnerable"), "abstain")   # 歧义 → abstain
+        self.assertEqual(sc.parse_verdict("not vulnerable"), "benign")    # P0-4 修复
+        self.assertEqual(sc.parse_verdict("non-vulnerable"), "benign")
+        self.assertEqual(sc.parse_verdict("vulnerable and not vulnerable"), "abstain")  # 真歧义
         self.assertEqual(sc.parse_verdict("no idea"), "abstain")
 
     def test_missing_field(self):
@@ -244,7 +246,7 @@ class TestVerifier(unittest.TestCase):
             p = Path(td) / "r.jsonl"
             p.write_text("\n".join(json.dumps(_rec(sample_id="A", arm=a))
                                    for a in ("real", "real")) + "\n", encoding="utf-8")
-            r = sc.verify_results_file(p, expected_pairs={("A", "real"), ("A", "partial")})
+            r = sc.verify_results_file(p, expected_pairs={("A", "real", None), ("A", "partial", None)})
             self.assertFalse(r["ok"])
             self.assertTrue(any("重复" in e for e in r["errors"]))
             self.assertTrue(any("缺" in e for e in r["errors"]))
@@ -254,7 +256,7 @@ class TestVerifier(unittest.TestCase):
             p = Path(td) / "r.jsonl"
             p.write_text("\n".join(json.dumps(_rec(sample_id="A", arm=a))
                                    for a in ("real", "partial")) + "\n", encoding="utf-8")
-            r = sc.verify_results_file(p, expected_pairs={("A", "real"), ("A", "partial")})
+            r = sc.verify_results_file(p, expected_pairs={("A", "real", None), ("A", "partial", None)})
             self.assertTrue(r["ok"], r["errors"])
 
 
