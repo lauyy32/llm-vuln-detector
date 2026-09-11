@@ -9,7 +9,7 @@
     "stale_policy": "基于旧 manifest 生成的 V4 派生工件（gate_a_report / real|placebo|shuffled_manifest / v4_canonical_manifest / v4_upstream_real_report / v4_feasibility_table / patches/**）已由本次从 v2 的重新生成**完全替换**，无残留旧工件"
   },
   "generated_from": {
-    "git_commit": "ff3a4740b4bc6375f9db40777e397f3001088b5e",
+    "git_commit": "8bc7c51c4767883c147d169371773af7022dfaf9",
     "n_candidates": 15,
     "n_confirmation": 14
   },

@@ -634,27 +634,58 @@ V4_ARTIFACTS = [
 
 
 def build_stale_artifacts(out_dir: Path) -> dict:
-    """P1 闭环：旧工件（git 历史 SHA）→ 新工件（当前 SHA）的机器可审计 superseded 映射。"""
+    """P1 闭环：旧工件（git 历史 SHA）→ 新工件的**机器可审计**状态映射。
+
+    分类（codex 要求，替代笼统的"完全替换"）：
+      REGENERATED_CHANGED   已重生成且字节改变
+      REGENERATED_IDENTICAL 已重生成但字节相同（内容本就不含漂移字段）
+      MISSING               历史无此文件
+      UNVERIFIED            当前缺失，无法核对
+    并对 patches/** 生成逐文件清单 + 确定性 tree SHA。
+    """
+    def _status(old: bytes, cur: Path) -> tuple:
+        if not old:
+            return "MISSING", None
+        if not cur.exists():
+            return "UNVERIFIED", None
+        cs = _sha256_bytes(cur.read_bytes())
+        return ("REGENERATED_IDENTICAL" if _sha256_bytes(old) == cs
+                else "REGENERATED_CHANGED"), cs
+
     entries = []
     for rel in V4_ARTIFACTS:
         gitrel = f"cpg/ablation/artifacts/v4/{rel}"
         old = subprocess.run(["git", "show", f"{SUPERSEDED_AT_COMMIT}:{gitrel}"],
                              cwd=str(ROOT), capture_output=True).stdout
-        cur = out_dir / rel
+        status, cur_sha = _status(old, out_dir / rel)
         entries.append({
             "artifact": gitrel,
             "superseded_sha256": _sha256_bytes(old) if old else None,
-            "superseded_at_commit": SUPERSEDED_AT_COMMIT,
-            "current_sha256": _sha256_bytes(cur.read_bytes()) if cur.exists() else None,
-            "replaced": bool(old) and cur.exists()
-                        and _sha256_bytes(old) != _sha256_bytes(cur.read_bytes()),
+            "current_sha256": cur_sha,
+            "compared_at_commit": SUPERSEDED_AT_COMMIT,
+            "status": status,
         })
-    doc = {"schema": "stale-artifacts/1",
-           "superseded_at_commit": SUPERSEDED_AT_COMMIT,
+    patch_files, parts = [], []
+    pdir = out_dir / PATCHES_REL
+    if pdir.is_dir():
+        for p in sorted(pdir.rglob("*.diff")):
+            b = p.read_bytes()
+            rel = p.relative_to(out_dir).as_posix()
+            patch_files.append({"path": rel, "sha256": _sha256_bytes(b), "bytes": len(b)})
+            parts.append(f"{rel}:{_sha256_bytes(b)}")
+    counts = {}
+    for e in entries:
+        counts[e["status"]] = counts.get(e["status"], 0) + 1
+    doc = {"schema": "stale-artifacts/2",
+           "compared_at_commit": SUPERSEDED_AT_COMMIT,
            "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
-           "note": "旧 V4 派生工件（基于陈旧 manifest）已被从 canonical v2 的重新生成替换；"
-                   "下表逐项给出旧/新 SHA，供机器核对无残留",
-           "entries": entries}
+           "note": ("逐项给出旧/新 SHA 与**机器判定的状态**（不再笼统声明'完全替换'）；"
+                    "patches/** 另附逐文件清单与确定性 tree SHA"),
+           "status_counts": counts,
+           "entries": entries,
+           "patches": {"n_files": len(patch_files),
+                       "tree_sha256": _sha256_bytes("\n".join(parts).encode("utf-8")),
+                       "files": patch_files}}
     write_text_lf(out_dir / "stale_artifacts.json",
                   json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
     return doc
@@ -855,8 +886,9 @@ def main() -> int:
     if args.step in ("gate", "all"):
         stale = build_stale_artifacts(args.out_dir)
         rep = build_gate_a_report(args.out_dir)
-        n_rep = sum(1 for e in stale["entries"] if e["replaced"])
-        print(f"[Stale] stale_artifacts.json: {n_rep}/{len(stale['entries'])} 项已替换")
+        print(f"[Stale] stale_artifacts.json: {stale['status_counts']} | "
+              f"patches {stale['patches']['n_files']} 文件 "
+              f"tree={stale['patches']['tree_sha256'][:12]}")
         print(f"[GateA-4] gate_a_pass={rep['gate_a_pass']} | blockers={rep['blockers']}")
         for arm in ("placebo", "shuffled"):
             oob = rep["token_gate"]["per_arm"][arm]["out_of_bounds"]

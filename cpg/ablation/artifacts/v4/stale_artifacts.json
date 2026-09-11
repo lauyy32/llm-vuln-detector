@@ -1,64 +1,300 @@
 {
-  "schema": "stale-artifacts/1",
-  "superseded_at_commit": "9f29b8b",
+  "schema": "stale-artifacts/2",
+  "compared_at_commit": "9f29b8b",
   "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH",
-  "note": "旧 V4 派生工件（基于陈旧 manifest）已被从 canonical v2 的重新生成替换；下表逐项给出旧/新 SHA，供机器核对无残留",
+  "note": "逐项给出旧/新 SHA 与**机器判定的状态**（不再笼统声明'完全替换'）；patches/** 另附逐文件清单与确定性 tree SHA",
+  "status_counts": {
+    "REGENERATED_CHANGED": 3,
+    "REGENERATED_IDENTICAL": 4,
+    "MISSING": 1
+  },
   "entries": [
     {
       "artifact": "cpg/ablation/artifacts/v4/v4_canonical_manifest.json",
       "superseded_sha256": "c6af68bbe62e718e2a9974f314578f3340fe9548e2b1bc67d655a7606e7f2417",
-      "superseded_at_commit": "9f29b8b",
       "current_sha256": "5538b7899d4d80d9b7a7be56545627ca78d4887033dcc65562673d92006ca824",
-      "replaced": true
+      "compared_at_commit": "9f29b8b",
+      "status": "REGENERATED_CHANGED"
     },
     {
       "artifact": "cpg/ablation/artifacts/v4/v4_upstream_real_report.json",
       "superseded_sha256": "63cbf3d429e6c6a501f641d6513aa830a7d8d5065856aa0cd55750563da8c27f",
-      "superseded_at_commit": "9f29b8b",
-      "current_sha256": "531e5243645db6902625f0b8c34b7e42516204f5db095c896b5feac89d13bc24",
-      "replaced": true
+      "current_sha256": "96558cfac0ec325c68f7fe4caff0bd912bd5609d3a36c3dc9cd32f95ef67213f",
+      "compared_at_commit": "9f29b8b",
+      "status": "REGENERATED_CHANGED"
     },
     {
       "artifact": "cpg/ablation/artifacts/v4/real_manifest.jsonl",
       "superseded_sha256": "1c6007f4e696a155b6232a5613ec14b8022f8a699d5f49926611753c545b802d",
-      "superseded_at_commit": "9f29b8b",
       "current_sha256": "1c6007f4e696a155b6232a5613ec14b8022f8a699d5f49926611753c545b802d",
-      "replaced": false
+      "compared_at_commit": "9f29b8b",
+      "status": "REGENERATED_IDENTICAL"
     },
     {
       "artifact": "cpg/ablation/artifacts/v4/placebo_manifest.jsonl",
       "superseded_sha256": "f1d8971d9b7c196e650772eca7290fbddfcfe35df81a9e3a224d245fe39e5b8b",
-      "superseded_at_commit": "9f29b8b",
       "current_sha256": "f1d8971d9b7c196e650772eca7290fbddfcfe35df81a9e3a224d245fe39e5b8b",
-      "replaced": false
+      "compared_at_commit": "9f29b8b",
+      "status": "REGENERATED_IDENTICAL"
     },
     {
       "artifact": "cpg/ablation/artifacts/v4/shuffled_manifest.jsonl",
       "superseded_sha256": "84639852d174390fc69ec04eb5c4e6f6457064bba268f5bc60331bbb6b394aff",
-      "superseded_at_commit": "9f29b8b",
       "current_sha256": "84639852d174390fc69ec04eb5c4e6f6457064bba268f5bc60331bbb6b394aff",
-      "replaced": false
+      "compared_at_commit": "9f29b8b",
+      "status": "REGENERATED_IDENTICAL"
     },
     {
       "artifact": "cpg/ablation/artifacts/v4/gate_a_report.json",
       "superseded_sha256": "115f54a050fd743556239402288fb2e46ba5e055557030c15c9900547914a0ff",
-      "superseded_at_commit": "9f29b8b",
-      "current_sha256": "5670830ad5ed1898e7bd2295ecca062864cb11b908e893bc2424a1058349bbad",
-      "replaced": true
+      "current_sha256": "9452c3d946b6cf8e6a879e755f85e3d5d293b928e2a6f456159c484d1c3939ae",
+      "compared_at_commit": "9f29b8b",
+      "status": "REGENERATED_CHANGED"
     },
     {
       "artifact": "cpg/ablation/artifacts/v4/v4_feasibility_table.json",
       "superseded_sha256": "9bb5fea8e4e9b825a1107159df61775626113869db31ce2924dbb58b22de1f3b",
-      "superseded_at_commit": "9f29b8b",
       "current_sha256": "9bb5fea8e4e9b825a1107159df61775626113869db31ce2924dbb58b22de1f3b",
-      "replaced": false
+      "compared_at_commit": "9f29b8b",
+      "status": "REGENERATED_IDENTICAL"
     },
     {
       "artifact": "cpg/ablation/artifacts/v4/manifest_registry.json",
       "superseded_sha256": null,
-      "superseded_at_commit": "9f29b8b",
-      "current_sha256": "a21c2572678b38cd9b535e462e0e79703db46e9339fda236e3027b6195f6c940",
-      "replaced": false
+      "current_sha256": null,
+      "compared_at_commit": "9f29b8b",
+      "status": "MISSING"
     }
-  ]
+  ],
+  "patches": {
+    "n_files": 45,
+    "tree_sha256": "19f444e76c6f96ec0667af17c648d2d9580b7007b0301549bb67c58bf45c45ba",
+    "files": [
+      {
+        "path": "patches/placebo/CVE-2026-12482.diff",
+        "sha256": "31000070ef94f63478a59a689355e86ce52d907daed59efa452ba70e35dd6138",
+        "bytes": 1184
+      },
+      {
+        "path": "patches/placebo/CVE-2026-45019.diff",
+        "sha256": "c232adaf85d4da1b686cc3b4e6e8871083a0b03d65243d18984ebc849cad6e20",
+        "bytes": 1249
+      },
+      {
+        "path": "patches/placebo/CVE-2026-50181.diff",
+        "sha256": "fb57a155b5346fe8f9919e45faf3caf92c7a13c695371599abba4ef3914792db",
+        "bytes": 1128
+      },
+      {
+        "path": "patches/placebo/CVE-2026-50558.diff",
+        "sha256": "9486f624cd74c77f961a58c60793a0fd59e88e33e2a9b82e61d9c1b5b5436e87",
+        "bytes": 394
+      },
+      {
+        "path": "patches/placebo/CVE-2026-53502.diff",
+        "sha256": "00fcf448046c1ea79be04af6f37149bc3872fcfd963c821a7042536334be0fb3",
+        "bytes": 938
+      },
+      {
+        "path": "patches/placebo/CVE-2026-53598.diff",
+        "sha256": "1c641778522125946a380b762da806ec269ffad5df43bfb201062418e5b64c06",
+        "bytes": 859
+      },
+      {
+        "path": "patches/placebo/CVE-2026-54574.diff",
+        "sha256": "cf89ca445864baef3c823da55f3952d5c48caa880232ed60089e2ada143b0fb2",
+        "bytes": 1014
+      },
+      {
+        "path": "patches/placebo/CVE-2026-54706.diff",
+        "sha256": "400a164d72884b8fee2ecc807c1c91cb4f7c479e14da069ed97f6c470358a7b8",
+        "bytes": 1212
+      },
+      {
+        "path": "patches/placebo/CVE-2026-54707.diff",
+        "sha256": "78d88bf408bba605b77054572b1e7ad6409a871434953b6aa2233142d147975f",
+        "bytes": 993
+      },
+      {
+        "path": "patches/placebo/CVE-2026-54785.diff",
+        "sha256": "a2f6f06de61393ec0ac8ac7f0113d9ff79b75598992e0b5a7a2b9451f1a4a3b5",
+        "bytes": 1297
+      },
+      {
+        "path": "patches/placebo/CVE-2026-59890.diff",
+        "sha256": "653606726ee1ecb8ec3a8b705e5553c51511dfefa21015abbdafda28b68d9ad0",
+        "bytes": 1041
+      },
+      {
+        "path": "patches/placebo/CVE-2026-67424.diff",
+        "sha256": "b66f0c26c6c31ac3b6ed5c2f8707d0f4db59502ccb03289a6365d2594eacdb33",
+        "bytes": 1275
+      },
+      {
+        "path": "patches/placebo/CVE-2026-67425.diff",
+        "sha256": "f05b11f5312e94c91969a964db621b286b28da235cb5e1e8e4a5655de1fd522e",
+        "bytes": 1151
+      },
+      {
+        "path": "patches/placebo/CVE-2026-70491.diff",
+        "sha256": "56e39a72469354c0733af0a639786f7817994bfba9c75bdb116ad3e1abf985d8",
+        "bytes": 527
+      },
+      {
+        "path": "patches/placebo/CVE-2026-73498.diff",
+        "sha256": "e299a729730e0398734182241d784d52cff67c8f01117eadeb13ca86ac1fe9df",
+        "bytes": 1115
+      },
+      {
+        "path": "patches/real/CVE-2026-12482.diff",
+        "sha256": "528a2ab6f91fea378fb90a9d4aed5f0dc2c78affac7db9283622103aba8129b7",
+        "bytes": 1580
+      },
+      {
+        "path": "patches/real/CVE-2026-45019.diff",
+        "sha256": "ec9a79e8172e7dde9d5cd1b510d602f65f5c5a85f40f0b65ebb007bf21eecc31",
+        "bytes": 181707
+      },
+      {
+        "path": "patches/real/CVE-2026-50181.diff",
+        "sha256": "29e6c3754b37307519468c27dd1d488f9a7934f5d3725f86511bff7a4eeddaf8",
+        "bytes": 7275
+      },
+      {
+        "path": "patches/real/CVE-2026-50558.diff",
+        "sha256": "b50cfd422acff293a0c674900774d516e643a61fc4f72da1c8473c71e0c1c55a",
+        "bytes": 3021
+      },
+      {
+        "path": "patches/real/CVE-2026-53502.diff",
+        "sha256": "127de2b2af29852c1e87c5f4f3a4aefb693988c624b315aee62a12c5e52af8bc",
+        "bytes": 4811
+      },
+      {
+        "path": "patches/real/CVE-2026-53598.diff",
+        "sha256": "183abad58cd5131e03efbed26588dc373533f219880845be07c12eb5c6fb3fff",
+        "bytes": 9558
+      },
+      {
+        "path": "patches/real/CVE-2026-54574.diff",
+        "sha256": "999f3e8b83dc2b1e0be967bd64de6025b30fae5fb5173c9f114937b621887965",
+        "bytes": 14457
+      },
+      {
+        "path": "patches/real/CVE-2026-54706.diff",
+        "sha256": "69af8305b8eb68379d667fb576eeabf1766c02e2634c9b1ea3ab139f9f25e838",
+        "bytes": 22330
+      },
+      {
+        "path": "patches/real/CVE-2026-54707.diff",
+        "sha256": "7509d75b3bf98aaaee531282cb45ccb03879049483e5d1f228f5e7b4dcbc284b",
+        "bytes": 9381
+      },
+      {
+        "path": "patches/real/CVE-2026-54785.diff",
+        "sha256": "5c3d2e3abb1eaa39992dfbd6058d4e5d33f6797f71a95024fdc3cec7013abcfb",
+        "bytes": 7137
+      },
+      {
+        "path": "patches/real/CVE-2026-59890.diff",
+        "sha256": "544f27f32d82a098bf8d1e055f41d1d336c87cc6de6a44f43357fd1a176bc9b3",
+        "bytes": 5833
+      },
+      {
+        "path": "patches/real/CVE-2026-67424.diff",
+        "sha256": "31e16606420198f023326899b891e4c295db4ea9589ec939c4a0065a1a8200c1",
+        "bytes": 31547
+      },
+      {
+        "path": "patches/real/CVE-2026-67425.diff",
+        "sha256": "0a2efce09266bbfb90bd51347d5b78e44be22c4327539284e34c85f93fbaece6",
+        "bytes": 32105
+      },
+      {
+        "path": "patches/real/CVE-2026-70491.diff",
+        "sha256": "3a08fdf8b2dff4a79c3b99bb234985aa1a2d6a6830a458bbc3555e7f7aca6f6c",
+        "bytes": 1782
+      },
+      {
+        "path": "patches/real/CVE-2026-73498.diff",
+        "sha256": "2d3eba6f4c89c470ee4bd41fd44dfcadb64c967fcfdb1b1b905c7a8db31235ca",
+        "bytes": 123332
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-12482.diff",
+        "sha256": "3a08fdf8b2dff4a79c3b99bb234985aa1a2d6a6830a458bbc3555e7f7aca6f6c",
+        "bytes": 1782
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-45019.diff",
+        "sha256": "528a2ab6f91fea378fb90a9d4aed5f0dc2c78affac7db9283622103aba8129b7",
+        "bytes": 1580
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-50181.diff",
+        "sha256": "999f3e8b83dc2b1e0be967bd64de6025b30fae5fb5173c9f114937b621887965",
+        "bytes": 14457
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-50558.diff",
+        "sha256": "31e16606420198f023326899b891e4c295db4ea9589ec939c4a0065a1a8200c1",
+        "bytes": 31547
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-53502.diff",
+        "sha256": "2d3eba6f4c89c470ee4bd41fd44dfcadb64c967fcfdb1b1b905c7a8db31235ca",
+        "bytes": 123332
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-53598.diff",
+        "sha256": "0a2efce09266bbfb90bd51347d5b78e44be22c4327539284e34c85f93fbaece6",
+        "bytes": 32105
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-54574.diff",
+        "sha256": "ec9a79e8172e7dde9d5cd1b510d602f65f5c5a85f40f0b65ebb007bf21eecc31",
+        "bytes": 181707
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-54706.diff",
+        "sha256": "544f27f32d82a098bf8d1e055f41d1d336c87cc6de6a44f43357fd1a176bc9b3",
+        "bytes": 5833
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-54707.diff",
+        "sha256": "5c3d2e3abb1eaa39992dfbd6058d4e5d33f6797f71a95024fdc3cec7013abcfb",
+        "bytes": 7137
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-54785.diff",
+        "sha256": "29e6c3754b37307519468c27dd1d488f9a7934f5d3725f86511bff7a4eeddaf8",
+        "bytes": 7275
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-59890.diff",
+        "sha256": "7509d75b3bf98aaaee531282cb45ccb03879049483e5d1f228f5e7b4dcbc284b",
+        "bytes": 9381
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-67424.diff",
+        "sha256": "127de2b2af29852c1e87c5f4f3a4aefb693988c624b315aee62a12c5e52af8bc",
+        "bytes": 4811
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-67425.diff",
+        "sha256": "69af8305b8eb68379d667fb576eeabf1766c02e2634c9b1ea3ab139f9f25e838",
+        "bytes": 22330
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-70491.diff",
+        "sha256": "b50cfd422acff293a0c674900774d516e643a61fc4f72da1c8473c71e0c1c55a",
+        "bytes": 3021
+      },
+      {
+        "path": "patches/shuffled/CVE-2026-73498.diff",
+        "sha256": "183abad58cd5131e03efbed26588dc373533f219880845be07c12eb5c6fb3fff",
+        "bytes": 9558
+      }
+    ]
+  }
 }
