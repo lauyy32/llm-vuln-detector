@@ -1,0 +1,176 @@
+{
+  "schema": "v4-rq1r-canonical-report-public/1",
+  "artifact_kind": "canonical_rq1r_main_result",
+  "protocol": {
+    "strict_rule": "判别 = vuln 显式 vulnerable 且 fixed 显式 benign；abstain 不计任何一侧",
+    "model": "qwen2.5-coder:7b",
+    "model_digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+    "representation": "legacy-rq1-r1-cpg-canonical",
+    "representation_sha256": "d8834882088b0e15817ce0b410604994fbaa3c4d1a2d867494e802af5c21c202",
+    "temperature": 0,
+    "top_p": 1.0,
+    "seed": 20260908,
+    "num_ctx": 32768,
+    "num_predict": 1024,
+    "ollama_version": "0.33.3",
+    "prompt_renderer_sha256": "60c99711948b9bfed15c6dfd755542d03a3eda2467c89103e6638348d5f9d86a",
+    "system_sha256": "9be9dce7d54d5d2686b28cd86765af49020d5e6e03c3b7954412b8a31a7c22c6",
+    "canonical_cpg_rows_sha256": "16deed5b38afc264508e19093adc1329eab118fb348c5b77f59393afaeacae46",
+    "cpg_eval_sha256": "db0498fe445bdf69717b02b0ebc828ed274ab14d9f2c1bb4f9e4dade01614f21",
+    "query_set_sha256": "a6a0fb37b387ce5b8c4d98441ed2d1f730d87452c64c7078c9038d7fde3a5b36",
+    "staged_manifest_sha256": "c2a3c6f32bca20c7cf352bef4b2080e90f347c24ee41fd4e20334aca047c7eec",
+    "git_commit": "ec948e00bae4bd3fd9fb49540ac28dad6dff9589"
+  },
+  "lock_chain": {
+    "ok": true,
+    "run_dir": "cpg/ablation/.work/rq1-r-canonical-v4",
+    "git_commit": "ec948e00bae4bd3fd9fb49540ac28dad6dff9589",
+    "locked_at": "2026-09-10T04:24:25.226079+00:00",
+    "reviewer": "Codex-independent-review-2026-09-10",
+    "approved_at": "2026-09-10T04:38:22.077464+00:00",
+    "lock_request_sha256": "90bd35c0e41d10fa3201746482cd2811e03a16985d2fdbe35c79d02a68300586",
+    "file_checks": [
+      {
+        "name": "canonical_manifest",
+        "base": "repo",
+        "ok": true,
+        "sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
+        "normalized_lf": true,
+        "crlf_present": false
+      },
+      {
+        "name": "protocol",
+        "base": "run",
+        "ok": true,
+        "sha256": "3a663e981adb02b35a5f7f698032c3cd3c658c32361a9ae182103aafbd5ac553",
+        "normalized_lf": true,
+        "crlf_present": true
+      },
+      {
+        "name": "prompt_manifest",
+        "base": "run",
+        "ok": true,
+        "sha256": "b475ccdb3ec8eb6551937a64bc8641759914906ee1dc8256f836af3e6b681e6a",
+        "normalized_lf": true,
+        "crlf_present": true
+      },
+      {
+        "name": "run_schedule",
+        "base": "run",
+        "ok": true,
+        "sha256": "0e0de5f3ebf986e5ec54f079303515e218071ad6acc5abd1898c5952ab6ef6cf",
+        "normalized_lf": true,
+        "crlf_present": true
+      },
+      {
+        "name": "cpg_bundle",
+        "base": "run",
+        "ok": true,
+        "sha256": "ce4abf4bf7dda7ae3aa7c2467ed2aed0e95a77da001673174f10bdce53b2c226",
+        "normalized_lf": true,
+        "crlf_present": true
+      }
+    ],
+    "n_prompts": 164,
+    "n_results": 164
+  },
+  "sources": {
+    "protocol.json": {
+      "name": "protocol.json",
+      "bytes": 1165,
+      "lines": 21,
+      "sha256": "6421193668d80c9ade6c93d8aae31e8e6015ff26342b66ef0d67a23cba9a6271"
+    },
+    "lock_request.json": {
+      "name": "lock_request.json",
+      "bytes": 1069,
+      "lines": 32,
+      "sha256": "1bc6473adfb5cda29e6a35a35c0cdd35b789307f335458a1c2b158447fed5a22"
+    },
+    "review_approval.json": {
+      "name": "review_approval.json",
+      "bytes": 304,
+      "lines": 7,
+      "sha256": "83df10f55b253e852e43726de447a076b8e7a69416904335a6991e7b5eb80135"
+    },
+    "summary.json": {
+      "name": "summary.json",
+      "bytes": 64,
+      "lines": 4,
+      "sha256": "56de4fdfb278e56543880cf8c43f5cdef1b8933f59c0a44827a327f3fdb334e7"
+    },
+    "state.json": {
+      "name": "state.json",
+      "bytes": 217,
+      "lines": 6,
+      "sha256": "4967b91f8a6d911409f7fc18a8fc08fb8b1d6385831fa6bdd9715cee6dc95f66"
+    },
+    "results.jsonl": {
+      "name": "results.jsonl",
+      "bytes": 5371433,
+      "lines": 164,
+      "sha256": "fb2aac5a2977a85134c4105d988f0b88de34d9179ae2cf754dd95536671fe043"
+    },
+    "run_schedule.json": {
+      "name": "run_schedule.json",
+      "bytes": 14351,
+      "lines": 821,
+      "sha256": "5c30d2df5479fd4e0b61f26373e3b840770fc39de4609c8b34b545a508c64746"
+    }
+  },
+  "main_result": {
+    "n_pairs": 82,
+    "strict_success": 1,
+    "strict_ids": [
+      "CVE-2026-67435"
+    ],
+    "rate": 0.012195,
+    "same_verdict": 76,
+    "same_verdict_rate": 0.926829,
+    "abstain_assisted": 13,
+    "abstain_assisted_rate": 0.158537
+  },
+  "exact_ci95": [
+    0.000309,
+    0.066083
+  ],
+  "contingency_vuln_x_fixed": {
+    "vulnerable": {
+      "vulnerable": 15,
+      "benign": 1,
+      "abstain": 1
+    },
+    "benign": {
+      "vulnerable": 0,
+      "benign": 53,
+      "abstain": 0
+    },
+    "abstain": {
+      "vulnerable": 0,
+      "benign": 4,
+      "abstain": 8
+    }
+  },
+  "summary_reconciled": true,
+  "summary_source": {
+    "n_pairs": 82,
+    "strict_success": 1,
+    "rate": 0.0122
+  },
+  "cpg_stratification": {
+    "available_dimensions": [
+      "canonical_cpg_rows_sha256",
+      "cpg_eval_sha256",
+      "cpg_cache_key"
+    ],
+    "n_with_rows_sha": 164,
+    "n_with_eval_sha": 164,
+    "n_unique_rows_sha": 1,
+    "line_count_stratification": "NOT_AVAILABLE_IN_RESULTS",
+    "note": "results.jsonl 未记录 CPG 行数，仅记录指纹 → **行数分层不可得**；如需按 CPG 覆盖分层，必须在运行协议中新增该字段后重跑，**不得**用其它字段替代推断。"
+  },
+  "n_results": 164,
+  "n_schedule": 164,
+  "note": "这是 RQ1-R 的**canonical 正式主结果**（消费并验证 v4 运行锁链）。历史口径的工具族补充分析见 rq1r_historical_supplement.json，两者**样本口径不同（1/82 vs 2/82），不得混用或互相替代**。",
+  "anonymized": true
+}
