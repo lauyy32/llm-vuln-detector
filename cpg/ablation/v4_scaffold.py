@@ -168,6 +168,92 @@ def append_result(results_path: Path, rec: dict) -> None:
     tmp.replace(results_path)
 
 
+LOCK_REQUEST_SCHEMA = "v4-run-lock-request/1"
+LOCK_REQUEST_REQUIRED = ("schema", "model", "tokenizer_sha256", "envelope_sha256",
+                         "run_plan_sha256", "arm_artifact_sha256", "requested_by",
+                         "signatures")
+
+
+def validate_lock_request(req: dict) -> list:
+    """**已冻结的正式字段集**校验（fail-closed）。"""
+    errs = []
+    if not isinstance(req, dict):
+        return ["lock request 非 dict"]
+    for k in LOCK_REQUEST_REQUIRED:
+        if k not in req:
+            errs.append(f"缺字段 {k}")
+    if req.get("schema") != LOCK_REQUEST_SCHEMA:
+        errs.append(f"schema 不符: {req.get('schema')}")
+    for k in ("tokenizer_sha256", "envelope_sha256", "run_plan_sha256"):
+        v = req.get(k)
+        if not (isinstance(v, str) and len(v) == 64
+                and all(c in "0123456789abcdef" for c in v)):
+            errs.append(f"{k} 非 64 位 hex")
+    arms = req.get("arm_artifact_sha256")
+    if not isinstance(arms, dict) or not arms:
+        errs.append("arm_artifact_sha256 必须为非空映射")
+    else:
+        for a, v in arms.items():
+            if not (isinstance(v, str) and len(v) == 64
+                    and all(c in "0123456789abcdef" for c in v)):
+                errs.append(f"arm_artifact_sha256[{a}] 非 64 位 hex")
+    if req.get("signatures") != []:
+        errs.append("请求模板的 signatures 必须为空（签名由 reviewer 另出）")
+    for forbidden in ("reviewer_id", "signature", "signed_at", "approver"):
+        if forbidden in req:
+            errs.append(f"请求模板不得含签名者字段 {forbidden}")
+    return errs
+
+
+def build_lock_request(arm_artifact_shas: dict, envelope_sha: str,
+                       gate_a_pass: bool, run_plan_sha: str,
+                       tokenizer_sha: str, model: str) -> dict:
+    """生成"请 reviewer 签锁"的**请求**（不是签名结果）。
+
+    fail-closed：`gate_a_pass` 为 False 时**不得**生成可签请求；
+    生成的请求必须通过 `validate_lock_request()`。
+    """
+    if not gate_a_pass:
+        raise ValueError("Gate A 未通过，禁止生成 RUN_LOCK 请求")
+    req = {SCAFFOLD_TAG: SCAFFOLD_ONLY, "schema": LOCK_REQUEST_SCHEMA,
+           "model": model, "tokenizer_sha256": tokenizer_sha,
+           "envelope_sha256": envelope_sha, "run_plan_sha256": run_plan_sha,
+           "arm_artifact_sha256": dict(sorted(arm_artifact_shas.items())),
+           "requested_by": "SCAFFOLD", "signatures": [],
+           "note": "本文件仅为请求模板；签名必须由 reviewer 在正式流程中出具"}
+    errs = validate_lock_request(req)
+    if errs:
+        raise ValueError("lock request 字段冻结校验失败: " + "; ".join(errs))
+    return req
+
+
+# ===========================================================================
+# 3b) 调度计划持久化（含内容 SHA，供 resume 对账）
+# ===========================================================================
+def write_plan(path: Path, plan: dict) -> dict:
+    """把计划落盘并返回其指纹（原子写：临时文件后 replace）。"""
+    body = json.dumps(plan, ensure_ascii=False, indent=2) + "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_bytes(body.encode("utf-8"))
+    tmp.replace(path)
+    return {"path": path.name, "bytes": len(body.encode("utf-8")),
+            "sha256": _sha(body.encode("utf-8"))}
+
+
+def load_plan(path: Path, expect_sha: str | None = None) -> dict:
+    """读取计划；给出 `expect_sha` 时校验指纹（fail-closed）。"""
+    if not path.exists():
+        raise FileNotFoundError(f"计划不存在: {path}")
+    raw = path.read_bytes()
+    got = _sha(raw)
+    if expect_sha is not None and got != expect_sha:
+        raise ValueError(f"计划指纹不符（{got[:12]} != {expect_sha[:12]}）")
+    doc = json.loads(raw.decode("utf-8"))
+    doc["_sha256"] = got
+    return doc
+
+
 # ===========================================================================
 # 4) 结果 verifier（verdict 必须绑定原始响应）
 # ===========================================================================
@@ -225,75 +311,56 @@ def verify_results_file(results_path: Path, expected_pairs: set | None = None) -
 
 
 # ===========================================================================
-# 5) RUN_LOCK **请求**模板（无签名、不含 reviewer 身份）
+# 5) （RUN_LOCK 请求模板已上移至 3b 之前，见 `build_lock_request`）
 # ===========================================================================
-def build_lock_request(arm_artifact_shas: dict, envelope_sha: str,
-                       gate_a_pass: bool, run_plan_sha: str,
-                       tokenizer_sha: str, model: str) -> dict:
-    """生成"请 reviewer 签锁"的**请求**（不是签名结果）。
-
-    fail-closed：`gate_a_pass` 为 False 时**不得**生成可签请求。
-    """
-    if not gate_a_pass:
-        raise ValueError("Gate A 未通过，禁止生成 RUN_LOCK 请求")
-    return {SCAFFOLD_TAG: SCAFFOLD_ONLY, "schema": "v4-run-lock-request/1",
-            "model": model, "tokenizer_sha256": tokenizer_sha,
-            "envelope_sha256": envelope_sha, "run_plan_sha256": run_plan_sha,
-            "arm_artifact_sha256": dict(sorted(arm_artifact_shas.items())),
-            "requested_by": "SCAFFOLD", "signatures": [],
-            "note": "本文件仅为请求模板；签名必须由 reviewer 在正式流程中出具"}
 
 
 # ===========================================================================
 # 6) 统计（纯 Python；口径见预注册 §五）
 # ===========================================================================
-def _betainc_reg(a: float, b: float, x: float) -> float:
-    """正则化不完全 Beta（连分数展开），用于 Clopper–Pearson。"""
-    if x <= 0:
-        return 0.0
-    if x >= 1:
-        return 1.0
-    lbeta = math.lgamma(a) + math.lgamma(b) - math.lgamma(a + b)
-    front = math.exp(math.log(x) * a + math.log(1 - x) * b - lbeta) / a
-    # 连分数（Lentz）
-    f, c, d = 1.0, 1.0, 0.0
-    for i in range(0, 300):
-        m = i // 2
-        if i == 0:
-            num = 1.0
-        elif i % 2 == 0:
-            num = (m * (b - m) * x) / ((a + 2 * m - 1) * (a + 2 * m))
-        else:
-            num = -((a + m) * (a + b + m) * x) / ((a + 2 * m) * (a + 2 * m + 1))
-        d = 1.0 + num * d
-        d = 1e-30 if abs(d) < 1e-30 else d
-        c = 1.0 + num / c
-        c = 1e-30 if abs(c) < 1e-30 else c
-        d = 1.0 / d
-        delta = c * d
-        f *= delta
-        if abs(1 - delta) < 1e-12:
-            break
-    return front * (f - 1)
+def _binom_cdf_le(x: int, n: int, p: float) -> float:
+    """P(X <= x)（二项）—— 与 strict_recompute.py 的 ble 同口径。"""
+    return sum(math.comb(n, k) * p ** k * (1 - p) ** (n - k) for k in range(0, x + 1))
 
 
-def _beta_quantile(p: float, a: float, b: float) -> float:
-    lo, hi = 0.0, 1.0
-    for _ in range(200):
-        mid = (lo + hi) / 2
-        if _betainc_reg(a, b, mid) < p:
-            lo = mid
-        else:
-            hi = mid
-    return (lo + hi) / 2
+def _binom_sf_ge(x: int, n: int, p: float) -> float:
+    """P(X >= x)（二项）—— 与 strict_recompute.py 的 bge 同口径。"""
+    return sum(math.comb(n, k) * p ** k * (1 - p) ** (n - k) for k in range(x, n + 1))
 
 
 def clopper_pearson(k: int, n: int, alpha: float = 0.05) -> tuple:
-    """exact 95% CI（Clopper–Pearson）。k=成功数, n=配对总数。"""
+    """exact Clopper–Pearson CI（**全项目唯一实现**）。
+
+    直接对**二项尾概率**做二分（与 `strict_recompute.py` 同口径），
+    避免 Beta 连分数在 `a≫b` 时不收敛（该缺陷曾实际发生）。
+    注意两个尾概率的单调性相反，故二分方向不同。
+    """
     if n <= 0:
         return (0.0, 1.0)
-    lo = 0.0 if k == 0 else _beta_quantile(alpha / 2, k, n - k + 1)
-    hi = 1.0 if k == n else _beta_quantile(1 - alpha / 2, k + 1, n - k)
+    if k == 0:
+        lo = 0.0
+    else:
+        # 下界：P(X >= k) 关于 p **递增**
+        a, b = 0.0, 1.0
+        for _ in range(200):
+            mid = (a + b) / 2
+            if _binom_sf_ge(k, n, mid) > alpha / 2:
+                b = mid
+            else:
+                a = mid
+        lo = (a + b) / 2
+    if k == n:
+        hi = 1.0
+    else:
+        # 上界：P(X <= k) 关于 p **递减**
+        a, b = 0.0, 1.0
+        for _ in range(200):
+            mid = (a + b) / 2
+            if _binom_cdf_le(k, n, mid) > alpha / 2:
+                a = mid
+            else:
+                b = mid
+        hi = (a + b) / 2
     return (round(lo, 6), round(hi, 6))
 
 

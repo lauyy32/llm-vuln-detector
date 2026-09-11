@@ -177,7 +177,7 @@ class TestLockRequest(unittest.TestCase):
 
     def test_request_has_no_signature(self):
         req = sc.build_lock_request({"real": "a" * 64}, "e" * 64, gate_a_pass=True,
-                                    run_plan_sha="p" * 64, tokenizer_sha="t" * 64, model="m")
+                                    run_plan_sha="d" * 64, tokenizer_sha="f" * 64, model="m")
         # 请求模板必须**无签名**且**不含签名者身份字段**
         self.assertEqual(req["signatures"], [])
         self.assertIs(req[sc.SCAFFOLD_TAG], True)
@@ -283,6 +283,86 @@ class TestScaffoldBoundaries(unittest.TestCase):
         self.assertIs(sc.plan_runs(["real"], ["A"], "m")[sc.SCAFFOLD_TAG], True)
         self.assertIs(sc.pairwise_sufficiency_discrimination({}, {})[sc.SCAFFOLD_TAG], True)
         self.assertIs(sc.build_envelope("m", "p")[sc.SCAFFOLD_TAG], True)
+
+
+class TestLockRequestSchemaFrozen(unittest.TestCase):
+    """A-4 剩余：RUN_LOCK 正式字段集冻结。"""
+
+    def _req(self, **kw):
+        # 注意：必须是**合法 64 位 hex**（'t'/'p' 等超范围字符会被 fail-closed 拒绝）
+        base = dict(arm_artifact_shas={"real": "a" * 64, "partial": "b" * 64},
+                    envelope_sha="e" * 64, gate_a_pass=True,
+                    run_plan_sha="d" * 64, tokenizer_sha="f" * 64, model="m")
+        base.update(kw)
+        return sc.build_lock_request(**base)
+
+    def test_valid_passes_validation(self):
+        self.assertEqual(sc.validate_lock_request(self._req()), [])
+
+    def test_missing_required_field(self):
+        req = self._req()
+        req.pop("envelope_sha256")
+        self.assertTrue(any("envelope_sha256" in e for e in sc.validate_lock_request(req)))
+
+    def test_bad_hex_rejected(self):
+        req = self._req()
+        req["run_plan_sha256"] = "zz"
+        self.assertTrue(any("hex" in e for e in sc.validate_lock_request(req)))
+
+    def test_nonempty_signatures_rejected(self):
+        req = self._req()
+        req["signatures"] = [{"by": "x"}]
+        self.assertTrue(any("signatures" in e for e in sc.validate_lock_request(req)))
+
+    def test_signer_fields_forbidden(self):
+        req = self._req()
+        req["reviewer_id"] = "someone"
+        self.assertTrue(any("reviewer_id" in e for e in sc.validate_lock_request(req)))
+
+    def test_gate_not_passed_refuses(self):
+        with self.assertRaises(ValueError):
+            sc.build_lock_request({}, "e" * 64, gate_a_pass=False,
+                                  run_plan_sha="p" * 64, tokenizer_sha="t" * 64, model="m")
+
+
+class TestPlanPersistence(unittest.TestCase):
+    """A-4 剩余：调度计划持久化 + 指纹对账。"""
+
+    def test_write_then_load_roundtrip(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "plan.json"
+            plan = sc.plan_runs(["real"], ["A"], "m", prompt_lookup={("real", "A"): "P"})
+            meta = sc.write_plan(p, plan)
+            self.assertTrue(p.exists())
+            self.assertEqual(len(meta["sha256"]), 64)
+            back = sc.load_plan(p, expect_sha=meta["sha256"])
+            self.assertEqual(back["n_items"], plan["n_items"])
+            self.assertFalse(p.with_suffix(p.suffix + ".tmp").exists())
+
+    def test_sha_mismatch_fails_closed(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "plan.json"
+            sc.write_plan(p, sc.plan_runs(["real"], ["A"], "m"))
+            with self.assertRaises(ValueError):
+                sc.load_plan(p, expect_sha="0" * 64)
+
+    def test_missing_plan_raises(self):
+        with self.assertRaises(FileNotFoundError):
+            sc.load_plan(Path("no/such/plan.json"))
+
+
+class TestUnifiedClopperPearson(unittest.TestCase):
+    """全项目 CP 只有一份实现，且与权威口径逐位一致。"""
+
+    def test_matches_authoritative_values(self):
+        self.assertAlmostEqual(sc.clopper_pearson(7, 82)[0], 0.035013, places=5)
+        self.assertAlmostEqual(sc.clopper_pearson(7, 82)[1], 0.168008, places=5)
+        self.assertAlmostEqual(sc.clopper_pearson(2, 74)[0], 0.003290, places=5)
+
+    def test_rq1r_delegates_to_scaffold(self):
+        from cpg.ablation import v4_rq1r as rq
+        for k, n in ((0, 10), (5, 10), (7, 82), (74, 74), (2, 74)):
+            self.assertEqual(rq.clopper_pearson(k, n), sc.clopper_pearson(k, n))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,347 @@
+{
+  "schema": "v4-rq1r-report/1",
+  "protocol": {
+    "strict_rule": "判别 = vuln 显式 vulnerable 且 fixed 显式 benign；abstain 不计任何一侧",
+    "lenient_note": "lenient（abstain→非 vuln）仅作规则敏感性申报，不用于结论",
+    "incomplete_excluded": [
+      "CVE-2026-53500",
+      "CVE-2026-59224",
+      "CVE-2026-70485"
+    ]
+  },
+  "data_scope": {
+    "tool_family_reference_seed": "v8_74",
+    "tool_family_reason": "该配置为 74 集 × 2 版本 × 5 个工具族（全 code 模式），是唯一覆盖全部工具族的横评配置",
+    "available_seeds": [
+      "A1",
+      "A2",
+      "A3",
+      "B1",
+      "B2",
+      "B3",
+      "C1",
+      "C2",
+      "C3",
+      "T1",
+      "v10_74_7b",
+      "v10_d1_7b",
+      "v10_d4_codellama",
+      "v13_85_ds_r1a",
+      "v13_85_ds_r1b",
+      "v13_85_ds_r2a",
+      "v13_85_ds_r2b",
+      "v2_A1",
+      "v2_A2",
+      "v2_A3",
+      "v2_Ax36",
+      "v2_B1",
+      "v3_14b",
+      "v3_14b_B",
+      "v4_noSum_A",
+      "v4_noSum_B",
+      "v5_42_14b_A",
+      "v5_42_A",
+      "v5_42_B",
+      "v6_54_14b",
+      "v6_54_A",
+      "v6_54_B",
+      "v8_74",
+      "v8_74_14b",
+      "v8_74_14b_B",
+      "v8_74_ast",
+      "v8_74_d3",
+      "v8_d1",
+      "v8_d1_expanded",
+      "v8_d1_final",
+      "v9_cwefix_74",
+      "v9_d2_devign",
+      "v9_llm_74",
+      "v9_llm_74_14b",
+      "v9_llm_d1"
+    ],
+    "cross_seed_note": "不同 seed 为不同实验配置，**不得跨配置叠加计数**"
+  },
+  "sources": {
+    "recompute": "cpg/ablation/.work/strict_recompute_out.json",
+    "recompute_sha256": "cdf290d6dc3d7a19317fa25b7eb2bf01f3f5960fb2cc124b28c286bc854a06fc",
+    "claims": "cpg/ablation/.work/claims.json",
+    "claims_sha256": "63eda5be9ba69e8e45febdec13b24e9e80103436ebb43eba96d4b1fe8acd3dee"
+  },
+  "claims_reconciled": true,
+  "headline": {
+    "local_7b_strict": {
+      "n": 82,
+      "strict_count": 2,
+      "strict_set": [
+        "61539",
+        "67435"
+      ]
+    },
+    "local_14b_strict": {
+      "n": 74,
+      "strict_count": 0,
+      "strict_set": []
+    },
+    "frontier_r1_strict": {
+      "n": 82,
+      "strict_count": 7,
+      "strict_set": [
+        "12482",
+        "13769",
+        "53502",
+        "53505",
+        "61539",
+        "67424",
+        "73498"
+      ]
+    },
+    "frontier_r2_strict": {
+      "n": 82,
+      "strict_count": 7,
+      "strict_set": [
+        "49852",
+        "53502",
+        "53505",
+        "54706",
+        "61539",
+        "61632",
+        "67425"
+      ]
+    },
+    "mcnemar_frontier_vs_local_r1": {
+      "b": 6,
+      "c": 1,
+      "p": 0.0625
+    },
+    "directional_r1": {
+      "answered_pairs": 26,
+      "correct": 7,
+      "inverted": 2,
+      "p": 0.08984375
+    },
+    "directional_r2": {
+      "answered_pairs": 36,
+      "correct": 7,
+      "inverted": 3,
+      "p": 0.171875
+    },
+    "abstain_genuine": {
+      "genuine": 148,
+      "total": 159,
+      "rate": 0.9308176100628931
+    }
+  },
+  "exact_ci": {
+    "local_7b": [
+      0.002968,
+      0.085343
+    ],
+    "local_14b": [
+      0.0,
+      0.048628
+    ],
+    "frontier_r1": [
+      0.035013,
+      0.168008
+    ],
+    "frontier_r2": [
+      0.035013,
+      0.168008
+    ]
+  },
+  "stratified_by_tool_family": {
+    "cpg_evidence": {
+      "n": 74,
+      "strict_disc": 1,
+      "inverted": 0,
+      "rate": 0.013514,
+      "ci95_exact": [
+        0.000342,
+        0.073007
+      ]
+    },
+    "codeql_baseline": {
+      "n": 74,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.048628
+      ]
+    },
+    "config_signature": {
+      "n": 74,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.048628
+      ]
+    },
+    "local_llm": {
+      "n": 74,
+      "strict_disc": 1,
+      "inverted": 0,
+      "rate": 0.013514,
+      "ci95_exact": [
+        0.000342,
+        0.073007
+      ]
+    },
+    "structural_heuristic": {
+      "n": 74,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.048628
+      ]
+    }
+  },
+  "stratified_by_vuln_group": {
+    "logic": {
+      "n": 54,
+      "strict_disc": 1,
+      "inverted": 0,
+      "rate": 0.018519,
+      "ci95_exact": [
+        0.000469,
+        0.098915
+      ]
+    },
+    "taint": {
+      "n": 20,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.168433
+      ]
+    }
+  },
+  "contingency_by_scorer_mode": {
+    "CPGEvidenceScorer|code": {
+      "benign": {
+        "benign": 57,
+        "vulnerable": 17
+      },
+      "vulnerable": {
+        "benign": 56,
+        "vulnerable": 18
+      }
+    },
+    "CodeQLBaselineScorer|code": {
+      "benign": {
+        "benign": 72,
+        "vulnerable": 2
+      },
+      "vulnerable": {
+        "benign": 72,
+        "vulnerable": 2
+      }
+    },
+    "ConfigSigScorer|code": {
+      "benign": {
+        "abstain": 20,
+        "benign": 54
+      },
+      "vulnerable": {
+        "abstain": 20,
+        "benign": 54
+      }
+    },
+    "LocalLLMScorer|code": {
+      "benign": {
+        "abstain": 16,
+        "benign": 43,
+        "vulnerable": 15
+      },
+      "vulnerable": {
+        "abstain": 13,
+        "benign": 44,
+        "vulnerable": 17
+      }
+    },
+    "StructuralHeuristicScorer|code": {
+      "benign": {
+        "benign": 65,
+        "vulnerable": 9
+      },
+      "vulnerable": {
+        "benign": 65,
+        "vulnerable": 9
+      }
+    }
+  },
+  "pairing_integrity_ok": true,
+  "non_reference_pairing_warnings": {
+    "n": 1000,
+    "note": "非参考配置中存在单侧样本（真实数据特性）；参考配置已硬校验通过",
+    "sample": [
+      "[non-reference] v10_d4_codellama/LocalLLMScorer/devign-qemu-2262: vuln=0 fixed=0",
+      "[non-reference] v10_d4_codellama/LocalLLMScorer/devign-qemu-1212: vuln=0 fixed=0",
+      "[non-reference] v10_d4_codellama/LocalLLMScorer/devign-FFmpeg-749: vuln=0 fixed=0",
+      "[non-reference] v10_d4_codellama/LocalLLMScorer/devign-FFmpeg-2021: vuln=0 fixed=0",
+      "[non-reference] v10_d4_codellama/LocalLLMScorer/devign-qemu-1104: vuln=0 fixed=0"
+    ]
+  },
+  "claims_ledger": [
+    {
+      "id": "local7b_strict_disc_d1",
+      "desc": "本地 7B strict 判别数（D1 完整对）",
+      "expect": 2
+    },
+    {
+      "id": "local14b_strict_disc_74",
+      "desc": "本地 14B strict 判别数（74 集）",
+      "expect": 0
+    },
+    {
+      "id": "frontier_strict_disc_r1",
+      "desc": "前沿 r1 strict 判别数",
+      "expect": 7
+    },
+    {
+      "id": "frontier_vs_local_mcnemar",
+      "desc": "前沿 vs 本地对称 strict McNemar",
+      "expect": {
+        "b": 6,
+        "c": 1,
+        "p": 0.0625
+      }
+    },
+    {
+      "id": "frontier_directional_r1",
+      "desc": "前沿 r1 自身方向检验（双端作答对）",
+      "expect": {
+        "correct": 7,
+        "inverted": 2,
+        "answered_pairs": 26,
+        "p": 0.08984375
+      }
+    },
+    {
+      "id": "frontier_directional_r2",
+      "desc": "前沿 r2 自身方向检验（双端作答对）",
+      "expect": {
+        "correct": 7,
+        "inverted": 3,
+        "answered_pairs": 36,
+        "p": 0.171875
+      }
+    },
+    {
+      "id": "frontier_abstain_genuine_rate",
+      "desc": "前沿真弃权率（故障剔除后）",
+      "expect": {
+        "genuine": 148,
+        "total": 159,
+        "rate": 0.9308176100628931
+      }
+    }
+  ]
+}
