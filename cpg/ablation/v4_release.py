@@ -108,7 +108,9 @@ def require_source_commit(source_commit: str | None, files: list,
         allow = {_rel(x) for x in (outputs or [])}
         leftover = []
         for ln in dirty.splitlines():
-            path = ln[3:].strip().strip('"')
+            if len(ln) < 4:
+                continue
+            path = ln[2:].strip().strip('"')   # porcelain: "XY PATH"
             if path and path not in allow:
                 leftover.append(path)
         if leftover:
