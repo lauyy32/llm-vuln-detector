@@ -1,12 +1,15 @@
 {
-  "schema": "v4-prereg/1",
-  "frozen_at_git_commit": "12dd0b6ecbcc35bb1d94e11a1326eb7abe49b7db",
-  "document": {
-    "path": "cpg/ablation/V4-四臂算法预注册.md",
-    "bytes": 5770,
-    "lines": 91,
-    "sha256": "b09296c16fceac7af7b318b6630df4a16f5494db1dd87af197fef555ebe23b9d"
-  },
+  "schema": "v4-prereg/2",
+  "status": "DRAFT_PREREG",
+  "source_commit": "34b9f5f8bf455ccebe96f44147efe1fcb70c1f12",
+  "documents": [
+    {
+      "path": "cpg/ablation/V4-四臂算法预注册.md",
+      "bytes": 6883,
+      "lines": 143,
+      "sha256": "97701e5e5cf705d225966ad66a5bd9bc119e55d0aae3f6f3e202b928e3128548"
+    }
+  ],
   "params": {
     "window": 20,
     "max_chars": 24000,
@@ -29,20 +32,15 @@
       "NON_CRITICAL": "NON_CRITICAL",
       "UNCERTAIN": "EXCLUDE_FROM_CONFIRMATORY"
     },
-    "placebo_token_target": "minimal-real 的最终 prompt token；比值界 [0.8, 1.25]（未舍入判定）",
-    "shuffled_donor_rule": "donor != 目标；约束匹配选 token 最接近者",
     "num_ctx": 32768,
     "num_predict": 1024,
-    "minimal_real_rule": "保留 closure(S ∪ deps(S)) 的全部 hunk，S={role∈{DIRECT,SUPPORTING}}",
-    "partial_rule": "从 minimal-real 删除 role=DIRECT_SECURITY 的 hunk（保留 SUPPORTING）",
-    "exclusion_rule": "exclusions ⊆ pending_uncertain，且 source_item_ids 必须等于该样本全部 pending hunk",
     "min_n_confirmatory": 8,
-    "primary_estimand": "pairwise sufficiency discrimination rate",
-    "power_note": "m=8 时 p1=0.90 功效 0.43；检出 90% 效应需 m=12 discordant pairs"
+    "primary_estimand": "pairwise sufficiency discrimination rate"
   },
   "policy": {
     "post_recovery": "只允许把标签代入本算法；不得修改任何参数",
     "deviation": "必须走 deviation log（原因/影响/作废的已跑结果）",
-    "recompute_gate": "双干净目录的四臂 prompt/selection/coverage SHA 必须一致"
+    "recompute_gate": "双干净目录的四臂 prompt/selection/coverage SHA 必须一致",
+    "status_note": "DRAFT_PREREG：placebo 生成算法、shuffled 约束与无候选处置、oracle 逐臂接受标准、minimal-real/partial 命名口径尚未冻结；**不得作为 A-4 的权威冻结输入**"
   }
 }
