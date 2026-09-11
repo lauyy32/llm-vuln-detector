@@ -1,5 +1,5 @@
 {
-  "schema": "v4-recovery/1",
+  "schema": "v4-recovery/1+SYNTHETIC_TEST_ONLY",
   "template": {
     "path": "cpg/ablation/artifacts/v4/critical_hunks.template.json",
     "bytes": 138293,
@@ -8,13 +8,13 @@
   },
   "submissions": {
     "reviewer1": {
-      "path": "C:/Users/lenovo/AppData/Local/Temp/tmpoyz1ns61/r1.jsonl",
+      "path": "<TMP>",
       "bytes": 160192,
       "lines": 283,
       "sha256": "48d8703bcf236ce561d9cad02af23d1859e904ce0dc54e70985dd8a35450f4ba"
     },
     "reviewer2": {
-      "path": "C:/Users/lenovo/AppData/Local/Temp/tmpoyz1ns61/r2.jsonl",
+      "path": "<TMP>",
       "bytes": 160239,
       "lines": 283,
       "sha256": "4471bbed408da38c5a32bca170ec81f01462055678e363a722a7d630cd3a7ff9"
@@ -22,7 +22,7 @@
   },
   "validation": {
     "reviewer1": {
-      "path": "C:\\Users\\lenovo\\AppData\\Local\\Temp\\tmpoyz1ns61\\r1.jsonl",
+      "path": "<TMP>",
       "n_rows": 284,
       "bytes": 160192,
       "sha256": "48d8703bcf236ce561d9cad02af23d1859e904ce0dc54e70985dd8a35450f4ba",
@@ -30,7 +30,7 @@
       "ok": true
     },
     "reviewer2": {
-      "path": "C:\\Users\\lenovo\\AppData\\Local\\Temp\\tmpoyz1ns61\\r2.jsonl",
+      "path": "<TMP>",
       "n_rows": 284,
       "bytes": 160239,
       "sha256": "4471bbed408da38c5a32bca170ec81f01462055678e363a722a7d630cd3a7ff9",
@@ -67,5 +67,7 @@
       "sha256": "b4d2d3cb2744f73bb50e008b6eec06a1d8de2f528a145f2aae2562cbf74fbc1f"
     }
   },
-  "next_step": "第三人填写 disagreements.json 的 final_*（含 final_role/final_dependency_group/final_counterfactual/final_evidence/final_reason/adjudicator）；必要时填 exclusions（结构化，仅限 UNCERTAIN 且须覆盖该样本全部 pending hunk）"
+  "next_step": "第三人填写 disagreements.json 的 final_*（含 final_role/final_dependency_group/final_counterfactual/final_evidence/final_reason/adjudicator）；必要时填 exclusions（结构化，仅限 UNCERTAIN 且须覆盖该样本全部 pending hunk）",
+  "SYNTHETIC_TEST_ONLY": true,
+  "not_for_analysis": "合成测试夹具，不得作为实验证据；不得与真实回收结果比较"
 }

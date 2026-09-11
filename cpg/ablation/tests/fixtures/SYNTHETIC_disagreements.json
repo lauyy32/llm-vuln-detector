@@ -1,5 +1,5 @@
 {
-  "schema": "v4-adjudication/2",
+  "schema": "v4-adjudication/2+SYNTHETIC_TEST_ONLY",
   "template_sha256": "7fd12a4488aa1ba19faa467196bc76a4403ad3cce5313d8f8fc0ad1f2ff45099",
   "submission_sha256": {
     "reviewer1": "48d8703bcf236ce561d9cad02af23d1859e904ce0dc54e70985dd8a35450f4ba",
@@ -10466,5 +10466,7 @@
       "final_reason": null,
       "adjudicator": null
     }
-  ]
+  ],
+  "SYNTHETIC_TEST_ONLY": true,
+  "not_for_analysis": "合成测试夹具，不得作为实验证据；不得与真实回收结果比较"
 }
