@@ -643,24 +643,31 @@ def build_stale_artifacts(out_dir: Path) -> dict:
       UNVERIFIED            当前缺失，无法核对
     并对 patches/** 生成逐文件清单 + 确定性 tree SHA。
     """
-    def _status(old: bytes, cur: Path) -> tuple:
-        if not old:
-            return "MISSING", None
-        if not cur.exists():
-            return "UNVERIFIED", None
-        cs = _sha256_bytes(cur.read_bytes())
-        return ("REGENERATED_IDENTICAL" if _sha256_bytes(old) == cs
-                else "REGENERATED_CHANGED"), cs
+    def _status(rel: str, cur: Path) -> tuple:
+        """P1-2：区分 NOT_PRESENT_AT_BASE / GIT_SHOW_ERROR / CURRENT_MISSING /
+        REGENERATED_IDENTICAL / REGENERATED_CHANGED / NEW_ARTIFACT。"""
+        gitrel = f"cpg/ablation/artifacts/v4/{rel}"
+        r = subprocess.run(["git", "show", f"{SUPERSEDED_AT_COMMIT}:{gitrel}"],
+                           cwd=str(ROOT), capture_output=True)
+        cur_sha = _sha256_bytes(cur.read_bytes()) if cur.exists() else None
+        if r.returncode != 0:
+            # 旧 commit 无此文件：当前存在 → NEW_ARTIFACT；当前也缺 → NOT_PRESENT_AT_BASE
+            if cur_sha is not None:
+                return "NEW_ARTIFACT", cur_sha, None
+            return "NOT_PRESENT_AT_BASE", None, None
+        old_sha = _sha256_bytes(r.stdout)
+        if cur_sha is None:
+            return "CURRENT_MISSING", None, old_sha
+        if old_sha == cur_sha:
+            return "REGENERATED_IDENTICAL", cur_sha, old_sha
+        return "REGENERATED_CHANGED", cur_sha, old_sha
 
     entries = []
     for rel in V4_ARTIFACTS:
-        gitrel = f"cpg/ablation/artifacts/v4/{rel}"
-        old = subprocess.run(["git", "show", f"{SUPERSEDED_AT_COMMIT}:{gitrel}"],
-                             cwd=str(ROOT), capture_output=True).stdout
-        status, cur_sha = _status(old, out_dir / rel)
+        status, cur_sha, old_sha = _status(rel, out_dir / rel)
         entries.append({
-            "artifact": gitrel,
-            "superseded_sha256": _sha256_bytes(old) if old else None,
+            "artifact": f"cpg/ablation/artifacts/v4/{rel}",
+            "superseded_sha256": old_sha,
             "current_sha256": cur_sha,
             "compared_at_commit": SUPERSEDED_AT_COMMIT,
             "status": status,
@@ -828,9 +835,92 @@ def build_g0_prompts(out_dir: Path) -> dict:
     return doc
 
 
+def build_hunk_coverage(out_dir: Path) -> dict:
+    """P0-2 门禁：逐 hunk 报告源码摘录覆盖状态（FULL / PARTIAL / ABSENT）。
+
+    动机：excerpt_vuln_for_patch 有内部字符预算，装不下的文件被静默跳过——可能
+    重现"语料已补全、表示层又删掉核心证据"的旧问题。仅"code_text 非空"远远不够。
+
+    对每个 real-patch hunk：判定其**删除侧（vulnerable 源码）行范围**是否被摘录
+    完整覆盖。security-critical 标注（来自 partial_arm_construction.md）为人工/协议
+    产物，本报告先给机械覆盖；`security_critical` 字段留待录入。
+    """
+    import re
+    report = {"schema": "v4-hunk-coverage/1",
+              "note": "security_critical 标注须由协议/人工录入；本表先给机械覆盖",
+              "samples": {}}
+    for cve in V4_CANDIDATES:
+        sd = sample_dir_path(cve)
+        patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
+        code = excerpt_vuln_for_patch(sd, patch)
+        # 记录摘录实际包含的 (文件, 行号集合)
+        covered: dict = {}
+        cur = None
+        for ln in code.split("\n"):
+            if ln.startswith("// ---- ") and ln.endswith(" ----"):
+                cur = ln[len("// ---- "):-len(" ----")]
+                covered.setdefault(cur, set())
+        # 重新精确计算：摘录中每个文件实际保留的原始行号
+        hunks_by_file: dict = {}
+        cur = None
+        for ln in patch.split("\n"):
+            if ln.startswith("diff --git ") and " b/" in ln:
+                cur = ln.split(" b/", 1)[1].strip()
+                hunks_by_file.setdefault(cur, [])
+            elif ln.startswith("@@ ") and cur is not None:
+                m = re.match(r"@@ -(\d+)(?:,(\d+))?", ln)
+                if m:
+                    hunks_by_file[cur].append((int(m.group(1)), int(m.group(2) or 1)))
+        WINDOW = 20
+        # 摘录中**实际保留**的文件集合（被预算丢弃的文件，其 hunk 一律 ABSENT）
+        kept_files = set()
+        for ln in code.split("\n"):
+            if ln.startswith("// ---- ") and ln.endswith(" ----"):
+                kept_files.add(ln[len("// ---- "):-len(" ----")])
+        rows = []
+        n_absent = n_partial = n_full = 0
+        for rel in sorted(hunks_by_file):
+            p = sd / "vuln" / rel
+            lines = (p.read_text(encoding="utf-8", errors="replace").split("\n")
+                     if p.exists() else [])
+            for start, count in hunks_by_file[rel]:
+                want = set(range(start - 1, start - 1 + count))
+                if rel not in kept_files:
+                    status = "ABSENT"          # 文件被预算整体丢弃
+                else:
+                    lo = max(0, start - 1 - WINDOW)
+                    hi = min(len(lines), start - 1 + count + WINDOW)
+                    inter = len(want & set(range(lo, hi)))
+                    status = ("FULL" if inter == len(want) and want
+                              else "PARTIAL" if inter > 0 else "ABSENT")
+                if status == "FULL":
+                    n_full += 1
+                elif status == "PARTIAL":
+                    n_partial += 1
+                else:
+                    n_absent += 1
+                rows.append({"file": rel, "old_start": start, "old_count": count,
+                             "file_kept": rel in kept_files,
+                             "coverage": status, "security_critical": None})
+        report["samples"][cve] = {"n_hunks": len(rows), "FULL": n_full,
+                                  "PARTIAL": n_partial, "ABSENT": n_absent,
+                                  "hunks": rows}
+    tot_abs = sum(s["ABSENT"] for s in report["samples"].values())
+    tot_par = sum(s["PARTIAL"] for s in report["samples"].values())
+    report["totals"] = {"FULL": sum(s["FULL"] for s in report["samples"].values()),
+                        "PARTIAL": tot_par, "ABSENT": tot_abs}
+    # 停止条件（机械层）：hunk 的 vulnerable 行范围 ABSENT → 该样本不得进确认性分析
+    report["blocking_samples"] = sorted(
+        [c for c, s in report["samples"].items() if s["ABSENT"] > 0])
+    write_text_lf(out_dir / "v4_hunk_coverage.json",
+                  json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+    return report
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate", "feasibility", "g0", "all"])
+    ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate",
+                                     "feasibility", "g0", "coverage", "all"])
     ap.add_argument("--out-dir", type=Path, default=OUT_DIR)
     ap.add_argument("--canonical-manifest", type=Path, default=None,
                     help="V4 权威 manifest（必须显式传入且等于 v4_manifest 单一来源）")
@@ -907,6 +997,10 @@ def main() -> int:
             if r["verdict"] != "FIT":
                 print(f"  {r['verdict']} {r['arm']}/{r['sample_id']}: "
                       f"{r.get('error') or str(r.get('prompt_tokens')) + ' tok'}")
+    if args.step in ("coverage", "all"):
+        cov = build_hunk_coverage(args.out_dir)
+        print(f"[Coverage] hunk 覆盖 {cov['totals']}；"
+              f"含 ABSENT 的样本 {len(cov['blocking_samples'])}: {cov['blocking_samples']}")
     return 0
 
 

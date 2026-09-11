@@ -6,7 +6,7 @@
   "status_counts": {
     "REGENERATED_CHANGED": 3,
     "REGENERATED_IDENTICAL": 4,
-    "MISSING": 1
+    "NEW_ARTIFACT": 1
   },
   "entries": [
     {
@@ -47,7 +47,7 @@
     {
       "artifact": "cpg/ablation/artifacts/v4/gate_a_report.json",
       "superseded_sha256": "115f54a050fd743556239402288fb2e46ba5e055557030c15c9900547914a0ff",
-      "current_sha256": "9452c3d946b6cf8e6a879e755f85e3d5d293b928e2a6f456159c484d1c3939ae",
+      "current_sha256": "0ca528edee02636ef28b9a27192acf9485b32fe1e763471a3b53ef460e331d64",
       "compared_at_commit": "9f29b8b",
       "status": "REGENERATED_CHANGED"
     },
@@ -61,9 +61,9 @@
     {
       "artifact": "cpg/ablation/artifacts/v4/manifest_registry.json",
       "superseded_sha256": null,
-      "current_sha256": null,
+      "current_sha256": "a21c2572678b38cd9b535e462e0e79703db46e9339fda236e3027b6195f6c940",
       "compared_at_commit": "9f29b8b",
-      "status": "MISSING"
+      "status": "NEW_ARTIFACT"
     }
   ],
   "patches": {

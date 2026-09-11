@@ -1,0 +1,2410 @@
+{
+  "schema": "v4-hunk-coverage/1",
+  "note": "security_critical 标注须由协议/人工录入；本表先给机械覆盖",
+  "samples": {
+    "CVE-2026-12482": {
+      "n_hunks": 2,
+      "FULL": 2,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "keras/src/utils/file_utils.py",
+          "old_start": 41,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "keras/src/utils/file_utils_test.py",
+          "old_start": 216,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-70491": {
+      "n_hunks": 1,
+      "FULL": 1,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "backend/open_webui/routers/tools.py",
+          "old_start": 446,
+          "old_count": 20,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-50558": {
+      "n_hunks": 4,
+      "FULL": 4,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "penelope.py",
+          "old_start": 16,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "penelope.py",
+          "old_start": 39,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "penelope.py",
+          "old_start": 3404,
+          "old_count": 21,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "penelope.py",
+          "old_start": 5221,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-67424": {
+      "n_hunks": 38,
+      "FULL": 18,
+      "PARTIAL": 0,
+      "ABSENT": 20,
+      "hunks": [
+        {
+          "file": "src/core/modules/atomic/ai/vision_analyze.py",
+          "old_start": 16,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/ai/vision_analyze.py",
+          "old_start": 361,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/browser/proxy_rotate.py",
+          "old_start": 14,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/browser/proxy_rotate.py",
+          "old_start": 195,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/communication/slack_send.py",
+          "old_start": 10,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/communication/slack_send.py",
+          "old_start": 100,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/graphql/mutation.py",
+          "old_start": 12,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/graphql/mutation.py",
+          "old_start": 32,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/graphql/query.py",
+          "old_start": 12,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/graphql/query.py",
+          "old_start": 32,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/http/batch.py",
+          "old_start": 15,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/http/batch.py",
+          "old_start": 62,
+          "old_count": 9,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/http/batch.py",
+          "old_start": 84,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/http/get.py",
+          "old_start": 12,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/http/get.py",
+          "old_start": 113,
+          "old_count": 11,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/http/request.py",
+          "old_start": 13,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/http/request.py",
+          "old_start": 334,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/http/request.py",
+          "old_start": 369,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/monitor/http_check.py",
+          "old_start": 16,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/monitor/http_check.py",
+          "old_start": 157,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/verify/visual_diff.py",
+          "old_start": 23,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/verify/visual_diff.py",
+          "old_start": 354,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/communication/messaging/discord.py",
+          "old_start": 13,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/communication/messaging/discord.py",
+          "old_start": 128,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/communication/messaging/slack.py",
+          "old_start": 13,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/communication/messaging/slack.py",
+          "old_start": 145,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/communication/messaging/teams.py",
+          "old_start": 11,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/communication/messaging/teams.py",
+          "old_start": 128,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/developer/http/requests.py",
+          "old_start": 13,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/developer/http/requests.py",
+          "old_start": 80,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/third_party/developer/http/requests.py",
+          "old_start": 172,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/utils.py",
+          "old_start": 594,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/verification_service.py",
+          "old_start": 12,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/verification_service.py",
+          "old_start": 27,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/verification_service.py",
+          "old_start": 320,
+          "old_count": 9,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/verification_service.py",
+          "old_start": 346,
+          "old_count": 10,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/verification_service.py",
+          "old_start": 361,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/test_verification_service.py",
+          "old_start": 16,
+          "old_count": 26,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-53502": {
+      "n_hunks": 4,
+      "FULL": 4,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "tests/loaders/test_file_loader.py",
+          "old_start": 7,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "tests/loaders/test_file_loader.py",
+          "old_start": 52,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "thumbor/loaders/file_loader.py",
+          "old_start": 9,
+          "old_count": 20,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "thumbor/loaders/file_loader.py",
+          "old_start": 31,
+          "old_count": 10,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-73498": {
+      "n_hunks": 90,
+      "FULL": 15,
+      "PARTIAL": 0,
+      "ABSENT": 75,
+      "hunks": [
+        {
+          "file": "src/mcp_atlassian/confluence/attachments.py",
+          "old_start": 149,
+          "old_count": 9,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/confluence/client.py",
+          "old_start": 17,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/confluence/client.py",
+          "old_start": 130,
+          "old_count": 8,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/confluence/search.py",
+          "old_start": 23,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/confluence/search.py",
+          "old_start": 33,
+          "old_count": 8,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/confluence/search.py",
+          "old_start": 45,
+          "old_count": 27,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/attachments.py",
+          "old_start": 42,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/attachments.py",
+          "old_start": 370,
+          "old_count": 9,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/client.py",
+          "old_start": 23,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/client.py",
+          "old_start": 143,
+          "old_count": 8,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/search.py",
+          "old_start": 21,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/search.py",
+          "old_start": 43,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/search.py",
+          "old_start": 60,
+          "old_count": 56,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/search.py",
+          "old_start": 240,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/jira/search.py",
+          "old_start": 298,
+          "old_count": 11,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/confluence.py",
+          "old_start": 20,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/confluence.py",
+          "old_start": 124,
+          "old_count": 15,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/confluence.py",
+          "old_start": 146,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/dependencies.py",
+          "old_start": 17,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/dependencies.py",
+          "old_start": 508,
+          "old_count": 8,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/dependencies.py",
+          "old_start": 592,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/dependencies.py",
+          "old_start": 641,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/dependencies.py",
+          "old_start": 663,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/main.py",
+          "old_start": 12,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/main.py",
+          "old_start": 209,
+          "old_count": 14,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/main.py",
+          "old_start": 246,
+          "old_count": 13,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/main.py",
+          "old_start": 261,
+          "old_count": 64,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/main.py",
+          "old_start": 328,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/servers/main.py",
+          "old_start": 442,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/oauth.py",
+          "old_start": 398,
+          "old_count": 9,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/oauth.py",
+          "old_start": 414,
+          "old_count": 8,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/oauth_setup.py",
+          "old_start": 17,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/oauth_setup.py",
+          "old_start": 85,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/oauth_setup.py",
+          "old_start": 122,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/ssl.py",
+          "old_start": 9,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/ssl.py",
+          "old_start": 48,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/ssrf_adapter.py",
+          "old_start": 0,
+          "old_count": 0,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/urls.py",
+          "old_start": 4,
+          "old_count": 9,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_atlassian/utils/urls.py",
+          "old_start": 89,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/cloud/test_confluence_cloud_operations.py",
+          "old_start": 131,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/cloud/test_confluence_cloud_operations.py",
+          "old_start": 141,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/cloud/test_mcp_tools_cloud.py",
+          "old_start": 306,
+          "old_count": 12,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/conftest.py",
+          "old_start": 8,
+          "old_count": 9,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/conftest.py",
+          "old_start": 24,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/conftest.py",
+          "old_start": 447,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/test_confluence_dc_operations.py",
+          "old_start": 80,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/test_confluence_dc_operations.py",
+          "old_start": 90,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/e2e/test_mcp_tools_dc.py",
+          "old_start": 305,
+          "old_count": 12,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_attachments.py",
+          "old_start": 3,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_attachments.py",
+          "old_start": 123,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_attachments.py",
+          "old_start": 176,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_attachments.py",
+          "old_start": 228,
+          "old_count": 33,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_attachments.py",
+          "old_start": 282,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_attachments.py",
+          "old_start": 311,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_attachments.py",
+          "old_start": 378,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_attachments.py",
+          "old_start": 1787,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_client.py",
+          "old_start": 379,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_search.py",
+          "old_start": 198,
+          "old_count": 14,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/confluence/test_search.py",
+          "old_start": 246,
+          "old_count": 13,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 69,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 121,
+          "old_count": 20,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 479,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 507,
+          "old_count": 9,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 517,
+          "old_count": 31,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 567,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 592,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 618,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_attachments.py",
+          "old_start": 1316,
+          "old_count": 3,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_client.py",
+          "old_start": 63,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_search.py",
+          "old_start": 347,
+          "old_count": 10,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_search.py",
+          "old_start": 359,
+          "old_count": 12,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_search.py",
+          "old_start": 694,
+          "old_count": 10,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_search.py",
+          "old_start": 729,
+          "old_count": 10,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/jira/test_search.py",
+          "old_start": 1204,
+          "old_count": 3,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_confluence_server.py",
+          "old_start": 926,
+          "old_count": 11,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_confluence_server.py",
+          "old_start": 947,
+          "old_count": 11,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_confluence_server.py",
+          "old_start": 1072,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_confluence_server.py",
+          "old_start": 1081,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_dependencies.py",
+          "old_start": 788,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_dependencies.py",
+          "old_start": 1127,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_dependencies.py",
+          "old_start": 1583,
+          "old_count": 3,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_main_server.py",
+          "old_start": 317,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/servers/test_mcp_protocol.py",
+          "old_start": 90,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/utils/test_oauth.py",
+          "old_start": 440,
+          "old_count": 36,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/utils/test_oauth.py",
+          "old_start": 1219,
+          "old_count": 3,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/utils/test_oauth_setup.py",
+          "old_start": 1,
+          "old_count": 5,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/utils/test_oauth_setup.py",
+          "old_start": 7,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/utils/test_oauth_setup.py",
+          "old_start": 45,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/utils/test_ssrf_adapter.py",
+          "old_start": 0,
+          "old_count": 0,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/unit/utils/test_urls.py",
+          "old_start": 328,
+          "old_count": 3,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-53598": {
+      "n_hunks": 10,
+      "FULL": 10,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "runtime/python/prompty/prompty/_version.py",
+          "old_start": 1,
+          "old_count": 1,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/prompty/core/loader.py",
+          "old_start": 9,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/prompty/core/loader.py",
+          "old_start": 26,
+          "old_count": 13,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/prompty/core/loader.py",
+          "old_start": 47,
+          "old_count": 17,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/prompty/core/loader.py",
+          "old_start": 86,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/prompty/core/loader.py",
+          "old_start": 96,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/prompty/core/loader.py",
+          "old_start": 112,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/prompty/core/loader.py",
+          "old_start": 121,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/prompty/core/loader.py",
+          "old_start": 152,
+          "old_count": 18,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "runtime/python/prompty/tests/test_loader.py",
+          "old_start": 343,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-67425": {
+      "n_hunks": 47,
+      "FULL": 18,
+      "PARTIAL": 0,
+      "ABSENT": 29,
+      "hunks": [
+        {
+          "file": "src/core/engine/variable_resolver.py",
+          "old_start": 7,
+          "old_count": 9,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/engine/variable_resolver.py",
+          "old_start": 194,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/module_policy.py",
+          "old_start": 108,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/ai/model.py",
+          "old_start": 12,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/ai/model.py",
+          "old_start": 131,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/ai/model.py",
+          "old_start": 142,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/browser/pagination.py",
+          "old_start": 16,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/browser/pagination.py",
+          "old_start": 321,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/document/excel_write.py",
+          "old_start": 11,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/document/excel_write.py",
+          "old_start": 105,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/document/pdf_fill_form.py",
+          "old_start": 11,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/document/pdf_fill_form.py",
+          "old_start": 122,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/document/pdf_to_word.py",
+          "old_start": 10,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/document/pdf_to_word.py",
+          "old_start": 107,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/document/word_to_pdf.py",
+          "old_start": 11,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/document/word_to_pdf.py",
+          "old_start": 94,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/compress.py",
+          "old_start": 11,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/compress.py",
+          "old_start": 167,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/convert.py",
+          "old_start": 11,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/convert.py",
+          "old_start": 53,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/convert.py",
+          "old_start": 176,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/crop.py",
+          "old_start": 14,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/crop.py",
+          "old_start": 188,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/download.py",
+          "old_start": 14,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/download.py",
+          "old_start": 33,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/download.py",
+          "old_start": 136,
+          "old_count": 11,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/qrcode_generate.py",
+          "old_start": 10,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/qrcode_generate.py",
+          "old_start": 53,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/resize.py",
+          "old_start": 11,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/resize.py",
+          "old_start": 150,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/rotate.py",
+          "old_start": 14,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/rotate.py",
+          "old_start": 175,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/watermark.py",
+          "old_start": 14,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/image/watermark.py",
+          "old_start": 246,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/llm/agent.py",
+          "old_start": 24,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/llm/agent.py",
+          "old_start": 312,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/llm/agent.py",
+          "old_start": 879,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/llm/agent.py",
+          "old_start": 888,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/llm/chat.py",
+          "old_start": 13,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/llm/chat.py",
+          "old_start": 158,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/llm/chat.py",
+          "old_start": 167,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/vector/connector.py",
+          "old_start": 9,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/vector/connector.py",
+          "old_start": 45,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/modules/atomic/vector/connector.py",
+          "old_start": 90,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/utils.py",
+          "old_start": 10,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "src/core/utils.py",
+          "old_start": 593,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "tests/modules/test_new_modules.py",
+          "old_start": 591,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-54706": {
+      "n_hunks": 14,
+      "FULL": 13,
+      "PARTIAL": 0,
+      "ABSENT": 1,
+      "hunks": [
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 74,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 101,
+          "old_count": 8,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 110,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 123,
+          "old_count": 15,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 153,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 163,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 178,
+          "old_count": 11,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 202,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/send_base_mode.py",
+          "old_start": 256,
+          "old_count": 11,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/share_mode.py",
+          "old_start": 300,
+          "old_count": 9,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/share_mode.py",
+          "old_start": 349,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/share_mode.py",
+          "old_start": 576,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/share_mode.py",
+          "old_start": 585,
+          "old_count": 18,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/tests/test_cli_web_symlink.py",
+          "old_start": 0,
+          "old_count": 0,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-59890": {
+      "n_hunks": 7,
+      "FULL": 7,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "setuptools/command/egg_info.py",
+          "old_start": 37,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "setuptools/command/egg_info.py",
+          "old_start": 46,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "setuptools/command/egg_info.py",
+          "old_start": 117,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "setuptools/tests/test_manifest.py",
+          "old_start": 10,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "setuptools/tests/test_manifest.py",
+          "old_start": 157,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "setuptools/tests/test_manifest.py",
+          "old_start": 331,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "setuptools/unicode_utils.py",
+          "old_start": 19,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-54707": {
+      "n_hunks": 9,
+      "FULL": 9,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "cli/onionshare_cli/web/receive_mode.py",
+          "old_start": 22,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/receive_mode.py",
+          "old_start": 91,
+          "old_count": 10,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/receive_mode.py",
+          "old_start": 133,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/receive_mode.py",
+          "old_start": 194,
+          "old_count": 10,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/receive_mode.py",
+          "old_start": 228,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/receive_mode.py",
+          "old_start": 377,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/receive_mode.py",
+          "old_start": 523,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cli/onionshare_cli/web/receive_mode.py",
+          "old_start": 586,
+          "old_count": 9,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "desktop/tests/test_gui_receive.py",
+          "old_start": 262,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-54785": {
+      "n_hunks": 6,
+      "FULL": 6,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "src/__init__.py",
+          "old_start": 2,
+          "old_count": 5,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_server.py",
+          "old_start": 1,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_server.py",
+          "old_start": 127,
+          "old_count": 20,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_server.py",
+          "old_start": 192,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "src/mcp_server.py",
+          "old_start": 441,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "tests/test_mcp_server.py",
+          "old_start": 298,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-50181": {
+      "n_hunks": 6,
+      "FULL": 6,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "langroid/agent/tools/file_tools.py",
+          "old_start": 9,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "langroid/agent/tools/file_tools.py",
+          "old_start": 58,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "langroid/agent/tools/file_tools.py",
+          "old_start": 164,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "langroid/agent/tools/file_tools.py",
+          "old_start": 221,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "langroid/utils/system.py",
+          "old_start": 187,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "tests/main/test_file_tools.py",
+          "old_start": 308,
+          "old_count": 3,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-54574": {
+      "n_hunks": 14,
+      "FULL": 14,
+      "PARTIAL": 0,
+      "ABSENT": 0,
+      "hunks": [
+        {
+          "file": "proot_distro/commands/restore.py",
+          "old_start": 48,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/commands/restore.py",
+          "old_start": 183,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/commands/restore.py",
+          "old_start": 289,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/commands/restore.py",
+          "old_start": 317,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/build_engine/copy_step.py",
+          "old_start": 49,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/build_engine/copy_step.py",
+          "old_start": 430,
+          "old_count": 11,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/tar_extract.py",
+          "old_start": 37,
+          "old_count": 13,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/tar_extract.py",
+          "old_start": 92,
+          "old_count": 8,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/tar_extract.py",
+          "old_start": 133,
+          "old_count": 11,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/tar_extract.py",
+          "old_start": 145,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/tar_extract.py",
+          "old_start": 156,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/tar_extract.py",
+          "old_start": 202,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/tar_extract.py",
+          "old_start": 211,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "proot_distro/helpers/tar_extract.py",
+          "old_start": 218,
+          "old_count": 8,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        }
+      ]
+    },
+    "CVE-2026-45019": {
+      "n_hunks": 32,
+      "FULL": 19,
+      "PARTIAL": 0,
+      "ABSENT": 13,
+      "hunks": [
+        {
+          "file": "backend/chainlit/config.py",
+          "old_start": 6,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/config.py",
+          "old_start": 17,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/config.py",
+          "old_start": 148,
+          "old_count": 18,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/config.py",
+          "old_start": 297,
+          "old_count": 30,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/config.py",
+          "old_start": 624,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/config.py",
+          "old_start": 638,
+          "old_count": 6,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/mcp.py",
+          "old_start": 1,
+          "old_count": 10,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/mcp.py",
+          "old_start": 29,
+          "old_count": 71,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 10,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 875,
+          "old_count": 10,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 1305,
+          "old_count": 12,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 1321,
+          "old_count": 15,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 1351,
+          "old_count": 65,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 1422,
+          "old_count": 38,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 1469,
+          "old_count": 7,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 1497,
+          "old_count": 21,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/server.py",
+          "old_start": 1522,
+          "old_count": 45,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/session.py",
+          "old_start": 22,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/session.py",
+          "old_start": 45,
+          "old_count": 24,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/session.py",
+          "old_start": 370,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/types.py",
+          "old_start": 21,
+          "old_count": 7,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/types.py",
+          "old_start": 245,
+          "old_count": 34,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/chainlit/version.py",
+          "old_start": 1,
+          "old_count": 1,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "backend/tests/test_config.py",
+          "old_start": 1,
+          "old_count": 10,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/tests/test_config.py",
+          "old_start": 125,
+          "old_count": 3,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/tests/test_mcp.py",
+          "old_start": 1,
+          "old_count": 15,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/tests/test_mcp.py",
+          "old_start": 179,
+          "old_count": 197,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/tests/test_mcp.py",
+          "old_start": 404,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/tests/test_mcp.py",
+          "old_start": 432,
+          "old_count": 15,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "backend/tests/test_session.py",
+          "old_start": 763,
+          "old_count": 3,
+          "file_kept": true,
+          "coverage": "FULL",
+          "security_critical": null
+        },
+        {
+          "file": "cypress/e2e/config_overrides/main.py",
+          "old_start": 6,
+          "old_count": 6,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        },
+        {
+          "file": "cypress/e2e/config_overrides/main.py",
+          "old_start": 47,
+          "old_count": 9,
+          "file_kept": false,
+          "coverage": "ABSENT",
+          "security_critical": null
+        }
+      ]
+    }
+  },
+  "totals": {
+    "FULL": 146,
+    "PARTIAL": 0,
+    "ABSENT": 138
+  },
+  "blocking_samples": [
+    "CVE-2026-45019",
+    "CVE-2026-54706",
+    "CVE-2026-67424",
+    "CVE-2026-67425",
+    "CVE-2026-73498"
+  ]
+}
