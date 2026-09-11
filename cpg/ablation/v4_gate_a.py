@@ -53,6 +53,16 @@ def _sha256_bytes(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
+def _rel(p) -> str:
+    """安全相对路径：不在 ROOT 下时回退绝对路径（防外部输入导致 ValueError）。"""
+    from pathlib import Path as _P
+    p = _P(p)
+    try:
+        return p.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return p.resolve().as_posix()
+
+
 def _lf_sha(b: bytes) -> str:
     """LF 归一化后的 SHA-256（hunk 身份锚点用，跨平台稳定）。"""
     return hashlib.sha256(b.replace(b"\r\n", b"\n")).hexdigest()
@@ -622,7 +632,7 @@ def build_manifest_registry(out_dir: Path) -> dict:
     """manifest registry：分别登记 RQ1-R（旧，冻结）与 V4（v2，活动）的权威锚点。"""
     def _ent(path: Path, consumer: str, status: str, note: str) -> dict:
         return {"consumer": consumer,
-                "manifest": path.relative_to(ROOT).as_posix(),
+                "manifest": _rel(path),
                 "sha256": _sha256_bytes(path.read_bytes()) if path.exists() else None,
                 "status": status, "note": note}
     reg = {

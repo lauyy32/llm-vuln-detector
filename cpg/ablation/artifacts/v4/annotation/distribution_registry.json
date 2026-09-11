@@ -1,0 +1,115 @@
+{
+  "schema": "v4-distribution-registry/1",
+  "generated_git_commit": "65a20cfe2ee05b7f5d1c89c2814ffe648c21f196",
+  "generator_impl_sha256": {
+    "v4_annotation.py": "ac9ee4db6e09b973c47159bcdb9f33f8f110538d4c520f0b7a07924f3475e914",
+    "v4_gate_a.py": "45f7c5b847501a38bad676d82328c8b472912587d92dd3e875c60b2222d6ba69",
+    "v4_selector.py": "5825861f3ccacb22572a92e55b6e36617d5432dc2f6b1adcf64cdcd10bdea26c"
+  },
+  "canonical_manifest": {
+    "path": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
+    "bytes": 93615,
+    "lines": 1914,
+    "sha256": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996"
+  },
+  "real_patches_tree_sha256": "42d51722bcccffa7355db691a51368e194ff1f01a0d39a58b01fc240940e9506",
+  "real_patches": [
+    {
+      "name": "CVE-2026-12482.diff",
+      "sha256": "528a2ab6f91fea378fb90a9d4aed5f0dc2c78affac7db9283622103aba8129b7"
+    },
+    {
+      "name": "CVE-2026-45019.diff",
+      "sha256": "ec9a79e8172e7dde9d5cd1b510d602f65f5c5a85f40f0b65ebb007bf21eecc31"
+    },
+    {
+      "name": "CVE-2026-50181.diff",
+      "sha256": "29e6c3754b37307519468c27dd1d488f9a7934f5d3725f86511bff7a4eeddaf8"
+    },
+    {
+      "name": "CVE-2026-50558.diff",
+      "sha256": "b50cfd422acff293a0c674900774d516e643a61fc4f72da1c8473c71e0c1c55a"
+    },
+    {
+      "name": "CVE-2026-53502.diff",
+      "sha256": "127de2b2af29852c1e87c5f4f3a4aefb693988c624b315aee62a12c5e52af8bc"
+    },
+    {
+      "name": "CVE-2026-53598.diff",
+      "sha256": "183abad58cd5131e03efbed26588dc373533f219880845be07c12eb5c6fb3fff"
+    },
+    {
+      "name": "CVE-2026-54574.diff",
+      "sha256": "999f3e8b83dc2b1e0be967bd64de6025b30fae5fb5173c9f114937b621887965"
+    },
+    {
+      "name": "CVE-2026-54706.diff",
+      "sha256": "69af8305b8eb68379d667fb576eeabf1766c02e2634c9b1ea3ab139f9f25e838"
+    },
+    {
+      "name": "CVE-2026-54707.diff",
+      "sha256": "7509d75b3bf98aaaee531282cb45ccb03879049483e5d1f228f5e7b4dcbc284b"
+    },
+    {
+      "name": "CVE-2026-54785.diff",
+      "sha256": "5c3d2e3abb1eaa39992dfbd6058d4e5d33f6797f71a95024fdc3cec7013abcfb"
+    },
+    {
+      "name": "CVE-2026-59890.diff",
+      "sha256": "544f27f32d82a098bf8d1e055f41d1d336c87cc6de6a44f43357fd1a176bc9b3"
+    },
+    {
+      "name": "CVE-2026-67424.diff",
+      "sha256": "31e16606420198f023326899b891e4c295db4ea9589ec939c4a0065a1a8200c1"
+    },
+    {
+      "name": "CVE-2026-67425.diff",
+      "sha256": "0a2efce09266bbfb90bd51347d5b78e44be22c4327539284e34c85f93fbaece6"
+    },
+    {
+      "name": "CVE-2026-70491.diff",
+      "sha256": "3a08fdf8b2dff4a79c3b99bb234985aa1a2d6a6830a458bbc3555e7f7aca6f6c"
+    },
+    {
+      "name": "CVE-2026-73498.diff",
+      "sha256": "2d3eba6f4c89c470ee4bd41fd44dfcadb64c967fcfdb1b1b905c7a8db31235ca"
+    }
+  ],
+  "distribution_files": [
+    {
+      "path": "cpg/ablation/artifacts/v4/annotation/标注交接说明.md",
+      "bytes": 6981,
+      "lines": 160,
+      "sha256": "65a9839ca2e6624ab9d281a506bf4ff1dd932f2c7d6c4af3232b4da482c4aa77"
+    },
+    {
+      "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer1.jsonl",
+      "bytes": 247651,
+      "lines": 284,
+      "sha256": "e36583c5a4e684355024a91adc7937a820f77e6c6b19d0accc949ea72feeab38"
+    },
+    {
+      "path": "cpg/ablation/artifacts/v4/annotation/critical_hunks.reviewer2.jsonl",
+      "bytes": 247651,
+      "lines": 284,
+      "sha256": "a72e77fa452c984f8e32adccff6d3286b6c519a55c41cee13bda361c52ba9585"
+    },
+    {
+      "path": "cpg/ablation/artifacts/v4/critical_hunks.template.json",
+      "bytes": 138293,
+      "lines": 3984,
+      "sha256": "7fd12a4488aa1ba19faa467196bc76a4403ad3cce5313d8f8fc0ad1f2ff45099"
+    },
+    {
+      "path": "cpg/ablation/artifacts/v4/v4_hunk_coverage.json",
+      "bytes": 203564,
+      "lines": 5316,
+      "sha256": "96c8c029a7c6fc31868026fc4eddbf630e463013b6a37902557aa055bd7a659c"
+    }
+  ],
+  "protocol": {
+    "blind": true,
+    "contains_ai_suggestions": false,
+    "submission_rule": "两位标注者私下分别提交；先交者结果不得出现在后交者可见位置"
+  }
+}

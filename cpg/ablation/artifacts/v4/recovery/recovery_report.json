@@ -1,0 +1,71 @@
+{
+  "schema": "v4-recovery/1",
+  "template": {
+    "path": "cpg/ablation/artifacts/v4/critical_hunks.template.json",
+    "bytes": 138293,
+    "lines": 3984,
+    "sha256": "7fd12a4488aa1ba19faa467196bc76a4403ad3cce5313d8f8fc0ad1f2ff45099"
+  },
+  "submissions": {
+    "reviewer1": {
+      "path": "C:/Users/lenovo/AppData/Local/Temp/tmpoyz1ns61/r1.jsonl",
+      "bytes": 160192,
+      "lines": 283,
+      "sha256": "48d8703bcf236ce561d9cad02af23d1859e904ce0dc54e70985dd8a35450f4ba"
+    },
+    "reviewer2": {
+      "path": "C:/Users/lenovo/AppData/Local/Temp/tmpoyz1ns61/r2.jsonl",
+      "bytes": 160239,
+      "lines": 283,
+      "sha256": "4471bbed408da38c5a32bca170ec81f01462055678e363a722a7d630cd3a7ff9"
+    }
+  },
+  "validation": {
+    "reviewer1": {
+      "path": "C:\\Users\\lenovo\\AppData\\Local\\Temp\\tmpoyz1ns61\\r1.jsonl",
+      "n_rows": 284,
+      "bytes": 160192,
+      "sha256": "48d8703bcf236ce561d9cad02af23d1859e904ce0dc54e70985dd8a35450f4ba",
+      "errors": [],
+      "ok": true
+    },
+    "reviewer2": {
+      "path": "C:\\Users\\lenovo\\AppData\\Local\\Temp\\tmpoyz1ns61\\r2.jsonl",
+      "n_rows": 284,
+      "bytes": 160239,
+      "sha256": "4471bbed408da38c5a32bca170ec81f01462055678e363a722a7d630cd3a7ff9",
+      "errors": [],
+      "ok": true
+    }
+  },
+  "agreement": {
+    "n_common": 284,
+    "n_template": 284,
+    "raw_agreement_role": 0.331,
+    "cohen_kappa_role": -0.0039,
+    "raw_agreement_dependency": 1.0,
+    "raw_agreement_counterfactual": 0.3486,
+    "raw_agreement_evidence": 1.0,
+    "uncertain_ratio_r1": 0.0,
+    "uncertain_ratio_r2": 0.0,
+    "submission_sha256": {
+      "reviewer1": "48d8703bcf236ce561d9cad02af23d1859e904ce0dc54e70985dd8a35450f4ba",
+      "reviewer2": "4471bbed408da38c5a32bca170ec81f01462055678e363a722a7d630cd3a7ff9"
+    }
+  },
+  "disagreement": {
+    "n_items": 249,
+    "kinds": {
+      "DISAGREEMENT": 249,
+      "UNANIMOUS_UNCERTAIN": 0,
+      "PARTIAL_UNCERTAIN": 0
+    },
+    "artifact": {
+      "path": "cpg/ablation/artifacts/v4/recovery/disagreements.json",
+      "bytes": 336258,
+      "lines": 10470,
+      "sha256": "b4d2d3cb2744f73bb50e008b6eec06a1d8de2f528a145f2aae2562cbf74fbc1f"
+    }
+  },
+  "next_step": "第三人填写 disagreements.json 的 final_*（含 final_role/final_dependency_group/final_counterfactual/final_evidence/final_reason/adjudicator）；必要时填 exclusions（结构化，仅限 UNCERTAIN 且须覆盖该样本全部 pending hunk）"
+}

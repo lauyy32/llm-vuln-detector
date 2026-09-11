@@ -287,10 +287,17 @@ def adjudicate(disagreements: Path, out: Path, template_path: Path,
                                         "reviewer2": _sha(sub2.read_bytes())}:
         raise ValueError("分歧清单 submission SHA 与当前提交不符")
     # 加固4：直接用**纯函数** expected_disagreements()，执行与编译器相同的规范投影比较
+    items = doc.get("items", [])
+    if doc.get("n_items") != len(items):
+        raise ValueError(f"仲裁件 n_items={doc.get('n_items')} 与 items 长度 {len(items)} 不符")
+    ids = [i.get("hunk_id") for i in items]
+    if len(ids) != len(set(ids)):
+        dup = sorted({x for x in ids if ids.count(x) > 1})
+        raise ValueError(f"仲裁件存在重复 hunk_id {len(dup)} 条: {[str(d)[:12] for d in dup[:3]]}")
+    got = {i.get("hunk_id"): i for i in items}
     exp = expected_disagreements(sub1, sub2, template_path)
-    got = {i.get("hunk_id"): i for i in doc.get("items", [])}
     if set(got) != set(exp):
-        raise ValueError("仲裁件 item 集合与当前分歧检测不一致（缺/多/重复）")
+        raise ValueError("仲裁件 item 集合与当前分歧检测不一致（缺/多）")
     for k, e in exp.items():
         g = got[k]
         for f in ("kind", "sample_id", "hunk_identity", "fields_in_dispute"):
