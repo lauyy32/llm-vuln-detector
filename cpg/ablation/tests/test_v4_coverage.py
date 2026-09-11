@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """coverage gate 测试：直接调用**生产函数** evaluate_coverage_gate（不在测试内重实现逻辑）。"""
 import hashlib
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -9,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 from cpg.ablation import v4_gate_a as ga  # noqa: E402
 from cpg.ablation import v4_selector as sel  # noqa: E402
+from cpg.ablation import v4_annotation as va  # noqa: E402
 
 IDS = {"CVE-X"}
 
@@ -28,7 +30,8 @@ def _ident(file="x.py", status="M", os_=10, oc=3, ns=10, nc=3, sha="a" * 64):
 
 def _cov(entries):
     """entries = [(ident, coverage)] → 满足新 schema 的 mock coverage。"""
-    hunks = [{"sample_id": "CVE-X", "hunk_identity": i, "coverage": c}
+    hunks = [{"sample_id": "CVE-X", "hunk_identity": i, "coverage": c,
+              "source_context_coverage": c, "candidate_patch_coverage": c}
              for i, c in entries]
     seen = {}
     for h in hunks:
@@ -44,16 +47,23 @@ def _cov(entries):
     }
 
 
-def _frozen(entries):
+def _frozen(entries, excluded=(), all_ids=("CVE-X",)):
     import hashlib as _h, json as _j
-    uni = {"all_sample_ids": ["CVE-X"], "active_sample_ids": ["CVE-X"],
-           "excluded_sample_ids": [], "exclusions": {}}
-    return {"status": "FROZEN_LABELED",
+    ROLE = {"SECURITY_CRITICAL": "DIRECT_SECURITY", "NON_CRITICAL": "NON_CRITICAL"}
+    ents = [{"sample_id": "CVE-X", "hunk_identity": i, "criticality": c,
+             "role": ROLE.get(c, c)} for i, c in entries]
+    role_counts = {}
+    for e in ents:
+        role_counts[e["role"]] = role_counts.get(e["role"], 0) + 1
+    uni = {"all_sample_ids": list(all_ids), "active_sample_ids": ["CVE-X"],
+           "excluded_sample_ids": list(excluded), "exclusions": {}}
+    return {"status": "FROZEN_LABELED" if not excluded else "FROZEN_WITH_EXCLUSIONS",
             "stale_universe_guard": uni,
             "universe_sha256": _h.sha256(
                 _j.dumps(uni, sort_keys=True).encode("utf-8")).hexdigest(),
-            "entries": [{"sample_id": "CVE-X", "hunk_identity": i, "criticality": c}
-                        for i, c in entries]}
+            "n_entries": len(ents), "n_excluded_samples": len(excluded),
+            "role_counts": role_counts,
+            "entries": ents}
 
 
 def _gate(cov, froz):
@@ -89,12 +99,12 @@ class TestEvaluateCoverageGate(unittest.TestCase):
     def test_critical_absent_blocks(self):
         i = _ident()
         errs = _gate(_cov([(i, "ABSENT")]), _frozen([(i, "SECURITY_CRITICAL")]))
-        self.assertTrue(any("非 FULL" in e for e in errs))
+        self.assertTrue(any("覆盖不合格" in e for e in errs))
 
     def test_critical_partial_blocks(self):
         i = _ident()
         errs = _gate(_cov([(i, "PARTIAL")]), _frozen([(i, "SECURITY_CRITICAL")]))
-        self.assertTrue(any("非 FULL" in e for e in errs))
+        self.assertTrue(any("覆盖不合格" in e for e in errs))
 
     def test_critical_full_passes(self):
         i = _ident()
@@ -112,8 +122,10 @@ class TestEvaluateCoverageGate(unittest.TestCase):
         reg = {"status": "FROZEN_LABELED", "stale_universe_guard": uni,
                "universe_sha256": _h.sha256(
                    _j.dumps(uni, sort_keys=True).encode("utf-8")).hexdigest(),
+               "n_entries": 1, "n_excluded_samples": 0,
+               "role_counts": {"UNCLEAR": 1},
                "entries": [{"sample_id": "CVE-X", "hunk_identity": i,
-                            "criticality": "UNCLEAR"}]}
+                            "criticality": "UNCLEAR", "role": "UNCLEAR"}]}
         errs = _gate(_cov([(i, "FULL")]), reg)
         self.assertTrue(any("未裁决" in e for e in errs))
 
@@ -122,7 +134,7 @@ class TestEvaluateCoverageGate(unittest.TestCase):
         reg = _frozen([(i, "SECURITY_CRITICAL")])
         reg["entries"][0]["mechanical_coverage"] = "FULL"    # 过期副本
         errs = _gate(_cov([(i, "ABSENT")]), reg)             # 当前值才是 ABSENT
-        self.assertTrue(any("非 FULL" in e for e in errs))
+        self.assertTrue(any("覆盖不合格" in e for e in errs))
 
     def test_stale_registry_copy_ignored_when_current_full(self):
         i = _ident()
@@ -252,3 +264,94 @@ class TestProductionAnnotationPackage(unittest.TestCase):
             fp.write_text("\n".join(_j.dumps(r, ensure_ascii=False) for r in rows), encoding="utf-8")
             v = va.validate_submission(fp, tpl)
             self.assertTrue(v["ok"], v["errors"][:5])
+
+
+class TestAddedCriticalSemantics(unittest.TestCase):
+    """P0-3：新增文件的 critical hunk —— source 侧 N/A 可接受，candidate 必须 FULL。"""
+
+    def test_added_critical_requires_candidate_full(self):
+        src = ga._critical_ok
+        self.assertTrue(src({"source_context_coverage": "NOT_APPLICABLE_ADDED",
+                             "candidate_patch_coverage": "FULL"}))
+        self.assertFalse(src({"source_context_coverage": "NOT_APPLICABLE_ADDED",
+                              "candidate_patch_coverage": "ABSENT"}))
+        self.assertTrue(src({"source_context_coverage": "FULL",
+                             "candidate_patch_coverage": "FULL"}))
+        self.assertFalse(src({"source_context_coverage": "ABSENT",
+                              "candidate_patch_coverage": "FULL"}))
+
+
+class TestUniverseAnchoring(unittest.TestCase):
+    """P0-1：universe 必须外部锚定，不得自声明缩成子集。"""
+
+    def _cov_two(self):
+        i1, i2 = _ident(sha="1" * 64), _ident(sha="2" * 64)
+        return _cov([(i1, "FULL"), (i2, "FULL")])
+
+    def test_shrunk_universe_blocked(self):
+        cov = self._cov_two()
+        # 伪造 all=[CVE-X]（缩成一个样本）——cov 里其实有两个 hunk 但同一 CVE
+        fz = _frozen([(_ident(sha="1" * 64), "NON_CRITICAL")], all_ids=("CVE-X",))
+        errs = _gate(cov, fz)
+        # entries 只有 1 条而 active 是 CVE-X → missing identity 应阻断
+        self.assertTrue(errs)
+
+    def test_all_must_equal_expected_ids(self):
+        cov = self._cov_two()
+        fz = _frozen([(_ident(sha="1" * 64), "NON_CRITICAL"),
+                      (_ident(sha="2" * 64), "NON_CRITICAL")])
+        fz["stale_universe_guard"]["all_sample_ids"] = ["CVE-X", "CVE-Y"]
+        import hashlib as _h, json as _j
+        fz["universe_sha256"] = _h.sha256(_j.dumps(
+            fz["stale_universe_guard"], sort_keys=True).encode("utf-8")).hexdigest()
+        errs = _gate(cov, fz)
+        self.assertTrue(any("expected_ids" in e or "coverage.samples" in e for e in errs))
+
+    def test_status_set_semantics(self):
+        cov = _cov([(_ident(), "FULL")])
+        fz = _frozen([(_ident(), "NON_CRITICAL")], excluded=("CVE-X",))
+        fz["status"] = "FROZEN_LABELED"     # 有 excluded 却称 LABELED
+        errs = _gate(cov, fz)
+        self.assertTrue(any("FROZEN_LABELED 不允许有 excluded" in e for e in errs))
+
+
+class TestArbitraryExclusionGuard(unittest.TestCase):
+    """P0-2：不得把**确定一致**的样本塞进 exclusions 删掉。"""
+
+    def test_confirmed_sample_cannot_be_excluded(self):
+        from cpg.ablation.tests.test_v4_annotation import _Env
+        e = _Env()
+        e.all_same(va.ROLE_NONCRIT)          # 两人完全一致、无 UNCERTAIN
+        dis = va.disagreement_list(e.sub1, e.sub2, e.tpl, e.d / "dis.json")
+        doc = json.loads((e.d / "dis.json").read_text(encoding="utf-8"))
+        doc["exclusions"] = {"CVE-A": {"reason": "r", "adjudicator": "a",
+                                       "evidence": "insufficient",
+                                       "source_item_ids": [e.ids["a1"]["hunk_id"]]}}
+        (e.d / "adj.json").write_bytes(
+            (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+        with self.assertRaises(ValueError) as cm:
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, e.d / "adj.json",
+                              e.d / "frozen.json", exclusions=doc["exclusions"])
+        self.assertIn("非 UNCERTAIN", str(cm.exception))
+
+
+class TestRealGeneratorEndToEnd(unittest.TestCase):
+    """真正调用 build_annotation_package（临时目录），而非只读既有工件。"""
+
+    def test_generate_then_validate(self):
+        try:
+            import tokenizers  # noqa: F401
+        except ImportError:
+            self.skipTest("tokenizers 未安装")
+        import json as _j, tempfile, shutil
+        src = ga.OUT_DIR
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            # 复制生成所需输入（patches / g0_selection / canonical manifest 引用）
+            shutil.copytree(src / "patches", out / "patches")
+            shutil.copytree(src / "g0_selection", out / "g0_selection")
+            shutil.copy2(src / "v4_hunk_coverage.json", out / "v4_hunk_coverage.json")
+            shutil.copy2(src / "critical_hunks.template.json", out / "critical_hunks.template.json")
+            pkg = ga.build_annotation_package(out)
+            self.assertEqual(ga.validate_blank_annotation_package(out), [])
+            self.assertTrue(pkg["blank_package_check"]["ok"])

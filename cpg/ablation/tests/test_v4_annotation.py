@@ -159,7 +159,8 @@ class TestSampleLevelExclusion(unittest.TestCase):
         e = _Env()
         e.subs({"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT},
                {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT})
-        froz = e.freeze(exclusions={"CVE-A": {"reason": "两标注者均证据不足", "adjudicator": "adjudicator1", "evidence": "insufficient", "source_item_ids": ["x"]}})
+        unc = [e.ids[k]["hunk_id"] for k in ("a1", "a2")]
+        froz = e.freeze(exclusions={"CVE-A": {"reason": "两标注者均证据不足", "adjudicator": "adjudicator1", "evidence": "insufficient", "source_item_ids": unc}})
         self.assertEqual(froz["status"], "FROZEN_WITH_EXCLUSIONS")
         # 不得残留任何 CVE-A entry
         self.assertFalse(any(x["sample_id"] == "CVE-A" for x in froz["entries"]))
@@ -184,7 +185,8 @@ class TestEndToEndGate(unittest.TestCase):
         for ident in ids:
             samples.setdefault(ident["sample_id"], {"n_hunks": 0, "hunks": []})
             samples[ident["sample_id"]]["hunks"].append(
-                {"sample_id": ident["sample_id"], "hunk_identity": ident, "coverage": status})
+                {"sample_id": ident["sample_id"], "hunk_identity": ident, "coverage": status,
+                 "source_context_coverage": status, "candidate_patch_coverage": status})
             samples[ident["sample_id"]]["n_hunks"] += 1
         for s in samples.values():
             s["selection_bound"] = True
@@ -218,7 +220,8 @@ class TestEndToEndGate(unittest.TestCase):
         e = _Env()
         e.subs({"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT},
                {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT})
-        froz = e.freeze(exclusions={"CVE-A": {"reason": "两标注者均证据不足", "adjudicator": "adjudicator1", "evidence": "insufficient", "source_item_ids": ["x"]}})
+        unc = [e.ids[k]["hunk_id"] for k in ("a1", "a2")]
+        froz = e.freeze(exclusions={"CVE-A": {"reason": "两标注者均证据不足", "adjudicator": "adjudicator1", "evidence": "insufficient", "source_item_ids": unc}})
         cov = self._cov_for(list(e.ids.values()))     # coverage 仍含 CVE-A
         errs = ga.evaluate_coverage_gate(cov, froz, expected_ids={"CVE-A", "CVE-X"})
         self.assertEqual(errs, [], errs)
@@ -230,7 +233,7 @@ class TestEndToEndGate(unittest.TestCase):
         froz = e.freeze()
         cov = self._cov_for(list(e.ids.values()), status="ABSENT")
         errs = ga.evaluate_coverage_gate(cov, froz, expected_ids=set(cov["samples"]))
-        self.assertTrue(any("非 FULL" in x for x in errs))
+        self.assertTrue(any("覆盖不合格" in x for x in errs))
 
     def test_unfrozen_blocks(self):
         from cpg.ablation import v4_gate_a as ga

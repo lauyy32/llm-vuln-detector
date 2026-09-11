@@ -86,6 +86,15 @@ def validate_submission(path: Path, template_path: Path) -> dict:
         except ValueError as e:
             errs.append(f"{r.get('sample_id')}: {e}")
             continue
+        # P1-1：hunk_id 必须是 64 位 hex 且可由其余字段重算
+        from cpg.ablation.v4_selector import is_hex64 as _hx, recompute_hunk_id as _rh, \
+            identity_matches as _im, IDENTITY_FIELDS as _IF
+        if not _hx(k):
+            errs.append(f"{r.get('sample_id')}: hunk_id 非 64 位 hex")
+        elif _rh(ident) != k:
+            errs.append(f"{r.get('sample_id')}: hunk_id 无法由 identity 重算（被篡改）")
+        elif k in tpl and not _im(ident, tpl[k]["hunk_identity"]):
+            errs.append(f"{r.get('sample_id')}: identity 与 template 逐字段不符")
         if k in got:
             dup.append(k)
         got.add(k)
@@ -104,6 +113,13 @@ def validate_submission(path: Path, template_path: Path) -> dict:
             errs.append(f"{r.get('sample_id')}: 非法 counterfactual={cf}")
         if not r.get("reason"):
             errs.append(f"{r.get('sample_id')}: reason 为空")
+        # P1-2：科学字段必填，不得留 null
+        if r.get("dependency_group") is None:
+            errs.append(f"{r.get('sample_id')}: dependency_group 不得为空（空依赖请填 []）")
+        if cf is None:
+            errs.append(f"{r.get('sample_id')}: counterfactual 必填")
+        if ev is None:
+            errs.append(f"{r.get('sample_id')}: evidence 必填")
         # P1：UNCERTAIN 必须 insufficient + 有理由
         if r.get("criticality") == ROLE_UNCERTAIN and ev != "insufficient":
             errs.append(f"{r.get('sample_id')}: UNCERTAIN 必须 evidence=insufficient")
@@ -354,6 +370,14 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
                          f"{sorted(missing_adjudication)}")
     # UNCERTAIN：须复审，或**结构化整例排除**
     structured = {}
+    if exclusions and not set(exclusions) <= pending_uncertain:
+        raise ValueError(f"exclusions 含非 UNCERTAIN 样本（不得主动删除确定样本）: "
+                         f"{sorted(set(exclusions) - pending_uncertain)}")
+    unc_ids = {k for k in tpl
+               if k in adj and adj[k].get("final_role") == ROLE_UNCERTAIN} | \
+              {k for k in tpl
+               if r1[k]["criticality"] == ROLE_UNCERTAIN and r2[k]["criticality"] == ROLE_UNCERTAIN
+               and k not in adj}
     for sid, rec in (exclusions or {}).items():
         if isinstance(rec, str):     # 裸字符串不再接受
             raise ValueError(f"exclusions[{sid}] 必须是结构化记录"
@@ -362,6 +386,16 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
                 if not rec.get(f)]
         if miss:
             raise ValueError(f"exclusions[{sid}] 缺字段 {miss}")
+        if rec.get("evidence") != "insufficient":
+            raise ValueError(f"exclusions[{sid}] evidence 必须为 insufficient")
+        from cpg.ablation.v4_selector import is_hex64 as _hx2
+        for it in rec["source_item_ids"]:
+            if not _hx2(it):
+                raise ValueError(f"exclusions[{sid}] source_item_ids 含非完整 hunk_id")
+            if it not in tpl or tpl[it]["sample_id"] != sid:
+                raise ValueError(f"exclusions[{sid}] source_item_ids 不属于该样本")
+            if it not in unc_ids:
+                raise ValueError(f"exclusions[{sid}] source_item_ids 非 UNCERTAIN 项")
         structured[sid] = rec
     unhandled = sorted(pending_uncertain - set(structured))
     if unhandled:

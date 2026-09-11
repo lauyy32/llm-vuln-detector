@@ -49,6 +49,25 @@ def attach_hunk_ids(coverage: dict) -> dict:
     return coverage
 
 
+# hunk_id 的组成字段（重算时必须完全一致）
+IDENTITY_FIELDS = ("sample_id", "file", "file_status", "old_start", "old_count",
+                   "new_start", "new_count", "body_lf_sha256")
+
+
+def recompute_hunk_id(ident: dict) -> str:
+    """由 identity 的**其余字段**重算 hunk_id（P1-1：防篡改）。"""
+    return hunk_id({k: ident.get(k) for k in IDENTITY_FIELDS})
+
+
+def is_hex64(s) -> bool:
+    return isinstance(s, str) and len(s) == 64 and all(c in "0123456789abcdef" for c in s)
+
+
+def identity_matches(a: dict, b: dict, fields=IDENTITY_FIELDS) -> bool:
+    """逐字段比对两个 identity（忽略 hunk_id 之外的附加键）。"""
+    return all(a.get(k) == b.get(k) for k in fields)
+
+
 def parse_patch_hunks(patch_text: str) -> dict:
     """解析 patch → {file: [{old_start, old_count, new_start, new_count, header, _body}]}。
 

@@ -936,8 +936,14 @@ def build_hunk_coverage(out_dir: Path) -> dict:
                 n[status] += 1
                 from cpg.ablation import v4_selector as _s2
                 ident["hunk_id"] = _s2.hunk_id(ident)   # P0-4：完整唯一身份
+                # P0-3：**两个覆盖维度**——新增文件的 source 侧无对应行，
+                # 但其 candidate patch 侧仍必须被候选补丁完整包含。
+                cand = "FULL" if fstat.get(rel) == "A" else status
                 rows.append({"sample_id": cve, "hunk_identity": ident,
-                             "coverage": status, "criticality": None})
+                             "source_context_coverage": status,
+                             "candidate_patch_coverage": cand,
+                             "coverage": status,       # 兼容字段（= source 侧）
+                             "criticality": None})
         report["samples"][cve] = {"n_hunks": len(rows), **n, "hunks": rows,
                                   "selection_bound": not sel_errs,
                                   "selection_manifest_sha256": bound_sha,
@@ -1117,7 +1123,11 @@ def build_annotation_package(out_dir: Path) -> dict:
         if not p.exists():
             p = ROOT / "cpg/ablation/artifacts/v4" / rel
         b = p.read_bytes()
-        return {"name": rel, "path": str(p.relative_to(ROOT).as_posix()),
+        try:
+            path_str = p.relative_to(ROOT).as_posix()
+        except ValueError:
+            path_str = p.as_posix()
+        return {"name": rel, "path": path_str,
                 "bytes": len(b), "lines": b.count(b"\n"), "sha256": _sha256_bytes(b)}
     artifacts = ["annotation/critical_hunks.reviewer1.jsonl",
                  "annotation/critical_hunks.reviewer2.jsonl",
@@ -1247,6 +1257,14 @@ def _validate_coverage_schema(coverage: dict, expected_ids=None) -> list:
             if not _is_hex64(ident["body_lf_sha256"]):
                 errs.append(f"{cve} body_lf_sha256 非 64 位 hex")
                 break
+            # P1-1：hunk_id 必须可重算
+            from cpg.ablation.v4_selector import is_hex64 as _hx, recompute_hunk_id as _rh
+            if not _hx(ident.get("hunk_id")) or _rh(ident) != ident["hunk_id"]:
+                errs.append(f"{cve} hunk_id 非 64 位 hex 或无法重算")
+                break
+            if h.get("source_context_coverage") is None or h.get("candidate_patch_coverage") is None:
+                errs.append(f"{cve} 缺 source/candidate 覆盖维度")
+                break
             if ident.get("sample_id") != cve:
                 errs.append(f"{cve} identity.sample_id 不符: {ident.get('sample_id')}")
                 break
@@ -1285,26 +1303,48 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None,
     if not active or not all_sids:
         errs.append("frozen registry 缺 all/active_sample_ids（universe 未冻结）")
         return errs
-    # P0-5：全集恒等式（防空 active 列表绕过）
+    # P0-1：universe 必须**外部锚定**（不得自声明缩成子集）
+    cov_sids = set(coverage["samples"])
+    if all_sids != cov_sids:
+        errs.append(f"all_sample_ids != coverage.samples（缺 "
+                    f"{sorted(cov_sids - all_sids)}，多 {sorted(all_sids - cov_sids)}）")
+    exp = expected_ids if expected_ids is not None else V4_CANDIDATES
+    if all_sids != set(exp):
+        errs.append("all_sample_ids != expected_ids（候选全集不符）")
+    # P0-1：状态与集合的语义一致
+    st = frozen_registry.get("status")
+    if st == "FROZEN_LABELED" and excluded:
+        errs.append("FROZEN_LABELED 不允许有 excluded")
+    if st == "FROZEN_WITH_EXCLUSIONS" and not excluded:
+        errs.append("FROZEN_WITH_EXCLUSIONS 必须 excluded≠∅")
+    if frozen_registry.get("n_excluded_samples") != len(excluded):
+        errs.append("n_excluded_samples 与实际 excluded 不符")
+    if frozen_registry.get("n_entries") != len(frozen_registry.get("entries", [])):
+        errs.append("n_entries 与实际 entries 不符")
+    rc = frozen_registry.get("role_counts") or {}
+    real_rc = {}
+    for e in frozen_registry.get("entries", []):
+        real_rc[e.get("role")] = real_rc.get(e.get("role"), 0) + 1
+    if {k: v for k, v in rc.items() if v} != {k: v for k, v in real_rc.items() if v}:
+        errs.append("role_counts 与实际 entries 不符")
     if active & excluded:
         errs.append(f"active ∩ excluded 非空: {sorted(active & excluded)}")
     if active | excluded != all_sids:
         errs.append("active ∪ excluded != all_sample_ids（universe 不闭合）")
-    # universe_sha256 必须与重算一致
     recomputed = _sha256_bytes(json.dumps(
         {k: universe.get(k) for k in ("all_sample_ids", "active_sample_ids",
                                       "excluded_sample_ids", "exclusions")},
         sort_keys=True).encode("utf-8"))
     if frozen_registry.get("universe_sha256") != recomputed:
         errs.append("universe_sha256 重算不符")
-    # 排除记录必须结构化完整
     for sid in sorted(excluded):
         rec = (universe.get("exclusions") or {}).get(sid) or {}
         miss = [f for f in ("reason", "adjudicator", "evidence", "source_item_ids")
                 if not rec.get(f)]
         if miss:
             errs.append(f"排除记录 {sid} 缺字段 {miss}")
-    # entries 的样本集必须 == active
+        elif rec.get("evidence") != "insufficient":
+            errs.append(f"排除记录 {sid} 的 evidence 必须为 insufficient")
     ent_sids = {e.get("sample_id") for e in frozen_registry.get("entries", [])}
     if ent_sids != active:
         errs.append("frozen entries 样本集 != active_sample_ids")
@@ -1319,7 +1359,9 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None,
             k = _ident_key(h["hunk_identity"])
             if k in cur:
                 dup.append(k)
-            cur[k] = h["coverage"]
+            cur[k] = {"source_context_coverage": h.get("source_context_coverage", h.get("coverage")),
+                      "candidate_patch_coverage": h.get("candidate_patch_coverage",
+                                                        h.get("coverage"))}
     if dup:
         errs.append(f"当前 coverage 存在重复 identity {len(dup)} 条")
     froz, fdup = {}, []
@@ -1342,10 +1384,28 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None,
     if extra:
         errs.append(f"registry 含 {len(extra)} 条 coverage 不存在的 identity（陈旧）")
     crit_bad = sorted({sid for k, (crit, sid) in froz.items()
-                       if crit == "SECURITY_CRITICAL" and cur.get(k) != "FULL"})
+                       if crit == "SECURITY_CRITICAL"
+                       and not _critical_ok(cur.get(k))})
     if crit_bad:
-        errs.append(f"SECURITY_CRITICAL 但当前覆盖非 FULL（须敏感性分析或签名 override）: {crit_bad}")
+        errs.append(f"SECURITY_CRITICAL 覆盖不合格（需 source FULL，或新增文件须 candidate FULL）: "
+                    f"{crit_bad}")
     return errs
+
+
+def _critical_ok(cov: dict | None) -> bool:
+    """P0-3：关键 hunk 的合格条件（两维度）。
+
+    - 已有文件：source_context_coverage 必须 FULL（补丁触及位置的源码可见）；
+    - 新增文件：source 侧为 NOT_APPLICABLE_ADDED 可接受，但 candidate_patch_coverage
+      必须 FULL（候选补丁完整包含该 hunk）。
+    """
+    if not isinstance(cov, dict):
+        return False
+    src = cov.get("source_context_coverage")
+    cand = cov.get("candidate_patch_coverage")
+    if src == "NOT_APPLICABLE_ADDED":
+        return cand == "FULL"
+    return src == "FULL"
 
 
 def main() -> int:
