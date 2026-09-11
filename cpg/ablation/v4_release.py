@@ -48,6 +48,55 @@ def _git_commit() -> str | None:
 
 
 # ---------------------------------------------------------------------------
+# A-3：四臂算法预注册（打开标注结果前冻结）
+# ---------------------------------------------------------------------------
+PREREG_PARAMS = {
+    "window": 20,
+    "max_chars": 24000,
+    "stable_sort_key": ["file_path", "old_start", "old_count",
+                        "new_start", "new_count", "body_lf_sha256"],
+    "critical_priority": "SECURITY_CRITICAL 优先纳入，其余按 stable_sort_key",
+    "dependency_closure": "对 SECURITY_CRITICAL 的 dependency_group 取传递闭包并一并纳入",
+    "budget_relief": "关键 hunk 不得因预算被丢弃；非关键可丢弃并计数落盘",
+    "unrepresentable_rule": "critical hunk 仍无法纳入 → 该样本 ABSENT 并进 confirmatory_blocking",
+    "tie_break": "同优先级按 stable_sort_key 字典序最小者优先",
+    "role_mapping": {"DIRECT_SECURITY": "SECURITY_CRITICAL",
+                     "SUPPORTING_REQUIRED": "SECURITY_CRITICAL",
+                     "NON_CRITICAL": "NON_CRITICAL",
+                     "UNCERTAIN": "EXCLUDE_FROM_CONFIRMATORY"},
+    "placebo_token_target": "minimal-real 的最终 prompt token；比值界 [0.8, 1.25]（未舍入判定）",
+    "shuffled_donor_rule": "donor != 目标；约束匹配选 token 最接近者",
+    "num_ctx": 32768,
+    "num_predict": 1024,
+    "minimal_real_rule": ("保留 closure(S ∪ deps(S)) 的全部 hunk，S={role∈{DIRECT,SUPPORTING}}"),
+    "partial_rule": "从 minimal-real 删除 role=DIRECT_SECURITY 的 hunk（保留 SUPPORTING）",
+    "exclusion_rule": "exclusions ⊆ pending_uncertain，且 source_item_ids 必须等于该样本全部 pending hunk",
+    "min_n_confirmatory": 8,
+    "primary_estimand": "pairwise sufficiency discrimination rate",
+    "power_note": "m=8 时 p1=0.90 功效 0.43；检出 90% 效应需 m=12 discordant pairs",
+}
+
+
+def prereg() -> dict:
+    """固化预注册参数 + 文档 SHA；标注回收后**不得**修改参数（除非走 deviation log）。"""
+    doc_path = ROOT / "cpg/ablation/V4-四臂算法预注册.md"
+    doc = {
+        "schema": "v4-prereg/1",
+        "frozen_at_git_commit": _git_commit(),
+        "document": _f(doc_path) if doc_path.exists() else None,
+        "params": PREREG_PARAMS,
+        "policy": {
+            "post_recovery": "只允许把标签代入本算法；不得修改任何参数",
+            "deviation": "必须走 deviation log（原因/影响/作废的已跑结果）",
+            "recompute_gate": "双干净目录的四臂 prompt/selection/coverage SHA 必须一致",
+        },
+    }
+    (OUT / "v4_prereg.json").write_bytes(
+        (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    return doc
+
+
+# ---------------------------------------------------------------------------
 # A-1：分发登记表
 # ---------------------------------------------------------------------------
 DISTRIBUTION_FILES = [
@@ -134,7 +183,7 @@ def recover(sub1: Path, sub2: Path, template: Path | None = None) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["registry", "recover"])
+    ap.add_argument("step", choices=["prereg", "registry", "recover"])
     ap.add_argument("--sub1", type=Path)
     ap.add_argument("--sub2", type=Path)
     ap.add_argument("--template", type=Path, default=None)
@@ -143,6 +192,12 @@ def main() -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
+    if args.step == "prereg":
+        d = prereg()
+        print(f"[A-3] v4_prereg.json 已冻结 {len(d['params'])} 项参数 "
+              f"@ {str(d['frozen_at_git_commit'])[:12]}")
+        print(f"  document sha: {str((d['document'] or {}).get('sha256'))[:16]}")
+        return 0
     if args.step == "registry":
         d = distribution_registry()
         print(f"[A-1] distribution_registry.json: {len(d['distribution_files'])} 个分发文件已登记")
