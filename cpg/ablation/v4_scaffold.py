@@ -205,14 +205,28 @@ def append_result(results_path: Path, rec: dict) -> None:
     tmp.replace(results_path)
 
 
-LOCK_REQUEST_SCHEMA = "v4-run-lock-request/1"
-LOCK_REQUEST_REQUIRED = ("schema", "model", "tokenizer_sha256", "envelope_sha256",
-                         "run_plan_sha256", "arm_artifact_sha256", "requested_by",
-                         "signatures")
+LOCK_REQUEST_SCHEMA = "v4-run-lock-request/2"
+
+# 与既有运行目录（rq1-r-canonical-v4/）**对齐**的锁字段结构：
+#   { state, locked_at, git_commit, files: {name: {base, path, sha256}} }
+# 其中 `files` 必须覆盖**全部承重输入**（P0-4）。
+LOCK_REQUIRED_FILES = (
+    "canonical_manifest",        # 语料清单
+    "annotation_registry",       # frozen critical-hunk 注册表
+    "gate_a_report",             # Gate A 报告
+    "prompt_manifest",           # 逐 prompt SHA 清单
+    "run_schedule",              # 冻结的调度（含 shuffle seed / repeat）
+    "renderer_impl",             # prompt renderer 实现 SHA
+    "selector_impl",             # selector 实现 SHA
+    "tokenizer",                 # 真实 tokenizer
+    "model_envelope_protocol",   # 模型身份 + 请求参数（含 model digest / ollama 版本）
+)
+LOCK_REQUEST_REQUIRED = ("schema", "state", "git_commit", "files",
+                         "universe", "schedule_seed", "signatures")
 
 
 def validate_lock_request(req: dict) -> list:
-    """**已冻结的正式字段集**校验（fail-closed）。"""
+    """**正式字段集**校验（fail-closed，与既有锁件对齐）。"""
     errs = []
     if not isinstance(req, dict):
         return ["lock request 非 dict"]
@@ -221,19 +235,35 @@ def validate_lock_request(req: dict) -> list:
             errs.append(f"缺字段 {k}")
     if req.get("schema") != LOCK_REQUEST_SCHEMA:
         errs.append(f"schema 不符: {req.get('schema')}")
-    for k in ("tokenizer_sha256", "envelope_sha256", "run_plan_sha256"):
-        v = req.get(k)
-        if not (isinstance(v, str) and len(v) == 64
-                and all(c in "0123456789abcdef" for c in v)):
-            errs.append(f"{k} 非 64 位 hex")
-    arms = req.get("arm_artifact_sha256")
-    if not isinstance(arms, dict) or not arms:
-        errs.append("arm_artifact_sha256 必须为非空映射")
+    if req.get("state") not in ("INPUTS_LOCKED",):
+        errs.append(f"state 必须为 INPUTS_LOCKED: {req.get('state')}")
+    gc = req.get("git_commit")
+    if not (isinstance(gc, str) and len(gc) == 40
+            and all(c in "0123456789abcdef" for c in gc)):
+        errs.append("git_commit 必须为 40 位 hex")
+    files = req.get("files")
+    if not isinstance(files, dict) or not files:
+        errs.append("files 必须为非空映射")
     else:
-        for a, v in arms.items():
+        missing = [n for n in LOCK_REQUIRED_FILES if n not in files]
+        if missing:
+            errs.append(f"files 缺承重输入: {missing}")
+        for name, spec in files.items():
+            if not isinstance(spec, dict):
+                errs.append(f"files.{name} 非对象")
+                continue
+            if spec.get("base") not in ("repo", "run"):
+                errs.append(f"files.{name}.base 非法: {spec.get('base')}")
+            v = spec.get("sha256")
             if not (isinstance(v, str) and len(v) == 64
                     and all(c in "0123456789abcdef" for c in v)):
-                errs.append(f"arm_artifact_sha256[{a}] 非 64 位 hex")
+                errs.append(f"files.{name}.sha256 非 64 位 hex")
+    uni = req.get("universe")
+    if not isinstance(uni, list) or not uni:
+        errs.append("universe 必须为非空样本列表")
+    seed = req.get("schedule_seed")
+    if not isinstance(seed, int):
+        errs.append("schedule_seed 必须为 int（顺序效应防线）")
     if req.get("signatures") != []:
         errs.append("请求模板的 signatures 必须为空（签名由 reviewer 另出）")
     for forbidden in ("reviewer_id", "signature", "signed_at", "approver"):
@@ -242,22 +272,27 @@ def validate_lock_request(req: dict) -> list:
     return errs
 
 
-def build_lock_request(arm_artifact_shas: dict, envelope_sha: str,
-                       gate_a_pass: bool, run_plan_sha: str,
-                       tokenizer_sha: str, model: str) -> dict:
-    """生成"请 reviewer 签锁"的**请求**（不是签名结果）。
+def build_lock_request(files: dict, universe: list, git_commit: str,
+                       schedule_seed: int, gate_a_pass: bool,
+                       locked_at: str | None = None) -> dict:
+    """生成 RUN_LOCK **请求**（不是签名结果）。
 
-    fail-closed：`gate_a_pass` 为 False 时**不得**生成可签请求；
-    生成的请求必须通过 `validate_lock_request()`。
+    **P0-4 修复**：字段结构与既有运行目录的 `lock_request.json` 对齐，
+    且 `files` 必须覆盖 `LOCK_REQUIRED_FILES` 全部承重输入（缺一即 fail-closed）。
+    `gate_a_pass=False` 时**不得**生成可签请求。
     """
     if not gate_a_pass:
         raise ValueError("Gate A 未通过，禁止生成 RUN_LOCK 请求")
     req = {SCAFFOLD_TAG: SCAFFOLD_ONLY, "schema": LOCK_REQUEST_SCHEMA,
-           "model": model, "tokenizer_sha256": tokenizer_sha,
-           "envelope_sha256": envelope_sha, "run_plan_sha256": run_plan_sha,
-           "arm_artifact_sha256": dict(sorted(arm_artifact_shas.items())),
+           "state": "INPUTS_LOCKED",
+           "locked_at": locked_at or "",
+           "git_commit": git_commit,
+           "files": dict(sorted(files.items())),
+           "universe": sorted(universe),
+           "schedule_seed": schedule_seed,
            "requested_by": "SCAFFOLD", "signatures": [],
-           "note": "本文件仅为请求模板；签名必须由 reviewer 在正式流程中出具"}
+           "note": ("本文件仅为请求模板；签名必须由 reviewer 在正式流程中出具。"
+                    "字段结构与既有运行目录 lock_request.json 对齐。")}
     errs = validate_lock_request(req)
     if errs:
         raise ValueError("lock request 字段冻结校验失败: " + "; ".join(errs))

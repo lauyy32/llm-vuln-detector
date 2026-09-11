@@ -261,25 +261,6 @@ class TestVerifier(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # 5) RUN_LOCK 请求模板
 # ---------------------------------------------------------------------------
-class TestLockRequest(unittest.TestCase):
-    def test_gate_not_passed_refuses(self):
-        with self.assertRaises(ValueError):
-            sc.build_lock_request({}, "e" * 64, gate_a_pass=False,
-                                  run_plan_sha="p" * 64, tokenizer_sha="t" * 64, model="m")
-
-    def test_request_has_no_signature(self):
-        req = sc.build_lock_request({"real": "a" * 64}, "e" * 64, gate_a_pass=True,
-                                    run_plan_sha="d" * 64, tokenizer_sha="f" * 64, model="m")
-        # 请求模板必须**无签名**且**不含签名者身份字段**
-        self.assertEqual(req["signatures"], [])
-        self.assertIs(req[sc.SCAFFOLD_TAG], True)
-        for forbidden in ("reviewer_id", "signature", "signed_at", "approver"):
-            self.assertNotIn(forbidden, req)
-
-
-# ---------------------------------------------------------------------------
-# 6) 统计（**已知值**校验）
-# ---------------------------------------------------------------------------
 class TestStatisticsKnownValues(unittest.TestCase):
     def test_clopper_pearson_table_value(self):
         """k=5,n=10,α=0.05 → (0.1871, 0.8129)（标准 CP 表值）。"""
@@ -378,28 +359,63 @@ class TestScaffoldBoundaries(unittest.TestCase):
 
 
 class TestLockRequestSchemaFrozen(unittest.TestCase):
-    """A-4 剩余：RUN_LOCK 正式字段集冻结。"""
+    """A-4 剩余：RUN_LOCK 正式字段集冻结（与既有运行目录 lock_request.json 对齐）。"""
+
+    def _files(self):
+        return {n: {"base": "run", "path": f"{n}.json", "sha256": "a" * 64}
+                for n in sc.LOCK_REQUIRED_FILES}
 
     def _req(self, **kw):
-        # 注意：必须是**合法 64 位 hex**（'t'/'p' 等超范围字符会被 fail-closed 拒绝）
-        base = dict(arm_artifact_shas={"real": "a" * 64, "partial": "b" * 64},
-                    envelope_sha="e" * 64, gate_a_pass=True,
-                    run_plan_sha="d" * 64, tokenizer_sha="f" * 64, model="m")
+        base = dict(files=self._files(), universe=["CVE-A", "CVE-B"],
+                    git_commit="e" * 40, schedule_seed=20260908, gate_a_pass=True)
         base.update(kw)
         return sc.build_lock_request(**base)
 
     def test_valid_passes_validation(self):
         self.assertEqual(sc.validate_lock_request(self._req()), [])
 
+    def test_structure_aligns_with_real_lock(self):
+        """字段结构必须与既有运行目录一致：state / git_commit / files{base,path,sha256}。"""
+        req = self._req()
+        for k in ("state", "locked_at", "git_commit", "files"):
+            self.assertIn(k, req, k)
+        spec = next(iter(req["files"].values()))
+        self.assertEqual(set(spec), {"base", "path", "sha256"})
+
     def test_missing_required_field(self):
         req = self._req()
-        req.pop("envelope_sha256")
-        self.assertTrue(any("envelope_sha256" in e for e in sc.validate_lock_request(req)))
+        req.pop("universe")
+        self.assertTrue(any("universe" in e for e in sc.validate_lock_request(req)))
+
+    def test_missing_bearing_input_rejected(self):
+        """缺任一承重输入（如 annotation_registry）即 fail-closed。"""
+        f = self._files()
+        f.pop("annotation_registry")
+        with self.assertRaises(ValueError) as cm:
+            sc.build_lock_request(files=f, universe=["A"], git_commit="e" * 40,
+                                  schedule_seed=1, gate_a_pass=True)
+        self.assertIn("承重输入", str(cm.exception))
 
     def test_bad_hex_rejected(self):
         req = self._req()
-        req["run_plan_sha256"] = "zz"
+        req["files"]["tokenizer"]["sha256"] = "zz"
         self.assertTrue(any("hex" in e for e in sc.validate_lock_request(req)))
+
+    def test_bad_git_commit_rejected(self):
+        req = self._req()
+        req["git_commit"] = "short"
+        self.assertTrue(any("git_commit" in e for e in sc.validate_lock_request(req)))
+
+    def test_missing_schedule_seed_rejected(self):
+        """无 schedule_seed → 顺序未冻结 → 拒绝。"""
+        req = self._req()
+        req["schedule_seed"] = None
+        self.assertTrue(any("schedule_seed" in e for e in sc.validate_lock_request(req)))
+
+    def test_bad_state_rejected(self):
+        req = self._req()
+        req["state"] = "DRAFT"
+        self.assertTrue(any("INPUTS_LOCKED" in e for e in sc.validate_lock_request(req)))
 
     def test_nonempty_signatures_rejected(self):
         req = self._req()
@@ -413,8 +429,9 @@ class TestLockRequestSchemaFrozen(unittest.TestCase):
 
     def test_gate_not_passed_refuses(self):
         with self.assertRaises(ValueError):
-            sc.build_lock_request({}, "e" * 64, gate_a_pass=False,
-                                  run_plan_sha="p" * 64, tokenizer_sha="t" * 64, model="m")
+            sc.build_lock_request(files=self._files(), universe=["A"],
+                                  git_commit="e" * 40, schedule_seed=1,
+                                  gate_a_pass=False)
 
 
 class TestPlanPersistence(unittest.TestCase):
