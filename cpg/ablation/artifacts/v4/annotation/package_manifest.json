@@ -20,9 +20,9 @@
     "reviewer": "reviewer1 | reviewer2"
   },
   "provenance": {
-    "generator_git_commit": "b1bf5649a76d5ef4156da4af79375ce32b5060a5",
-    "selector_impl_sha256": "b2ee35d45e19884adb4303c8cd415f3023f3baf0df63d039a1edb94eccdd51e8",
-    "annotation_generator_impl_sha256": "f19505a4a9da6c451a0d9786adfad7a043d3c37259e47bfc014501cc88fcbc49",
+    "generator_git_commit": "9a1af37c1dcdb8594f5647abc2cb46f2f0a63e69",
+    "selector_impl_sha256": "9ff1356f0be13f344dd490c99540bf031960dfcb93c511bb44ea2dd3bc101d22",
+    "annotation_generator_impl_sha256": "2b6977de3f0d0b6465186f0d342bf079c6c762a4dde513ba5c15723859a23fa5",
     "canonical_manifest": "cpg/ablation/artifacts/canonical_corpus_manifest.v2.json",
     "canonical_manifest_sha256": "75704840292685ac7a525b8f47942dfcbccb5c41734e1cb718f46c6412e44996",
     "real_patches_tree_sha256": "d546e38973f326ea9751e6335f43300fb2704d353423aea42ae86dca5b646fff"
@@ -52,16 +52,16 @@
     {
       "name": "critical_hunks.template.json",
       "path": "cpg/ablation/artifacts/v4/critical_hunks.template.json",
-      "bytes": 113585,
-      "lines": 3700,
-      "sha256": "268f671826f8df02c9ad069edc1e660cba7e0504438326ca17e5b9df70cfaf64"
+      "bytes": 138293,
+      "lines": 3984,
+      "sha256": "7fd12a4488aa1ba19faa467196bc76a4403ad3cce5313d8f8fc0ad1f2ff45099"
     },
     {
       "name": "v4_hunk_coverage.json",
       "path": "cpg/ablation/artifacts/v4/v4_hunk_coverage.json",
-      "bytes": 151288,
-      "lines": 4464,
-      "sha256": "589b768f6d9ece74e22edb7ba6aab6c21a9c4ff7495a28369752c03324aa1b0d"
+      "bytes": 177132,
+      "lines": 4748,
+      "sha256": "0793056e9ae2a2fe3c763fc8149c625d7ceae9462e870d2295f2b8d834d31a47"
     }
   ]
 }
