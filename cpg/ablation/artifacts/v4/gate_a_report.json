@@ -8,7 +8,7 @@
     "revision_reason": "PAIR_MANIFEST_PROVENANCE_REFRESH"
   },
   "generated_from": {
-    "git_commit": "f5619a90c3de4b912739b4ee4dbeb5574b4b1869",
+    "git_commit": "97386343bddc44949f4cb75419b87119c4961e83",
     "n_candidates": 15,
     "n_confirmation": 14
   },
@@ -196,13 +196,14 @@
   },
   "coverage_check": {
     "errors": [
-      "critical registry 未冻结（status=DRAFT_UNLABELED）→ 无法区分关键/非关键 hunk，暂按保守阻断：['CVE-2026-45019', 'CVE-2026-67424', 'CVE-2026-67425', 'CVE-2026-73498']"
+      "frozen registry 缺失或未冻结（status != FROZEN_LABELED）→ 保守阻断"
     ],
-    "detector_is_gate": true
+    "detector_is_gate": true,
+    "join": "frozen criticality × current coverage（按 hunk identity）"
   },
   "gate_a_pass": false,
   "blockers": [
-    "coverage: [\"critical registry 未冻结（status=DRAFT_UNLABELED）→ 无法区分关键/非关键 hunk，暂按保守阻断：['CVE-2026-45019', 'CVE-2026-67424', 'CVE-2026-67425', 'CVE-2026-73498']\"]",
+    "coverage: ['frozen registry 缺失或未冻结（status != FROZEN_LABELED）→ 保守阻断']",
     "placebo token ratio out of bounds",
     "shuffled token ratio out of bounds",
     "real patch 超 num_ctx: ['CVE-2026-45019']"
