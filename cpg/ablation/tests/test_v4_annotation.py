@@ -244,5 +244,71 @@ class TestEndToEndGate(unittest.TestCase):
         self.assertTrue(errs)
 
 
+
+
+class TestUncertainExclusionFullChain(unittest.TestCase):
+    """施工单4：UNCERTAIN 整例排除的**全链路**四条专项。"""
+
+    def _env_uncertain(self, deps_differ=False):
+        from cpg.ablation.tests.test_v4_annotation import _Env
+        e = _Env()
+        roles = {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT}
+        kw = {}
+        if deps_differ:      # 角色一致但 dependency 分歧 → 会进入 adjudication（原死路分支）
+            kw = {"r1_deps": {"a1": []}, "r2_deps": {"a1": [e.ids["a2"]["hunk_id"]]}}
+        e.subs(roles, roles, **kw)
+        return e
+
+    def _exc(self, e, ids):
+        return {"reason": "两标注者均证据不足", "adjudicator": "adj1",
+                "evidence": "insufficient", "source_item_ids": sorted(ids)}
+
+    def test_uncertain_exclusion_chain_succeeds(self):
+        """① 一致 UNCERTAIN（含原死路分支）→ 结构化整例排除 → compile 成功。"""
+        e = self._env_uncertain(deps_differ=True)
+        ids = {e.ids[k]["hunk_id"] for k in ("a1", "a2")}
+        froz = e.freeze(exclusions={"CVE-A": self._exc(e, ids)})
+        self.assertEqual(froz["status"], "FROZEN_WITH_EXCLUSIONS")
+        self.assertFalse(any(x["sample_id"] == "CVE-A" for x in froz["entries"]))
+
+    def test_exclusion_missing_one_pending_hunk_fails(self):
+        """② 少引用一个 pending hunk 必须失败。"""
+        e = self._env_uncertain()
+        ids = {e.ids[k]["hunk_id"] for k in ("a1", "a2")}
+        with self.assertRaises(ValueError) as cm:
+            e.freeze(exclusions={"CVE-A": self._exc(e, list(ids)[:1])})
+        self.assertIn("必须等于该样本全部 pending", str(cm.exception))
+
+    def test_tampered_kind_or_fields_fails(self):
+        """③ 篡改 kind / fields_in_dispute 必须失败。"""
+        for field, val in (("kind", "DISAGREEMENT"),
+                           ("fields_in_dispute", {"role": True, "dependency": False,
+                                                  "counterfactual": False, "evidence": False})):
+            e = self._env_uncertain(deps_differ=True)
+            va.disagreement_list(e.sub1, e.sub2, e.tpl, e.d / "dis.json")
+            doc = json.loads((e.d / "dis.json").read_text(encoding="utf-8"))
+            doc["items"][0][field] = val
+            (e.d / "adj.json").write_bytes(
+                (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+            with self.assertRaises(ValueError):
+                va.compile_frozen(e.tpl, e.sub1, e.sub2, e.d / "adj.json",
+                                  e.d / "frozen.json")
+
+    def test_extra_adjudication_item_fails(self):
+        """④ 额外增加仲裁项必须失败。"""
+        e = self._env_uncertain(deps_differ=True)
+        va.disagreement_list(e.sub1, e.sub2, e.tpl, e.d / "dis.json")
+        doc = json.loads((e.d / "dis.json").read_text(encoding="utf-8"))
+        doc["items"].append({"kind": "DISAGREEMENT", "hunk_id": "f" * 64,
+                             "sample_id": "CVE-Z", "hunk_identity": _ident("CVE-Z"),
+                             "fields_in_dispute": {}})
+        (e.d / "adj.json").write_bytes(
+            (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+        with self.assertRaises(ValueError) as cm:
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, e.d / "adj.json",
+                              e.d / "frozen.json")
+        self.assertIn("不符", str(cm.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

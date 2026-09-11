@@ -302,14 +302,37 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
         if it.get("kind") not in ("DISAGREEMENT", "UNANIMOUS_UNCERTAIN", "PARTIAL_UNCERTAIN"):
             raise ValueError(f"仲裁件含未知 kind: {it.get('kind')}")
         adj[k] = it
+    # 施工单3：编译器**自行重算**预期分歧映射并严格比对（缺/增/改任一即 fail-closed）
+    _dis = disagreement_list(sub1, sub2, template_path,
+                             out.parent / "_expected_disagreements.json")
+    expected = {i["hunk_id"]: i for i in _dis["items"]}
+    if set(adj) != set(expected):
+        raise ValueError(f"仲裁件与当前预期分歧集合不符: 缺 {sorted(set(expected) - set(adj))[:2]}，"
+                         f"多 {sorted(set(adj) - set(expected))[:2]}")
+    for k, e in expected.items():
+        a = adj[k]
+        if a.get("kind") != e["kind"]:
+            raise ValueError(f"仲裁件 kind 被篡改: {str(k)[:12]}")
+        if a.get("sample_id") != e["sample_id"]:
+            raise ValueError(f"仲裁件 sample_id 被篡改: {str(k)[:12]}")
+        if a.get("hunk_identity") != e["hunk_identity"]:
+            raise ValueError(f"仲裁件 hunk_identity 被篡改: {str(k)[:12]}")
+        if a.get("fields_in_dispute") != e["fields_in_dispute"]:
+            raise ValueError(f"仲裁件 fields_in_dispute 被篡改: {str(k)[:12]}")
 
     # ---- 逐 hunk 判定 ----
-    # P0-3：**分离**两类待处理——普通分歧缺仲裁（必须仲裁，不得靠排除绕过）
-    #        与 UNCERTAIN 未复审（复审后可带证据整例排除）
+    # P0：直接维护 pending_uncertain_ids（**不再用 `k not in adj` 推导**——一致 UNCERTAIN
+    #     若因其他字段分歧而进入 adjudication，其 final_role 为 null，推导会漏掉）
     entries = []
-    missing_adjudication, pending_uncertain = set(), set()
+    missing_adjudication = set()
+    pending_uncertain_ids: dict = {}      # {sample_id: {hunk_id, ...}}
+
+    def _mark_uncertain(sid: str, hid: str) -> None:
+        pending_uncertain_ids.setdefault(sid, set()).add(hid)
+
     for k, t in tpl.items():
         x, y = r1[k], r2[k]
+        sid = t["sample_id"]
         same_all = (x["criticality"] == y["criticality"]
                     and sorted(x.get("dependency_group") or []) == sorted(y.get("dependency_group") or [])
                     and x.get("counterfactual") == y.get("counterfactual")
@@ -319,12 +342,17 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
             cf, ev, rs = x.get("counterfactual"), x.get("evidence"), x.get("reason")
         else:
             a = adj.get(k)
+            # 一致 UNCERTAIN（可伴其他字段分歧）：无论是否在 adj，都记为 pending
+            if x["criticality"] == ROLE_UNCERTAIN and y["criticality"] == ROLE_UNCERTAIN \
+                    and (a is None or not a.get("adjudicator")
+                         or a.get("final_role") == ROLE_UNCERTAIN):
+                _mark_uncertain(sid, k)
+                continue
             if not a or not a.get("adjudicator"):
-                # 未仲裁：普通分歧与 UNCERTAIN 分别记账
                 if x["criticality"] == ROLE_UNCERTAIN and y["criticality"] == ROLE_UNCERTAIN:
-                    pending_uncertain.add(t["sample_id"])
+                    _mark_uncertain(sid, k)
                 else:
-                    missing_adjudication.add(t["sample_id"])
+                    missing_adjudication.add(sid)
                 continue
             # P0-4：final_* 必须完整
             need = ("final_role", "final_dependency_group", "final_counterfactual",
@@ -335,7 +363,7 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
             if a["final_role"] not in VALID_ROLES:
                 raise ValueError(f"仲裁 final_role 非法: {a.get('final_role')}")
             if a["final_role"] == ROLE_UNCERTAIN:
-                pending_uncertain.add(t["sample_id"])
+                _mark_uncertain(sid, k)
                 continue
             if a["final_evidence"] not in VALID_EVIDENCE:
                 raise ValueError(f"仲裁 final_evidence 非法: {a.get('final_evidence')}")
@@ -345,19 +373,18 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
             dep = a.get("final_dependency_group") or []
             cf, ev, rs = (a.get("final_counterfactual"), a.get("final_evidence"),
                           a.get("final_reason"))
-            # P0-4：仲裁后的依赖须完整 hunk_id、存在、同 CVE、不得自引用
+            from cpg.ablation.v4_selector import is_hex64 as _hx3
             for d in dep:
-                if not (isinstance(d, str) and len(d) == 64
-                        and all(c in "0123456789abcdef" for c in d)):
+                if not _hx3(d):
                     raise ValueError(f"仲裁依赖非完整 hunk_id: {str(d)[:16]}")
                 if d == k:
                     raise ValueError("仲裁依赖自引用")
                 if d not in tpl:
                     raise ValueError(f"仲裁依赖不存在 {d[:12]}")
-                if tpl[d]["sample_id"] != t["sample_id"]:
+                if tpl[d]["sample_id"] != sid:
                     raise ValueError(f"仲裁依赖跨 CVE: {tpl[d]['sample_id']}")
         entries.append({
-            "sample_id": t["sample_id"], "hunk_id": k, "hunk_identity": t["hunk_identity"],
+            "sample_id": sid, "hunk_id": k, "hunk_identity": t["hunk_identity"],
             "role": role, "source": src,
             "criticality": ("SECURITY_CRITICAL" if role in SAFE_ROLES
                             else "NON_CRITICAL" if role == ROLE_NONCRIT else role),
@@ -368,20 +395,15 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
     if missing_adjudication:
         raise ValueError(f"存在未仲裁的普通分歧（不得以 exclusions 绕过）: "
                          f"{sorted(missing_adjudication)}")
-    # UNCERTAIN：须复审，或**结构化整例排除**
+    pending_uncertain = {k for s in pending_uncertain_ids.values() for k in s}
+    # UNCERTAIN：须复审，或**结构化整例排除**（source_item_ids 必须==该样本的 pending 全集）
     structured = {}
-    if exclusions and not set(exclusions) <= pending_uncertain:
+    if exclusions and not set(exclusions) <= pending_uncertain_ids.keys():
         raise ValueError(f"exclusions 含非 UNCERTAIN 样本（不得主动删除确定样本）: "
-                         f"{sorted(set(exclusions) - pending_uncertain)}")
-    unc_ids = {k for k in tpl
-               if k in adj and adj[k].get("final_role") == ROLE_UNCERTAIN} | \
-              {k for k in tpl
-               if r1[k]["criticality"] == ROLE_UNCERTAIN and r2[k]["criticality"] == ROLE_UNCERTAIN
-               and k not in adj}
+                         f"{sorted(set(exclusions) - set(pending_uncertain_ids))}")
     for sid, rec in (exclusions or {}).items():
-        if isinstance(rec, str):     # 裸字符串不再接受
-            raise ValueError(f"exclusions[{sid}] 必须是结构化记录"
-                             f"（reason/adjudicator/evidence/source_item_ids）")
+        if isinstance(rec, str):
+            raise ValueError(f"exclusions[{sid}] 必须是结构化记录")
         miss = [f for f in ("reason", "adjudicator", "evidence", "source_item_ids")
                 if not rec.get(f)]
         if miss:
@@ -389,15 +411,17 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
         if rec.get("evidence") != "insufficient":
             raise ValueError(f"exclusions[{sid}] evidence 必须为 insufficient")
         from cpg.ablation.v4_selector import is_hex64 as _hx2
-        for it in rec["source_item_ids"]:
+        want_here = set(pending_uncertain_ids.get(sid) or set())
+        got = set(rec["source_item_ids"])
+        for it in got:
             if not _hx2(it):
                 raise ValueError(f"exclusions[{sid}] source_item_ids 含非完整 hunk_id")
-            if it not in tpl or tpl[it]["sample_id"] != sid:
-                raise ValueError(f"exclusions[{sid}] source_item_ids 不属于该样本")
-            if it not in unc_ids:
-                raise ValueError(f"exclusions[{sid}] source_item_ids 非 UNCERTAIN 项")
+        # 必须**完整覆盖**该样本的全部 pending hunk（不得只引用子集）
+        if got != want_here:
+            raise ValueError(f"exclusions[{sid}] source_item_ids 必须等于该样本全部 pending "
+                             f"UNCERTAIN（缺 {sorted(want_here - got)[:2]}，多 {sorted(got - want_here)[:2]}）")
         structured[sid] = rec
-    unhandled = sorted(pending_uncertain - set(structured))
+    unhandled = sorted(set(pending_uncertain_ids) - set(structured))
     if unhandled:
         raise ValueError(f"存在未复审 UNCERTAIN（须复审或结构化整例排除）: {unhandled}")
     excluded = set(structured)
