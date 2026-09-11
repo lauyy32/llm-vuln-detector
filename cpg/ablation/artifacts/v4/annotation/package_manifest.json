@@ -1,0 +1,15 @@
+{
+  "schema": "v4-annotation-package/1",
+  "n_entries": 284,
+  "reviewers": [
+    "reviewer1",
+    "reviewer2"
+  ],
+  "blind": true,
+  "contains_ai_suggestions": false,
+  "artifacts": [
+    "annotation/critical_hunks.reviewer1.jsonl",
+    "annotation/critical_hunks.reviewer2.jsonl",
+    "annotation/标注手册.md"
+  ]
+}

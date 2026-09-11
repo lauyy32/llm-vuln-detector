@@ -1056,6 +1056,104 @@ def build_hunk_coverage(out_dir: Path) -> dict:
     return report
 
 
+def build_annotation_package(out_dir: Path) -> dict:
+    """生成**双盲标注包**：reviewer1/2 空白模板 + 人读手册。
+
+    纪律（codex）：
+      - 每条含 **完整 diff hunk + 前后上下文 + 文件状态 + CVE/CWE + 统一判定问题**；
+      - **不含任何 AI 建议标签**（criticality 留空）；
+      - 两位标注者各自独立填写，**互不可见**；
+      - 分歧由第三人仲裁，产出 frozen.json。
+    """
+    tpl = json.loads((out_dir / "critical_hunks.template.json").read_text(encoding="utf-8"))
+    cm = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+    cwe_by = {s["sample_id"]: ",".join(s.get("cwes") or []) for s in cm["samples"]}
+    # 收集每个 hunk 的可读上下文（完整 body + 前后 N 行源码）
+    ctx_by_key = {}
+    for cve in V4_CANDIDATES:
+        sd = sample_dir_path(cve)
+        patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
+        parsed = _parse_patch_hunks(patch, sample_id=cve)
+        fstat = _file_status(patch)
+        for rel, hs in parsed.items():
+            p = sd / "vuln" / rel
+            lines = (p.read_text(encoding="utf-8", errors="replace").split("\n")
+                     if p.exists() else [])
+            for h in hs:
+                ident = _hunk_identity(rel, fstat.get(rel, "M"), h,
+                                       _lf_sha(h["_body"].encode("utf-8")))
+                ident["sample_id"] = cve
+                lo = max(0, h["old_start"] - 1 - 15)
+                hi = min(len(lines), h["old_start"] - 1 + h["old_count"] + 15)
+                ctx_by_key[_ident_key(ident)] = {
+                    "cve": cve, "cwe": cwe_by.get(cve, ""), "file": rel,
+                    "file_status": fstat.get(rel, "M"),
+                    "hunk_header": h["header"],
+                    "hunk_body": h["_body"],
+                    "source_context_before": "\n".join(lines[lo:h["old_start"] - 1]),
+                    "source_context_windows": "\n".join(
+                        f"{i+1:>6}| {lines[i]}" for i in range(lo, hi)),
+                }
+    # 1) 空白标注模板（reviewer1/2 结构完全一致，内容由标注者填写）
+    for who in ("reviewer1", "reviewer2"):
+        rows = []
+        for e in tpl["entries"]:
+            k = _ident_key(e["hunk_identity"])
+            c = ctx_by_key[k]
+            rows.append({
+                "sample_id": e["sample_id"],
+                "hunk_identity": e["hunk_identity"],
+                "question": ("该 hunk 是否为消除目标漏洞所必需的安全关键 hunk？"
+                             "（SECURITY_CRITICAL / NON_CRITICAL）"),
+                "criticality": None,          # 标注者填写
+                "reason": None,               # 标注者填写
+                "oracle": None,               # 可选：PoC/安全回归测试
+                "reviewer": who,
+            })
+        p = out_dir / "annotation" / f"critical_hunks.{who}.jsonl"
+        write_text_lf(p, "\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n")
+    # 2) 人读手册（按 CVE 分组，含完整上下文）
+    md = ["# V4 critical-hunk 双盲标注手册", "",
+          "> **规则**：独立标注，**不要**与他人讨论；分歧交第三人仲裁。",
+          "> 每条只需回答：该 hunk 是否为**消除目标漏洞所必需的安全关键 hunk**。",
+          "> 判定参考：是否切断漏洞路径 / 引入必要安全控制（越权检查、边界校验、协议约束、净化器）。",
+          "> **不要**参考 patch 的其他 hunk 或任何模型输出。", "",
+          "## 记录格式", "",
+          "```json",
+          '{"sample_id":"...","hunk_identity":{...},"criticality":"SECURITY_CRITICAL|NON_CRITICAL",',
+          ' "reason":"一句话","oracle":"可选：PoC/测试","reviewer":"reviewer1|reviewer2"}',
+          "```", ""]
+    for cve in V4_CANDIDATES:
+        md.append(f"\n---\n\n## {cve}（CWE: {cwe_by.get(cve) or '未指定'}）\n")
+        for e in tpl["entries"]:
+            if e["sample_id"] != cve:
+                continue
+            c = ctx_by_key[_ident_key(e["hunk_identity"])]
+            md.append(f"### `{c['file']}`（状态 {c['file_status']}）")
+            md.append(f"- hunk: `{c['hunk_header'].strip()}`")
+            md.append(f"- identity(body_lf_sha256): `{e['hunk_identity']['body_lf_sha256'][:16]}...`\n")
+            md.append("**源码上下文（vuln 侧，含行号）**\n")
+            md.append("```python\n" + c["source_context_windows"] + "\n```\n")
+            md.append("**该 hunk 的 diff**\n")
+            md.append("```diff\n" + c["hunk_header"] + "\n" + c["hunk_body"] + "\n```\n")
+            md.append("**问题**：该 hunk 是否为消除目标漏洞所必需的安全关键 hunk？\n")
+            md.append("- [ ] SECURITY_CRITICAL　- [ ] NON_CRITICAL")
+            md.append("- reason：")
+            md.append("- oracle（可选）：\n")
+    write_text_lf(out_dir / "annotation" / "标注手册.md", "\n".join(md) + "\n")
+    doc = {"schema": "v4-annotation-package/1",
+           "n_entries": tpl["n_entries"],
+           "reviewers": ["reviewer1", "reviewer2"],
+           "blind": True,
+           "contains_ai_suggestions": False,
+           "artifacts": ["annotation/critical_hunks.reviewer1.jsonl",
+                         "annotation/critical_hunks.reviewer2.jsonl",
+                         "annotation/标注手册.md"]}
+    write_text_lf(out_dir / "annotation" / "package_manifest.json",
+                  json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+    return doc
+
+
 def build_critical_hunks_template(out_dir: Path) -> dict:
     """P0-1 拆分：**只含机械身份与待标注上下文**，不含任何人工标签、不含 coverage。
 
@@ -1174,7 +1272,7 @@ def evaluate_coverage_gate(coverage: dict, frozen_registry: dict | None) -> list
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("step", choices=["canonical", "upstream", "arms", "gate",
-                                     "feasibility", "g0", "coverage", "all"])
+                                     "feasibility", "g0", "coverage", "annotate", "all"])
     ap.add_argument("--out-dir", type=Path, default=OUT_DIR)
     ap.add_argument("--canonical-manifest", type=Path, default=None,
                     help="V4 权威 manifest（必须显式传入且等于 v4_manifest 单一来源）")
@@ -1258,6 +1356,12 @@ def main() -> int:
               f"{len(cov['mechanical_absent_samples'])}: {cov['mechanical_absent_samples']}")
         print(f"[Template] critical_hunks.template.json {tpl['n_entries']} 条"
               f"（纯身份，不含标签/coverage）—> 待生成双盲标注包")
+    if args.step in ("annotate", "all"):
+        pkg = build_annotation_package(args.out_dir)
+        print(f"[Annotation] 双盲标注包：{pkg['n_entries']} 条 × {len(pkg['reviewers'])} 位标注者"
+              f" | blind={pkg['blind']} | ai_suggestions={pkg['contains_ai_suggestions']}")
+        for a in pkg["artifacts"]:
+            print(f"  - {a}")
     return 0
 
 
