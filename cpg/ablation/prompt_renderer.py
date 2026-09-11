@@ -88,9 +88,10 @@ OUTPUT_CONTRACT_V4 = (
     "abstain = 信息不足）"
 )
 
-# V4 表示预算（草案初值；冻结前须由真实 G0 renderer 的 token 测算校准）
-DEFAULT_V4_MAX_CODE_CHARS = 24000
-DEFAULT_V4_MAX_PATCH_CHARS = 60000
+# V4 表示预算：**不由字符阈值决定分类**（P0-3）。分类只由真实 tokenizer 对完整
+# prompt 的计数得出（FIT / OVER_BUDGET）；字符参数仅供表示策略内部裁剪参考，
+# 不得作为 RENDER_FAILURE 的判据。
+DEFAULT_V4_EXCERPT_CHARS = 24000
 
 
 def render_v4_prompt(
@@ -99,22 +100,24 @@ def render_v4_prompt(
     cwe: str | None,
     code_text: str | None,
     candidate_patch: str | None,
-    max_code_chars: int = DEFAULT_V4_MAX_CODE_CHARS,
-    max_patch_chars: int = DEFAULT_V4_MAX_PATCH_CHARS,
+    strict_budget: bool = False,
+    max_code_chars: int = DEFAULT_V4_EXCERPT_CHARS,
+    max_patch_chars: int = 10 ** 12,
 ) -> str:
-    """V4 四臂 prompt 渲染（草案）。超预算抛 ValueError（不截断）。
+    """V4 三/四臂 prompt 渲染。默认**不**因长度拒绝（strict_budget=False）。
 
-    除 candidate_patch 外，四臂输入完全一致（A1 契约）。
+    除 candidate_patch 外，各臂输入必须完全一致（A1 契约）；code_text 由调用方
+    单次生成并复用。超长输入交由 tokenizer 计数判定 OVER_BUDGET，而非在此抛错。
     """
     parts = [SYSTEM_V4, "\n# 审计任务", f"- CVE: {cve or 'unknown'}",
              f"- 目标 CWE: {cwe or '未指定'}"]
     if code_text:
-        if len(code_text) > max_code_chars:
+        if strict_budget and len(code_text) > max_code_chars:
             raise ValueError(f"code_text 超预算 {len(code_text)} > {max_code_chars}")
         parts.append(f"\n# 相关代码（vuln 状态）\n```\n{code_text}\n```")
     if candidate_patch:
-        if len(candidate_patch) > max_patch_chars:
-            raise ValueError(f"candidate_patch 超预算 {len(candidate_patch)} > {max_patch_chars}")
+        if strict_budget and len(candidate_patch) > max_patch_chars:
+            raise ValueError(f"candidate_patch 超预算 {len(candidate_patch)}")
         parts.append(f"\n# 候选补丁\n```diff\n{candidate_patch}\n```")
     parts.append(OUTPUT_CONTRACT_V4)
     return "\n".join(parts)

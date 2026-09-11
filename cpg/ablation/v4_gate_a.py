@@ -709,30 +709,40 @@ def excerpt_vuln_for_patch(sample_dir: Path, patch_text: str, window: int = 20,
 
 
 def build_g0_prompts(out_dir: Path) -> dict:
-    """P0-4/G0：用真实 renderer 渲染四臂 prompt，落盘全文并用真实 tokenizer 计数。
+    """P0-1/P0-3 返工：每 CVE 只生成**一次**与 arm 无关的 code_text，四臂复用同一字节串；
+    分类只由真实 tokenizer 对完整 prompt 计数决定（无字符阈值），并做硬断言。
 
-    每个 (cve, arm) 给出 FIT / OVER_BUDGET / RENDER_FAILURE。
+    - code_text 选择基于**冻结的 real patch** 的 hunk 位置（预注册规则），
+      shuffled 的 donor 路径**不参与**目标源码选择。
+    - 硬断言：同 CVE 四臂 code_text_sha256 必须唯一；任一臂 code_text 为空 → 该组失败。
     """
     from cpg.ablation.model_client import NUM_CTX, NUM_PREDICT
     from cpg.ablation import prompt_renderer as pr
     cm = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
     cwe_by = {s["sample_id"]: (s.get("cwes") or [None])[0] for s in cm["samples"]}
-    rows = []
+    rows, group_errors = [], []
     prompt_dir = out_dir / "g0_prompts"
     for cve in V4_CANDIDATES:
         sd = sample_dir_path(cve)
+        # —— 单次、与 arm 无关的源码上下文（基于 real patch 的 hunk 位置）——
+        real_patch = read_patch(out_dir, f"{PATCHES_REL}/real/{cve}.diff")
+        code = excerpt_vuln_for_patch(sd, real_patch)
+        code_sha = _sha256_bytes(code.encode("utf-8"))
+        if not code.strip():
+            group_errors.append(f"{cve}: code_text 为空（预注册选择未命中任何文件）")
         for arm in ("real", "placebo", "shuffled"):
             rel = f"{PATCHES_REL}/{arm}/{cve}.diff"
-            patch = read_patch(out_dir, rel)
-            code = excerpt_vuln_for_patch(sd, patch)
-            rec = {"sample_id": cve, "arm": arm, "patch_path": rel}
             try:
-                prompt = pr.render_v4_prompt(cve=cve, cwe=cwe_by.get(cve),
-                                             code_text=code, candidate_patch=patch)
-            except ValueError as e:
-                rec.update({"verdict": "RENDER_FAILURE", "error": str(e)[:200]})
-                rows.append(rec)
+                patch = read_patch(out_dir, rel)
+            except FileNotFoundError as e:
+                rows.append({"sample_id": cve, "arm": arm, "patch_path": rel,
+                             "code_text_sha256": code_sha,
+                             "verdict": "RENDER_FAILURE", "error": str(e)[:200]})
                 continue
+            rec = {"sample_id": cve, "arm": arm, "patch_path": rel,
+                   "code_text_sha256": code_sha}
+            prompt = pr.render_v4_prompt(cve=cve, cwe=cwe_by.get(cve),
+                                         code_text=code, candidate_patch=patch)
             tok = count_tokens(prompt)
             rec.update({"prompt_tokens": tok,
                         "code_tokens": count_tokens(code),
@@ -740,20 +750,50 @@ def build_g0_prompts(out_dir: Path) -> dict:
                         "num_predict": NUM_PREDICT, "num_ctx": NUM_CTX,
                         "margin": NUM_CTX - (tok + NUM_PREDICT),
                         "verdict": "FIT" if tok + NUM_PREDICT <= NUM_CTX else "OVER_BUDGET",
-                        "prompt_sha256": _sha256_bytes(prompt.encode("utf-8"))})
+                        "prompt_sha256": _sha256_bytes(prompt.encode("utf-8")),
+                        "patch_sha256": _sha256_bytes(patch.encode("utf-8"))})
             pp = prompt_dir / arm / f"{cve}.txt"
             write_text_lf(pp, prompt)
             rec["prompt_path"] = pp.relative_to(out_dir).as_posix()
             rows.append(rec)
-    doc = {"schema": "v4-g0-prompts/1",
-           "renderer": "cpg/ablation/prompt_renderer.py::render_v4_prompt（草案）",
+    # —— 硬断言 ——
+    by_cve = {}
+    for r in rows:
+        by_cve.setdefault(r["sample_id"], []).append(r)
+    for cve, rs in by_cve.items():
+        shas = {r["code_text_sha256"] for r in rs}
+        if len(shas) != 1:
+            group_errors.append(f"{cve}: 四臂 code_text_sha256 不唯一（{len(shas)} 个）")
+    doc = {"schema": "v4-g0-prompts/2",
+           "status": "DRAFT_TRIPLE_ARM（partial/minimal-real 第四臂未构造，分母须分开）",
+           "renderer": "cpg/ablation/prompt_renderer.py::render_v4_prompt",
+           "arms": ["real", "placebo", "shuffled"],
+           "n_arms": 3,
            "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT,
            "n_fit": sum(1 for r in rows if r["verdict"] == "FIT"),
            "n_over": sum(1 for r in rows if r["verdict"] == "OVER_BUDGET"),
            "n_render_failure": sum(1 for r in rows if r["verdict"] == "RENDER_FAILURE"),
+           "code_text_unique_per_cve": all(
+               len({r["code_text_sha256"] for r in rs}) == 1 for rs in by_cve.values()),
+           "empty_code_groups": [c for c, rs in by_cve.items()
+                                 if not rs or rs[0].get("code_tokens") == 0],
+           "group_errors": group_errors,
+           "provenance": {
+               "generator_git_commit": _git_commit(),
+               "renderer_impl_sha256": _sha256_bytes(
+                   (ROOT / "cpg/ablation/prompt_renderer.py").read_bytes()),
+               "tokenizer_sha256": _sha256_bytes(TOKENIZER_PATH.read_bytes()),
+               "canonical_manifest": str(CANONICAL_MANIFEST.relative_to(ROOT).as_posix()),
+               "canonical_manifest_sha256": _sha256_bytes(CANONICAL_MANIFEST.read_bytes()),
+               "arm_registry": ["real", "placebo", "shuffled"],
+               "system_message": "prompt_renderer.SYSTEM_V4",
+               "user_message_boundary": "# 审计任务",
+           },
            "rows": rows}
     write_text_lf(out_dir / "v4_g0_prompt_report.json",
                   json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+    if group_errors:
+        raise RuntimeError("G0 硬断言失败: " + "; ".join(group_errors[:5]))
     return doc
 
 
