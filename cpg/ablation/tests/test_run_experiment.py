@@ -4,6 +4,8 @@
 
 invoke 测试一律使用 fake ModelClient，不得实际调用模型。
 """
+from __future__ import annotations
+
 import json
 import sys
 import tempfile

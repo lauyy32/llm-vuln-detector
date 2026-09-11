@@ -24,7 +24,10 @@ KNOWN_SAFE_LINES = {
 }
 
 
-EXCLUDE_PARTS = {".work", "staging", "artifacts", "corpus_src", "fixtures"}
+EXCLUDE_PARTS = {".work", "staging", "artifacts", "corpus_src", "fixtures",
+                 # 非第一方代码：vendored 依赖可能使用高于本仓下限（3.9）的语法，
+                 # 会被下面的 SyntaxError 分支误报为违规（曾用 anyio/click 触发）。
+                 ".venv", "site-packages", "__pycache__", ".git", "node_modules"}
 
 
 def _call_target_name(node: ast.Call) -> str:

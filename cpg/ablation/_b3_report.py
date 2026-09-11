@@ -3,6 +3,8 @@
 输入：seeds/{A,B,C}{1,2,3}/results.csv（A=有码+taint, B=有码无taint, C=无码+taint）
 输出：B3-消融与互补性报告.md
 """
+from __future__ import annotations
+
 import csv
 import json
 import re
