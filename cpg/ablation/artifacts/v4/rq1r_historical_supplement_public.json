@@ -1,5 +1,8 @@
 {
-  "schema": "v4-rq1r-report-public/1",
+  "schema": "v4-rq1r-historical-supplement-public/1",
+  "artifact_kind": "historical_tool_family_supplement",
+  "NOT_THE_CANONICAL_RQ1R": true,
+  "disclaimer": "本工件为**历史口径补充分析**（数据源：strict_recompute_out.json / claims.json / seeds/v8_74），**不得**用作 RQ1-R 正式主结果。正式主结果必须消费新的 canonical 运行目录（rq1-r-canonical-v4/：protocol.json / lock_request.json / review_approval.json / results.jsonl / summary.json）。两者数字不同 （历史 2/82 vs canonical 1/82），混用会造成口径污染。",
   "protocol": {
     "strict_rule": "判别 = vuln 显式 vulnerable 且 fixed 显式 benign；abstain 不计任何一侧",
     "lenient_note": "lenient（abstain→非 vuln）仅作规则敏感性申报，不用于结论",
@@ -202,7 +205,9 @@
     }
   },
   "stratified_by_vuln_group": {
-    "logic": {
+    "CPGEvidenceScorer|logic": {
+      "scorer": "CPGEvidenceScorer",
+      "unit": "logic",
       "n": 54,
       "strict_disc": 1,
       "inverted": 0,
@@ -212,7 +217,105 @@
         0.098915
       ]
     },
-    "taint": {
+    "CPGEvidenceScorer|taint": {
+      "scorer": "CPGEvidenceScorer",
+      "unit": "taint",
+      "n": 20,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.168433
+      ]
+    },
+    "CodeQLBaselineScorer|logic": {
+      "scorer": "CodeQLBaselineScorer",
+      "unit": "logic",
+      "n": 54,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.066032
+      ]
+    },
+    "CodeQLBaselineScorer|taint": {
+      "scorer": "CodeQLBaselineScorer",
+      "unit": "taint",
+      "n": 20,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.168433
+      ]
+    },
+    "ConfigSigScorer|logic": {
+      "scorer": "ConfigSigScorer",
+      "unit": "logic",
+      "n": 54,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.066032
+      ]
+    },
+    "ConfigSigScorer|taint": {
+      "scorer": "ConfigSigScorer",
+      "unit": "taint",
+      "n": 20,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.168433
+      ]
+    },
+    "LocalLLMScorer|logic": {
+      "scorer": "LocalLLMScorer",
+      "unit": "logic",
+      "n": 54,
+      "strict_disc": 1,
+      "inverted": 0,
+      "rate": 0.018519,
+      "ci95_exact": [
+        0.000469,
+        0.098915
+      ]
+    },
+    "LocalLLMScorer|taint": {
+      "scorer": "LocalLLMScorer",
+      "unit": "taint",
+      "n": 20,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.168433
+      ]
+    },
+    "StructuralHeuristicScorer|logic": {
+      "scorer": "StructuralHeuristicScorer",
+      "unit": "logic",
+      "n": 54,
+      "strict_disc": 0,
+      "inverted": 0,
+      "rate": 0.0,
+      "ci95_exact": [
+        0.0,
+        0.066032
+      ]
+    },
+    "StructuralHeuristicScorer|taint": {
+      "scorer": "StructuralHeuristicScorer",
+      "unit": "taint",
       "n": 20,
       "strict_disc": 0,
       "inverted": 0,

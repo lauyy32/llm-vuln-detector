@@ -93,16 +93,41 @@ class TestScheduler(unittest.TestCase):
         self.assertEqual(st[("CVE-A", "real")], "READY")
         self.assertEqual(st[("CVE-B", "real")], "MISSING_PROMPT")
 
-    def test_resume_reads_done_ids_and_tolerates_partial_line(self):
+    def test_resume_reads_done_ids_and_tolerates_truncated_tail(self):
+        """只容忍**末尾**半行；中间损坏行必须报错（P1-1）。"""
+        import hashlib as _h
         with tempfile.TemporaryDirectory() as td:
             p = Path(td) / "r.jsonl"
             p.write_text(
                 json.dumps({"sample_id": "A", "arm": "real"}) + "\n"
-                + '{"sample_id": "B", "arm": "part' + "\n"      # 半行
+                + json.dumps({"sample_id": "C", "arm": "partial"}) + "\n"
+                + '{"sample_id": "B", "arm": "part',          # 末尾半行（可容忍）
+                encoding="utf-8")
+            r = sc.load_done_ids(p)
+            self.assertEqual(r["done"], {("A", "real"), ("C", "partial")})
+            self.assertTrue(r["truncated_tail"])
+
+    def test_resume_rejects_middle_corruption(self):
+        """中间损坏行必须报错（原先被静默跳过 → 损坏结果滞留 + 重复调用）。"""
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "r.jsonl"
+            p.write_text(
+                json.dumps({"sample_id": "A", "arm": "real"}) + "\n"
+                + '{"broken": ' + "\n"
                 + json.dumps({"sample_id": "C", "arm": "partial"}) + "\n",
                 encoding="utf-8")
-            done = sc.load_done_ids(p)
-            self.assertEqual(done, {("A", "real"), ("C", "partial")})
+            with self.assertRaises(ValueError) as cm:
+                sc.load_done_ids(p)
+            self.assertIn("损坏行", str(cm.exception))
+
+    def test_resume_clean_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "r.jsonl"
+            p.write_text(json.dumps({"sample_id": "A", "arm": "real"}) + "\n",
+                         encoding="utf-8")
+            r = sc.load_done_ids(p)
+            self.assertEqual(r["done"], {("A", "real")})
+            self.assertFalse(r["truncated_tail"])
 
     def test_append_result_is_atomic_and_appendable(self):
         with tempfile.TemporaryDirectory() as td:
@@ -114,15 +139,54 @@ class TestScheduler(unittest.TestCase):
             self.assertFalse(p.with_suffix(p.suffix + ".tmp").exists())
 
     def test_missing_results_file_returns_empty(self):
-        self.assertEqual(sc.load_done_ids(Path("no/such.jsonl")), set())
+        self.assertEqual(sc.load_done_ids(Path("no/such.jsonl")),
+                         {"done": set(), "truncated_tail": False})
+
+
+class TestPlanOrdering(unittest.TestCase):
+    """P0-4b：顺序必须可冻结（确定性打乱 + 记录 seed + repeats）。"""
+
+    def test_deterministic_shuffle_reproducible(self):
+        a = sc.plan_runs(["real", "partial"], ["A", "B", "C"], "m", shuffle_seed=42)
+        b = sc.plan_runs(["real", "partial"], ["A", "B", "C"], "m", shuffle_seed=42)
+        self.assertEqual([i["sample_id"] for i in a["items"]],
+                         [i["sample_id"] for i in b["items"]])
+        self.assertEqual(a["shuffle_seed"], 42)
+
+    def test_different_seed_changes_order(self):
+        a = sc.plan_runs(["real", "partial"], ["A", "B", "C", "D"], "m", shuffle_seed=1)
+        b = sc.plan_runs(["real", "partial"], ["A", "B", "C", "D"], "m", shuffle_seed=2)
+        self.assertNotEqual([i["sample_id"] for i in a["items"]],
+                            [i["sample_id"] for i in b["items"]])
+
+    def test_no_seed_warns_about_order_effect(self):
+        p = sc.plan_runs(["real"], ["A"], "m")
+        self.assertIn("顺序效应", p["note"])
+
+    def test_repeats_expand_items(self):
+        p = sc.plan_runs(["real"], ["A", "B"], "m", shuffle_seed=7, repeats=3)
+        self.assertEqual(p["n_items"], 6)
+        self.assertEqual(sorted({i["repeat"] for i in p["items"]}), [0, 1, 2])
 
 
 # ---------------------------------------------------------------------------
 # 4) 结果 verifier
 # ---------------------------------------------------------------------------
-def _rec(**kw):
-    base = {"sample_id": "A", "arm": "real", "model": "m", "verdict": "benign",
-            "raw_response_sha256": "a" * 64, "envelope_sha256": "b" * 64}
+def _rec(raw="The patch is benign.", verdict=None, **kw):
+    """构造**自洽**的记录：SHA 由原始响应重算，verdict 与解析一致。
+
+    `verdict=None` 表示"由 raw 解析决定"；显式传入才覆盖（用于构造不一致用例）。
+    注意：旧版用 `"a" * 64` 作为 raw_response_sha256 并期待校验通过 —— 那固化了
+    "只要格式像 hex 就放行"的错误行为，已在 P0-3 修复。
+    """
+    import hashlib as _h
+    base = {"sample_id": "A", "arm": "real", "model": "m",
+            "raw_response_text": raw,
+            "raw_response_sha256": _h.sha256(raw.encode("utf-8")).hexdigest(),
+            "envelope_sha256": "b" * 64,
+            "verdict": sc.parse_verdict(raw)}
+    if verdict is not None:
+        base["verdict"] = verdict
     base.update(kw)
     return base
 
@@ -131,21 +195,49 @@ class TestVerifier(unittest.TestCase):
     def test_valid(self):
         self.assertEqual(sc.verify_result(_rec()), [])
 
+    def test_forged_sha_without_raw_text_rejected(self):
+        """P0-3：伪造/占位 SHA、无原始响应 → 必须拒绝。"""
+        errs = sc.verify_result({"sample_id": "A", "arm": "real", "model": "m",
+                                 "verdict": "benign",
+                                 "raw_response_sha256": "a" * 64,
+                                 "envelope_sha256": "b" * 64})
+        self.assertTrue(any("raw_response_text" in e for e in errs))
+
+    def test_sha_must_match_raw_text(self):
+        r = _rec()
+        r["raw_response_sha256"] = "a" * 64          # 与原文不符
+        self.assertTrue(any("重算值不符" in e for e in sc.verify_result(r)))
+
+    def test_verdict_must_match_parsed(self):
+        r = _rec(raw="The patch is benign.")
+        r["verdict"] = "vulnerable"                   # 手写 verdict 与原文不符
+        self.assertTrue(any("解析" in e for e in sc.verify_result(r)))
+
+    def test_parse_verdict_rules(self):
+        self.assertEqual(sc.parse_verdict("this is vulnerable"), "vulnerable")
+        self.assertEqual(sc.parse_verdict("this is benign"), "benign")
+        self.assertEqual(sc.parse_verdict("not vulnerable"), "abstain")   # 歧义 → abstain
+        self.assertEqual(sc.parse_verdict("no idea"), "abstain")
+
     def test_missing_field(self):
         r = _rec()
         r.pop("raw_response_sha256")
         self.assertTrue(any("raw_response_sha256" in e for e in sc.verify_result(r)))
 
     def test_bad_verdict(self):
-        self.assertTrue(any("verdict" in e for e in sc.verify_result(_rec(verdict="maybe"))))
+        r = _rec()
+        r["verdict"] = "maybe"
+        self.assertTrue(any("verdict" in e for e in sc.verify_result(r)))
 
     def test_bad_hex(self):
-        self.assertTrue(any("hex" in e for e in sc.verify_result(_rec(envelope_sha256="zz"))))
+        r = _rec()
+        r["envelope_sha256"] = "zz"
+        self.assertTrue(any("hex" in e for e in sc.verify_result(r)))
 
     def test_abstain_requires_reason(self):
-        errs = sc.verify_result(_rec(verdict="abstain"))
-        self.assertTrue(any("abstain_reason" in e for e in errs))
-        self.assertEqual(sc.verify_result(_rec(verdict="abstain", abstain_reason="x")), [])
+        r = _rec(raw="no idea at all", abstain_reason=None)
+        self.assertTrue(any("abstain_reason" in e for e in sc.verify_result(r)))
+        self.assertEqual(sc.verify_result(_rec(raw="no idea", abstain_reason="x")), [])
 
     def test_file_verify_detects_dup_and_missing(self):
         with tempfile.TemporaryDirectory() as td:

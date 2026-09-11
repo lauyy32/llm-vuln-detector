@@ -20,6 +20,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 
 SCAFFOLD_ONLY = True
@@ -118,44 +119,80 @@ def context_fit(prompt_tokens: int, num_ctx: int = 32768,
 # 3) 调度器（只产**计划**，不写正式目录、不发送）
 # ===========================================================================
 def plan_runs(arms: list, sample_ids: list, model: str,
-              prompt_lookup: dict | None = None) -> dict:
+              prompt_lookup: dict | None = None,
+              shuffle_seed: int | None = None,
+              repeats: int = 1) -> dict:
     """生成运行计划（**SCAFFOLD_ONLY**）。
 
-    `prompt_lookup[(arm, sample_id)]` 若缺失，则该条目状态为 `MISSING_PROMPT`
+    **P0-4b 修复**：顺序必须**冻结**，否则会产生顺序效应。
+    - 先按 `(sample_id, arm, repeat)` 生成确定性顺序；
+    - 若给出 `shuffle_seed`，用该 seed **确定性打乱**并记录 seed（可复算）；
+    - `repeats > 1` 时同一 `(sid, arm)` 有多条，各带 `repeat` 序号。
+
+    `prompt_lookup[(arm, sample_id)]` 缺失时该条目状态为 `MISSING_PROMPT`
     ——刻意不生成占位 prompt，避免"看似可跑"的假象。
     """
+    import random as _random
     items, missing = [], 0
+    base = []
     for sid in sample_ids:
         for arm in arms:
-            key = (arm, sid)
-            has = bool(prompt_lookup and prompt_lookup.get(key))
-            if not has:
-                missing += 1
-            items.append({"sample_id": sid, "arm": arm, "order": len(items),
-                          "status": "READY" if has else "MISSING_PROMPT"})
-    return {SCAFFOLD_TAG: SCAFFOLD_ONLY, "schema": "v4-run-plan/1",
-            "model": model, "n_items": len(items), "n_ready": len(items) - missing,
+            for rep in range(repeats):
+                base.append((sid, arm, rep))
+    if shuffle_seed is not None:
+        _random.Random(shuffle_seed).shuffle(base)
+    for sid, arm, rep in base:
+        has = bool(prompt_lookup and prompt_lookup.get((arm, sid)))
+        if not has:
+            missing += 1
+        items.append({"sample_id": sid, "arm": arm, "repeat": rep,
+                      "order": len(items),
+                      "status": "READY" if has else "MISSING_PROMPT"})
+    return {SCAFFOLD_TAG: SCAFFOLD_ONLY, "schema": "v4-run-plan/2",
+            "model": model, "shuffle_seed": shuffle_seed, "repeats": repeats,
+            "n_items": len(items), "n_ready": len(items) - missing,
             "n_missing_prompt": missing,
-            "note": "计划仅供脚手架自测；正式 schedule 必须由冻结流程生成",
+            "note": ("计划仅供脚手架自测；正式 schedule 必须由冻结流程生成"
+                     + ("（顺序已用 recorded seed 确定性打乱）" if shuffle_seed is not None
+                        else "（**未打乱**：存在顺序效应风险，正式运行前必须给出 shuffle_seed）")),
             "items": items}
 
 
-def load_done_ids(results_path: Path) -> set:
-    """resume：读取已完成 `(sample_id, arm)` 集合（容忍半行）。"""
+def load_done_ids(results_path: Path) -> dict:
+    """resume：读取已完成 `(sample_id, arm)` 集合。
+
+    **P1-1 修复**：只容忍**文件末尾**的未完成半行（强杀进程的常见残留）；
+    **中间**的损坏行属于数据损坏，必须显式报错（否则损坏结果会滞留并导致重复调用）。
+
+    返回 `{"done": set, "truncated_tail": bool}`。
+    """
     if not results_path.exists():
-        return set()
-    done = set()
-    for ln in results_path.read_text(encoding="utf-8").splitlines():
-        ln = ln.strip()
-        if not ln:
+        return {"done": set(), "truncated_tail": False}
+    text = results_path.read_text(encoding="utf-8")
+    lines = text.split("\n")
+    # 末尾若为空串（正常换行结尾）则去除；否则视为未完成半行
+    truncated_tail = False
+    if lines and lines[-1] == "":
+        lines = lines[:-1]
+    else:
+        truncated_tail = True
+        lines = lines[:-1]
+        if lines and not lines[-1].strip():
+            lines = lines[:-1]
+    done, errs = set(), []
+    for i, ln in enumerate(lines, 1):
+        if not ln.strip():
             continue
         try:
             rec = json.loads(ln)
-        except json.JSONDecodeError:
-            continue        # 半行/损坏行直接跳过，不阻断 resume
+        except json.JSONDecodeError as e:
+            errs.append(f"line {i}: {e.msg}（中间损坏行，拒绝静默跳过）")
+            continue
         if rec.get("sample_id") and rec.get("arm"):
             done.add((rec["sample_id"], rec["arm"]))
-    return done
+    if errs:
+        raise ValueError("结果文件存在损坏行: " + "; ".join(errs[:3]))
+    return {"done": done, "truncated_tail": truncated_tail}
 
 
 def append_result(results_path: Path, rec: dict) -> None:
@@ -257,16 +294,55 @@ def load_plan(path: Path, expect_sha: str | None = None) -> dict:
 # ===========================================================================
 # 4) 结果 verifier（verdict 必须绑定原始响应）
 # ===========================================================================
-RESULT_REQUIRED = ("sample_id", "arm", "model", "verdict", "raw_response_sha256",
-                   "envelope_sha256")
+RESULT_REQUIRED = ("sample_id", "arm", "model", "verdict", "raw_response_text",
+                   "raw_response_sha256", "envelope_sha256")
+
+# verdict 解析规则（与既有 RQ1-R 口径一致：只在显式出现时判定，否则 abstain）
+_VERDICT_PATTERNS = (
+    ("vulnerable", re.compile(r"\bvulnerable\b", re.I)),
+    ("benign", re.compile(r"\bbenign\b|\bnot\s+vulnerable\b", re.I)),
+)
+
+
+def parse_verdict(raw_response_text: str) -> str:
+    """从**原始响应**解析 verdict（禁止只看派生字段）。
+
+    规则：显式 `vulnerable` 优先；显式 `benign`/`not vulnerable` 次之；两者皆无 → `abstain`。
+    出现歧义（同时含两者）时返回 `abstain` 并标注，交由人工复核。
+    """
+    t = raw_response_text or ""
+    hit_v = bool(_VERDICT_PATTERNS[0][1].search(t))
+    hit_b = bool(_VERDICT_PATTERNS[1][1].search(t))
+    if hit_v and hit_b:
+        return "abstain"          # 歧义 → 不擅自判定
+    if hit_v:
+        return "vulnerable"
+    if hit_b:
+        return "benign"
+    return "abstain"
 
 
 def verify_result(rec: dict) -> list:
-    """单条结果校验（fail-closed）。"""
+    """单条结果校验（**真 fail-closed**，P0-3 修复）。
+
+    必须同时满足：
+      - 必填字段齐全（含 `raw_response_text`）；
+      - `raw_response_sha256` == 对 `raw_response_text` **重算**的 SHA（拒绝伪造/占位摘要）；
+      - `verdict` == 从原始响应**重新解析**的 verdict（拒绝手写 verdict）；
+      - 两个 SHA 均为 64 位 hex；abstain 须给出理由。
+    """
     errs = []
     for k in RESULT_REQUIRED:
         if not rec.get(k):
             errs.append(f"缺字段 {k}")
+    raw = rec.get("raw_response_text")
+    if raw:
+        recomputed = _sha(raw.encode("utf-8"))
+        if rec.get("raw_response_sha256") != recomputed:
+            errs.append("raw_response_sha256 与原始响应重算值不符（伪造或占位摘要）")
+        derived = parse_verdict(raw)
+        if rec.get("verdict") != derived:
+            errs.append(f"verdict 与从原始响应解析的结果不符（记录 {rec.get('verdict')} vs 解析 {derived}）")
     if rec.get("verdict") not in VALID_VERDICTS:
         errs.append(f"非法 verdict: {rec.get('verdict')}")
     for k in ("raw_response_sha256", "envelope_sha256"):
@@ -276,6 +352,11 @@ def verify_result(rec: dict) -> list:
             errs.append(f"{k} 非 64 位 hex")
     if rec.get("verdict") == "abstain" and not rec.get("abstain_reason"):
         errs.append("abstain 必须给出 abstain_reason")
+    # 运行时身份：若记录则必须自洽（不强制存在，但存在即校验）
+    for k in ("model_digest", "ollama_version", "prompt_sha256", "system_sha256"):
+        v = rec.get(k)
+        if v and k.endswith("sha256") and not (isinstance(v, str) and len(v) == 64):
+            errs.append(f"{k} 非 64 位 hex")
     return errs
 
 

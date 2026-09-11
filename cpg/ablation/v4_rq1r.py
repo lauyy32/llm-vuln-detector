@@ -199,13 +199,17 @@ CPG_TOOL_FAMILIES = {
 
 
 def strict_discrimination_by_group(rows: list, key: str, seeds: list | None = None) -> dict:
-    """按 `scorer`（工具族）或 `group`（漏洞族）分层，计算 strict 判别数。
+    """分层 strict 判别数。
 
-    判别定义与 strict_recompute.py 一致：vuln 显式 vulnerable 且 fixed 显式 benign，
-    abstain 不计任何一侧；INCOMPLETE 样本排除。
+    **统计单位（P0-2 修复）**：`v8_74` 中同一 `sample_id/version` 有 **5 个 scorer**；
+    若只用 `[group][sample_id][version]` 建字典，**后读的 scorer 会静默覆盖先读的**，
+    得到的不是分层结果而是"某一行序 scorer"的结果。
 
-    **数据范围**：`rows` 若含多个 seed 配置会造成重复计数，故先按 `_seed` 过滤；
-    `seeds=None` 时要求 `rows` 只来自**单一配置**（否则 fail-closed）。
+    因此本函数**显式声明统计单位**：
+      - `key="scorer"` → 每 scorer 一个单元（内部再按 sample/version 聚合，安全）；
+      - `key="group"`  → 输出 **scorer × vuln_group 二维分层**（每个 scorer 内再分组）；
+      - `key="seed"`   → 每 seed 一个单元。
+    第二维固定为 `scorer`，**不再让 scorer 之间互相覆盖**。
     """
     if key not in ("scorer", "group", "seed"):
         raise ValueError("key 只能是 scorer / group / seed")
@@ -213,27 +217,54 @@ def strict_discrimination_by_group(rows: list, key: str, seeds: list | None = No
     if seeds is None and len(present) > 1:
         raise ValueError(f"rows 含 {len(present)} 个 seed 配置，必须显式指定 seeds（防重复计数）")
     use = rows if seeds is None else [r for r in rows if r.get("_seed") in set(seeds)]
+
+    # 二维键：主维度 × scorer（scorer 永远是第二维，杜绝静默覆盖）
     by = defaultdict(lambda: defaultdict(dict))
     for r in use:
         if r.get("sample_id") in INCOMPLETE or r["mode"] != "code":
             continue
-        by[r[key]][r["sample_id"]][r["version"]] = r["predicted"]
+        main = r[key]
+        by[(main, r["scorer"])][r["sample_id"]][r["version"]] = r["predicted"]
+
+    # 输出：scorer 层聚合 + （key=group 时）主维度再分解
+    per_scorer = defaultdict(lambda: defaultdict(dict))
+    for (main, scorer), samples in by.items():
+        per_scorer[scorer][main] = samples
     out = {}
-    for grp, samples in sorted(by.items()):
-        n = ok = inverted = 0
-        for sid, v in samples.items():
-            if "vuln" not in v or "fixed" not in v:
-                continue
-            n += 1
-            if v["vuln"] == "vulnerable" and v["fixed"] == "benign":
-                ok += 1
-            elif v["vuln"] == "benign" and v["fixed"] == "vulnerable":
-                inverted += 1
-        lo, hi = clopper_pearson(ok, n)
-        label = CPG_TOOL_FAMILIES.get(grp, grp) if key == "scorer" else grp
-        out[label] = {"n": n, "strict_disc": ok, "inverted": inverted,
-                      "rate": round(ok / n, 6) if n else None, "ci95_exact": [lo, hi]}
+    for scorer, groups in sorted(per_scorer.items()):
+        label_s = CPG_TOOL_FAMILIES.get(scorer, scorer) if key == "scorer" else scorer
+        if key == "scorer":
+            n = ok = inv = 0
+            for _g, samples in groups.items():
+                a, b, c = _count_samples(samples)
+                n += a; ok += b; inv += c
+            lo, hi = clopper_pearson(ok, n)
+            out[label_s] = {"n": n, "strict_disc": ok, "inverted": inv,
+                            "rate": round(ok / n, 6) if n else None, "ci95_exact": [lo, hi]}
+        else:
+            for main, samples in sorted(groups.items()):
+                label_m = CPG_TOOL_FAMILIES.get(main, main) if key == "seed" else main
+                n, ok, inv = _count_samples(samples)
+                lo, hi = clopper_pearson(ok, n)
+                out[f"{label_s}|{label_m}"] = {
+                    "scorer": label_s, "unit": label_m,
+                    "n": n, "strict_disc": ok, "inverted": inv,
+                    "rate": round(ok / n, 6) if n else None, "ci95_exact": [lo, hi]}
     return out
+
+
+def _count_samples(samples: dict) -> tuple:
+    """统计一个 {sample_id: {version: predicted}} 组的 (n, strict, inverted)。"""
+    n = ok = inv = 0
+    for _sid, v in samples.items():
+        if "vuln" not in v or "fixed" not in v:
+            continue
+        n += 1
+        if v["vuln"] == "vulnerable" and v["fixed"] == "benign":
+            ok += 1
+        elif v["vuln"] == "benign" and v["fixed"] == "vulnerable":
+            inv += 1
+    return n, ok, inv
 
 
 # ---------------------------------------------------------------------------
@@ -320,7 +351,16 @@ def build_report(publish: bool = False) -> dict:
 
     rec, claims = auth["recompute"], auth["claims"]["claims"]
     doc = {
-        "schema": "v4-rq1r-report/1",
+        # P0-1：本报告基于**历史** claims/seeds 口径，**不是** canonical r1 的正式结果
+        "schema": "v4-rq1r-historical-supplement/1",
+        "artifact_kind": "historical_tool_family_supplement",
+        "NOT_THE_CANONICAL_RQ1R": True,
+        "disclaimer": (
+            "本工件为**历史口径补充分析**（数据源：strict_recompute_out.json / claims.json / "
+            "seeds/v8_74），**不得**用作 RQ1-R 正式主结果。正式主结果必须消费新的 canonical "
+            "运行目录（rq1-r-canonical-v4/：protocol.json / lock_request.json / "
+            "review_approval.json / results.jsonl / summary.json）。两者数字不同 "
+            "（历史 2/82 vs canonical 1/82），混用会造成口径污染。"),
         "protocol": {
             "strict_rule": "判别 = vuln 显式 vulnerable 且 fixed 显式 benign；abstain 不计任何一侧",
             "lenient_note": "lenient（abstain→非 vuln）仅作规则敏感性申报，不用于结论",
@@ -371,7 +411,8 @@ def build_report(publish: bool = False) -> dict:
     }
     if publish:
         pub = anonymize(doc)
-        pub["schema"] = "v4-rq1r-report-public/1"
+        pub["schema"] = "v4-rq1r-historical-supplement-public/1"
+        pub["artifact_kind"] = "historical_tool_family_supplement"
         pub["anonymized"] = True
         aerr = anonymize_check(pub)
         if aerr:
@@ -381,12 +422,12 @@ def build_report(publish: bool = False) -> dict:
 
 
 def write_reports() -> dict:
-    """写两份：内部版 + 匿名发布版（均由调用方决定是否提交）。"""
+    """写两份：内部版 + 匿名发布版（**历史补充**命名，避免与正式 RQ1-R 混淆）。"""
     internal = build_report(publish=False)
     public = build_report(publish=True)
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "rq1r_report.json").write_bytes(
+    (OUT / "rq1r_historical_supplement.json").write_bytes(
         (json.dumps(internal, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-    (OUT / "rq1r_report_public.json").write_bytes(
+    (OUT / "rq1r_historical_supplement_public.json").write_bytes(
         (json.dumps(public, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
     return {"internal": internal, "public": public}

@@ -85,11 +85,23 @@ class TestContingencyAndStratification(unittest.TestCase):
             self.assertLessEqual(v["strict_disc"], v["n"])
             self.assertEqual(len(v["ci95_exact"]), 2)
 
-    def test_vuln_group_stratification(self):
+    def test_vuln_group_stratification_is_two_dimensional(self):
+        """P0-2：必须输出 scorer × vuln_group 二维，不得让 scorer 互相覆盖。"""
         st = rq.strict_discrimination_by_group(self.rows, "group", seeds=self.seeds)
         self.assertTrue(st)
-        for v in st.values():
+        # 每个键形如 "<scorer>|<group>"，且都带 scorer/unit 字段
+        scorers = {v["scorer"] for v in st.values()}
+        units = {v["unit"] for v in st.values()}
+        self.assertGreater(len(scorers), 1, "必须保留多个 scorer（否则说明被覆盖）")
+        self.assertTrue(units <= {"logic", "taint"}, units)
+        for k, v in st.items():
+            self.assertIn("|", k)
             self.assertLessEqual(v["strict_disc"], v["n"])
+
+    def test_group_stratification_covers_all_scorers(self):
+        """五个 scorer × 两个漏洞族 = 10 个单元（v8_74 全量时）。"""
+        st = rq.strict_discrimination_by_group(self.rows, "group", seeds=self.seeds)
+        self.assertEqual(len(st), 10, sorted(st))
 
     def test_multi_seed_rows_without_explicit_seeds_fails_closed(self):
         """跨配置未指定 seeds 时必须拒绝（防 41× 重复计数）。"""
@@ -175,16 +187,19 @@ class TestReport(unittest.TestCase):
         self.assertIn("显式 vulnerable", doc["protocol"]["strict_rule"])
         self.assertIn("abstain", doc["protocol"]["lenient_note"])
 
-    def test_write_reports_creates_both(self):
+    def test_write_reports_creates_both_with_supplement_naming(self):
         import tempfile
         orig = rq.OUT
         with tempfile.TemporaryDirectory() as td:
             try:
                 rq.OUT = Path(td)
                 r = rq.write_reports()
-                self.assertTrue((Path(td) / "rq1r_report.json").exists())
-                self.assertTrue((Path(td) / "rq1r_report_public.json").exists())
+                self.assertTrue((Path(td) / "rq1r_historical_supplement.json").exists())
+                self.assertTrue((Path(td) / "rq1r_historical_supplement_public.json").exists())
                 self.assertTrue(r["public"]["anonymized"])
+                # P0-1：必须显式标注"非 canonical 正式结果"
+                self.assertTrue(r["internal"]["NOT_THE_CANONICAL_RQ1R"])
+                self.assertIn("canonical", r["internal"]["disclaimer"])
             finally:
                 rq.OUT = orig
 
