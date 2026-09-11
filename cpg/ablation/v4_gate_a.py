@@ -753,10 +753,15 @@ def build_g0_prompts(out_dir: Path) -> dict:
         code_sha = _sha256_bytes(code.encode("utf-8"))
         sel_sha = _sha256_bytes(json.dumps(selection, sort_keys=True).encode("utf-8"))
         # P0-3：selection 落盘为冻结工件，coverage 只消费它（不再各自重算）
+        from cpg.ablation import v4_selector as _sel
         write_text_lf(out_dir / "g0_selection" / f"{cve}.json",
                       json.dumps({"sample_id": cve, "code_text_sha256": code_sha,
                                   "selection_manifest": selection,
                                   "selection_manifest_sha256": sel_sha,
+                                  # P1-3：显式绑定 selector 实现 SHA（此前只记 renderer）
+                                  "selector_impl_sha256": _sel.selector_impl_sha256(),
+                                  "window": selection.get("window"),
+                                  "max_chars": selection.get("max_chars"),
                                   "renderer_impl_sha256": _sha256_bytes(
                                       (ROOT / "cpg/ablation/prompt_renderer.py").read_bytes()),
                                   "patch_sha256": _sha256_bytes(real_patch.encode("utf-8"))},
