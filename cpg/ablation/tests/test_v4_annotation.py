@@ -310,5 +310,71 @@ class TestUncertainExclusionFullChain(unittest.TestCase):
         self.assertIn("不符", str(cm.exception))
 
 
+
+
+class TestAdjudicationGaps(unittest.TestCase):
+    """缺口1/2：仲裁为 UNCERTAIN 时的 final_* 完整性 + 仲裁件内嵌 reviewer 内容绑定。"""
+
+    def _env(self):
+        from cpg.ablation.tests.test_v4_annotation import _Env
+        e = _Env()
+        roles = {"a1": va.ROLE_UNCERTAIN, "a2": va.ROLE_UNCERTAIN, "x1": va.ROLE_NONCRIT}
+        e.subs(roles, roles, r1_deps={"a1": []}, r2_deps={"a1": [e.ids["a2"]["hunk_id"]]})
+        va.disagreement_list(e.sub1, e.sub2, e.tpl, e.d / "dis.json")
+        return e
+
+    def _write_adj(self, e, mutate):
+        doc = json.loads((e.d / "dis.json").read_text(encoding="utf-8"))
+        mutate(doc)
+        (e.d / "adj.json").write_bytes(
+            (json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+        return e.d / "adj.json"
+
+    def test_partial_final_fields_with_uncertain_role_fails(self):
+        """缺口1：adjudicator 存在但只有 final_role=UNCERTAIN、其余 final_* 缺失 → 必须失败。"""
+        e = self._env()
+        adj = self._write_adj(e, lambda d: d["items"][0].update(
+            {"adjudicator": "adj1", "final_role": va.ROLE_UNCERTAIN}))
+        with self.assertRaises(ValueError) as cm:
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, adj, e.d / "frozen.json")
+        self.assertIn("缺 final 字段", str(cm.exception))
+
+    def test_tampered_embedded_reviewer_content_fails(self):
+        """缺口2：仲裁件内嵌 reviewer1 内容被替换（顶部 SHA 不变）→ 必须失败。"""
+        e = self._env()
+        def _mut(d):
+            d["items"][0]["reviewer1"]["evidence"] = "PoC"      # 篡改内嵌内容
+        adj = self._write_adj(e, _mut)
+        with self.assertRaises(ValueError) as cm:
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, adj, e.d / "frozen.json")
+        self.assertIn("内嵌", str(cm.exception))
+
+    def test_n_items_mismatch_fails(self):
+        e = self._env()
+        adj = self._write_adj(e, lambda d: d.update({"n_items": 99}))
+        with self.assertRaises(ValueError) as cm:
+            va.compile_frozen(e.tpl, e.sub1, e.sub2, adj, e.d / "frozen.json")
+        self.assertIn("n_items", str(cm.exception))
+
+    def test_complete_final_fields_uncertain_still_works(self):
+        """完整 final_* + final_role=UNCERTAIN → 正常进入 pending（不抛）。"""
+        e = self._env()
+        ids = {e.ids[k]["hunk_id"] for k in ("a1", "a2")}
+        def _mut(d):
+            d["items"][0].update({"adjudicator": "adj1", "final_role": va.ROLE_UNCERTAIN,
+                                  "final_dependency_group": [],
+                                  "final_counterfactual": "不确定",
+                                  "final_evidence": "insufficient",
+                                  "final_reason": "仍无法确定"})
+        adj = self._write_adj(e, _mut)
+        froz = va.compile_frozen(e.tpl, e.sub1, e.sub2, adj, e.d / "frozen.json",
+                                exclusions={"CVE-A": {
+                                    "reason": "两标注者均证据不足", "adjudicator": "adj1",
+                                    "evidence": "insufficient",
+                                    "source_item_ids": sorted(ids)}})
+        self.assertEqual(froz["status"], "FROZEN_WITH_EXCLUSIONS")
+        self.assertFalse(any(x["sample_id"] == "CVE-A" for x in froz["entries"]))
+
+
 if __name__ == "__main__":
     unittest.main()

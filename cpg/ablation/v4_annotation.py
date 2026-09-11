@@ -209,13 +209,24 @@ def agreement_report(sub1: Path, sub2: Path, template_path: Path) -> dict:
 _FIELD_LABELS = {"criticality": "role"}
 
 
-def disagreement_list(sub1: Path, sub2: Path, template_path: Path, out: Path) -> dict:
-    """分歧清单（JSON 对象）：**role / dependency / counterfactual / evidence 任一不一致**
-    都要进入仲裁（P0-3）。每项分别给出四类分歧标志。
+def _reviewer_projection(row: dict) -> dict:
+    """reviewer 侧的**规范化投影**（缺口2：用于比对仲裁件内嵌内容是否被篡改）。"""
+    return {"criticality": row.get("criticality"),
+            "dependency_group": sorted(row.get("dependency_group") or []),
+            "counterfactual": row.get("counterfactual"),
+            "evidence": row.get("evidence"),
+            "reason": row.get("reason")}
+
+
+def expected_disagreements(sub1: Path, sub2: Path, template_path: Path) -> dict:
+    """**纯函数**：重算当前预期的分歧映射（不写盘）。
+
+    返回 {hunk_id: item}；item 含 kind / sample_id / hunk_identity / fields_in_dispute
+    以及两侧 reviewer 的规范化投影，供编译器逐字段比对。
     """
     r1 = _index_checked(sub1, template_path, "reviewer1")
     r2 = _index_checked(sub2, template_path, "reviewer2")
-    items = []
+    out = {}
     for k in sorted(set(r1) & set(r2)):
         x, y = r1[k], r2[k]
         flags = {
@@ -233,17 +244,18 @@ def disagreement_list(sub1: Path, sub2: Path, template_path: Path, out: Path) ->
             kind = "PARTIAL_UNCERTAIN"
         else:
             kind = "DISAGREEMENT"
-        items.append({
-            "kind": kind, "sample_id": x["sample_id"], "hunk_id": k,
-            "hunk_identity": x["hunk_identity"], "fields_in_dispute": flags,
-            "reviewer1": {f: x.get(f) for f in
-                          ("criticality", "dependency_group", "counterfactual",
-                           "evidence", "reason")},
-            "reviewer2": {f: y.get(f) for f in
-                          ("criticality", "dependency_group", "counterfactual",
-                           "evidence", "reason")},
-            **{f: None for f in FINAL_FIELDS},
-        })
+        out[k] = {"kind": kind, "sample_id": x["sample_id"], "hunk_id": k,
+                  "hunk_identity": x["hunk_identity"], "fields_in_dispute": flags,
+                  "reviewer1": _reviewer_projection(x),
+                  "reviewer2": _reviewer_projection(y)}
+    return out
+
+
+def _write_disagreements(sub1: Path, sub2: Path, template_path: Path, out: Path) -> dict:
+    """落盘分歧清单（JSON 对象），供第三人仲裁。"""
+    items = list(expected_disagreements(sub1, sub2, template_path).values())
+    for it in items:
+        it.update({f: None for f in FINAL_FIELDS})
     doc = {"schema": "v4-adjudication/2",
            "template_sha256": _sha(template_path.read_bytes()),
            "submission_sha256": {"reviewer1": _sha(sub1.read_bytes()),
@@ -256,6 +268,13 @@ def disagreement_list(sub1: Path, sub2: Path, template_path: Path, out: Path) ->
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
     return doc
+
+
+def disagreement_list(sub1: Path, sub2: Path, template_path: Path, out: Path) -> dict:
+    """分歧清单（JSON 对象）：role / dependency / counterfactual / evidence 任一不一致
+    都要进入仲裁（P0-3）。每项分别给出四类分歧标志。
+    """
+    return _write_disagreements(sub1, sub2, template_path, out)
 
 
 def adjudicate(disagreements: Path, out: Path, template_path: Path,
@@ -302,23 +321,23 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
         if it.get("kind") not in ("DISAGREEMENT", "UNANIMOUS_UNCERTAIN", "PARTIAL_UNCERTAIN"):
             raise ValueError(f"仲裁件含未知 kind: {it.get('kind')}")
         adj[k] = it
-    # 施工单3：编译器**自行重算**预期分歧映射并严格比对（缺/增/改任一即 fail-closed）
-    _dis = disagreement_list(sub1, sub2, template_path,
-                             out.parent / "_expected_disagreements.json")
-    expected = {i["hunk_id"]: i for i in _dis["items"]}
+    # 施工单3 + 缺口2：编译器**自行重算**（纯函数，不写盘）并逐字段比对，
+    # 含两侧 reviewer 的规范化投影（防仲裁件内嵌内容被替换而顶部 SHA 不变）。
+    if adj_doc.get("n_items") != len(adj_doc.get("items", [])):
+        raise ValueError("仲裁件 n_items 与 items 长度不符")
+    expected = expected_disagreements(sub1, sub2, template_path)
     if set(adj) != set(expected):
         raise ValueError(f"仲裁件与当前预期分歧集合不符: 缺 {sorted(set(expected) - set(adj))[:2]}，"
                          f"多 {sorted(set(adj) - set(expected))[:2]}")
     for k, e in expected.items():
         a = adj[k]
-        if a.get("kind") != e["kind"]:
-            raise ValueError(f"仲裁件 kind 被篡改: {str(k)[:12]}")
-        if a.get("sample_id") != e["sample_id"]:
-            raise ValueError(f"仲裁件 sample_id 被篡改: {str(k)[:12]}")
-        if a.get("hunk_identity") != e["hunk_identity"]:
-            raise ValueError(f"仲裁件 hunk_identity 被篡改: {str(k)[:12]}")
-        if a.get("fields_in_dispute") != e["fields_in_dispute"]:
-            raise ValueError(f"仲裁件 fields_in_dispute 被篡改: {str(k)[:12]}")
+        for f in ("kind", "sample_id", "hunk_identity", "fields_in_dispute"):
+            if a.get(f) != e[f]:
+                raise ValueError(f"仲裁件 {f} 被篡改: {str(k)[:12]}")
+        for rv in ("reviewer1", "reviewer2"):
+            got = a.get(rv) or {}
+            if _reviewer_projection(got) != e[rv]:
+                raise ValueError(f"仲裁件内嵌 {rv} 内容与提交不符（被篡改）: {str(k)[:12]}")
 
     # ---- 逐 hunk 判定 ----
     # P0：直接维护 pending_uncertain_ids（**不再用 `k not in adj` 推导**——一致 UNCERTAIN
@@ -342,19 +361,15 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
             cf, ev, rs = x.get("counterfactual"), x.get("evidence"), x.get("reason")
         else:
             a = adj.get(k)
-            # 一致 UNCERTAIN（可伴其他字段分歧）：无论是否在 adj，都记为 pending
-            if x["criticality"] == ROLE_UNCERTAIN and y["criticality"] == ROLE_UNCERTAIN \
-                    and (a is None or not a.get("adjudicator")
-                         or a.get("final_role") == ROLE_UNCERTAIN):
-                _mark_uncertain(sid, k)
-                continue
-            if not a or not a.get("adjudicator"):
+            # 缺口1修复：先区分"未仲裁"与"已仲裁"。**凡有 adjudicator，必须先统一校验
+            # 全部 final_* 字段**，之后才按 final_role 决定确定标签或 pending UNCERTAIN。
+            if a is None or not a.get("adjudicator"):
+                # 未仲裁：一致 UNCERTAIN → pending；否则记 missing_adjudication
                 if x["criticality"] == ROLE_UNCERTAIN and y["criticality"] == ROLE_UNCERTAIN:
                     _mark_uncertain(sid, k)
                 else:
                     missing_adjudication.add(sid)
                 continue
-            # P0-4：final_* 必须完整
             need = ("final_role", "final_dependency_group", "final_counterfactual",
                     "final_evidence", "final_reason")
             miss = [f for f in need if a.get(f) is None]
@@ -362,17 +377,20 @@ def compile_frozen(template_path: Path, sub1: Path, sub2: Path, adjudicated: Pat
                 raise ValueError(f"仲裁项缺 final 字段 {miss}: {str(k)[:12]}")
             if a["final_role"] not in VALID_ROLES:
                 raise ValueError(f"仲裁 final_role 非法: {a.get('final_role')}")
-            if a["final_role"] == ROLE_UNCERTAIN:
-                _mark_uncertain(sid, k)
-                continue
             if a["final_evidence"] not in VALID_EVIDENCE:
                 raise ValueError(f"仲裁 final_evidence 非法: {a.get('final_evidence')}")
             if a["final_counterfactual"] not in VALID_COUNTERFACTUAL:
                 raise ValueError(f"仲裁 final_counterfactual 非法: {a.get('final_counterfactual')}")
+            if not isinstance(a["final_dependency_group"], list):
+                raise ValueError("仲裁 final_dependency_group 必须为列表")
+            # 校验通过后再按 final_role 分支
+            if a["final_role"] == ROLE_UNCERTAIN:
+                _mark_uncertain(sid, k)
+                continue
             role, src = a["final_role"], "adjudicated"
-            dep = a.get("final_dependency_group") or []
-            cf, ev, rs = (a.get("final_counterfactual"), a.get("final_evidence"),
-                          a.get("final_reason"))
+            dep = a["final_dependency_group"]
+            cf, ev, rs = (a["final_counterfactual"], a["final_evidence"],
+                          a["final_reason"])
             from cpg.ablation.v4_selector import is_hex64 as _hx3
             for d in dep:
                 if not _hx3(d):
