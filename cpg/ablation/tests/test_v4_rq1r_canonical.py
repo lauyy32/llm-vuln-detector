@@ -187,5 +187,53 @@ class TestCanonicalReport(unittest.TestCase):
                 rc.OUT = orig
 
 
+class TestPublishableLedger(unittest.TestCase):
+    """P1-2：干净克隆必须能从仓库独立复算主结果。"""
+
+    def test_ledger_exists_and_has_all_samples(self):
+        p = rc.OUT / "rq1r_canonical_ledger.jsonl"
+        self.assertTrue(p.exists(), "账本必须入库")
+        rows = [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
+        self.assertEqual(len(rows), 164)
+        for f in rc.LEDGER_FIELDS:
+            self.assertIn(f, rows[0], f)
+
+    def test_ledger_has_no_raw_response_text(self):
+        """账本**不得**含原始响应体（体积与发布风险）。"""
+        p = rc.OUT / "rq1r_canonical_ledger.jsonl"
+        s = p.read_text(encoding="utf-8")
+        self.assertNotIn("raw_response_text", s)
+
+    def test_manifest_records_run_artifact_shas(self):
+        mf = rc.OUT / "rq1r_canonical_manifest.json"
+        self.assertTrue(mf.exists())
+        doc = json.loads(mf.read_text(encoding="utf-8"))
+        self.assertEqual(len(doc["run_artifacts"]), 9)
+        for name, f in doc["run_artifacts"].items():
+            self.assertEqual(len(f["sha256"]), 64, name)
+        self.assertIn("reproduce", doc)
+        self.assertIn("lock_chain", doc)
+
+    def test_ledger_independently_reproduces_main_result(self):
+        v = rc.verify_ledger_reproduces()
+        self.assertTrue(v["ok"])
+        self.assertEqual(v["reproduced"]["n_pairs"], 82)
+        self.assertEqual(v["reproduced"]["strict_success"], 1)
+        self.assertEqual(v["reproduced"]["strict_ids"], ["CVE-2026-67435"])
+
+    def test_reproduce_detects_tampered_ledger(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "led.jsonl"
+            rows = [json.loads(l) for l in
+                    (rc.OUT / "rq1r_canonical_ledger.jsonl").read_text(encoding="utf-8").splitlines()
+                    if l.strip()]
+            for r in rows:                       # 把所有判定改成 abstain → 复算必变
+                r["verdict"] = "abstain"
+            p.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n",
+                         encoding="utf-8")
+            got = rc.reproduce_from_ledger(p)
+            self.assertNotEqual(got["strict_success"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

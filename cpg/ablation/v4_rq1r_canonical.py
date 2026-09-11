@@ -298,6 +298,102 @@ def build_report(publish: bool = False) -> dict:
     return doc
 
 
+LEDGER_SCHEMA = "v4-rq1r-canonical-ledger/1"
+MANIFEST_SCHEMA = "v4-rq1r-canonical-manifest/1"
+
+# 账本字段：足以**独立重算主结果**，但**不含原始响应体**（体积 + 发布风险）
+LEDGER_FIELDS = ("sample_id", "side", "arm", "repeat", "verdict",
+                 "raw_response_sha256", "prompt_sha256", "system_sha256",
+                 "model_digest", "prompt_eval_count", "parse_status")
+
+
+def write_publishable_ledger(out_dir: Path | None = None) -> dict:
+    """把**最小可复算账本**与**生成清单**写入仓库（P1-2）。
+
+    目的：干净克隆也能拿到足以重算主结果的字段与全部输入 SHA
+    （运行目录位于未跟踪的 `.work/`，不可依赖）。
+
+    账本**不含** `raw_response_text`（体积与发布风险）——因此它能复算
+    `verdict → 主结果`，但**不能**独立复核 `verdict` 是否忠实于原始响应；
+    后者需要运行目录，本清单记录其 SHA 以便追溯。
+    """
+    run_dir = RUN_DIR
+    chain = verify_lock_chain(run_dir)
+    results = _read_jsonl(run_dir / "results.jsonl")
+    out = out_dir or OUT
+    out.mkdir(parents=True, exist_ok=True)
+
+    ledger_path = out / "rq1r_canonical_ledger.jsonl"
+    lines = []
+    for r in results:
+        row = {k: r.get(k) for k in LEDGER_FIELDS}
+        lines.append(json.dumps(row, ensure_ascii=False, sort_keys=True))
+    ledger_path.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
+
+    main = classify_pairs(build_pairs(results))
+    summary = _read_json(run_dir / "summary.json")
+    errs = reconcile_with_summary(main, summary)
+    if errs:
+        raise ValueError("账本自检失败（与 summary 不符）: " + "; ".join(errs))
+
+    manifest = {
+        "schema": MANIFEST_SCHEMA,
+        "artifact_kind": "canonical_rq1r_publishable_ledger",
+        "purpose": ("让干净克隆能独立复算 canonical RQ1-R 主结果；"
+                    "原始响应体不入库（见 run_artifacts 的 SHA 以便追溯）"),
+        "ledger": _fp(ledger_path),
+        "ledger_fields": list(LEDGER_FIELDS),
+        "expected_main_result": {k: main[k] for k in
+                                 ("n_pairs", "strict_success", "rate", "strict_ids",
+                                  "same_verdict", "abstain_assisted")},
+        "summary_source": summary,
+        "lock_chain": {
+            "git_commit": chain["git_commit"], "reviewer": chain["reviewer"],
+            "lock_request_sha256": chain["lock_request_sha256"],
+            "file_checks": chain["file_checks"],
+        },
+        "run_artifacts": {n: _fp(run_dir / n) for n in
+                          ("protocol.json", "lock_request.json", "review_approval.json",
+                           "summary.json", "state.json", "results.jsonl", "run_schedule.json",
+                           "prompt_manifest.jsonl", "cpg_bundle.json")},
+        "reproduce": ("读取 ledger + 按 side 组对 → vuln==vulnerable 且 fixed==benign 计数 "
+                      "→ 与 expected_main_result 对账"),
+        "note": ("账本能复算 verdict→主结果；**不能**独立复核 verdict 对原始响应的忠实性"
+                 "（原始响应体未入库）。完整运行目录的 SHA 见 run_artifacts。"),
+    }
+    (out / "rq1r_canonical_manifest.json").write_bytes(
+        (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    return {"ledger": ledger_path, "manifest": manifest}
+
+
+def reproduce_from_ledger(ledger_path: Path | None = None) -> dict:
+    """从**账本**独立复算主结果（不依赖运行目录）。"""
+    p = ledger_path or (OUT / "rq1r_canonical_ledger.jsonl")
+    if not p.exists():
+        raise FileNotFoundError(f"缺账本: {p}")
+    rows = [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
+    return classify_pairs(build_pairs(rows))
+
+
+def verify_ledger_reproduces() -> dict:
+    """账本复算结果必须与 manifest.expected_main_result 一致（fail-closed）。"""
+    mf = OUT / "rq1r_canonical_manifest.json"
+    if not mf.exists():
+        raise FileNotFoundError("缺 manifest（请先 write_publishable_ledger）")
+    doc = json.loads(mf.read_text(encoding="utf-8"))
+    got = reproduce_from_ledger(OUT / doc["ledger"]["name"])
+    want = doc["expected_main_result"]
+    errs = [f"{k}: 账本 {got.get(k)} != 期望 {want[k]}"
+            for k in ("n_pairs", "strict_success", "strict_ids",
+                      "same_verdict", "abstain_assisted")
+            if got.get(k) != want[k]]
+    if errs:
+        raise ValueError("账本复算失败（fail-closed）: " + "; ".join(errs))
+    return {"ok": True, "reproduced": {k: got[k] for k in
+                                       ("n_pairs", "strict_success", "rate",
+                                        "strict_ids")}}
+
+
 def write_reports() -> dict:
     internal = build_report(publish=False)
     public = build_report(publish=True)

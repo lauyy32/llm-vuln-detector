@@ -1,0 +1,144 @@
+{
+  "schema": "v4-rq1r-canonical-manifest/1",
+  "artifact_kind": "canonical_rq1r_publishable_ledger",
+  "purpose": "让干净克隆能独立复算 canonical RQ1-R 主结果；原始响应体不入库（见 run_artifacts 的 SHA 以便追溯）",
+  "ledger": {
+    "name": "rq1r_canonical_ledger.jsonl",
+    "bytes": 80743,
+    "lines": 164,
+    "sha256": "8f624a4d5d3091560c27fdd4f8d0d29881af1ae071f0a800b8aedd1c321dec00"
+  },
+  "ledger_fields": [
+    "sample_id",
+    "side",
+    "arm",
+    "repeat",
+    "verdict",
+    "raw_response_sha256",
+    "prompt_sha256",
+    "system_sha256",
+    "model_digest",
+    "prompt_eval_count",
+    "parse_status"
+  ],
+  "expected_main_result": {
+    "n_pairs": 82,
+    "strict_success": 1,
+    "rate": 0.012195,
+    "strict_ids": [
+      "CVE-2026-67435"
+    ],
+    "same_verdict": 76,
+    "abstain_assisted": 13
+  },
+  "summary_source": {
+    "n_pairs": 82,
+    "strict_success": 1,
+    "rate": 0.0122
+  },
+  "lock_chain": {
+    "git_commit": "ec948e00bae4bd3fd9fb49540ac28dad6dff9589",
+    "reviewer": "Codex-independent-review-2026-09-10",
+    "lock_request_sha256": "90bd35c0e41d10fa3201746482cd2811e03a16985d2fdbe35c79d02a68300586",
+    "file_checks": [
+      {
+        "name": "canonical_manifest",
+        "base": "repo",
+        "ok": true,
+        "sha256": "113ee1468dbbf01afd1c468d0e230d528f2b213c39e651e9b4d558075e50a391",
+        "normalized_lf": true,
+        "crlf_present": false
+      },
+      {
+        "name": "protocol",
+        "base": "run",
+        "ok": true,
+        "sha256": "3a663e981adb02b35a5f7f698032c3cd3c658c32361a9ae182103aafbd5ac553",
+        "normalized_lf": true,
+        "crlf_present": true
+      },
+      {
+        "name": "prompt_manifest",
+        "base": "run",
+        "ok": true,
+        "sha256": "b475ccdb3ec8eb6551937a64bc8641759914906ee1dc8256f836af3e6b681e6a",
+        "normalized_lf": true,
+        "crlf_present": true
+      },
+      {
+        "name": "run_schedule",
+        "base": "run",
+        "ok": true,
+        "sha256": "0e0de5f3ebf986e5ec54f079303515e218071ad6acc5abd1898c5952ab6ef6cf",
+        "normalized_lf": true,
+        "crlf_present": true
+      },
+      {
+        "name": "cpg_bundle",
+        "base": "run",
+        "ok": true,
+        "sha256": "ce4abf4bf7dda7ae3aa7c2467ed2aed0e95a77da001673174f10bdce53b2c226",
+        "normalized_lf": true,
+        "crlf_present": true
+      }
+    ]
+  },
+  "run_artifacts": {
+    "protocol.json": {
+      "name": "protocol.json",
+      "bytes": 1165,
+      "lines": 21,
+      "sha256": "6421193668d80c9ade6c93d8aae31e8e6015ff26342b66ef0d67a23cba9a6271"
+    },
+    "lock_request.json": {
+      "name": "lock_request.json",
+      "bytes": 1069,
+      "lines": 32,
+      "sha256": "1bc6473adfb5cda29e6a35a35c0cdd35b789307f335458a1c2b158447fed5a22"
+    },
+    "review_approval.json": {
+      "name": "review_approval.json",
+      "bytes": 304,
+      "lines": 7,
+      "sha256": "83df10f55b253e852e43726de447a076b8e7a69416904335a6991e7b5eb80135"
+    },
+    "summary.json": {
+      "name": "summary.json",
+      "bytes": 64,
+      "lines": 4,
+      "sha256": "56de4fdfb278e56543880cf8c43f5cdef1b8933f59c0a44827a327f3fdb334e7"
+    },
+    "state.json": {
+      "name": "state.json",
+      "bytes": 217,
+      "lines": 6,
+      "sha256": "4967b91f8a6d911409f7fc18a8fc08fb8b1d6385831fa6bdd9715cee6dc95f66"
+    },
+    "results.jsonl": {
+      "name": "results.jsonl",
+      "bytes": 5371433,
+      "lines": 164,
+      "sha256": "fb2aac5a2977a85134c4105d988f0b88de34d9179ae2cf754dd95536671fe043"
+    },
+    "run_schedule.json": {
+      "name": "run_schedule.json",
+      "bytes": 14351,
+      "lines": 821,
+      "sha256": "5c30d2df5479fd4e0b61f26373e3b840770fc39de4609c8b34b545a508c64746"
+    },
+    "prompt_manifest.jsonl": {
+      "name": "prompt_manifest.jsonl",
+      "bytes": 167500,
+      "lines": 164,
+      "sha256": "2e21aa2bd7726e8fb8a6c879c2b4a0f3cf35d534c9775f810dda94ce2c0ac0d1"
+    },
+    "cpg_bundle.json": {
+      "name": "cpg_bundle.json",
+      "bytes": 7193,
+      "lines": 79,
+      "sha256": "f8d1287c79306d1f53426478de0b568763bd24938ede738c82c500a74efd5dcf"
+    }
+  },
+  "reproduce": "读取 ledger + 按 side 组对 → vuln==vulnerable 且 fixed==benign 计数 → 与 expected_main_result 对账",
+  "note": "账本能复算 verdict→主结果；**不能**独立复核 verdict 对原始响应的忠实性（原始响应体未入库）。完整运行目录的 SHA 见 run_artifacts。"
+}
