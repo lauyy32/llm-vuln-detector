@@ -88,9 +88,12 @@ def _git(*args: str, raw: bool = False):
     return r.returncode, (r.stdout or b"").decode("utf-8", errors="replace").strip()
 
 
-def require_source_commit(source_commit: str | None, files: list) -> dict:
+def require_source_commit(source_commit: str | None, files: list,
+                          outputs: list | None = None) -> dict:
     """fail-closed：校验 source_commit 存在 / 工作树干净 / HEAD 一致 / blob 一致。
 
+    `outputs`：本轮**将要写出**的工件路径 —— 这些文件的未提交状态不计入"脏"
+    （否则同一轮内先写 A 再生成 B 会因 A 而失败）。
     任一条不成立即抛异常（**不再允许 UNSPECIFIED 或随意传入**）。
     """
     if not source_commit:
@@ -99,8 +102,17 @@ def require_source_commit(source_commit: str | None, files: list) -> dict:
     if rc != 0:
         raise ValueError(f"source_commit 不存在: {source_commit}")
     rc, dirty = _git("status", "--porcelain")
-    if rc != 0 or dirty:
-        raise ValueError(f"工作树不干净，禁止冻结（dirty={dirty[:120]!r}）")
+    if rc != 0:
+        raise ValueError("无法读取 git 状态")
+    if dirty:
+        allow = {_rel(x) for x in (outputs or [])}
+        leftover = []
+        for ln in dirty.splitlines():
+            path = ln[3:].strip().strip('"')
+            if path and path not in allow:
+                leftover.append(path)
+        if leftover:
+            raise ValueError(f"工作树不干净（非本轮产物）: {leftover[:5]}")
     rc, head = _git("rev-parse", "HEAD")
     if rc != 0 or head != source_commit:
         raise ValueError(f"HEAD({head[:12]}) != source_commit({source_commit[:12]})")
@@ -133,7 +145,8 @@ def distribution_registry(source_commit: str) -> dict:
         "reviewer2": payload_common + [ANN / "critical_hunks.reviewer2.jsonl"],
     }
     files = sorted({p for v in per_reviewer.values() for p in v} | set(INTERNAL_PROVENANCE))
-    prov = require_source_commit(source_commit, files)
+    prov = require_source_commit(source_commit, files,
+                                  outputs=[ANN / "distribution_registry.json"])
 
     payload_docs, trees = {}, {}
     for who, ps in per_reviewer.items():
@@ -195,7 +208,8 @@ PREREG_STATUS = "DRAFT_PREREG"
 
 def prereg(source_commit: str) -> dict:
     doc_path = ROOT / "cpg/ablation/V4-四臂算法预注册.md"
-    prov = require_source_commit(source_commit, [doc_path])
+    prov = require_source_commit(source_commit, [doc_path],
+                                 outputs=[OUT / "v4_prereg.json"])
     doc = {
         "schema": "v4-prereg/3",
         "status": PREREG_STATUS,
